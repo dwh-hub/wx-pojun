@@ -1,0 +1,1632 @@
+// 原来会员端的css样式
+
+.pl{
+	float:left;
+}
+.pr{
+	float:right;
+}
+.pb{
+	clear:both;
+}
+#memberClassDetail{
+	z-index: 2000;
+}
+.noUpload{
+	text-align:center;
+	linr-height:210px;
+}
+.activeImg{
+    border-bottom: 1px solid #eeeeee;	
+}
+.storeDetailDiv{
+	position: absolute;
+    width: 100%;
+    top: 46px;
+    bottom: 0px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+/* 底部图片
+.memberIndexImg{
+	background:url(/assets/img/menberBottom.png) 10px center no-repeat;
+}
+.memberIndexClickImg{
+	background:url(/assets/img/menberBottom.png) 10px center no-repeat;
+}
+
+ */
+
+/* 门店选中 */
+.blue{
+	color: #5db2ff!important;
+	border: 1px solid #5db2ff !important;
+}
+#memberIndexTab, #memberIndexDetail, #memberActiveTab, #memberActiveDetail, #memberClassTab{
+	z-index:2000;
+}
+/* 返回样式 */
+.backs{
+	position: absolute;
+    top: 8px;
+    left: 10px;
+    color: #505050;
+    width: 57px;
+    text-align: center;
+    height: 29px;
+    border-radius: 3px;
+    background: white;
+    line-height: 27px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+/* 底部点击 */
+.buttomClick{
+	color:#2193fa !important;
+}
+
+/* 标题 */
+.top_name{
+	width:100%;
+	text-align:center;
+	height:46px;
+	line-height:46px;
+	font-size: 15px;
+	border-bottom: 1px solid #eeeeee;
+}
+.top{
+	width:100%;
+	text-align:center;
+	height:46px;
+	line-height:46px;
+	background:white;
+	border-bottom: 1px solid #EDEDED;
+	font-weight: normal;
+}
+#memberIndexTab, #memberActiveTab, #memberClassTab, #memberMessageTab, #memberMineTab{
+	position:fixed;
+	top:0px;
+	bottom:66px;
+	width:100%;
+    background: white;
+}
+#memberComes{
+	display:none;
+	position:fixed;
+	top:0px;
+	bottom:66px;
+	width:100%;
+    background: white;
+    z-index:1000;
+    border-bottom: 1px solid #eeeeee;
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+   	display:none;
+}
+#memberActiveDetail, #memberIndexDetail, #memberMessageDetail, #memberClassDetail, #memberClassTime, #memberClassSuccess, #memberMineDetail{
+	position:fixed;
+	top:0px;
+	bottom:66px;
+	width:100%;
+    background: white;
+    transform: translate(1000px, 0px);
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+}
+#memberActiveTab, #memberClassTab, #memberMessageTab, #memberMineTab{
+	display:none;
+}
+.selectCompany{
+    background-color: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    width: 100%;
+    top: 0px;
+    bottom: 66px;
+    z-index: 1001;
+    display:none;
+}
+#companyList p{
+	width:100%; text-align:center;
+}
+#companyList{
+    position: fixed;
+    top: 50px;
+    width: 90%;
+    height: auto;
+    margin: 0 5%;
+    background: white;
+    border-radius: 6px;
+    z-index: 2010;
+    padding-bottom: 4px;
+    display: none;
+    padding: 15px;
+}
+#companyList span{
+	display: block;
+    height: 40px;
+    line-height: 40px;
+    width: 100%;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #cccccc;
+    margin-top: 20px;	
+}
+.company_detail{    
+	position: absolute;
+    top: 233px;
+    height: 95px;
+    padding: 10px 15px;
+    width: 100%;
+    border-bottom: 8px solid #f3f3f3;
+}
+#company_img, #company_imgs{
+	width:65px;
+	height:65px;
+    border-radius: 5px;    
+    border: 1px solid #eeeeee;
+    display: block;
+    margin: auto;
+}
+.title_img{
+	margin-top:30px;
+}
+.hello{
+	padding: 10px 15px;
+	border-bottom: 1px solid #eeeeee;
+}
+.boundDiv{
+	height:46px;
+	width:100%;
+	border-bottom:1px solid #eeeeee;
+}
+.showTooltips{
+	background-color: #1aad19;
+	display:block;
+	width:90%;
+	margin:auto;
+	text-align:center;
+	height:45px;
+	line-height:45px;
+	color:white;
+	border-radius: 5px;
+    margin-top: 15px
+}
+#yz_btn{
+	width: 30%;
+    padding: 0;
+    height: 45px;
+    border-left: 1px solid #e5e5e5;
+    background:white;
+    line-height: 46px;
+    font-size: 17px;
+    color: #3cc51f;
+}
+#codeText{
+	width:100%;
+	box-shadow: none;
+}
+#boundPhone{
+	width:50%;
+	box-shadow: none;
+}
+.boundDiv span{
+	display:block;
+	width:20%;
+	height:45px;
+	line-height:45px;
+	padding-left:15px;
+}
+.boundDiv botton{
+}
+.boundDiv input{
+	height:45px;
+	line-height:45px;
+	padding-left:15px;
+	border:none;
+	background:initial;
+}
+.hello span {
+    display: block;
+    width: 100%;
+    text-align: center;
+    height: 36px;
+    line-height: 36px;
+    background: #98caff;
+    color: white;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+#company_titles{
+	width:100%;
+	text-align:center;
+	margin-top:10px;
+}
+.company_text{
+	width:75%;
+    padding-left: 15px;
+}
+.companyImg_div{
+}
+.company_title, #company_titles{
+	font-size:16px;
+}
+.company_intro{
+	font-size:12px;
+    height: 32px;
+    overflow: hidden;
+    margin-top: 7px;
+    letter-spacing: 1px;
+    line-height: 17px;
+}
+.more_Company{
+	position: absolute;
+    top: 330px;
+    width: 100%;
+}
+.topTwo{
+	position:absolute;
+	top: 46px;
+    bottom:0px;
+	width: 100%;
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+}
+.moreCompanyBlue{
+	position: absolute;
+    width: 5px;
+    height: 24px;
+    background: #2193fa;    
+    border-radius: 9px;    
+    top: 10px;
+    left: 15px;
+}
+.more_CompanyTitle{
+	padding-left:12px;
+	font-size:15px;    
+	height: 27px;
+    line-height: 24px;    
+    margin: 10px 15px;
+}
+#store_img{
+	width: 96px;
+    height: 66px;
+}
+.moreCompanyImg_div{
+}
+.moreCompany_text{
+	padding-left: 11px;
+    width: 66%;
+    overflow: hidden;
+    height: 67px;
+}
+.moreCompany_title{
+	font-size: 15px !important;
+    font-weight: bold;
+}
+.moreCompany_text div{
+	margin-bottom:5px;
+	font-size:13px
+}
+.moreCompany_list{
+}
+.moreCompany_detail{
+	padding:0 15px;
+    height: 76px;
+    border-bottom: 1px solid #eeeeee;    
+    margin-top: 12px;
+}
+#memberMessage{
+	position:relative;
+}
+.messageCount{
+	position: absolute;
+    width: 22px;
+    height: 22px;
+    text-align: center;
+    background: #EF4F4F;
+    border-radius: 50%;
+    color: white;
+    right: 10px;
+    top: 2px;
+    font-size: 12px;
+    line-height: 22px;
+    display:none;
+}
+.index_bottom{
+	position:fixed;
+	bottom:0px;
+	width:100%;
+	height:66px;
+	background:white;
+    border-top: 1px solid #eeeeee;
+}
+.index_bottom div{
+	display:block;
+	width:20%;
+	float:left;
+	text-align:center;
+	color:#8a8a8a;
+	padding: 10px 0px;
+}
+.index_bottom span{
+	display:block;
+	width:100%;
+	text-align:center;
+	color:#8a8a8a;    
+	margin-top: 5px;
+}
+.index_bottom img{
+	width:23px;
+	height:23px;
+	margin:auto;    
+}
+.clickImg{
+	display:none;
+}
+/* 我的 */
+.mine_top{
+	padding:20px 30px;
+	height:110px;
+}
+.mineImgDiv{
+	border-radius:50%;
+}
+#mineImg{
+	width:66px;
+	height:66px;
+    border-radius: 5px;
+}
+#carMineImg{
+	width:60px;
+	height:60px;
+    border-radius: 50%;
+}
+.mineDetail{
+	margin:13px 0 0 15px;
+}
+.mineDetail p{
+	margin:-5px 0 10px 0;
+	font-size: 15px;
+}
+.detail_list {
+    height: 46px;
+    border-bottom: 1px solid #EDEDED;
+    font-size:15px;
+}
+.detail_list span {
+    display: block;
+    line-height: 46px;
+}
+.detail_title {
+    float: left;
+    margin-left: 10px;
+    color: #515151;
+}
+.detail_contrnt {
+    float: right;
+    margin-right: 15px;
+}
+.mineDeail{
+	border-top: 10px solid #f4f4f4;
+}
+.detail_list img{
+	width: 36px;
+    float: left;
+    padding: 12px 0 12px 15px;
+}
+#mineExit{
+	width: 92%;
+    height: 40px;
+    line-height: 40px;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    background: #5db2ff;
+    position: absolute;
+    bottom: 15px;
+    left: 4%;
+}
+/* 会员卡详情 */
+#carNames{
+	font-size:15px;
+}
+.blanceRecode{
+	width:90%;
+	margin:auto;
+}
+.mineCarDeail{
+	width:90%;
+	margin:auto;
+	clear:both;
+	padding-top: 15px;
+}
+.menberCarCountDetailMain{
+	position:absolute;
+	top: 46px;
+	bottom:0px;
+	width:100%;
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+}
+.blanceRecode div{
+	width:50%;
+	float:left;
+    height: 60px;
+}
+.blanceRecode div:nth-child(1){
+	border-right:1px solid #eeeeee;
+}
+.blanceRecode span{
+	display:block;
+	width:100%;
+	text-align:center;
+	line-height: 30px;
+	color: #939393;
+}
+#blanceAuthoritys, #useAuthority{
+	font-size:18px;
+	color: #303030;
+}
+
+.cards{
+	position:absolute;
+	top:46px;
+	bottom:0px;
+	overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.menberCarCountList, .memberMineAppointment{
+	position:absolute;
+	top:0px;
+	bottom:0px;
+	display:none;
+	width: 100%;
+}
+.menberCarCountDetail{
+	position:absolute;
+	top:0px;
+	bottom:0px;
+	width:100%;
+    background: white;
+    transform: translate(1000px, 0px);
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+}
+.memberMineCarDetail{
+	position: relative;
+    margin: 15px 30px;
+    /* height: 170px; */
+    border-radius: 7px;
+    box-shadow: 1px 2px 2px #929292;
+}
+.priceCar{
+    background: linear-gradient(to left top, #37d8a9, #0dbbc9)/* linear-gradient(to left top, #54d44c, #4ccc9c) *//* linear-gradient(to left top, #e98bfb, #923bfb) */;
+}
+.priceColor{
+	color: #37d8a9;
+}
+    
+.dateCar{
+    background: linear-gradient(to left top, #ffc66c, #ff8851);
+}
+.dateColor{
+	color: #ffc66c;
+}
+.numCar{
+    background: linear-gradient(to left top, #a7d0f6, #1c9efe)/* linear-gradient(to left top, #54d44c, #4ccc9c) */;
+}
+.numColor{
+	color: #a7d0f6;
+}
+.canNotCar{
+	background: linear-gradient(to left top, lightgray, gray);
+}
+.disColor{
+	color: #b1b1b1;
+}
+
+.memberMineCarbg{
+	width: 100%;
+    margin: auto;
+    /* height: 197px; */
+    border-radius: 7px;
+}
+.memberCarDetail_main{
+	position: absolute;
+    top: 20px;
+    padding: 0px 15px;
+    bottom:0px;
+    width: 100%;
+    color: white;
+}
+
+.memberCarDetail_bottom{
+	position: absolute;
+    left: 0px;
+    padding: 0 15px;
+    width: 100%;
+    bottom: 10px;
+}
+.cardClassName{
+	font-size: 16px;
+    font-weight: bold;
+    margin: 0 0 0;
+    color: white;
+}
+.masterClassName{
+	float: right;
+    display: block;
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 3px;
+    font-size: 13px;
+}
+#balanceAuthority{
+    font-size: 15px;
+    padding:0 5px;
+}
+.balanceAuthority{
+	clear: both;
+    padding-left: 0px;
+    font-size: 19px;
+    float:left;
+}
+.authorityUnit{
+    padding-left: 0px;
+    font-size: 15px;
+    float:left;
+}
+.carDetailClick{
+	display: block;
+    float: right;
+    width: 67px;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    background: white;
+    border-radius: 13px;
+    font-size: 12px;
+}
+/* 会员卡详情结束 */
+/* 预约历史 */
+.oppiontHistory_time{
+	position:absolute;
+	width:100%;
+	top:46px;
+	bottom:0px;
+}
+/* 预约历史结束 */
+
+/* 活动 */
+.activeList{
+	position:absolute;
+	top:46px;
+	bottom:0px;
+	width:100%;
+	padding:0 15px;
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+   	
+}
+.activeDetail{
+	width: 100%;
+    margin-top: 20px;
+    box-shadow: 1px 3px 10px #c5c5c5;
+    border-radius: 5px;
+}
+.activeImg img{
+	height:170px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+.activeDetailBottom{
+	height: 65px;
+}
+.activeDetailBottom p{
+	margin:0 0 0 0;
+}
+.activeTitle{
+	font-size: 16px;
+    font-weight: bold;
+    padding: 10px 5px 5px 10px;
+}
+.activeContent{
+	font-size: 15px;
+    padding-left: 10px;
+    color:#afafaf;
+}
+#memberActiveDetail img{
+	
+}
+
+/* 活动详情 */
+.PJ_mobile_content{
+	position: absolute;
+    top: 46px;
+    bottom:0px;
+}
+.content_head{
+	height: 46px;
+    line-height: 46px;
+    color: #fff;
+    position: relative;
+    padding-left: 48px;
+    padding-right: 50px;
+    font-size: 1.5rem;	
+}
+.PJ_mobile_content .content_head img{
+    position: absolute;
+    left: 15px;
+    top: 15px;
+    width: 40px;
+    height: 40px;
+    margin-top: -12px;
+    border-radius: 5px;	
+}
+#activeCompanyName{
+	height: 46px;
+    line-height: 46px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    color:#333333;
+}
+.content_head span{
+	position: absolute;
+    right: 15px;
+    color: #333333;
+    top: 0px;
+}
+.activeTitles{
+	margin: 0px 15px;
+    text-align: center;
+    height: 40px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+    font-weight: bolder !important;
+    line-height: 40px;
+    font-size: 15px;
+    color: #565656;
+}
+.intro{
+	margin: 0 15px;
+    font-size: 14px;
+    color: #666;
+    height: 25px;
+    line-height: 25px;
+    margin-top: 15px;
+}
+.activeDetails{
+	border-top:5px solid #F4F4F4;
+	padding:0 15px;
+}
+.detail_header h6{
+	color: #333;
+    padding-left: 5px;
+    border-width: 0 0 0 2px;
+    border-style: solid;
+    font-size: 14px;
+    font-weight: 500!important;
+}
+.activeMainDetail{
+	margin-top:10px;
+	border-top:1px solid #eeeeee;
+	padding:10px;
+}
+/* 活动详情结束 */
+/* 签到记录 */
+.costCountDetailMain, .oppiontCountMain, .menberClassCountMain{
+	position: absolute;
+    top: 46px;
+    bottom: 0px;
+    width: 100%;
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+}
+.costRecordMain{
+	height:80px;
+	border-bottom:1px solid #eeeeee;
+	padding: 10px 5px;
+}
+.carTitleTime{
+	float:left;
+	padding-left:15px;
+}
+.carTitleTime p{
+	margin:5px 0 0 0;
+}
+.carCost{
+	float:right;
+	padding-right: 10px;
+	padding-top: 20px;
+    font-size: 18px;
+}
+/* 签到记录结束 */
+
+/* 消息详情 */
+.memberMessageDetail p{
+	margin:0px;
+	
+}
+#messageDetailContent{
+	clear:both;
+	line-height: 26px;
+}
+#messageDetailTitle{
+	float: left;
+    font-weight: bold;
+    font-size: 15px;
+}
+#messageDetailTime{
+	float:right;
+}
+/* 消息 */
+.messageDetailMain{
+	margin: 15px;
+    border: 1px solid #e6e6e6;
+    border-radius: 15px;
+    padding: 15px;
+}
+#turnRead{
+	position: absolute;
+    top: 8px;
+    right: 15px;
+    color: white;
+    width: 73px;
+    text-align: center;
+    height: 30px;
+    border-radius: 5px;
+    line-height: 30px;
+    background: #2ab4fc;
+    font-size: 12px;
+}
+#faceCarSure{
+	position: absolute;
+    top: 8px;
+    right: 15px;
+    color: white;
+    width: 55px;
+    text-align: center;
+    height: 30px;
+    border-radius: 5px;
+    line-height: 30px;
+    background: #2ab4fc;
+    font-size: 12px;
+}
+.readClick{
+	border-bottom:2px solid #2193fa;
+	color: #2193fa !important;
+}
+.isRead span{
+	height:40px;
+	line-height:40px;
+	width:50%;
+	text-align:center;
+	float:left;
+}
+#search_bar {
+    height: 46px;
+    margin-top: -1px;
+}
+.weui_search_text {
+    font-weight: normal;
+    top: 5px !important;
+}
+.weui_search_inner .weui_icon_search, .weui_search_inner .weui_icon_clear {
+    top: 7px !important;
+}
+.unreadMain, .readMain{
+	position:absolute;
+	top:132px;
+	bottom:0px;
+	width:100%;
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+}
+.readMain{
+    transform: translate(1000px, 0px);
+}
+.unreadDetail, .readDetail{
+	height: 86px;
+    border-bottom: 1px solid #eeeeee;
+    padding: 10px 15px;
+    position:relative;
+}
+.unread_bottom, .read_bottom, .oppiont_bottom, .menberClass_bottom, .active_bottom, .leagueClass_bottom{
+	height:50px;
+	clear: both;
+}
+.dropload-load{
+	display:none;
+}
+.messageTime {
+	position:absolute;
+	top:19px;
+	right:15px;
+    font-size: 15px;
+}
+.unreadImgDiv, .readImgDiv{
+	width: 60px;
+    height: 60px;
+    background: #f0f0f2;
+    border-radius: 50%;
+    float:left;
+}
+.unreadImgDiv img, .readImgDiv img{
+	padding: 12px;
+}
+.messageContent p{
+	margin:0 0 3px 0;
+}
+.messageContent{
+	width: 73%;
+    margin-left: 12px;    
+    margin-top: 10px;
+    float:left;
+}
+.messageSome{
+	clear:both;
+    width: 100%;
+    height: 20px;
+    overflow: hidden;
+    margin-top: 7px !important;
+}
+.messageTitle{
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* 预约列表 */
+.oppiontDetail{
+	height:93px;
+	border-bottom:1px solid #eeeeee;
+	clear: both;
+}
+.oppiontTime{
+	height:93px;
+	width: 77px;
+	float:left;
+	border-right:1px solid #eeeeee;
+	padding-top: 20px;
+	position: relative;
+}
+.oppiontTime p{
+	text-align:center;
+	margin: 0 0 5px;
+}
+.oppiontHour{
+	font-size: 19px;
+}
+.oppiontDay{
+	font-size: 15px;
+	color: #909090;
+}
+.oppiontCarDetail{
+	float:left;
+	padding:10px 20px;
+}
+.oppiontCarDetail p{
+	    margin: 0 0 3px;
+}
+.oppiontCarName{
+	font-size: 16px;
+    font-weight: bold;
+    color: #363636;
+}
+.oppiontTimeDetail{
+	font-size: 15px;
+	color: #909090;
+}
+.oppiontstatus{
+	display: block;
+    width: 48px;
+    text-align: center;
+    line-height: 20px;
+    margin: auto;
+    background: #70b624;
+    color: white;
+    border-radius: 4px;
+    font-size: 12px;
+}
+.oppiontDot{
+	position: absolute;
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    right: -4px;
+    top: 43px;
+    background: #70b624;
+}
+.Dotgreen{
+    background: #70b624;
+}
+.Dotred{
+    background: #EF4F4F;
+}
+.Dotblue{
+    background: dodgerblue;
+}
+/* 预约列表结束 */
+
+/* 团课列表 */
+.leagueClass_datail{
+	height:100px;
+	border-bottom:1px solid #eeeeee;
+	padding:15px;
+}
+.leagueClass_datail p{
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.leagueClass_datail p:nth-child(1){
+	font-size:17px;
+}
+.leagueClass_datail p:nth-child(2){
+	margin-top:5px;
+}
+.leagueClass_datail p:nth-child(3){
+	margin-top:5px;
+	color:#b9b9b9;
+}
+.leagueClass_datail p{
+	margin:0px;
+}
+.leagueClass_status{
+	color: #5db2ff;
+    line-height: 62px;
+    float: right;
+}
+.teamClassImg{
+	width:60px;
+	height:60px;
+	margin-top:5px;
+	margin-right: 10px;
+}
+/* 团课列表结束 */
+
+/* 门店详情 */
+.facilityDetails{
+	display:none;
+}
+#detailStoreImg{
+	border-radius:50%;
+	width: 66px;
+    height: 66px;
+}
+.swiper-containercoach span{
+	display:block;
+	text-align:center;	
+}
+.topImg{
+	width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    box-shadow: 1px 1px 5px #8e8e8e;
+}
+.indexDetailTop{
+	padding:15px;
+	height: 98px;
+}
+.storeName{
+	font-size: 17px;
+    line-height: 67px;
+    margin-left: 15px;
+}
+.store{
+	width:20%;
+	float:left;
+	margin-top: 3px;
+}
+.store_imgs{
+	height:90px;
+	border-radius: 6px;
+}
+.storeImg_list{
+	height:95px;
+	padding:0 10px;
+	overflow: hidden;
+}
+.storePlice{
+	padding: 15px;
+    height: 86px;
+}
+.plice{
+	width:40px;
+	padding-left: 6px;
+}
+.storePhone{
+	width: 50px;
+    border-left: 1px solid #bbbbbb;
+    height: 60px;
+    padding: 17px 0 0 20px;
+}
+.typcns:before{
+	font-size:25px !important;
+	line-height:56px !important;
+}
+.glyphicon-earphone{
+	font-size: 22px;
+    color: #43a3fb;
+}
+.facility{
+	position:relative;
+	border-top:10px solid #eeeeee;
+}
+.storeCoach{
+	position:relative;
+	clear: both;
+	overflow: hidden;
+}
+.facilityTitle, .storeCoachTitle{
+	padding-left: 30px;
+    line-height: 46px;
+    font-size: 16px;
+}
+.facilityDetail{
+	
+}
+.facilityDetail div{
+	width:25%;
+	height:60px;
+	float:left;
+	margin-bottom: 13px;
+}
+.facilityDetail img{
+	width: 26%;
+    margin: 0 37%;
+}
+.facilityDetail span{
+	display:block;
+	width: 100%;
+	text-align:center;
+	margin-top: 5px;
+} 
+/* 教练列表 */
+.coach_list{
+	padding:15px;
+	height:110px;
+}
+/* 教练 */
+.coach_img{
+	border-radius: 5px;
+    width: 50px;
+    height: 50px;
+}
+.swiper-containercoach span{
+	display: block;
+    margin-top: 5px;
+}
+
+/* 头像管理 */
+.showHeadImg{
+	width:100%;
+	height:135px;
+	padding: 20px 0px;
+	border-bottom:1px solid #eeeeee;
+}
+.showHeadImg img{
+	height: 66px;
+    width: 66px;
+    margin: auto;
+    display: block;
+    border-radius: 5px;
+}
+.showHeadImg p{
+	width:100%;
+	text-align:center;
+	width: 100%;
+    margin: 10px 0 0 0;
+    text-align: center;
+    color: #919191;
+}
+.headImgClick{
+	background: #d3eaff;
+}
+#faceCarList{
+	position: absolute;
+    top: 142px;
+    bottom: 0px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+#uploadPhoto, #uFaceSubmit{
+	position: absolute;
+    bottom: 15px;
+    width: 90%;
+    margin: 0 5%;
+    text-align: center;
+    display: block;
+    height: 40px;
+    line-height: 40px;
+    background: #5db2ff;
+    color: white;
+    border-radius: 3px;
+}
+#headImgSpan{
+	display: block;
+    height: 23px;
+    line-height: 23px;
+    width: 53px;
+    margin: 13px auto;
+    text-align: center;
+    border: 1px solid #cac9c9;
+    color: #949494;
+    border-radius: 3px;
+    display:none;
+}
+.alreadyLoad{
+	width: 100%;
+    line-height: 41px;
+    text-align: center;
+    color: #909090;
+    margin:0px;
+}
+#hearImgList{
+	height: 90px;
+    background: white;
+}
+.headImgDiv{
+	width:33.3%;
+	float:left;
+	height: 90px;
+    padding: 16px 0;
+    position:relative;
+}
+#hearImgList img{
+	width:55px;
+	height:55px;
+	display:block;
+	border-radius: 5px;
+	margin:0 auto;
+}
+.headImgDelete{
+    width: 53px;
+    text-align: center;
+    bottom: -14px;
+    border: 1px solid #b0b0b0;
+    margin: 30px auto;
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: 20px;
+    display:none;
+}
+/* 头像管理结束 */
+
+/* 约课 */
+.memberClassTop{
+	width: 100%;
+    padding: 11px;
+    color: #575757;
+    height: 38px;
+    border-bottom: 1px solid #eeeeee;
+}
+.success_img{
+	margin:auto;
+	width:90%;
+}	
+.success_img img{
+	width:100%;
+}
+.carTypeClick{
+	color: #5db2ff;
+    border-bottom: 2px solid #5db2ff;
+}
+#classDate{
+	float:left;
+	font-size: 12px;
+}
+.classType{
+	float:right;
+	margin-top: -4px;
+}
+.classType span{
+	display:block;
+	float:left;
+	width:46px;
+	height: 26px;
+    padding-left: 6px;
+	letter-spacing: 5px;
+}
+.storeCheck{
+	padding: 5px 11px;
+    height: 30px;
+    
+}
+#checkStore{
+	float:left;
+	padding-left: 10px;    
+	font-size: 13px;
+    line-height: 22px;
+}
+.fa-angle-down, .fa-angle-up{
+	float:right;
+	color: #606060;
+    font-size: 20px;
+}
+.fa-angle-up{
+	display:none;
+}
+.storeCheched{
+	color:#5db2ff;
+}
+.storeList{
+	background:#f6f5f5;
+	display:none;    
+	z-index: 20;
+	top:114px;
+    position: absolute;
+    width: 100%;
+}
+.storeList span{
+	display:block;
+	width:100%;
+	height:36px;
+	line-height:36px;
+	padding-left:30px;
+}
+.coachList{
+	position:absolute;
+	top:114px;
+	bottom:0px;
+    width: 100%;
+	overflow-y: auto;
+   	-webkit-overflow-scrolling: touch;
+}
+.leagueClass{
+	position:absolute;
+	top:114px;
+	bottom:0px;
+	border-top: 10px solid #f8f8f8;
+    width: 100%;
+    background: white;
+    transform: translate(1000px, 0px);
+}
+.already, .notalready{
+    width: 100%;
+    height: 26px;
+    line-height: 26px;
+    color: #505050;
+    padding-left: 15px;
+    clear: both;
+	border-top: 10px solid #f8f8f8;
+}
+/* .notalready{
+	border-top: 10px solid #f8f8f8;
+} */
+
+.date_top{
+	padding:16px;
+	height:92px;
+	border-bottom:1px solid #f3f3f3;
+	position:relative;
+}
+.head_img{
+	padding-top:5px;
+	margin-left: 10px;
+}
+.date_topcontent{
+	color:black;
+	margin-left:15px;
+	width:150px;
+	margin-top:5px;
+}
+.appointment{
+	display: block;
+    width: 60px;
+    height: 30px;
+    border: 1px solid #cfcfcf;
+    border-radius: 5px;
+    text-align: center;
+    line-height: 30px;
+    margin-top:15px;
+}
+#manpng, #womenpng{
+    position: absolute;
+    top: 60px;
+    left: 70px;
+    width: auto;
+}
+#carAvatars {
+    width: 56px;
+    height: 56px;
+    margin: 20px auto;
+    display: block;
+    border-radius: 50%;
+}
+#name2{
+	text-align:center;
+}
+.store_img{
+	width:56px;
+	height:56px;
+	border-radius:50%;
+}
+.carDetail{
+	position:relative;
+	width:96%;
+	margin:12px auto;
+	height: 115px;
+    background: #d0d0d0;
+    border-radius: 10px;
+    box-shadow: 1px 2px 2px #929292;
+}
+.carbg{
+	width:100%;
+	margin:auto;
+	height: 115px;
+    background: #d0d0d0;
+    border-radius: 10px;
+}	
+.carDetail_text{
+	width:50%;
+	float:left;
+}
+.carDetail_main{
+	position: absolute;
+    top: 20px;
+    left: 13px;
+    width:100%;
+    color: white;
+}
+.carDetail_blance{
+	width:30%;
+	float:left;
+}
+.carDetail_blance span{
+    display: block;
+    float:right;
+    width: 62px;
+    background: rgba(2,2,2,0.4);
+    text-align: center;
+    height: 25px;
+    border-radius: 20px;
+    font-size: 12px;
+    line-height: 25px;
+    margin: 25px 30px 0 20px;
+}
+/* 团课 */
+.leagueClass_time{
+	position:absolute;
+	top:0px;
+	width: 100%;
+	border-bottom:1px solid #eeeeee;
+}
+.leagueClass_main{
+	position:absolute;
+	top:50px;
+	width: 100%;
+	bottom:0px;
+	overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+.leagueClassTime, .oppiontHistoryTime{
+	width:100%;
+	padding: 0px 10px;
+	position:relative;
+	height:50px;
+}
+.leagueClassTime span, .oppiontHistoryTime span{
+	display:block;
+	float:left;
+	width:12.5%;
+	text-align: center;
+	height:50px;
+    line-height: 50px;
+}
+.fa-calendar{
+	text-align: center;
+    line-height: 50px;
+    color: #6c6c6c;
+    display: block;
+    width: 100%;
+}
+.dataClick{
+	position:absolute;
+    border-radius: 50%;
+    height: 45px;
+    top: 2px;
+    left: 8px;
+    border: 2px solid #5db2ff;
+    width: 45px;
+    background: white;
+}
+#leagueClassTimes, #oppiontHistoryTimes{
+	position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 11%;
+    height: 38px;
+    opacity: 0;
+    z-index: 1000;
+}
+.dataClick p{ 
+	width: 100%;
+    text-align: center;
+    font-size: 12px;
+}
+.months{
+	margin: 3px 0 0 0 !important;
+	color: #3ca3ff;
+}
+.weekday{
+	margin: -7px 0 0 0;
+}
+/* 团课结束 */
+/* 获取项目 */
+.project{
+	background: rgba(2,2,2,0.4);
+	width:100%;
+	top:0px;
+	bottom:0px;
+	/* left:1000px; */
+	position: fixed;
+	display:none;
+	z-index: 2001;
+}
+.project_body{
+	width:90%;
+	margin:100px auto 0 auto;
+	background: white;
+	padding: 30px 15px 15px 15px;
+	border-radius: 5px;
+}
+.project_body .modalBtn{
+    display: block;
+    text-align: center;
+    height: 36px;
+    line-height: 36px;
+    width: 48%;
+    float:left;
+    border: 1px solid #cecccc;
+    border-radius: 3px;
+    margin-bottom: 15px;
+    background: #58aef3;
+   	color: white;
+}	
+.project_body span{
+	display:block;
+	text-align:center;
+	height:36px;
+	line-height:36px;
+	width:90%;
+	margin:auto;
+	border: 1px solid #cecccc;
+ 	border-radius: 3px;
+ 	margin-bottom: 15px;
+}
+/* 项目底部样式 */
+.project_bottom{
+	height: 36px;
+	width: 90%;
+    margin: auto;
+}
+#project_sure,#venue_sure{
+    margin-left: 4%;
+}
+#project_cancel, #project_sure{
+    display: block;
+    text-align: center;
+    height: 36px;
+    line-height: 36px;
+    width: 48%;
+    float:left;
+    border: 1px solid #cecccc;
+    border-radius: 3px;
+    margin-bottom: 15px;
+    background: #58aef3;
+   	color: white;
+}
+.blues{
+    color: dodgerblue !important;
+  	border: 1px solid dodgerblue !important;
+}
+
+/*预约的时间的  */
+.time-header{
+	text-align:center;
+}
+.time-header input{
+    text-align: center;
+    font-size: 18px;
+    width: 60%;
+    border: none;
+    height: 50px;
+}
+.bacGreen{
+ 	background-color:#67c87b!important;
+ 	color:white!important;
+}
+.bacRed{
+ 	background-color:#ff675b !important;
+ 	color:white!important;
+ }
+ .bacGray{
+ 	background-color:lightgray!important;
+ }
+ .timebtn{
+ 	margin: 5px;
+  		border: 1px solid lightgray!important;
+  		border-radius: 5px;
+    padding: 0 5px;
+    height: 35px!important;
+    line-height: 35px;
+    width: 21%;
+    background:none;
+ }
+ #timeRight,#timeLeft{
+ 	font-size:23px;
+ }
+ .time2Tab,.time3Tab{
+ 	display:none;
+ }
+ .time-select{
+ 	text-align:center;
+ 	height: 36px;
+ }
+ .time-content{
+ 	text-align:center;
+ 	position: absolute;
+   	bottom: 75px;
+   	top: 127px;
+   	position: absolute;
+       overflow: auto;
+ }
+ .time-select input{
+ 	font-size:14px;
+ 	padding:0 10px;
+ 	height: 30px!important;
+ 	line-height: 30px;
+ 	border:1px solid lightgray;
+ }
+ .btn4-active{
+ 	border:1px solid #427FED!important;
+ }
+.stronmodal-content input {
+    border: none;
+    background: initial;
+    height: 36px;
+}
+/* 确认按钮 */
+.modalfooters{
+	height:75px;
+	position: absolute;
+   	width: 100%;
+   	bottom: 0px;
+}
+.modalfooters span {
+    color: white;
+    display: block;
+    float: left;
+    width: 50%;
+    text-align: center;
+    background: cornflowerblue;
+    height: 43px;
+    line-height: 43px;
+    border-right: 1px solid white;
+}
+/* 提示颜色 */
+.hit_color{
+
+}
+.hit_color span{
+	width: 10px;
+    height: 10px;
+    display: block;
+    float: left;
+    margin-top: 6px;
+    margin-left: 16px;
+}
+.hit_color p{
+	float: left;
+	margin-left: 5px;
+}
+/* 预约样式 */
+.color_red{
+	background: #ff675b !important;
+}
+.color_green{
+	background: #67c87b !important;
+}
+.color_white{
+	border: 1px solid #b7b6b6 !important;
+}

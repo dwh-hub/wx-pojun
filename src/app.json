@@ -1,9 +1,10 @@
 {
   "pages": [
+    "pages/mine/main",
+    "pages/appointmentCards/main",
     "pages/appointmentClass/main",
     "pages/message/main",
     "pages/cardDetail/main",
-    "pages/mine/main",
     "pages/memberCard/main",
     "pages/homepage/main",
     "pages/activeDetail/main",

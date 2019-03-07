@@ -11,7 +11,30 @@
       <div class="current-store">
         <img src="/static/images/icon-address.png" alt>
         <span class="store-name">$XX店$</span>
-        <img class="more" src="/static/images/arrow-bottom.png" alt="">
+        <img class="more" src="/static/images/arrow-bottom.png" alt>
+      </div>
+      <div class="signing">
+        <div class="signing-title">已签约</div>
+        <div class="signing-list">
+          <div class="signing-item">
+            <div class="cover-wrapper">
+              <img class="cover" src="https://www.pojun-tech.cn/assets/img/morenTo.png" alt>
+              <img class="man sex" src="https://www.pojun-tech.cn/assets/img/women.png" alt>
+              <!-- <img class="woman sex" src="https://www.pojun-tech.cn/assets/img/man.png" alt=""> -->
+            </div>
+            <div class="info">
+              <div class="name">$客户$</div>
+              <!-- <div class="name"></div> -->
+            </div>
+            <div class="btn-wrapper">
+              <span class="btn-appointment">预约</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="signing-none">
+        <div class="signing-title">未签约</div>
+        <div class="signing-none-list"></div>
       </div>
     </div>
   </div>
@@ -101,6 +124,61 @@ export default {
         width: 20;
         height: 20px;
         margin-top: 5px;
+      }
+    }
+    .signing-title {
+      line-height: 26px;
+      padding-left: 15px;
+      font-size: 14px;
+      color: #333;
+      border-top: 10px solid #f8f8f8;
+    }
+    .signing {
+      .signing-list {
+        padding-left: 30px;
+        padding-right: 15px;
+        box-sizing: border-box;
+        .signing-item {
+          display: flex;
+          justify-content: space-between;
+          padding: 15px 0;
+          .cover-wrapper {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            .cover {
+              width: 100%;
+              height: 100%;
+              border-radius: 5px;
+            }
+            .sex {
+              position: absolute;
+              bottom: -5px;
+              right: -5px;
+              width: 15px;
+              height: 15px;
+            }
+          }
+          .info {
+            flex: 1;
+            text-align: left;
+            padding: 3px 0; 
+            padding-left: 15px;
+            font-size: 14px
+          }
+          .btn-wrapper {
+            .btn-appointment {
+              display: inline-block;
+              margin-top: 10px;
+              line-height: 28px;
+              width: 58px;
+              text-align: center;
+              color: #333;
+              border: 1px solid #ccc;
+              border-radius: 5px;
+            }
+          }
+        }
       }
     }
   }

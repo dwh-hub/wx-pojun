@@ -1,13 +1,10 @@
 {
   "pages": [
-    "pages/homepage/main",
     "pages/activeDetail/main",
+    "pages/homepage/main",
     "pages/mine/main",
     "pages/storeDetail/main",
-    "pages/active/main",
-    "pages/webInline/main",
-    "pages/testPage/main",
-    "pages/authorize/main"
+    "pages/active/main"
   ],
   "window": {
     "backgroundTextStyle": "dark",

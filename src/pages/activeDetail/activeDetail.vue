@@ -1,7 +1,7 @@
 <template>
   <div id="memberActiveDetail">
     <div class="active-cover">
-      <img src alt>
+      <!-- <img src alt> -->
     </div>
     <div class="active-title">$活动标题$</div>
     <div class="active-num">$仅限前300名$</div>
@@ -11,7 +11,7 @@
     </div>
     <div class="activeBottom">
       <span class="activeBottomTitle">人数：</span>
-      <ul class="count">
+      <!-- <ul class="count">
         <li class="pl" style="margin-left: 20px;">
           <span id="num-jian" class="num-jian">-</span>
         </li>
@@ -27,8 +27,8 @@
         <li class="pl">
           <span id="num-jia" class="num-jia">+</span>
         </li>
-      </ul>
-      <span id="sign">报名</span>
+      </ul> -->
+      <span class="sign">报名</span>
     </div>
   </div>
 </template>
@@ -49,7 +49,7 @@ export default {
     margin: 0px 15px;
     text-align: center;
     height: 40px;
-    padding-bottom: 10px;
+    // padding-bottom: 10px;
     border-bottom: 2px solid #ddd;
     font-weight: bolder;
     line-height: 40px;
@@ -76,18 +76,32 @@ export default {
       font-size: 14px;
       font-weight: 500;
     }
+    .active-content {
+      img {
+        width: 100%;
+      }
+    }
   }
   .activeBottom {
-    width: 100%;
-    height: 53px;
     position: fixed;
     bottom: 0px;
+    width: 100%;
+    height: 53px;
+    box-sizing: border-box;
     line-height: 53px;
     padding-left: 15px;
     border-top: 1px solid #eee;
     .activeBottomTitle {
       display: block;
       float: left;
+    }
+    .sign {
+      float: right;
+      display: block;
+      width: 90px;
+      text-align: center;
+      background-color: #3b97eb;
+      color: #fff;
     }
   }
 }

@@ -50,6 +50,7 @@ let baseWebpackConfig = {
       'vue': 'mpvue',
       '@': resolve('src'),
       'COMMON': path.resolve(__dirname, '../src/common'),
+      'COMPS': path.resolve(__dirname, '../src/components'),
       'IMGS': path.resolve(__dirname, '../static/images')
     },
     symlinks: false,

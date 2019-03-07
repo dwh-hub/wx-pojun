@@ -83,6 +83,7 @@ export default {
 #memberMineTab {
   .mine_top {
     padding: 20px 30px;
+    box-sizing: border-box; 
     height: 110px;
     .mineImgDiv {
       border-radius: 50%;

@@ -1,7 +1,9 @@
 {
   "pages": [
-    "pages/mine/main",
     "pages/message/main",
+    "pages/cardDetail/main",
+    "pages/mine/main",
+    "pages/memberCard/main",
     "pages/homepage/main",
     "pages/activeDetail/main",
     "pages/storeDetail/main",
@@ -11,8 +13,7 @@
     "pages/checkInRecord/main",
     "pages/classTimes/main",
     "pages/faceSetUp/main",
-    "pages/myPoints/main",
-    "pages/memberCard/main"
+    "pages/myPoints/main"
   ],
   "window": {
     "backgroundTextStyle": "dark",

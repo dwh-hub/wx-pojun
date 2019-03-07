@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/appointmentClass/main",
     "pages/message/main",
     "pages/cardDetail/main",
     "pages/mine/main",
@@ -33,6 +34,11 @@
       },{
         "pagePath": "pages/active/main",
         "text": "活动",
+        "iconPath": "static/tabs/orders.png",
+        "selectedIconPath": "static/tabs/orders-active.png"
+      },{
+        "pagePath": "pages/appointmentClass/main",
+        "text": "约课",
         "iconPath": "static/tabs/orders.png",
         "selectedIconPath": "static/tabs/orders-active.png"
       },{

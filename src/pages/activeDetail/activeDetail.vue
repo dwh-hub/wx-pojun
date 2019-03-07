@@ -11,23 +11,11 @@
     </div>
     <div class="activeBottom">
       <span class="activeBottomTitle">人数：</span>
-      <!-- <ul class="count">
-        <li class="pl" style="margin-left: 20px;">
-          <span id="num-jian" class="num-jian">-</span>
-        </li>
-        <li class="pl">
-          <input
-            onkeyup="this.value=this.value.replace(/\D/g,'')"
-            type="number"
-            class="input-num"
-            id="input-num"
-            value="1"
-          >
-        </li>
-        <li class="pl">
-          <span id="num-jia" class="num-jia">+</span>
-        </li>
-      </ul> -->
+      <div class="count-wrapper">
+        <span class="decrease" @click="signNum--">-</span>
+        <span class="numbers">{{signNum}}</span>
+        <span class="increase" @click="signNum++">+</span>
+      </div>
       <span class="sign">报名</span>
     </div>
   </div>
@@ -36,7 +24,9 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+      signNum: '1'
+    };
   }
 };
 </script>
@@ -94,6 +84,26 @@ export default {
     .activeBottomTitle {
       display: block;
       float: left;
+    }
+    .count-wrapper {
+      // float: left;
+      display: inline-block;
+      margin-top: 3px;
+      line-height: 30px;
+      text-align: center;
+      // border-radius: 4px;
+      border: 1px solid #dbdbdb;
+      .decrease,
+      .increase {
+        display: inline-block;
+        width: 31px;
+      }
+      .numbers {
+        display: inline-block;
+        min-width: 40px;
+        border-left: 1px solid #dbdbdb;
+        border-right: 1px solid #dbdbdb;
+      }
     }
     .sign {
       float: right;

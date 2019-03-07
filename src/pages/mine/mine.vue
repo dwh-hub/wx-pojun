@@ -1,122 +1,143 @@
 <template>
-  <div id="memberComes">
-    <div class="title">
-      <div class="title_img">
+  <div id="memberMineTab" class="clickTab">
+    <div class="mine_top">
+      <div class="mineImgDiv pl">
         <img
-          id="company_imgs"
+          class="mineImg"
           alt
           src="https://www.pojun-tech.com/images/company_log/3/1.5355962923289521E12.png"
         >
       </div>
-      <p id="company_titles"></p>
-      <div class="hello">
-        <span>第一次使用，请绑定您的会籍信息</span>
+      <div class="pl mineDetail">
+        <p id="mineName">$姓名（身份）$</p>
+        <p id="minePhone">$130 4567 8192$</p>
       </div>
-      <div class="boundDiv">
-        <span class="pl">手机号</span>
-        <input class="pl" type="text" maxlength="11" placeholder="请输入手机号" id="boundPhone">
-        <button class="pr" id="yz_btn">获取验证码</button>
-      </div>
-      <div class="boundDiv">
-        <input class type="text" placeholder="请输入验证码" id="codeText">
-      </div>
-      <span class="showTooltips" id="showTooltips">绑定</span>
     </div>
+    <div class="mineDeail">
+      <div
+        class="detail_item"
+        v-for="(item, index) in mineNav"
+        :key="index"
+        @click="navTo(item.navigatorUrl)"
+      >
+        <img alt :src="item.imgUrl">
+        <span class="detail_title">{{item.navName}}</span>
+        <!-- <span class="detail_contrnt" id="carCount"></span> -->
+      </div>
+    </div>
+    <div class="mineExit">解除绑定</div>
   </div>
 </template>
 
 <script>
 export default {
   data() {
-    return {};
+    return {
+      mineNav: [
+        {
+          imgUrl: "https://www.pojun-tech.cn/assets/img/mineCar.png",
+          navName: "会员卡",
+          navigatorUrl: '../memberCard/main'
+        },
+        {
+          imgUrl: "https://www.pojun-tech.cn/assets/img/lessons.png",
+          navName: "上课次数",
+          navigatorUrl: '../classTimes/main'
+        },
+        {
+          imgUrl: "https://www.pojun-tech.cn/assets/img/appiont.png",
+          navName: "预约记录",
+          navigatorUrl: '../appointmentRecord/main'
+        },
+        {
+          imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
+          navName: "签到记录",
+          navigatorUrl: '../checkInRecord/main'
+        },
+        {
+          imgUrl: "https://www.pojun-tech.cn/assets/img/integral.png",
+          navName: "我的积分",
+          navigatorUrl: '../myPoints/main'
+        },
+        {
+          imgUrl: "https://www.pojun-tech.cn/assets/img/checkFace.png",
+          navName: "人脸设置",
+          navigatorUrl: '../faceSetUp/main'
+        }
+      ]
+    };
+  },
+  methods: {
+    navTo(url) {
+      wx.navigateTo({
+        url: url
+      })
+    }
   }
 };
 </script>
 
 <style lang="less">
 @import "~COMMON/less/reset.less";
-.pl {
-  float: left;
-}
-.pr {
-  float: right;
-}
-.pb {
-  clear: both;
-}
-#memberComes {
-  .title {
-    .title_img {
-      margin-top: 30px;
-      #company_imgs {
-        width: 65px;
-        height: 65px;
+
+#memberMineTab {
+  .mine_top {
+    padding: 20px 30px;
+    height: 110px;
+    .mineImgDiv {
+      border-radius: 50%;
+      .mineImg {
+        width: 66px;
+        height: 66px;
         border-radius: 5px;
-        border: 1px solid #eeeeee;
-        display: block;
-        margin: auto;
       }
     }
-    #company_titles {
-      width: 100%;
-      text-align: center;
-      margin-top: 10px;
-    }
-    .hello {
-      padding: 10px 15px;
-      border-bottom: 1px solid #eeeeee;
-      > span {
-        display: block;
-        width: 100%;
-        text-align: center;
-        height: 36px;
-        line-height: 36px;
-        background: #98caff;
-        color: white;
-        border-radius: 20px;
-        margin-top: 20px;
+    .mineDetail {
+      margin: 13px 0 0 15px;
+      > p {
+        margin: -5px 0 10px 0;
+        font-size: 15px;
       }
     }
-    .boundDiv {
+  }
+  .mineDeail {
+    border-top: 10px solid #f4f4f4;
+    .detail_item {
       height: 46px;
-      width: 100%;
-      border-bottom: 1px solid #eeeeee;
-      > span {
-        display: block;
-        width: 20%;
-        height: 45px;
-        line-height: 45px;
-        padding-left: 15px;
+      border-bottom: 1px solid #ededed;
+      font-size: 15px;
+      line-height: 46px;
+      padding-left: 15px;
+      > img {
+        display: inline-block;
+        vertical-align: middle;
+        width: 25px;
+        height: 25px;
       }
-      > input {
-        height: 45px;
-        line-height: 45px;
-        padding-left: 15px;
-        border: none;
-        background: initial;
+      .detail_title {
+        vertical-align: middle;
+        margin-left: 10px;
+        color: #515151;
       }
-      #yz_btn {
-        width: 30%;
-        padding: 0;
-        height: 49px;
-        border-left: 1px solid #e5e5e5;
-        background: white;
-        line-height: 46px;
-        font-size: 17px;
-        color: #3cc51f;
-      }
+      // .detail_contrnt {
+      //   float: right;
+      //   margin-right: 15px;
+      // }
     }
-    .showTooltips {
-      background-color: #1aad19;
-      display: block;
-      width: 90%;
-      margin: auto;
-      text-align: center;
-      height: 45px;
-      line-height: 45px;
-      color: white;
-      border-radius: 5px;
-      margin-top: 15px;
+  }
+  .mineExit {
+    position: absolute;
+    bottom: 15px;
+    left: 4%;
+    width: 92%;
+    height: 40px;
+    line-height: 40px;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    background: #5db2ff;
+    &:active {
+      opacity: 0.6;
     }
   }
 }

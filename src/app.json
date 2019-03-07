@@ -1,10 +1,18 @@
 {
   "pages": [
-    "pages/activeDetail/main",
-    "pages/homepage/main",
     "pages/mine/main",
+    "pages/message/main",
+    "pages/homepage/main",
+    "pages/activeDetail/main",
     "pages/storeDetail/main",
-    "pages/active/main"
+    "pages/active/main",
+    "pages/login/main",
+    "pages/appointmentRecord/main",
+    "pages/checkInRecord/main",
+    "pages/classTimes/main",
+    "pages/faceSetUp/main",
+    "pages/myPoints/main",
+    "pages/memberCard/main"
   ],
   "window": {
     "backgroundTextStyle": "dark",
@@ -24,6 +32,11 @@
       },{
         "pagePath": "pages/active/main",
         "text": "活动",
+        "iconPath": "static/tabs/orders.png",
+        "selectedIconPath": "static/tabs/orders-active.png"
+      },{
+        "pagePath": "pages/message/main",
+        "text": "消息",
         "iconPath": "static/tabs/orders.png",
         "selectedIconPath": "static/tabs/orders-active.png"
       },{

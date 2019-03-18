@@ -26,7 +26,6 @@
       </div>
     </div>
     <div class="mineExit">解除绑定</div>
-    <van-button>行不行啊</van-button>
   </div>
 </template>
 

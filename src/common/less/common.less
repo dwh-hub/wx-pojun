@@ -1,8 +1,45 @@
 // 闭合浮动
 .clearfix:after {
-    content: ".";
-    display: block;
-    height: 0;
-    clear: both;
-    visibility: hidden;
+  content: ".";
+  display: block;
+  height: 0;
+  clear: both;
+  visibility: hidden;
+}
+
+// 最多显示n行的文本
+.Mult-line(@line) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: @line;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+// 遮罩层
+.Mask(@color) {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: @color;
+  z-index: 999;
+}
+
+// 移动端1px显示
+.border-1px(@color, @direction) {
+  position: relative;
+  &:after {
+    content: "  ";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 200%;
+    height: 200%;
+    border-@{direction}: 1px solid @color;
+    transform-origin: 0 0;
+    transform: scale(.5, .5);
+  }
 }

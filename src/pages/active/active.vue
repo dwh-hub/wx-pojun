@@ -84,7 +84,7 @@ export default {
         }
       }
       .activeDetailBottom {
-        height: 65px;
+        // height: 65px;
         .activeTitle {
           font-size: 16px;
           font-weight: bold;
@@ -93,6 +93,7 @@ export default {
         .activeContent {
           font-size: 15px;
           padding-left: 10px;
+          padding-bottom: 5px;
           color: #afafaf;
         }
       }

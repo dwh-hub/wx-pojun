@@ -1,7 +1,7 @@
 <template>
   <div class="title-cell clearfix">
     <div class="title" :style="{fontSize: titleSize+'px'}">{{title}}</div>
-    <div class="more-text" :style="{fontSize: moreSize+'px'}">{{moreText}}<img v-if="moreText" class="arrow" src="/static/images/icon-right-arrow.png"></div>
+    <div class="more-text" :style="{fontSize: moreSize+'px'}" @click="tapMore">{{moreText}}<img v-if="moreText" class="arrow" src="/static/images/icon-right-arrow.png"></div>
   </div>
 </template>
 
@@ -15,9 +15,6 @@ export default {
     moreText: {
       type: String,
       default: ''
-    },
-    url: {
-      type: String
     },
     titleSize: {
       type: Number,
@@ -36,6 +33,12 @@ export default {
       return {
         fontSize: this.size + 'px'
       }
+    }
+  },
+  methods: {
+    tapMore() {
+      console.log('taptaptpa')
+      this.$emit('tapMore')
     }
   }
 };

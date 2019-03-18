@@ -33,9 +33,12 @@ export default {
     flex: 0 0 90px;
     width: 90px;
     height: 90px;
+    padding: 12px;
+    box-sizing: border-box;
     > img {
-      width: 100%;
-      height: 100%;
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
       background-color: #bfbfbf;
     }
   }

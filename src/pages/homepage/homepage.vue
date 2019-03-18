@@ -4,8 +4,8 @@
     <swiper
       class="swiper"
       indicator-dots="true"
-      indicator-color="rgba(0, 0, 0, .3)"
-      indicator-active-color="rgba(0, 0, 0, .6)"
+      indicator-color="#fff"
+      indicator-active-color="rgba(74, 134, 232, 1)"
       :autoplay="true"
       :circular="true"
       :loop="true"
@@ -45,7 +45,7 @@
       </div>
     </div>
     <div class="nearby-store-wrapper">
-      <title-cell title="附近的店" moreText="全部门店" :moreSize="14" :titleSize="18"></title-cell>
+      <title-cell title="附近的店" moreText="全部门店" :moreSize="14" :titleSize="18" @tapMore="toAllStore"></title-cell>
       <div class="store-wrapper">
         <div class="nearby-store" v-for="(item, index) in 2" :key="index">
           <div class="cover">
@@ -141,6 +141,11 @@ export default {
         url: "../storeDetail/main"
       });
     },
+    toAllStore() {
+      wx.navigateTo({
+        url: "../allStore/main"
+      });
+    }
     // touchStart(e) {
     //   // console.log(e)
     //   this.touch.x = e.clientX;

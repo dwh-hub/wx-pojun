@@ -1,5 +1,7 @@
 {
   "pages": [
+    "pages/storeDetail/main",
+    "pages/allStore/main",
     "pages/homepage/main",
     "pages/mine/main",
     "pages/appointmentCards/main",
@@ -8,7 +10,6 @@
     "pages/cardDetail/main",
     "pages/memberCard/main",
     "pages/activeDetail/main",
-    "pages/storeDetail/main",
     "pages/active/main",
     "pages/login/main",
     "pages/appointmentRecord/main",

@@ -211,7 +211,8 @@ export default {
   }
   .nearby-store-wrapper {
     padding: 0 15px;
-    .border-1px(#eee, bottom);
+    // .border-1px(#eee, bottom);
+    border-bottom: 1rpx solid #eee;
     .title-cell,
     .title {
       font-weight: bold;

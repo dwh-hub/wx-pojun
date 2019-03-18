@@ -81,7 +81,7 @@ export default {
         font-weight: bold;
       }
       .time {
-        margin-top: 10px;
+        margin-top: 12px;
         color: #bababa;
       }
     }

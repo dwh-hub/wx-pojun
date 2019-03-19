@@ -15,6 +15,9 @@
     </div>
     <div class="coach-imgs">
       <div class="title">个人形象</div>
+      <div class="img-group">
+        <img><img><img>
+      </div>
     </div>
   </div>
 </template>
@@ -80,13 +83,29 @@ export default {
     padding: 0 20px;
     .title {
       margin-top: 15px;
+      margin-bottom: 10px;
       font-weight: bold;
     }
   }
   .coach-desc {
     >p {
-      margin-top: 5px;
       color: #bababa;
+    }
+  }
+  .coach-imgs {
+    .img-group {
+      display: flex;
+      >img {
+        flex: 1;
+        margin-right: 5px;
+        width: 100%;
+        height: 80px;
+        border-radius: 2px;
+        background-color: #eee;
+        &:nth-last-of-type(1) {
+          margin-right: 0px;
+        }
+      }
     }
   }
 }

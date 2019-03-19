@@ -7,7 +7,7 @@ teamClassDetail 课程详情
 appointmentResult 预约结果
 assess 评价
 coachList 私教列表
-
+coachDetail 私教详情
 
 问题
     teamClassList

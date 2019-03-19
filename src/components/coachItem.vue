@@ -4,10 +4,11 @@
       <img>
     </div>
     <div class="coach-info">
-      <div class="coach-name">$瑜伽$</div>
-      <div class="coach-desc">$信息$</div>
+      <div class="coach-name">$高子涵$</div>
+      <div class="coach-desc">$我是最美最美最美最美的$</div>
+      <div class="coach-times">$13节课 共授课19次$</div>
     </div>
-    <div class="tag">
+    <div class="tag" v-if="hasTag">
       <div class="coach-type">$瑜伽$</div>
       <div class="coach-status">$热门$</div>
     </div>
@@ -17,7 +18,12 @@
 <script>
 export default {
   name: "coach-item",
-  props: {}
+  props: {
+    hasTag: {
+      type: Boolean,
+      default: false
+    }
+  }
 };
 </script>
 
@@ -28,16 +34,19 @@ export default {
   display: flex;
   padding-right: 10px;
   box-shadow: 0px 0px 5px #ccc;
+  border-radius: 2px;
   background-color: #fff;
+  padding: 10px 0;
   .cover {
     flex: 0 0 90px;
     width: 90px;
-    height: 90px;
-    padding: 12px;
+    // height: 90px;
+    // padding: 12px;
+    padding-left: 12px;
     box-sizing: border-box;
     > img {
-      width: 66px;
-      height: 66px;
+      width: 80px;
+      height: 80px;
       border-radius: 50%;
       background-color: #bfbfbf;
     }
@@ -46,10 +55,11 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     padding-left: 12px;
     > div {
       flex: 1;
-      line-height: 45px;
+      // line-height: 30px;
       .Mult-line(1);
     }
     .coach-name {
@@ -58,8 +68,10 @@ export default {
       color: #333;
     }
     .coach-desc {
-      font-size: 15px;
-      color: #333;
+      color: #bababa;
+    }
+    .coach-times {
+      color: #2a82e4;
     }
   }
   .tag {

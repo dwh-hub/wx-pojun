@@ -19,32 +19,64 @@
     <div class="address">
       <h4>地址</h4>
       <div class="store">$店名$$距离$</div>
-      <div class="address-detail">$一个很长很长很长很长很长很长很长的地址$</div> 
+      <div class="address-detail">$一个很长很长很长很长很长很长很长的地址$</div>
     </div>
     <div class="business-hours">
       <div class="business">
         <div class="business-text">营业时间</div>
         <div class="time">$09:00-22:00$</div>
       </div>
-      <div class="phone">
+      <div class="phone" @click="call">
         <img src="/static/images/icon-phone.png">
       </div>
+    </div>
+    <div class="team-class-part">
+      <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+      <team-class-item></team-class-item>
+    </div>
+    <div class="coach-part">
+      <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+      <coach-item></coach-item>
     </div>
   </div>
 </template>
 
 <script>
+import {setNavTab} from "COMMON/js/common.js";
+import titleCell from "COMPS/titleCell.vue";
+import teamClassItem from "COMPS/teamClassItem.vue";
+import coachItem from "COMPS/coachItem.vue";
+
 export default {
   name: "storeDetail",
   data() {},
-  mounted() {},
-  methods: {}
+  components: {
+    titleCell,
+    teamClassItem,
+    coachItem
+  },
+  onLoad() {
+    setNavTab("", "#2a82e4");
+  },
+  methods: {
+    toAllStore() {
+      wx.navigateTo({
+        url: "../allStore/main"
+      });
+    },
+    call() {
+      wx.makePhoneCall({
+        phoneNumber: "1340000"
+      });
+    }
+  }
 };
 </script>
 
 <style lang="less">
 @import "~COMMON/less/reset.less";
 .store-detail {
+  padding-bottom: 20px;
   .swiper {
     height: 180px;
   }
@@ -53,9 +85,9 @@ export default {
     height: 100%;
   }
   .address {
-    padding: 12px 20px;
+    padding: 12px 15px;
     border-bottom: 1px solid #eee;
-    >h4 {
+    > h4 {
       font-weight: bold;
       font-size: 16px;
     }
@@ -89,7 +121,7 @@ export default {
       flex: 0 0 75px;
       position: relative;
       box-sizing: border-box;
-      >img {
+      > img {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -98,6 +130,16 @@ export default {
         width: 30px;
         height: 30px;
         border-left: 1px solid #eee;
+      }
+    }
+  }
+  .team-class-part,
+  .coach-part {
+    padding: 0 15px;
+    .title-cell {
+      margin: 5px 0;
+      .title {
+        font-weight: bold;
       }
     }
   }

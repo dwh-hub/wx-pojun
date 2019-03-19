@@ -1,5 +1,5 @@
 <template>
-  <div class="team-class-item">
+  <div class="team-class-item" @click="toDetail">
     <div class="cover">
       <img>
     </div>
@@ -18,7 +18,14 @@
 <script>
 export default {
   name: "team-class-item",
-  props: {}
+  props: {},
+  methods: {
+    toDetail() {
+      wx.navigateTo({
+        url: '../teamClassDetail/main'
+      })
+    }
+  }
 };
 </script>
 
@@ -29,6 +36,7 @@ export default {
   display: flex;
   padding-right: 10px;
   box-shadow: 0px 0px 5px #ccc;
+  border-radius: 2px;
   background-color: #fff;
   .cover {
     flex: 0 0 90px;

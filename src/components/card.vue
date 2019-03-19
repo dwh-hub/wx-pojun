@@ -41,7 +41,12 @@ export default {
 
 <style lang="less">
 @import "~COMMON/less/reset.less";
-
+.pl {
+  float: left;
+}
+.pr {
+  float: right;
+}
 .card {
   position: relative;
   width: 100%;

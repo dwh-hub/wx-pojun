@@ -1,11 +1,17 @@
 {
   "pages": [
+    "pages/coachDetail/main",
+    "pages/coachList/main",
+    "pages/assess/main",
+    "pages/appointmentResult/main",
+    "pages/teamClassDetail/main",
+    "pages/appointmentClass/main",
+    "pages/teamClassList/main",
     "pages/storeDetail/main",
     "pages/allStore/main",
     "pages/homepage/main",
     "pages/mine/main",
     "pages/appointmentCards/main",
-    "pages/appointmentClass/main",
     "pages/message/main",
     "pages/cardDetail/main",
     "pages/memberCard/main",
@@ -18,6 +24,11 @@
     "pages/faceSetUp/main",
     "pages/myPoints/main"
   ],
+  "permission": {
+    "scope.userLocation": {
+      "desc": "你的位置信息将用于小程序位置接口的效果展示"
+    }
+  },
   "window": {
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#fff",

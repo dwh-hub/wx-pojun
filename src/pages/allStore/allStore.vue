@@ -6,6 +6,8 @@
 
 <script>
 import storeItem from 'COMPS/storeItem.vue';
+import {setNavTab} from "COMMON/js/common.js";
+
 export default {
   name: 'all-store',
   data() {
@@ -15,6 +17,9 @@ export default {
   },
   components: {
     storeItem
+  },
+  onLoad() {
+    setNavTab("", "#2a82e4");
   },
   methods: {
     toStoreDetail() {

@@ -1,5 +1,5 @@
 <template>
- <!-- @touchstart="touchStart" @touchend="touchEnd" -->
+  <!-- @touchstart="touchStart" @touchend="touchEnd" -->
   <div class="homepage">
     <swiper
       class="swiper"
@@ -25,29 +25,29 @@
         <div class="company-title">破军科技</div>
         <div class="company-text">在更好的为会员服务的道路上越走越远。</div>
       </div>
-    </div> -->
+    </div>-->
     <div class="tab-list">
-      <div class="tab-item">
-        <img src="/static/images/user.png" alt="">
+      <div class="tab-item" @click="toNav('../teamClassList/main')">
+        <img src="/static/images/icon-team.png" alt>
         <div class="text">团课</div>
       </div>
-      <div class="tab-item">
-        <img src="/static/images/user.png" alt="">
+      <div class="tab-item" @click="toNav('../coachList/main')">
+        <img src="/static/images/icon-team.png" alt>
         <div class="text">私教</div>
       </div>
-      <div class="tab-item">
-        <img src="/static/images/user.png" alt="">
+      <div class="tab-item" @click="toNav('../memberCard/main')">
+        <img src="/static/images/icon-member.png" alt>
         <div class="text">会员卡</div>
       </div>
       <div class="tab-item">
-        <img src="/static/images/user.png" alt="">
+        <img src="/static/images/icon-notice.png" alt>
         <div class="text">公告</div>
       </div>
     </div>
     <div class="nearby-store-wrapper">
-      <title-cell title="附近的店" moreText="全部门店" :moreSize="14" :titleSize="18" @tapMore="toAllStore"></title-cell>
+      <title-cell title="附近的店" moreText="全部门店" :moreSize="14" :titleSize="18" @tapMore="toNav('../allStore/main')"></title-cell>
       <div class="store-wrapper">
-        <div class="nearby-store" v-for="(item, index) in 2" :key="index">
+        <div class="nearby-store" v-for="(item, index) in 2" :key="index" @click="toNav('../storeDetail/main')">
           <div class="cover">
             <img>
           </div>
@@ -67,10 +67,10 @@
 </template>
 
 <script>
-import setNavTab from 'COMMON/js/common.js'
-import titleCell from 'COMPS/titleCell.vue'
-import teamClassItem from 'COMPS/teamClassItem.vue'
-import coachItem from 'COMPS/coachItem.vue'
+import { setNavTab } from "COMMON/js/common.js";
+import titleCell from "COMPS/titleCell.vue";
+import teamClassItem from "COMPS/teamClassItem.vue";
+import coachItem from "COMPS/coachItem.vue";
 
 export default {
   data() {
@@ -114,10 +114,13 @@ export default {
           address: "思明区群鸿商业城28号58号楼"
         }
       ],
-      touch: {
-        x: "",
-        y: ""
-      }
+      // touch: {
+      //   x: "",
+      //   y: ""
+      // }
+      longitude: "", // 经度
+      latitude: "", // 维度
+      bannerList: []
     };
   },
   components: {
@@ -126,9 +129,18 @@ export default {
     coachItem
   },
   mounted() {
+    let that = this;
+    wx.getLocation({
+      type: "wgs84",
+      success(res) {
+        that.latitude = res.latitude;
+        that.longitude = res.longitude;
+      }
+    });
+    // this.getBannerList()
   },
   onLoad() {
-    setNavTab('前锋体育', '#2a82e4');
+    setNavTab("前锋体育", "#2a82e4");
   },
   onPullDownRefresh() {
     setTimeout(() => {
@@ -136,14 +148,21 @@ export default {
     }, 2000);
   },
   methods: {
-    toStoreDetail() {
+    toNav(url) {
       wx.navigateTo({
-        url: "../storeDetail/main"
+        url: url
       });
     },
-    toAllStore() {
-      wx.navigateTo({
-        url: "../allStore/main"
+    getBannerList() {
+      let that = this;
+      wx.request({
+        url: "http://192.168.1.8/system/set/wxcompanyinfo",
+        data: {
+          companyId: ""
+        },
+        success(res) {
+          that.bannerList = res.data.data.wxCarousel.split(",");
+        }
       });
     }
     // touchStart(e) {
@@ -193,15 +212,18 @@ export default {
   .tab-list {
     display: flex;
     width: 100%;
-    padding-top: 20px;
-    padding-bottom: 5px;
-    .border-1px(#eee, bottom);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1rpx solid #eee;
     .tab-item {
       flex: 1;
       text-align: center;
-      >img {
-        width: 32px;
-        height: 32px;
+      > img {
+        width: 20px;
+        height: 20px;
+        padding: 10px;
+        background-color: @theme-color;
+        border-radius: 50%;
       }
       .text {
         margin-top: 5px;
@@ -222,11 +244,11 @@ export default {
       justify-content: space-between;
       padding-bottom: 10px;
       .nearby-store {
-        flex:  0 0 48%;
+        flex: 0 0 48%;
         width: 96%;
         .cover {
           width: 100%;
-          >img {
+          > img {
             width: 100%;
             height: 90px;
             background-color: #bfbfbf;

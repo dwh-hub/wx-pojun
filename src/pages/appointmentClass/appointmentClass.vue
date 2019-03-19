@@ -1,76 +1,106 @@
 <template>
   <div class="appointmentClass">
-    <div class="top-nav clearfix">
-      <div class="now-date pl">今天：{{formatDate}}</div>
-      <div class="nav pr">
-        <span class="private" @click="privateList" :class="{ select: isPrivate }">私教</span>
-        <span class="league" @click="leagueList" :class="{ select: !isPrivate }">团课</span>
-      </div>
+    <div class="nav-tab">
+      <div class="stay" :class="{active: currentNav==1}" @click="stay">待上课</div>
+      <div class="assess" :class="{active: currentNav==2}" @click="assess">待评价</div>
+      <div class="complete" :class="{active: currentNav==3}" @click="complete">已完成</div>
+      <div class="other" :class="{active: currentNav==4}" @click="other">其他</div>
     </div>
-    <div class="store-list">
-      <div class="current-store">
-        <img src="/static/images/icon-address.png" alt>
-        <span class="store-name">$XX店$</span>
-        <img class="more" src="/static/images/arrow-bottom.png" alt>
-      </div>
-      <div class="signing">
-        <div class="signing-title">已签约</div>
-        <div class="signing-list">
-          <div class="signing-item">
-            <div class="cover-wrapper">
-              <img class="cover" src="https://www.pojun-tech.cn/assets/img/morenTo.png" alt>
-              <img class="man sex" src="https://www.pojun-tech.cn/assets/img/women.png" alt>
-              <!-- <img class="woman sex" src="https://www.pojun-tech.cn/assets/img/man.png" alt=""> -->
-            </div>
-            <div class="info">
-              <div class="name">$客户$</div>
-              <!-- <div class="name"></div> -->
-            </div>
-            <div class="btn-wrapper">
-              <span class="btn-appointment">预约</span>
-            </div>
-          </div>
+    <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
+      <div class="stay-team-class">
+        <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <div class="team-class-wrapper">
+          <team-class-item v-for="(item, index) in teamClassList" :key="index"></team-class-item>
         </div>
+        <none-result text="你还没有预约团课呢" v-if="!teamClassList.length"></none-result>
       </div>
-      <div class="signing-none">
-        <div class="signing-title">未签约</div>
-        <div class="signing-none-list"></div>
+      <div class="stay-coach">
+        <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <div class="coach-wrapper">
+          <coach-item v-for="(item, index) in coachList" :key="index"></coach-item>
+        </div>
+        <none-result text="你还没有预约私教呢" v-if="!coachList.length"></none-result>
       </div>
     </div>
+    <van-action-sheet
+      :show="showSelect"
+      :actions="actions"
+      @close="closeSelect"
+      @select="selectCur"
+    ></van-action-sheet>
+    <none-result text="你还没有准备好吗" :buttonText="btnText" @tapBtn="toggleSelect" v-if="!teamClassList.length && !coachList.length"></none-result>
+    <div class="bottom-btn" v-if="teamClassList.length || coachList.length" @click="toggleSelect">继续预约</div>
   </div>
 </template>
 
 <script>
+import { setNavTab } from "COMMON/js/common.js";
+import noneResult from "COMPS/noneResult.vue";
+import titleCell from "COMPS/titleCell.vue";
+import teamClassItem from "COMPS/teamClassItem.vue";
+import coachItem from "COMPS/coachItem.vue";
+
 export default {
   data() {
     return {
-      isPrivate: true
+      currentNav: 1,
+      showSelect: false,
+      teamClassList: [],
+      coachList: [],
+      actions: [{ name: "团课" }, { name: "私教" }]
     };
   },
-  methods: {
-    privateList() {
-      this.isPrivate = true;
-    },
-    leagueList() {
-      this.isPrivate = false;
-    }
+  components: {
+    noneResult,
+    titleCell,
+    teamClassItem,
+    coachItem
+  },
+  onLoad() {
+    setNavTab("", "#2a82e4");
   },
   computed: {
-    formatDate() {
-      let date = new Date();
-      let week = [
-        "星期一",
-        "星期二",
-        "星期三",
-        "星期四",
-        "星期五",
-        "星期六",
-        "星期日"
-      ];
-      // x月x日 星期x
-      return (
-        date.getMonth() + 1 + "月" + date.getDate() + "日" + week[date.getDay()]
-      );
+    btnText() {
+      if (!this.teamClassList.length && !this.coachList.length) {
+        return "试试预约";
+      }
+    }
+  },
+  methods: {
+    stay() {
+      this.currentNav = 1;
+    },
+    assess() {
+      this.currentNav = 2;
+    },
+    complete() {
+      this.currentNav = 3;
+    },
+    other() {
+      this.currentNav = 4;
+    },
+    toggleSelect() {
+      this.showSelect = true;
+    },
+    toAllStore() {
+      wx.navigateTo({
+        url: "../allStore/main"
+      });
+    },
+    selectCur(event) {
+      this.showSelect = false;
+      if (event.target.name == "团课") {
+        wx.navigateTo({
+          url: "../teamClassList/main"
+        });
+      } else if (event.target.name == "私教") {
+        wx.navigateTo({
+          url: "../coachList/main"
+        });
+      }
+    },
+    closeSelect() {
+      this.showSelect = false;
     }
   }
 };
@@ -81,105 +111,41 @@ export default {
 @import "~COMMON/less/common";
 
 .appointmentClass {
-  .top-nav {
-    line-height: 40px;
-    padding: 0 10px;
-    border-bottom: 1px solid #eee;
-    .now-date {
-      font-size: 12px;
-      color: #333;
-    }
-    .nav {
-      > span {
-        display: inline-block;
-        line-height: 30px;
-        padding: 0 10px;
-        color: #333;
-        font-size: 14px;
-        &.select {
-          color: #5db2ff;
-          border-bottom: 2px solid #5db2ff;
-        }
+  .nav-tab {
+    display: flex;
+    border-bottom: 10px solid #f5f5f5;
+    > div {
+      flex: 1;
+      line-height: 42px;
+      text-align: center;
+      border-bottom: 1rpx solid #eee;
+      border-right: 1rpx solid #eee;
+      &:nth-last-of-type(1) {
+        border-right: none;
+      }
+      &.active {
+        color: @theme-color;
       }
     }
   }
-  .store-list {
-    .current-store {
-      padding: 0 10px;
-      line-height: 28px;
-      > img {
-        display: inline-block;
-        vertical-align: middle;
-        width: 18px;
-        height: 18px;
-      }
-      .store-name {
-        display: inline-block;
-        vertical-align: middle;
-        font-size: 12px;
-        margin-left: 10px;
-      }
-      .more {
-        float: right;
-        width: 20;
-        height: 20px;
-        margin-top: 5px;
-      }
-    }
-    .signing-title {
-      line-height: 26px;
-      padding-left: 15px;
-      font-size: 14px;
-      color: #333;
-      border-top: 10px solid #f8f8f8;
-    }
-    .signing {
-      .signing-list {
-        padding-left: 30px;
-        padding-right: 15px;
-        box-sizing: border-box;
-        .signing-item {
-          display: flex;
-          justify-content: space-between;
-          padding: 15px 0;
-          .cover-wrapper {
-            position: relative;
-            width: 50px;
-            height: 50px;
-            .cover {
-              width: 100%;
-              height: 100%;
-              border-radius: 5px;
-            }
-            .sex {
-              position: absolute;
-              bottom: -5px;
-              right: -5px;
-              width: 15px;
-              height: 15px;
-            }
-          }
-          .info {
-            flex: 1;
-            text-align: left;
-            padding: 3px 0; 
-            padding-left: 15px;
-            font-size: 14px
-          }
-          .btn-wrapper {
-            .btn-appointment {
-              display: inline-block;
-              margin-top: 10px;
-              line-height: 28px;
-              width: 58px;
-              text-align: center;
-              color: #333;
-              border: 1px solid #ccc;
-              border-radius: 5px;
-            }
-          }
-        }
-      }
+  .title-cell .title {
+    font-weight: bold;
+  }
+  .stay-list {
+    padding: 0 15px;
+  }
+  .bottom-btn {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    line-height: 42px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    background-color: @theme-color;
+    &:active {
+      opacity: 0.8;
     }
   }
 }

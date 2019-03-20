@@ -134,20 +134,6 @@ export default {
   .stay-list {
     padding: 0 15px;
   }
-  .bottom-btn {
-    position: fixed;
-    bottom: 0px;
-    left: 0px;
-    width: 100%;
-    line-height: 42px;
-    text-align: center;
-    color: #fff;
-    font-size: 16px;
-    background-color: @theme-color;
-    &:active {
-      opacity: 0.8;
-    }
-  }
 }
 </style>
 

@@ -1,24 +1,34 @@
 <template>
-  <div class="store-item" @click="tapStore">
+  <div class="store-item" @click="toDetail">
     <div class="store-cover">
+      <!-- TODO: :src="info.cover" -->
       <img>
     </div>
     <div class="store-info">
       <div class="store-top">
-        <span class="store-name">$店名$</span>
-        <span class="store-range">距离</span>
+        <span class="store-name">{{info.storeName}}</span>
+        <span class="store-range">{{info.range}}</span>
       </div>
-      <div class="store-bottom">$一个很长很长很长很长很长很长的地址$</div>
+      <div class="store-bottom">{{info.address || '暂无地址'}}</div>
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  props: {},
+  props: {
+    info: {
+      type: Object,
+      default: function() {
+        return {}
+      }
+    }
+  },
   methods: {
-    tapStore() {
-      this.$emit('tapStore')
+    toDetail() {
+      wx.navigateTo({
+        url: '../storeDetail/main?storeId='+ this.info.storeId
+      })
     }
   }
 };
@@ -41,10 +51,9 @@ export default {
     }
   }
   .store-info {
-    line-height: 40px;
-    padding-left: 20px;
-    padding-right: 10px;
+    padding: 14px 10px 14px 20px;
     .store-top {
+      margin-bottom: 8px;
       .store-name {
         font-size: 16px;
         color: #333;
@@ -53,6 +62,7 @@ export default {
       .store-range {
         float: right;
         font-size: 14px;
+        color: @theme-color;
       }
     }
     .store-bottom {

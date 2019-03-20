@@ -69,7 +69,7 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div class="appointment">马上预约</div> 
+    <div class="bottom-btn appointment" @click="appointClass">马上预约</div> 
   </div>
 </template>
 
@@ -86,6 +86,13 @@ export default {
   },
   onLoad() {
     setNavTab("", "#2a82e4");
+  },
+  methods: {
+    appointClass() {
+      wx.navigateTo({
+        url: '../appointmentResult/main'
+      })
+    }
   }
 };
 </script>
@@ -211,20 +218,6 @@ export default {
         width: 30px;
         height: 30px;
       }
-    }
-  }
-  .appointment {
-    position: fixed;
-    bottom: 0;
-    left: 0px;
-    width: 100%;
-    line-height: 48px;
-    text-align: center;
-    color: #fff;
-    background-color: @theme-color;
-    font-size: 18px;
-    &:active {
-      opacity: 0.8;
     }
   }
 }

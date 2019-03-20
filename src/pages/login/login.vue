@@ -13,9 +13,9 @@
         <span>第一次使用，请绑定您的会籍信息</span>
       </div>
       <div class="boundDiv">
-        <span class="pl">手机号</span>
-        <input class="pl" type="text" maxlength="11" placeholder="请输入手机号" id="boundPhone">
-        <button class="pr" id="yz_btn">获取验证码</button>
+        <span class="phone">手机号</span>
+        <input class="phone-input" type="text" maxlength="11" placeholder="请输入手机号" id="boundPhone">
+        <div class="code">获取验证码</div>
       </div>
       <div class="boundDiv">
         <input class type="text" placeholder="请输入验证码" id="codeText">
@@ -78,15 +78,16 @@ export default {
       }
     }
     .boundDiv {
-      height: 46px;
+      display: flex;
+      height: 50px;
       width: 100%;
       border-bottom: 1px solid #eeeeee;
       > span {
-        display: block;
-        width: 20%;
+        flex: 0 0 20%;
+        text-align: center;
         height: 45px;
         line-height: 45px;
-        padding-left: 15px;
+        // padding-left: 15px;
       }
       > input {
         height: 45px;
@@ -95,14 +96,13 @@ export default {
         border: none;
         background: initial;
       }
-      #yz_btn {
-        width: 30%;
-        padding: 0;
-        height: 49px;
-        border-left: 1px solid #e5e5e5;
-        background: white;
-        line-height: 46px;
-        font-size: 17px;
+      .code {
+        flex: 0 0 25%;
+        text-align: center;
+        border-left: 1px solid #eee;
+        background: #fff;
+        line-height: 50px;
+        font-size: 16px;
         color: #3cc51f;
       }
     }

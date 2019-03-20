@@ -5,7 +5,7 @@
       <p class="result-p">感谢您对本课程的支持，请耐心等待开课</p>
       <div class="btn-group">
         <span class="cancel">取消预约</span>
-        <span class="assess">评价</span>
+        <span class="assess" @click="assess">评价</span>
         <span class="again">再约一节</span>
       </div>
     </div>
@@ -37,6 +37,13 @@ export default {
   },
   onLoad() {
     setNavTab("", "#2a82e4");
+  },
+  methods: {
+    assess() {
+      wx.navigateTo({
+        url: '../assess/main'
+      })
+    }
   }
 };
 </script>

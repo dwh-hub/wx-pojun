@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "预约教练",
+  "usingComponents": {
+    "van-popup": "../../../static/vant/popup/index"
+  }
+}

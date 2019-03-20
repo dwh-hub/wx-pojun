@@ -1,5 +1,5 @@
 <template>
-  <div class="coach-item">
+  <div class="coach-item" @click="toDetail">
     <div class="cover">
       <img>
     </div>
@@ -12,6 +12,7 @@
       <div class="coach-type">$瑜伽$</div>
       <div class="coach-status">$热门$</div>
     </div>
+    <div class="appoint" @click.stop="toAppoint" v-else>预约</div>
   </div>
 </template>
 
@@ -23,6 +24,18 @@ export default {
       type: Boolean,
       default: false
     }
+  },
+  methods: {
+    toDetail() {
+      wx.navigateTo({
+        url: '../coachDetail/main'
+      })
+    },
+    toAppoint() {
+      wx.navigateTo({
+        url: '../appointmentCoach/main'
+      })
+    }
   }
 };
 </script>
@@ -32,11 +45,11 @@ export default {
 
 .coach-item {
   display: flex;
-  padding-right: 10px;
   box-shadow: 0px 0px 5px #ccc;
   border-radius: 2px;
   background-color: #fff;
   padding: 10px 0;
+  padding-right: 5px;
   .cover {
     flex: 0 0 90px;
     width: 90px;
@@ -87,6 +100,17 @@ export default {
       color: #f17f55;
       background-color: #feeee9;
     }
+  }
+  .appoint {
+    line-height: 24px;
+    height: 24px;
+    width: 60px;
+    margin: auto;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 2px;
+    background-color: @theme-color;
+    color: #fff;
   }
 }
 </style>

@@ -1,3 +1,5 @@
+const window = {}
+window.api = 'http://192.168.1.8'
 // 获取sessionKey 需调用wx.login获取sessionKey
 function initsessionKey() {
   let sessionKey = wx.getStorageSync("sessionKey");
@@ -10,6 +12,7 @@ function initsessionKey() {
   return Promise.resolve();
 }
 
+export {window}
 
 /**
  * 设置页面导航条的标题和颜色
@@ -43,4 +46,11 @@ export function HttpRequest(obj) {
     obj.header['unique-str'] = res;
     wx.request(obj)
   });
+}
+
+
+export default {
+  window,
+  setNavTab,
+  HttpRequest
 }

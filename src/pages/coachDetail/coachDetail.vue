@@ -19,6 +19,11 @@
         <img><img><img>
       </div>
     </div>
+    <div class="course">
+      <div class="title">成长历程</div>
+      <div class="course-content"></div>
+    </div>
+    <div class="bottom-btn appointment-btn" @click="toAppoint">马上预约</div>  
   </div>
 </template>
 
@@ -30,6 +35,13 @@ export default {
   },
   onLoad() {
     setNavTab("", "#2a82e4");
+  },
+  methods: {
+    toAppoint() {
+      wx.navigateTo({
+        url: '../appointmentCoach/main'
+      })
+    }
   }
 };
 </script>
@@ -38,6 +50,7 @@ export default {
 @import "~COMMON/less/common.less";
 
 .coach-detail {
+  padding-bottom: 60px;
   .coach {
     display: flex;
     border-radius: 2px;
@@ -79,7 +92,8 @@ export default {
     }
   }
   .coach-desc,
-  .coach-imgs {
+  .coach-imgs,
+  .course {
     padding: 0 20px;
     .title {
       margin-top: 15px;
@@ -106,6 +120,14 @@ export default {
           margin-right: 0px;
         }
       }
+    }
+  }
+  .course {
+    .course-content {
+      width: 100%;
+      height: 270px;
+      border-radius: 15px;
+      background-color: #eee;
     }
   }
 }

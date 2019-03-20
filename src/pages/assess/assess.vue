@@ -25,7 +25,7 @@
       <div class="assess-title">商家评价</div>
       <van-rate :value="storeRateVaule" :size="36" @change="onStoreRate"/>
     </div>
-    <div class="assess-btn" @click="assess">立即评价</div>
+    <div class="assess-btn bottom-btn" @click="assess">立即评价</div>
   </div>
 </template>
 
@@ -157,16 +157,6 @@ page {
       font-size: 18px;
       font-weight: bold;
     }
-  }
-  .assess-btn {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    line-height: 48px;
-    color: #fff;
-    background-color: @theme-color;
   }
 }
 </style>

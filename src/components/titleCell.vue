@@ -37,7 +37,6 @@ export default {
   },
   methods: {
     tapMore() {
-      console.log('taptaptpa')
       this.$emit('tapMore')
     }
   }

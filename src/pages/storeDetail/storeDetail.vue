@@ -18,8 +18,8 @@
     </swiper>
     <div class="address">
       <h4>地址</h4>
-      <div class="store">$店名$$距离$</div>
-      <div class="address-detail">$一个很长很长很长很长很长很长很长的地址$</div>
+      <div class="store">{{storeInfo.storeName}}$距离$</div>
+      <div class="address-detail">{{storeInfo.address}}</div>
     </div>
     <div class="business-hours">
       <div class="business">
@@ -42,21 +42,33 @@
 </template>
 
 <script>
-import {setNavTab} from "COMMON/js/common.js";
+import { setNavTab, window } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
 
 export default {
   name: "storeDetail",
-  data() {},
+  data() {
+    return {
+      storeId: -1,
+      storeInfo: {},
+      teamClassList: [],
+      coachList: []
+    };
+  },
   components: {
     titleCell,
     teamClassItem,
     coachItem
   },
-  onLoad() {
+  onLoad(option) {
+    this.storeId = option.storeId;
     setNavTab("", "#2a82e4");
+  },
+  mounted() {
+    this.getStoreDetail();
+    this.getStoreQuery();
   },
   methods: {
     toAllStore() {
@@ -65,8 +77,45 @@ export default {
       });
     },
     call() {
+      if (!this.storeInfo.phone) {
+        return wx.showToast({
+          title: "该门店无手机号",
+          icon: "none",
+          duration: 1000
+        });
+      }
       wx.makePhoneCall({
-        phoneNumber: "1340000"
+        phoneNumber: this.storeInfo.phone
+      });
+    },
+    getStoreDetail() {
+      let that = this;
+      wx.request({
+        url: window.api + "/store/detail/" + that.storeId,
+        success(res) {
+          let _data = res.data.data;
+          let _obj = {
+            address: _data.parentName + _data.cityName + _data.address,
+            name: _data.storeName,
+            phone: _data.phone,
+            banner: _data.images.split(",")
+          };
+          that.storeInfo = _obj;
+          Object.assign(that.storeInfo, _obj);
+          console.log(that.storeInfo);
+        }
+      });
+    },
+    getStoreQuery() {
+      let that = this;
+      wx.request({
+        url: window.api + "/system/setup/store/query",
+        data: {
+          storeId: that.storeId
+        },
+        success(res) {
+          console.log(res);
+        }
       });
     }
   }

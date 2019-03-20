@@ -45,9 +45,20 @@
       </div>
     </div>
     <div class="nearby-store-wrapper">
-      <title-cell title="附近的店" moreText="全部门店" :moreSize="14" :titleSize="18" @tapMore="toNav('../allStore/main')"></title-cell>
+      <title-cell
+        title="附近的店"
+        moreText="全部门店"
+        :moreSize="14"
+        :titleSize="18"
+        @tapMore="toNav('../allStore/main')"
+      ></title-cell>
       <div class="store-wrapper">
-        <div class="nearby-store" v-for="(item, index) in 2" :key="index" @click="toNav('../storeDetail/main')">
+        <div
+          class="nearby-store"
+          v-for="(item, index) in 2"
+          :key="index"
+          @click="toNav('../storeDetail/main')"
+        >
           <div class="cover">
             <img>
           </div>
@@ -67,7 +78,7 @@
 </template>
 
 <script>
-import { setNavTab } from "COMMON/js/common.js";
+import { setNavTab, window } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
@@ -76,44 +87,7 @@ export default {
   data() {
     return {
       bannerArr: ["https://www.pojun-tech.com/assets/img/morenImg.jpg"],
-      storeList: [
-        {
-          imgPath: "1",
-          storeName: "思明店",
-          phoneNum: "18894562567",
-          address: "思明区群鸿商业城28号58号楼"
-        },
-        {
-          imgPath: "2",
-          storeName: "骏景店",
-          phoneNum: "0595-68973238",
-          address: "港塘路94-96号鼎盛骏景小区会所"
-        },
-        {
-          imgPath: "3",
-          storeName: "思明店",
-          phoneNum: "18894562567",
-          address: "思明区群鸿商业城28号58号楼"
-        },
-        {
-          imgPath: "1",
-          storeName: "思明店",
-          phoneNum: "18894562567",
-          address: "思明区群鸿商业城28号58号楼"
-        },
-        {
-          imgPath: "2",
-          storeName: "骏景店",
-          phoneNum: "0595-68973238",
-          address: "港塘路94-96号鼎盛骏景小区会所"
-        },
-        {
-          imgPath: "3",
-          storeName: "思明店",
-          phoneNum: "18894562567",
-          address: "思明区群鸿商业城28号58号楼"
-        }
-      ],
+      storeList: [],
       // touch: {
       //   x: "",
       //   y: ""
@@ -137,7 +111,7 @@ export default {
         that.longitude = res.longitude;
       }
     });
-    // this.getBannerList()
+    this.getBannerList();
   },
   onLoad() {
     setNavTab("前锋体育", "#2a82e4");
@@ -156,12 +130,16 @@ export default {
     getBannerList() {
       let that = this;
       wx.request({
-        url: "http://192.168.1.8/system/set/wxcompanyinfo",
+        url: window.api + "/system/set/wxcompanyinfo",
         data: {
           companyId: ""
         },
         success(res) {
-          that.bannerList = res.data.data.wxCarousel.split(",");
+          console.log(res.data.code)
+          if (res.data.code === 200) {
+            that.bannerList = res.data.data.wxCarousel.split(",");
+            console.log(that.bannerList);
+          }
         }
       });
     }

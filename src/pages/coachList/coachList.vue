@@ -6,6 +6,7 @@
       <div class="search" :class="{active: currentNav==3}" @click="selectSearch">搜索</div>
     </div>
     <div class="coach-list">
+      <div class="sub-title">$标题$</div>
       <coach-item v-for="(item, index) in 3" :key="index"></coach-item>
     </div>
   </div>
@@ -49,6 +50,7 @@ page{
 .coach-list-wrapper {
   .nav-tab {
     display: flex;
+    margin-bottom: 8px;
     background-color: #fff;
     > div {
       flex: 1;
@@ -67,6 +69,10 @@ page{
   }
   .coach-list {
     padding: 0 10px;
+    .sub-title {
+      font-weight: bold;
+      margin-bottom: 10px; 
+    }
     .coach-item {
       margin-bottom: 20px;
     }

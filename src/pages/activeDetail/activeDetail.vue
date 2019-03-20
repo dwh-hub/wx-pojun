@@ -22,11 +22,15 @@
 </template>
 
 <script>
+import {setNavTab} from 'COMMON/js/common.js'
 export default {
   data() {
     return {
       signNum: '1'
     };
+  },
+  onLoad() {
+    setNavTab("", "#2a82e4");
   }
 };
 </script>
@@ -76,10 +80,10 @@ export default {
     position: fixed;
     bottom: 0px;
     width: 100%;
-    height: 53px;
-    box-sizing: border-box;
-    line-height: 53px;
+    height: 48px;
+    line-height: 48px;
     padding-left: 15px;
+    box-sizing: border-box;
     border-top: 1px solid #eee;
     .activeBottomTitle {
       display: block;

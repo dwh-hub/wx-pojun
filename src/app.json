@@ -1,5 +1,7 @@
 {
   "pages": [
+    "pages/activeDetail/main",
+    "pages/active/main",
     "pages/appointmentCoach/main",
     "pages/allStore/main",
     "pages/teamClassList/main",
@@ -16,8 +18,6 @@
     "pages/message/main",
     "pages/cardDetail/main",
     "pages/memberCard/main",
-    "pages/activeDetail/main",
-    "pages/active/main",
     "pages/login/main",
     "pages/appointmentRecord/main",
     "pages/checkInRecord/main",

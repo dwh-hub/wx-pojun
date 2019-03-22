@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import { formatDate } from "COMMON/js/common.js";
 export default {
   data() {
     return {
@@ -72,8 +73,10 @@ export default {
       this.dayArray = _dayArray;
     },
     selectWeek(index) {
-      this.$emit("selectWeek");
       this.selectDateIndex = index;
+      formatDate(new Date(), 'yyyy-MM')
+      let date = formatDate(new Date(), 'yyyy-MM') + '-' + this.dayArray[index]
+      this.$emit("selectWeek", date);
     }
   }
 };

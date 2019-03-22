@@ -47,6 +47,7 @@ export default {
       showSelect: false,
       teamClassList: [],
       coachList: [],
+      classId: '',
       actions: [{ name: "团课" }, { name: "私教" }]
     };
   },
@@ -56,7 +57,8 @@ export default {
     teamClassItem,
     coachItem
   },
-  onLoad() {
+  onLoad(option) {
+    this.classId = option.classId;
     setNavTab("", "#2a82e4");
   },
   computed: {

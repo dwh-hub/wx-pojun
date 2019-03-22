@@ -1,29 +1,49 @@
 <template>
   <div class="team-class-item" @click="toDetail">
     <div class="cover">
-      <img>
+      <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg">
     </div>
     <div class="team-class-info">
-      <div class="team-class-name">$瑜伽$</div>
-      <div class="team-class-coach">$教练$</div>
-      <div class="team-class-time">$9:45-15:45$</div>
+      <div class="team-class-name">{{info.anotherName || '团课名称'}}</div>
+      <div class="team-class-coach">{{info.coachNameArrayStr || '团课教练'}}</div>
+      <div class="team-class-time"><span>{{info.venueName || '场馆名称'}}</span>{{startTime}}~{{endTime}}</div>
     </div>
     <div class="tag">
-      <div class="team-class-type">$瑜伽$</div>
-      <div class="team-class-status">$热门$</div>
+      <!-- <div class="team-class-type">$瑜伽$</div>
+      <div class="team-class-status">$热门$</div> -->
     </div>
   </div>
 </template>
 
 <script>
+import {formatDate} from 'COMMON/js/common.js'
 export default {
   name: "team-class-item",
-  props: {},
+  props: {
+    info: {
+      type: Object,
+      default: function() {
+        return {}
+      }
+    }
+  },
   methods: {
     toDetail() {
       wx.navigateTo({
-        url: '../teamClassDetail/main'
+        url: '../teamClassDetail/main?classId=' + this.info.teamScheduleId
       })
+    }
+  },
+  computed: {
+    startTime() {
+      if(this.info.timeStart) {
+        return formatDate(new Date(this.info.timeStart), 'hh:mm')
+      }
+    },
+    endTime() {
+      if(this.info.timeEnd) {
+        return formatDate(new Date(this.info.timeEnd), 'hh:mm')
+      }
     }
   }
 };
@@ -45,7 +65,7 @@ export default {
     > img {
       width: 100%;
       height: 100%;
-      background-color: #bfbfbf;
+      background-color: #eee;
     }
   }
   .team-class-info {
@@ -68,6 +88,11 @@ export default {
       color: #333;
     }
     .team-class-time {
+      >span {
+        font-size: 14px;
+        margin-right: 5px;
+        color: #999;
+      }
       font-size: 12px;
       color: #bababa;
     }

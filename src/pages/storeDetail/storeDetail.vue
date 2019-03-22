@@ -12,19 +12,22 @@
       <div v-for="(item,index) in 3" :key="index">
         <swiper-item>
           <!-- <img :src="item" class="banner"> -->
-          <img class="banner" src="/static/images/banner-1.jpg">
+          <img
+            class="banner"
+            src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
+          >
         </swiper-item>
       </div>
     </swiper>
     <div class="address">
       <h4>地址</h4>
-      <div class="store">{{storeInfo.storeName}}$距离$</div>
+      <div class="store">{{storeInfo.name}}<span class="range">1.4km*</span></div>
       <div class="address-detail">{{storeInfo.address}}</div>
     </div>
     <div class="business-hours">
       <div class="business">
         <div class="business-text">营业时间</div>
-        <div class="time">$09:00-22:00$</div>
+        <div class="time">{{businessTime || '未设置营业时间'}}</div>
       </div>
       <div class="phone" @click="call">
         <img src="/static/images/icon-phone.png">
@@ -42,7 +45,7 @@
 </template>
 
 <script>
-import { setNavTab, window } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest, formatDate } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
@@ -54,7 +57,8 @@ export default {
       storeId: -1,
       storeInfo: {},
       teamClassList: [],
-      coachList: []
+      coachList: [],
+      businessTime: ""
     };
   },
   components: {
@@ -69,12 +73,13 @@ export default {
   mounted() {
     this.getStoreDetail();
     this.getStoreQuery();
+    this.getTeamClassList();
   },
   methods: {
     toAllStore() {
-      wx.navigateTo({
-        url: "../allStore/main"
-      });
+      // wx.navigateTo({
+      //   url: "../allStore/main"
+      // });
     },
     call() {
       if (!this.storeInfo.phone) {
@@ -88,35 +93,59 @@ export default {
         phoneNumber: this.storeInfo.phone
       });
     },
+    // 获取门店详情
     getStoreDetail() {
       let that = this;
-      wx.request({
+      HttpRequest({
         url: window.api + "/store/detail/" + that.storeId,
         success(res) {
           let _data = res.data.data;
+          let _address = _data.parentName + _data.cityName + _data.address;
+          _address = _address.replace(/null/g, '')
+          _address = _address.replace(/[0]/ig, '')
           let _obj = {
-            address: _data.parentName + _data.cityName + _data.address,
+            address: _address || '未设置详细地址',
             name: _data.storeName,
             phone: _data.phone,
-            banner: _data.images.split(",")
+            bannerList: _data.images.split(",")
           };
           that.storeInfo = _obj;
-          Object.assign(that.storeInfo, _obj);
+          console.log(res.data.data)
+          // Object.assign(that.storeInfo, _obj);
           console.log(that.storeInfo);
         }
       });
     },
+    // 门店系统设置，获取营业时间
     getStoreQuery() {
       let that = this;
-      wx.request({
+      HttpRequest({
         url: window.api + "/system/setup/store/query",
         data: {
           storeId: that.storeId
         },
         success(res) {
-          console.log(res);
+          if (res.data.data.openTimeStart && res.data.data.openTimeEnd) {
+            that.businessTime =
+              res.data.data.openTimeStart + "~" + res.data.data.openTimeEnd;
+          }
         }
       });
+    },
+    // 门店内的团课
+    getTeamClassList() {
+      let that = this
+      HttpRequest({
+        url: window.api + '/teamClass/teamSchedule/weekView',
+        data: {
+          storeId: that.storeId,
+          calendarStart: formatDate(new Date(), 'yyyy-MM-dd'),
+          calendarEnd: ''
+        },
+        success(res) {
+          console.log(res.data.data)
+        }
+      })
     }
   }
 };
@@ -144,6 +173,12 @@ export default {
       font-size: 16px;
       color: @theme-color;
       margin: 8px 0;
+      >span {
+        display: inline-block;
+        margin-left: 5px;
+        color: @theme-color;
+        font-size: 12px;
+      }
     }
     .address-detail {
       color: #bababa;

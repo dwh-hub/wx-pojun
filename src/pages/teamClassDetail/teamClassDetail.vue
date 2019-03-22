@@ -12,11 +12,14 @@
       <div v-for="(item,index) in 3" :key="index">
         <swiper-item>
           <!-- <img :src="item" class="banner"> -->
-          <img class="banner" src="/static/images/banner-1.jpg">
+          <img
+            class="banner"
+            src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
+          >
         </swiper-item>
       </div>
     </swiper>
-    <div class="class-name">$塑性杠铃操$</div>
+    <div class="class-name">{{classDetail.anotherName || '课程名称'}}</div>
     <div class="coach-detail">
       <div class="cover">
         <img>
@@ -28,15 +31,15 @@
     </div>
     <div class="class-info">
       <!-- TODO:传课程时间 -->
-      <title-cell title="3月18日 周三 20:15-21:15" moreText="其他时间" :moreSize="14" :titleSize="16"></title-cell>
+      <title-cell :title="classTime" moreText="其他时间" :moreSize="14" :titleSize="16"></title-cell>
       <div class="address-group">
         <div class="store">
-          <span class="name">$仓山万达店$</span>
-          <span>2.4KM</span>
+          <span class="name">{{classDetail.storeName}}</span>
+          <span class="range">2.4KM</span>
         </div>
         <div class="address">$福州仓山大街商铺272号万达广场A9楼三楼$</div>
       </div>
-      <div class="class-type">$合同结算$</div>
+      <!-- <div class="class-type">$合同结算$</div> -->
     </div>
     <div class="class-desc">
       <div class="title">课程介绍</div>
@@ -69,29 +72,85 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div class="bottom-btn appointment" @click="appointClass">马上预约</div> 
+    <div class="bottom-btn appointment" @click="appointClass">马上预约</div>
   </div>
 </template>
 
 <script>
-import { setNavTab } from "COMMON/js/common.js";
+import {
+  setNavTab,
+  window,
+  HttpRequest,
+  formatDate
+} from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 export default {
   name: "team-class-detail",
   data() {
-    return {};
+    return {
+      id: "",
+      classDetail: {}
+    };
   },
   components: {
     titleCell
   },
-  onLoad() {
+  onLoad(option) {
+    this.id = option.classId;
     setNavTab("", "#2a82e4");
+  },
+  mounted() {
+    this.getClassDetail();
+  },
+  computed: {
+    statrTime() {
+      if (this.classDetail.timeStart) {
+        return formatDate(new Date(this.classDetail.timeStart), "hh:mm");
+      }
+    },
+    endTime() {
+      if (this.classDetail.timeEnd) {
+        return formatDate(new Date(this.classDetail.timeEnd), "hh:mm");
+      }
+    },
+    classTime() {
+      let week = ["一", "二", "三", "四", "五", "六", "日"];
+      let w = "周" + week[new Date(this.classDetail.timeStart).getDay() + 1];
+      let md = formatDate(new Date(this.classDetail.timeStart), "M月dd");
+      return md + " " + w + " " + this.statrTime + "-" + this.endTime;
+    }
   },
   methods: {
     appointClass() {
-      wx.navigateTo({
-        url: '../appointmentResult/main'
-      })
+      let that = this
+      wx.showModal({
+        title: "提示",
+        content: "是否确认预约？",
+        success(res) {
+          if (res.confirm) {
+            wx.navigateTo({
+              url: "../appointmentResult/main?classId=" + that.id
+            });
+          } else if (res.cancel) {
+            console.log("用户点击取消");
+          }
+        }
+      });
+    },
+    getClassDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/teamClass/teamSchedule/getOne",
+        data: {
+          teamScheduleId: that.id
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.classDetail = res.data.data;
+          }
+          console.log(res.data.data);
+        }
+      });
     }
   }
 };
@@ -166,6 +225,10 @@ export default {
         }
         .name {
           font-size: 16px;
+          margin-right: 10px;
+        }
+        .range {
+          font-size: 12px;
         }
       }
       .address {

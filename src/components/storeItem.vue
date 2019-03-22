@@ -2,14 +2,14 @@
   <div class="store-item" @click="toDetail">
     <div class="store-cover">
       <!-- TODO: :src="info.cover" -->
-      <img>
+      <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg">
     </div>
     <div class="store-info">
       <div class="store-top">
         <span class="store-name">{{info.storeName}}</span>
         <span class="store-range">{{info.range}}</span>
       </div>
-      <div class="store-bottom">{{info.address || '暂无地址'}}</div>
+      <div class="store-bottom">{{info.address || '未设置详细地址'}}</div>
     </div>
   </div>
 </template>
@@ -20,7 +20,12 @@ export default {
     info: {
       type: Object,
       default: function() {
-        return {}
+        return {
+          storeId: 94,
+          storeName: '门店名称',
+          range: '1.2km',
+          address: '思明区群鸿商业城28号58号楼'
+        }
       }
     }
   },

@@ -18,7 +18,7 @@
       <van-rate :value="coachRateVaule" :size="36" @change="onCoachRate"/>
     </div>
     <div class="store">
-      <img src="/static/images/banner-1.jpg" alt>
+      <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg" alt>
       <span class="store-name">$三体店$</span>
     </div>
     <div class="store-assess">

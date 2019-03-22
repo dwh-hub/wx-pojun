@@ -10,10 +10,10 @@
       :circular="true"
       :loop="true"
     >
-      <div v-for="(item,index) in 3" :key="index">
+      <div v-for="(item,index) in bannerList" :key="index">
         <swiper-item>
           <!-- <img :src="item" class="banner"> -->
-          <img class="banner" src="/static/images/banner-1.jpg">
+          <img class="banner" src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg">
         </swiper-item>
       </div>
     </swiper>
@@ -57,10 +57,10 @@
           class="nearby-store"
           v-for="(item, index) in 2"
           :key="index"
-          @click="toNav('../storeDetail/main')"
         >
+        <!-- @click="toNav('../storeDetail/main')" -->
           <div class="cover">
-            <img>
+            <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg">
           </div>
           <div class="nearby-bottom">
             <span class="name">$推荐店名$</span>
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import { setNavTab, window } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
@@ -135,9 +135,10 @@ export default {
           companyId: ""
         },
         success(res) {
-          console.log(res.data.code)
           if (res.data.code === 200) {
-            that.bannerList = res.data.data.wxCarousel.split(",");
+            that.bannerList = res.data.data.wxCarousel.split(",").map((e) => {
+              return e = window.api + e
+            })
             console.log(that.bannerList);
           }
         }
@@ -229,7 +230,7 @@ export default {
           > img {
             width: 100%;
             height: 90px;
-            background-color: #bfbfbf;
+            background-color: #eee;
             border-radius: 5px;
           }
         }

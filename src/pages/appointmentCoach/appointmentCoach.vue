@@ -74,38 +74,54 @@
         <span>选择开始时间</span>
         <img src="/static/images/icon-close.png" @click="isTimePopup = false">
       </div>
-      <select-date></select-date>
+      <select-date @selectWeek="onDate"></select-date>
       <div class="specific-date">
         <div class="morning">
           <h5>上午</h5>
           <div class="hours">
-            <div class="hour" v-for="(item, index) in morningTimes" :class="{active: item == curTime}" :key="index" @click="selectHour(item)">
-              {{item}}
-            </div> 
+            <div
+              class="hour"
+              v-for="(item, index) in morningTimes"
+              :class="{active: item == curTime}"
+              :key="index"
+              @click="selectHour(item)"
+            >{{item}}</div>
           </div>
         </div>
         <div class="noon">
           <h5>中午</h5>
           <div class="hours">
-            <div class="hour" v-for="(item, index) in noonTimes" :class="{active: item == curTime}" @click="selectHour(item)" :key="index">
-              {{item}}
-            </div> 
+            <div
+              class="hour"
+              v-for="(item, index) in noonTimes"
+              :class="{active: item == curTime}"
+              @click="selectHour(item)"
+              :key="index"
+            >{{item}}</div>
           </div>
         </div>
         <div class="afternoon">
           <h5>下午</h5>
           <div class="hours">
-            <div class="hour" v-for="(item, index) in afternoonTimes" :class="{active: item == curTime}" @click="selectHour(item)" :key="index">
-              {{item}}
-            </div> 
+            <div
+              class="hour"
+              v-for="(item, index) in afternoonTimes"
+              :class="{active: item == curTime}"
+              @click="selectHour(item)"
+              :key="index"
+            >{{item}}</div>
           </div>
         </div>
         <div class="afternoon">
           <h5>晚上</h5>
           <div class="hours">
-            <div class="hour" v-for="(item, index) in nightTime" :class="{active: item == curTime}" @click="selectHour(item)" :key="index">
-              {{item}}
-            </div> 
+            <div
+              class="hour"
+              v-for="(item, index) in nightTime"
+              :class="{active: item == curTime}"
+              @click="selectHour(item)"
+              :key="index"
+            >{{item}}</div>
           </div>
         </div>
       </div>
@@ -152,7 +168,7 @@
 </template>
 
 <script>
-import { setNavTab } from "COMMON/js/common.js";
+import { setNavTab, formatDate, window, HttpRequest } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 
@@ -174,24 +190,31 @@ export default {
       noonTimes: [],
       afternoonTimes: [],
       nightTime: [],
+      // 当前选择的日期
+      curDate: "",
       // 点击选择的时间
-      curTime: ''
+      curTime: "",
+      coachId: "",
+      cardList: []
     };
   },
   components: {
     titleCell,
     selectDate
   },
-  onLoad() {
+  onLoad(option) {
+    this.coachId = option.coachId;
     setNavTab("", "#2a82e4");
   },
   mounted() {
     this.computedTime();
+    this.curDate = formatDate(new Date(), "yyyy-MM-dd");
+    this.getAllCardS()
   },
   methods: {
     // 选择时间
     selectHour(item) {
-      this.curTime = item
+      this.curTime = item;
     },
     // 计算可选择预约时间
     computedTime() {
@@ -222,6 +245,7 @@ export default {
     selectStore() {
       this.isStorePopup = false;
       this.storeCellText = "已选择门店";
+      this.isTimePopup = true;
     },
     // 选择合同
     selectCard() {
@@ -231,7 +255,7 @@ export default {
     // 选择时间
     selectDate() {
       this.isTimePopup = false;
-      this.timeCellText = "已选择时间";
+      this.timeCellText = this.curDate + " " + this.curTime;
     },
     // 确认预约
     appointCoach() {
@@ -259,7 +283,31 @@ export default {
       wx.navigateTo({
         url: "../appointmentResult/main"
       });
-    }
+    },
+    // 组件select-date返回的日期
+    onDate(date) {
+      this.curDate = date;
+    },
+    // 获取能使用的合同列表
+    // getCardS() {
+    //   let that = this
+    //   HttpRequest({
+    //     url: window.api + "/customer/card/cardInfos",
+    //     data: {
+    //       page: 1,
+    //       pageCount: 100,
+    //       customerId: wx.getStorageSync("userInfo").id
+    //     },
+    //     success(res) {
+    //       if (res.data.code === 200) {
+    //         // that.cardList = res.data.data.result;
+    //         res.data.data.result.map((e) => {
+    //           if()
+    //         })
+    //       }
+    //     }
+    //   });
+    // }
   }
 };
 </script>

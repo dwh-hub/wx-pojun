@@ -38,7 +38,7 @@ export default {
     >img {
       width: 120px;
       height: 120px;
-      background-color: #ccc;
+      background-color: #eee;
     }
     >p {
       margin-top: 10px;

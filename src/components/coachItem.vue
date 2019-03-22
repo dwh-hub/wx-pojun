@@ -1,10 +1,10 @@
 <template>
   <div class="coach-item" @click="toDetail">
     <div class="cover">
-      <img>
+      <img src="http://pojun-tech.cn/assets/img/morenm.png">
     </div>
     <div class="coach-info">
-      <div class="coach-name">$高子涵$</div>
+      <div class="coach-name">{{info.userName || '教练名字'}}</div>
       <div class="coach-desc">$我是最美最美最美最美的$</div>
       <div class="coach-times">$13节课 共授课19次$</div>
     </div>
@@ -20,6 +20,12 @@
 export default {
   name: "coach-item",
   props: {
+    info: {
+      type: Object,
+      default: function() {
+        return {}
+      }
+    },
     hasTag: {
       type: Boolean,
       default: false
@@ -28,12 +34,12 @@ export default {
   methods: {
     toDetail() {
       wx.navigateTo({
-        url: '../coachDetail/main'
+        url: '../coachDetail/main?coachId=' + this.info.userId
       })
     },
     toAppoint() {
       wx.navigateTo({
-        url: '../appointmentCoach/main'
+        url: '../appointmentCoach/main?coachId=' + this.info.userId
       })
     }
   }
@@ -61,7 +67,7 @@ export default {
       width: 80px;
       height: 80px;
       border-radius: 50%;
-      background-color: #bfbfbf;
+      background-color: #eee;
     }
   }
   .coach-info {

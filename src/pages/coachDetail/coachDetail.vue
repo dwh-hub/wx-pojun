@@ -28,19 +28,28 @@
 </template>
 
 <script>
-import { setNavTab } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 export default {
   data() {
-    return {};
+    return {
+      coachId: ''
+    };
   },
-  onLoad() {
+  onLoad(option) {
+    this.coachId = option.coachId
     setNavTab("", "#2a82e4");
   },
   methods: {
     toAppoint() {
       wx.navigateTo({
-        url: '../appointmentCoach/main'
+        url: '../appointmentCoach/main?coachId=' + this.coachId
       })
+    },
+    getCoachDetail() {
+      // HttpRequest({
+      //   url: '',
+      //   data: {}
+      // })
     }
   }
 };

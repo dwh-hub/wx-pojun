@@ -1,57 +1,113 @@
 <template>
   <div id="cardDetail">
-    <card></card>
+    <card :info="cardInfo"></card>
     <div class="moneyRecode">
       <div class="spend">
         <div class="spend-text">消费</div>
-        <div class="spend-num">$1000.00元$</div>
+        <div class="spend-num">{{customer.recCount}}次</div>
       </div>
       <div class="balance">
         <div class="balance-text">剩余</div>
-        <div class="balance-num">$1000.00元$</div>
+        <div class="balance-num">{{cardInfo.periodOfValidity}}{{cardInfo.authorityUnitChar}}</div>
       </div>
     </div>
     <div class="card-info">
       <div class="carad-info-item">
         <span class="item-title">拥有人</span>
-        <span class="item-content">$姓名（身份）$</span>
+        <span class="item-content">{{cardInfo.mainUser}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">联系方式</span>
-        <span class="item-content">$13046886548$</span>
+        <span class="item-content">{{cardInfo.phone}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">办理销售</span>
-        <span class="item-content">$13$</span>
+        <span class="item-content">{{cardInfo.transactUserName}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">办理时间</span>
-        <span class="item-content">$2019-03-01$</span>
+        <span class="item-content">{{activateDate}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">合同编号</span>
-        <span class="item-content">$32132132$</span>
+        <span class="item-content">{{cardInfo.pactId}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">上课教练</span>
-        <span class="item-content">$名字$</span>
+        <span class="item-content">{{cardInfo.coachUserName || '--'}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">有效期</span>
-        <span class="item-content">$2019-03-01~2019-03-01$</span>
+        <span class="item-content">{{activateDate}}~{{doomsday}}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import card from "COMPS/card";
 export default {
   data() {
-    return {};
+    return {
+      cardId: '',
+      // 合同详情
+      cardInfo: {},
+      // 消费统计
+      customer: {}
+    };
   },
   components: {
     card
+  },
+  onLoad(option) {
+    this.cardId = option.id
+    setNavTab("", "#2a82e4");
+  },
+  mounted() {
+    this.getCardDetail()
+  },
+  computed: {
+    // 卡的激活时间
+    activateDate() {
+      if(this.cardInfo.activateDate) {
+        return this.cardInfo.cardAddTime.split(" ")[0]
+      }
+    },
+    // 卡的到期时间
+    doomsday() {
+      if (this.cardInfo.doomsday) {
+        return this.cardInfo.doomsday.split(" ")[0]
+      }
+    },
+  },
+  methods: {
+    // 获取合同详情
+    getCardDetail() {
+      let that = this
+      HttpRequest({
+        url: window.api + '/customer/card/detail/' + that.cardId,
+        success(res) {
+          that.cardInfo = res.data.data
+          console.log(that.cardInfo)
+          that.getCustomer(res.data.data.pactId)
+        }
+      })
+    },
+    // 获取消费统计
+    getCustomer(id) {
+      let that = this
+      HttpRequest({
+        url: window.api + '/consumption/log/pages/customer',
+        data: {
+          pactId: id
+        },
+        success(res) {
+          that.customer = res.data.data
+          console.log(that.customer)
+        }
+      })
+    }
   }
 };
 </script>

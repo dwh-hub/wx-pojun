@@ -4,13 +4,12 @@
       <div class="mineImgDiv pl">
         <img
           class="mineImg"
-          alt
-          src="https://www.pojun-tech.com/images/company_log/3/1.5355962923289521E12.png"
+          :src="userInfo.headImgPath || 'https://pojun-tech.cn/assets/img/morenTo.png'"
         >
       </div>
       <div class="pl mineDetail">
-        <p id="mineName">$姓名（身份）$</p>
-        <p id="minePhone">$130 4567 8192$</p>
+        <p id="mineName">{{userInfo.name}}</p>
+        <p id="minePhone">{{userInfo.phone}}</p>
       </div>
     </div>
     <div class="mineDeail">
@@ -22,14 +21,17 @@
       >
         <img alt :src="item.imgUrl">
         <span class="detail_title">{{item.navName}}</span>
-        <!-- <span class="detail_contrnt" id="carCount"></span> -->
+        <span class="detail_contrnt">{{item.hit}}{{item.text}}</span>
       </div>
     </div>
-    <div class="mineExit">解除绑定</div>
+    <div class="mineExit" @click="singOut">解除绑定</div>
   </div>
 </template>
 
 <script>
+import { setNavTab, window, getCookie, HttpRequest } from "COMMON/js/common.js";
+import store from "../../utils/store";
+
 export default {
   data() {
     return {
@@ -37,41 +39,104 @@ export default {
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/mineCar.png",
           navName: "会员卡",
-          navigatorUrl: '../memberCard/main'
+          navigatorUrl: "../memberCard/main",
+          hit: "",
+          text: "张"
         },
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/lessons.png",
           navName: "上课次数",
-          navigatorUrl: '../classTimes/main'
+          navigatorUrl: "../classTimes/main",
+          hit: "",
+          text: "次"
         },
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/appiont.png",
           navName: "预约记录",
-          navigatorUrl: '../appointmentRecord/main'
+          navigatorUrl: "../appointmentRecord/main",
+          hit: "",
+          text: "次"
         },
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
           navName: "签到记录",
-          navigatorUrl: '../checkInRecord/main'
+          navigatorUrl: "../checkInRecord/main",
+          hit: "",
+          text: "次"
         },
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/integral.png",
           navName: "我的积分",
-          navigatorUrl: '../myPoints/main'
+          navigatorUrl: "../myPoints/main",
+          hit: "",
+          text: "分"
         },
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/checkFace.png",
           navName: "人脸设置",
-          navigatorUrl: '../faceSetUp/main'
+          navigatorUrl: "../faceSetUp/main",
+          hit: "",
+          text: ""
         }
-      ]
+      ],
+      // 临时的用户数据
+      userInfo: {}
     };
+  },
+  onLoad() {
+    this.getTimes();
+    setNavTab("", "#2a82e4");
+  },
+  mounted() {
+    this.userInfo = wx.getStorageSync('userInfo')
+    store.commit("saveUserInfo", this.userInfo);
   },
   methods: {
     navTo(url) {
       wx.navigateTo({
         url: url
-      })
+      });
+    },
+    singOut() {
+      wx.showModal({
+        title: "提示",
+        content: "确认解除绑定吗？",
+        success(res) {
+          if (res.confirm) {
+            console.log("用户点击确定");
+          } else if (res.cancel) {
+            console.log("用户点击取消");
+          }
+        }
+      });
+    },
+    getTimes() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/wxcustomer/selfcount",
+        method: "POST",
+        success(res) {
+          if (res.data.code === 200) {
+            that.mineNav.forEach(function(e) {
+              if (e.navName == "会员卡") {
+                e.hit = res.data.data.cardCount;
+              } else if (e.navName == "上课次数") {
+                e.hit = res.data.data.attendClassCount;
+              } else if (e.navName == "预约记录") {
+                e.hit = res.data.data.appointCount;
+              } else if (e.navName == "签到记录") {
+                e.hit = res.data.data.consumeLogCount;
+              } else if (e.navName == "我的积分") {
+                e.hit = res.data.data.selfIntegral;
+              }
+            });
+          } else {
+            wx.redirectTo({
+              url: "../login/main"
+            });
+          }
+        }
+      });
     }
   }
 };
@@ -83,7 +148,7 @@ export default {
 #memberMineTab {
   .mine_top {
     padding: 20px 30px;
-    box-sizing: border-box; 
+    box-sizing: border-box;
     height: 110px;
     .mineImgDiv {
       border-radius: 50%;
@@ -105,10 +170,10 @@ export default {
     border-top: 10px solid #f4f4f4;
     .detail_item {
       height: 46px;
-      border-bottom: 1px solid #ededed;
-      font-size: 15px;
       line-height: 46px;
+      font-size: 15px;
       padding-left: 15px;
+      border-bottom: 1px solid #ededed;
       > img {
         display: inline-block;
         vertical-align: middle;
@@ -118,12 +183,11 @@ export default {
       .detail_title {
         vertical-align: middle;
         margin-left: 10px;
-        color: #515151;
       }
-      // .detail_contrnt {
-      //   float: right;
-      //   margin-right: 15px;
-      // }
+      .detail_contrnt {
+        float: right;
+        margin-right: 15px;
+      }
     }
   }
   .mineExit {
@@ -136,9 +200,9 @@ export default {
     color: white;
     text-align: center;
     border-radius: 5px;
-    background: #5db2ff;
+    background: @theme-color;
     &:active {
-      opacity: 0.6;
+      opacity: 0.8;
     }
   }
 }

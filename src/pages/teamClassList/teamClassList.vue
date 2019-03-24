@@ -5,13 +5,15 @@
       <div class="nav-tab">
         <div class="store" :class="{active: currentNav==1}" @click="selectAllStore">
           {{curStore}}
-          <div class="store-nav-list" v-show="showStoreList" :class="{slide: showStoreList}">
-            <div
-              class="store-nav-item"
-              v-for="(item, index) in storeNav"
-              :key="index"
-              @click.stop="selectStore(item)"
-            >{{item.storeName}}</div>
+          <div class="list-warpper">
+            <div class="store-nav-list" :class="{slide: showStoreList}">
+              <div
+                class="store-nav-item"
+                v-for="(item, index) in 5"
+                :key="index"
+                @click.stop="selectStore(item)"
+              >item.storeName</div>
+            </div>
           </div>
         </div>
         <div class="class" :class="{active: currentNav==2}" @click="selectAllClass">全部课程</div>
@@ -43,7 +45,7 @@ export default {
       storeNav: [],
       classList: [],
       // 当前选择的门店
-      curStore: '全部门店'
+      curStore: "全部门店"
     };
   },
   onLoad() {
@@ -64,7 +66,7 @@ export default {
     },
     selectStore(item) {
       this.showStoreList = false;
-      this.curStore = item.storeName
+      this.curStore = item.storeName || '全部门店';
       this.getClassList("", item.storeId);
     },
     selectAllClass() {
@@ -93,10 +95,10 @@ export default {
             };
           });
           _storeList.push({
-            storeName: '全部门店',
-            storeId: ''
-          })
-          that.storeNav = _storeList
+            storeName: "全部门店",
+            storeId: ""
+          });
+          that.storeNav = _storeList;
           console.log(that.storeNav);
         }
       });
@@ -153,18 +155,25 @@ export default {
           color: @theme-color;
         }
       }
-      .store-nav-list {
+      .list-warpper {
         position: absolute;
         top: 42px;
         left: 0px;
         width: 100%;
+        height: 300px;
+        overflow: hidden;
+        background-color: rgba(0,0,0,0);
+        z-index: 98;
+      }
+      .store-nav-list {
         text-align: left;
         max-height: 300px;
+        transform: translateY(-100%);
         background-color: #fff;
         overflow-y: auto;
-        z-index: 98;
+        transition: transform 0.5s;
         &.slide {
-          z-index: 98;
+          transform: translateY(0px);
         }
         .store-nav-item {
           line-height: 50px;

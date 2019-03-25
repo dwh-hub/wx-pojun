@@ -1,10 +1,10 @@
 <template>
   <div class="appointmentClass">
     <div class="nav-tab">
-      <div class="stay" :class="{active: currentNav==1}" @click="stay">待上课</div>
-      <div class="assess" :class="{active: currentNav==2}" @click="assess">待评价</div>
-      <div class="complete" :class="{active: currentNav==3}" @click="complete">已完成</div>
-      <div class="other" :class="{active: currentNav==4}" @click="other">其他</div>
+      <div class="stay" :class="{active: currentNav==1}" @click="selectNav(1)">待上课</div>
+      <div class="assess" :class="{active: currentNav==2}" @click="selectNav(2)">待评价</div>
+      <div class="complete" :class="{active: currentNav==3}" @click="selectNav(3)">已完成</div>
+      <div class="other" :class="{active: currentNav==4}" @click="selectNav(4)">其他</div>
     </div>
     <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
       <div class="stay-team-class">
@@ -28,13 +28,22 @@
       @close="closeSelect"
       @select="selectCur"
     ></van-action-sheet>
-    <none-result text="你还没有准备好吗" :buttonText="btnText" @tapBtn="toggleSelect" v-if="!teamClassList.length && !coachList.length"></none-result>
-    <div class="bottom-btn" v-if="teamClassList.length || coachList.length" @click="toggleSelect">继续预约</div>
+    <none-result
+      text="你还没有准备好吗"
+      :buttonText="btnText"
+      @tapBtn="toggleSelect"
+      v-if="!teamClassList.length && !coachList.length"
+    ></none-result>
+    <div
+      class="bottom-btn"
+      v-if="teamClassList.length || coachList.length"
+      @click="toggleSelect"
+    >继续预约</div>
   </div>
 </template>
 
 <script>
-import { setNavTab } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
@@ -47,7 +56,9 @@ export default {
       showSelect: false,
       teamClassList: [],
       coachList: [],
-      classId: '',
+      classId: "",
+      // 当前登录用户的id
+      customerId: "",
       actions: [{ name: "团课" }, { name: "私教" }]
     };
   },
@@ -58,8 +69,10 @@ export default {
     coachItem
   },
   onLoad(option) {
+    this.customerId = this.userInfo = wx.getStorageSync("userInfo").id;
     this.classId = option.classId;
     setNavTab("", "#2a82e4");
+    this.getOwnClassList();
   },
   computed: {
     btnText() {
@@ -69,17 +82,8 @@ export default {
     }
   },
   methods: {
-    stay() {
-      this.currentNav = 1;
-    },
-    assess() {
-      this.currentNav = 2;
-    },
-    complete() {
-      this.currentNav = 3;
-    },
-    other() {
-      this.currentNav = 4;
+    selectNav(index) {
+      this.currentNav = index;
     },
     toggleSelect() {
       this.showSelect = true;
@@ -103,6 +107,20 @@ export default {
     },
     closeSelect() {
       this.showSelect = false;
+    },
+    // 获取我的课程列表 status 3 已下课
+    getOwnClassList(status) {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/pages/own",
+        data: {
+          customerId: that.customerId,
+          status: status
+        },
+        success(res) {
+          console.log(res);
+        }
+      });
     }
   }
 };

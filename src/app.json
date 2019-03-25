@@ -1,6 +1,8 @@
 {
   "pages": [
+    "pages/appointmentClass/main",
     "pages/teamClassList/main",
+    "pages/teamClassDetail/main",
     "pages/coachList/main",
     "pages/allStore/main",
     "pages/message/main",
@@ -16,8 +18,6 @@
     "pages/coachDetail/main",
     "pages/assess/main",
     "pages/appointmentResult/main",
-    "pages/teamClassDetail/main",
-    "pages/appointmentClass/main",
     "pages/storeDetail/main",
     "pages/appointmentCards/main",
     "pages/cardDetail/main",

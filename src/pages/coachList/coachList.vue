@@ -85,6 +85,7 @@ export default {
     //   this.getSingInCoachList();
     // });
   },
+  // 触底刷新
   onReachBottom() {
     let allLen = this.allCoachList.length;
     let len = this.coachList.length;

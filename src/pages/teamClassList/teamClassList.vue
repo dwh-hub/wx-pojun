@@ -5,8 +5,8 @@
       <div class="nav-tab">
         <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
           {{curStore}}
-          <div class="list-warpper" @click.stop="clickMask">
-            <div class="store-nav-list" :class="{slide: showStoreList}">
+          <div class="list-warpper" :class="{slideWrap: showStoreNav}" @click.stop="clickMask">
+            <div class="store-nav-list" :class="{slide: showStoreNav}">
               <div
                 class="store-nav-item"
                 v-for="(item, index) in storeNav"
@@ -18,7 +18,19 @@
         </div>
         <div class="class" :class="{active: currentNav==2}" @click="selectNav(2)">全部课程</div>
         <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div>
-        <div class="coach" :class="{active: currentNav==4}" @click="selectNav(4)">全部教练</div>
+        <div class="coach" :class="{active: currentNav==4}" @click="selectNav(4)">
+          全部教练
+          <div class="list-warpper" :class="{slideWrap: showCoachNav}" @click.stop="clickMask">
+            <div class="store-nav-list" :class="{slide: showCoachNav}">
+              <div
+                class="store-nav-item"
+                v-for="(item, index) in coachNav"
+                :key="index"
+                @click.stop="selectCoach(item)"
+              >{{item.userName}}</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div class="list">
@@ -41,12 +53,22 @@ export default {
   data() {
     return {
       currentNav: 1,
-      showStoreList: false,
+      showStoreNav: false,
+      showCoachNav: false,
+      // nav团课列表
       storeNav: [],
+      // nav教练列表
+      coachNav: [],
       // 分页的团课
       classList: [],
       // 存储所有的团课
       allClassList: [],
+      // 当前选择的门店
+      curStoreId: "",
+      // 当前选择的教练id
+      curCoachId: "",
+      // 当前选择的日期
+      curDate: "",
       // 当前选择的门店
       curStore: "全部门店"
     };
@@ -59,45 +81,65 @@ export default {
     selectDate
   },
   mounted() {
+    this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.getAllStore();
     this.getClassList();
+    this.getCoachList();
   },
   computed: {
     maskShow() {
-      if (this.showStoreList) {
+      if (this.showStoreNav || this.showCoachNav) {
         return true;
       } else {
         return false;
       }
     }
   },
+  // 触底刷新
   onReachBottom() {
-    let allLen = this.classList.length;
+    let allLen = this.allClassList.length;
     let len = this.classList.length;
     if (allLen > 20 && allLen > len) {
       if (allLen - len >= 20) {
         this.classList = this.classList.concat(
-          this.classList.slice(len - 1, len + 20)
+          this.allClassList.slice(len - 1, len + 20)
         );
       } else {
         this.classList = this.classList.concat(
-          this.classList.slice(len - 1, allLen - 1)
+          this.allClassList.slice(len - 1, allLen - 1)
         );
       }
     }
-    console.log("触底刷新");
   },
   methods: {
     selectNav(index) {
-      index == 1 ? (this.showStoreList = true) : (this.showStoreList = false);
+      this.currentNav = index;
+      if (index == 4 && this.curStoreId == "") {
+        return wx.showToast({
+          title: "请先选择门店",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      index == 1 ? (this.showStoreNav = true) : (this.showStoreNav = false);
+      index == 4 ? (this.showCoachNav = true) : (this.showCoachNav = false);
     },
+    // 选择门店
     selectStore(item) {
-      this.showStoreList = false;
+      this.showStoreNav = false;
+      this.curStoreId = item.storeId;
       this.curStore = item.storeName || "全部门店";
-      this.getClassList("", item.storeId);
+      this.getClassList();
+      this.getCoachList();
+    },
+    // 选择教练
+    selectCoach(item) {
+      this.curCoachId = item.userId
+      this.getClassList();
     },
     clickMask() {
-      this.showStoreList = false;
+      this.showStoreNav = false;
+      this.showCoachNav = false;
     },
     // 获取全部门店
     getAllStore() {
@@ -124,7 +166,11 @@ export default {
         }
       });
     },
-    getClassList(date, id) {
+    // 获取团课列表
+    getClassList(date) {
+      if (date) {
+        this.curDate = date;
+      }
       wx.showLoading({
         title: "加载中"
       });
@@ -133,15 +179,15 @@ export default {
         url: window.api + "/teamClass/teamSchedule/weekView",
         methods: "POST",
         data: {
-          storeId: id || "",
-          calendarStart: date || formatDate(new Date(), "yyyy-MM-dd"),
-          calendarEnd: date || ""
+          coachId: that.curCoachId,
+          storeId: that.curStoreId,
+          calendarStart: that.curDate,
+          calendarEnd: that.curDate
         },
         success(res) {
           wx.hideLoading();
           if (res.data.code === 200) {
-            that.allClassList = res.data.data
-
+            that.allClassList = res.data.data;
             if (res.data.data.length > 20) {
               that.classList = res.data.data.slice(0, 20);
             } else {
@@ -149,6 +195,28 @@ export default {
             }
           }
         }
+      });
+    },
+    // 获取教练列表
+    getCoachList() {
+      let that = this;
+      return new Promise(function(resolve, reject) {
+        HttpRequest({
+          url: window.api + "/customer/register/userofrole",
+          data: {
+            storeId: that.curStoreId,
+            positionType: 1
+          },
+          success(res) {
+            that.coachNav = res.data.data;
+            if(!res.data.data.length) {
+              that.coachNav = that.coachNav.concat({
+                userName: '无'
+              })
+            }
+            resolve();
+          }
+        });
       });
     }
   }
@@ -182,10 +250,14 @@ export default {
         top: 42px;
         left: 0px;
         width: 100%;
-        height: 300px;
+        height: 0px;
         overflow: hidden;
         background-color: rgba(0, 0, 0, 0);
+        transition: height 0.3s;
         z-index: 98;
+        &.slideWrap {
+          height: 300px;
+        }
         .store-nav-list {
           text-align: left;
           max-height: 300px;

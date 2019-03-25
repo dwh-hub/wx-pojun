@@ -22,12 +22,13 @@
     <div class="class-name">{{classDetail.anotherName || '课程名称'}}</div>
     <div class="coach-detail">
       <div class="cover">
-        <img>
+        <img scr="http://pojun-tech.cn/assets/img/morenm.png">
+        <div class="name">名字</div>
       </div>
-      <div class="coach-info">
+      <!-- <div class="coach-info">
         <div class="coach-name">$JsonG 宁宁$</div>
         <div class="coach-desc">$简介$</div>
-      </div>
+      </div> -->
     </div>
     <div class="class-info">
       <!-- TODO:传课程时间 -->
@@ -114,8 +115,8 @@ export default {
       }
     },
     classTime() {
-      let week = ["一", "二", "三", "四", "五", "六", "日"];
-      let w = "周" + week[new Date(this.classDetail.timeStart).getDay() + 1];
+      let week = ["日","一", "二", "三", "四", "五", "六"];
+      let w = "周" + week[new Date(this.classDetail.timeStart).getDay()];
       let md = formatDate(new Date(this.classDetail.timeStart), "M月dd");
       return md + " " + w + " " + this.statrTime + "-" + this.endTime;
     }
@@ -193,26 +194,30 @@ export default {
         border-radius: 50%;
         background-color: #bfbfbf;
       }
-    }
-    .coach-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding-left: 12px;
-      .coach-name {
-        flex: 0 0 40px;
-        font-size: 16px;
-        line-height: 40px;
-        font-weight: bold;
-        color: #333;
-      }
-      .coach-desc {
-        .Mult-line(3);
-        flex: 1;
-        font-size: 14px;
-        color: #bababa;
+      .name {
+        margin-top: 5px;
+        text-align: center;
       }
     }
+    // .coach-info {
+    //   flex: 1;
+    //   display: flex;
+    //   flex-direction: column;
+    //   padding-left: 12px;
+    //   .coach-name {
+    //     flex: 0 0 40px;
+    //     font-size: 16px;
+    //     line-height: 40px;
+    //     font-weight: bold;
+    //     color: #333;
+    //   }
+    //   .coach-desc {
+    //     .Mult-line(3);
+    //     flex: 1;
+    //     font-size: 14px;
+    //     color: #bababa;
+    //   }
+    // }
   }
   .class-info {
     padding: 5px 15px 15px 15px;

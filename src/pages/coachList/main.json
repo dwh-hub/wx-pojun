@@ -1,3 +1,6 @@
 {
-  "navigationBarTitleText": "私教"
+  "navigationBarTitleText": "私教",
+  "usingComponents": {
+    "van-search": "../../../static/vant/search/index"
+  }
 }

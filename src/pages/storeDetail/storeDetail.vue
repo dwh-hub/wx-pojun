@@ -35,11 +35,11 @@
     </div>
     <div class="team-class-part">
       <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
-      <team-class-item></team-class-item>
+      <team-class-item :info="item" v-for="(item, index)  in teamClassList" :key="index"></team-class-item>
     </div>
     <div class="coach-part">
       <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
-      <coach-item></coach-item>
+      <coach-item :info="item" v-for="(item, index) in coachList" :key="index"></coach-item>
     </div>
   </div>
 </template>
@@ -49,7 +49,6 @@ import { setNavTab, window, HttpRequest, formatDate } from "COMMON/js/common.js"
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
-
 export default {
   name: "storeDetail",
   data() {
@@ -74,6 +73,7 @@ export default {
     this.getStoreDetail();
     this.getStoreQuery();
     this.getTeamClassList();
+    this.getCoachList();
   },
   methods: {
     toAllStore() {
@@ -132,7 +132,7 @@ export default {
         }
       });
     },
-    // 门店内的团课
+    // 该门店的团课
     getTeamClassList() {
       let that = this
       HttpRequest({
@@ -143,9 +143,23 @@ export default {
           calendarEnd: ''
         },
         success(res) {
-          console.log(res.data.data)
+          that.teamClassList = res.data.data.slice(0, 1)
         }
       })
+    },
+    // 该门店的教练
+    getCoachList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/customer/register/userofrole",
+        data: {
+          storeId: that.storeId,
+          positionType: 1
+        },
+        success(res) {
+          that.coachList = res.data.data.slice(0,1);
+        }
+      });
     }
   }
 };

@@ -1,25 +1,41 @@
 <template>
   <div class="coach-list-wrapper">
     <div class="nav-tab">
-      <div class="store" :class="{active: currentNav==1}" @click="selectAllStore">
-        {{curStore}}
-        <div class="store-nav-list" v-show="showStoreList" :class="{slide: showStoreList}">
-          <div
-            class="store-nav-item"
-            v-for="(item, index) in storeNav"
-            :key="index"
-            @click.stop="selectStore(item)"
-          >{{item.storeName}}</div>
+      <div class="nav-tab-left">
+        <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
+          {{curStore}}
+          <div class="list-warpper" :class="{slideWrap: showStoreList}">
+            <div class="store-nav-list" :class="{slide: showStoreList}">
+              <div
+                class="store-nav-item"
+                v-for="(item, index) in storeNav"
+                :key="index"
+                @click.stop="selectStore(item)"
+              >{{item.storeName}}</div>
+            </div>
+          </div>
         </div>
+        <div class="signing" :class="{active: currentNav==2}" @click="selectNav(2)">
+          {{curCoachStatus}}
+          <div class="list-warpper" :class="{slideWrap: showSigning}" @click.stop="clickMask">
+            <div class="store-nav-list" :class="{slide: showSigning}">
+              <div class="store-nav-item" @click.stop="selectCoach(1)">全部教练</div>
+              <div class="store-nav-item" @click.stop="selectCoach(2)">已签约教练</div>
+              <!-- <div class="store-nav-item">未签约</div> -->
+            </div>
+          </div>
+        </div>
+        <div class="search" :class="{active: currentNav==3}" @click="selectNav(3)">搜索</div>
       </div>
-      <div class="Signing" :class="{active: currentNav==2}" @click="selectSigning">是否签约</div>
-      <div class="search" :class="{active: currentNav==3}" @click="selectSearch">搜索</div>
+      <div class="search-wrapper" :class="{'show-search':showSearch}">
+        <van-search :value="searchText" show-action @cancel="searchCancel" placeholder="请输入搜索关键词"/>
+      </div>
     </div>
     <div class="coach-list">
       <!-- <div class="sub-title">$标题$</div> -->
-      <coach-item :info="item" v-for="(item, index) in coachList" :key="index"></coach-item>
+      <coach-item :info="item" v-for="(item, index) in curCoachList" :key="index"></coach-item>
     </div>
-    <div class="mask" v-show="showStoreList" @click="showStoreList = false"></div>
+    <div class="mask" v-show="maskShow" @click="clickMask"></div>
   </div>
 </template>
 
@@ -32,13 +48,28 @@ export default {
       currentNav: 1,
       // 显示门店下拉框
       showStoreList: false,
+      // 显示签约列表
+      showSigning: false,
+      // 显示搜索框
+      showSearch: false,
+      searchText: "",
+      // 分页的所有教练列表
       coachList: [],
+      // 储存所有教练的教练列表
+      allCoachList: [],
+      // 签约教练列表
+      signOnCoachList: [],
       storeNav: {},
       // 当前选择的选择门店
       curStore: "全部门店",
+      curCoachStatus: "全部",
       curStoreId: "",
       // 当前登录用户的ID
-      customerId: ""
+      customerId: "",
+      // 当前显示的教练列表
+      curCoachList: [],
+      // 是否签约 false 全部 true 已签约
+      isSingin: false
     };
   },
   components: {
@@ -49,16 +80,48 @@ export default {
     this.customerId = wx.getStorageSync("userInfo").id;
   },
   mounted() {
-    this.getAllStore().then(() => {
-      this.getSingInCoachList();
-    });
+    this.getAllStore();
+    // .then(() => {
+    //   this.getSingInCoachList();
+    // });
+  },
+  onReachBottom() {
+    let allLen = this.allCoachList.length;
+    let len = this.coachList.length;
+    if (allLen > 20 && allLen > len) {
+      if (allLen - len >= 20) {
+        this.coachList = this.coachList.concat(
+          this.allCoachList.slice(len - 1, len + 20)
+        );
+      } else {
+        this.coachList = this.coachList.concat(
+          this.allCoachList.slice(len - 1, allLen - 1)
+        );
+      }
+    }
+    this.curCoachList = this.coachList;
+    console.log("触底刷新");
+  },
+  computed: {
+    maskShow() {
+      if (this.showSigning || this.showStoreList) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   },
   methods: {
-    selectAllStore() {
-      this.currentNav = 1;
-      this.showStoreList = true;
+    selectNav(index) {
+      this.currentNav = index;
+      index == 1 ? (this.showStoreList = true) : (this.showStoreList = false);
+      index == 2 ? (this.showSigning = true) : (this.showSigning = false);
+      index == 3 ? (this.showSearch = true) : (this.showSearch = false);
     },
-    // 获取全部门店
+    searchCancel() {
+      this.showSearch = false;
+    },
+    // 获取全部门店列表
     getAllStore() {
       let that = this;
       return new Promise(function(resolve) {
@@ -83,54 +146,83 @@ export default {
         });
       });
     },
-    // 签约
-    selectSigning() {
-      this.currentNav = 2;
-    },
-    // 搜索
-    selectSearch() {
-      this.currentNav = 3;
-    },
     // 选择门店
     selectStore(item) {
+      console.log(this.isSingin)
       this.showStoreList = false;
-      this.getCoachList(item.storeId);
       this.curStore = item.storeName;
       this.curStoreId = item.storeId;
-      console.log(item);
-      console.log(this.curStoreId);
+      if (this.isSingin) {
+        this.getSingInCoachList().then(() => {
+          this.curCoachList =  this.signOnCoachList
+        });
+      } else {
+        this.getCoachList(item.storeId).then(() => {
+          this.curCoachList =  this.coachList
+        });
+      }
+    },
+    // 教练签约筛选
+    selectCoach(index) {
+      this.showSigning = false;
+      // index 1 全部 2 已签约
+      if (index === 1) {
+        this.curCoachStatus = "全部";
+        this.isSingin = false;
+        this.getCoachList(item.storeId).then(() => {
+          this.curCoachList =  this.coachList
+        });
+      } else if (index === 2) {
+        this.curCoachStatus = "已签约";
+        this.isSingin = true;
+        this.getSingInCoachList().then(() => {
+          this.curCoachList =  this.signOnCoachList
+        });
+      }
     },
     // 获取教练列表
     getCoachList(id) {
       let that = this;
-      HttpRequest({
-        url: window.api + "/customer/register/userofrole",
-        data: {
-          storeId: id || "",
-          positionType: 1
-        },
-        success(res) {
-          // TODO: 暂未分页
-          if (res.data.data.length > 20) {
-            that.coachList = res.data.data.slice(0, 20);
+      return new Promise(function(resolve, reject) {
+        HttpRequest({
+          url: window.api + "/customer/register/userofrole",
+          data: {
+            storeId: id || "",
+            positionType: 1
+          },
+          success(res) {
+            that.allCoachList = res.data.data;
+            if (res.data.data.length > 20) {
+              that.coachList = res.data.data.slice(0, 20);
+            } else {
+              that.coachList = res.data.data;
+            }
+            resolve();
           }
-          that.coachList = res.data.data;
-        }
+        });
       });
     },
     // 获取签约教练
     getSingInCoachList() {
       let that = this;
-      HttpRequest({
-        url: window.api + "/customer/card/selectSignOnCoach",
-        data: {
-          storeId: that.curStoreId,
-          customerId: that.customerId
-        },
-        success(res) {
-          console.log(res.data.data);
-        }
+      return new Promise(function(resolve, reject) {
+        HttpRequest({
+          url: window.api + "/customer/card/selectSignOnCoach",
+          data: {
+            storeId: that.curStoreId,
+            customerId: that.customerId
+          },
+          success(res) {
+            // console.log(res.data.data);
+            that.signOnCoachList = res.data.data;
+            resolve();
+          }
+        });
       });
+    },
+    clickMask() {
+      this.showStoreList = false;
+      this.showSigning = false;
     }
   }
 };
@@ -144,43 +236,72 @@ page {
 }
 .coach-list-wrapper {
   .nav-tab {
-    display: flex;
     position: relative;
     margin-bottom: 8px;
     background-color: #fff;
-    > div {
-      flex: 1;
-      line-height: 42px;
-      text-align: center;
-      border-top: 1rpx solid #eee;
-      border-bottom: 1rpx solid #eee;
-      border-right: 1rpx solid #eee;
-      &:nth-last-of-type(1) {
-        border-right: none;
-      }
-      &.active {
-        color: @theme-color;
+    .nav-tab-left {
+      display: flex;
+      > div {
+        flex: 1;
+        line-height: 42px;
+        text-align: center;
+        border-top: 1rpx solid #eee;
+        border-bottom: 1rpx solid #eee;
+        border-right: 1rpx solid #eee;
+        &:nth-last-of-type(1) {
+          border-right: none;
+        }
+        &.active {
+          color: @theme-color;
+        }
       }
     }
-    .store-nav-list {
+    .search-wrapper {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+      background-color: #fff;
+      &.show-search {
+        transform: translateX(0px);
+      }
+      ._van-search {
+        width: 100%;
+      }
+    }
+    .list-warpper {
       position: absolute;
       top: 42px;
       left: 0px;
       width: 100%;
-      text-align: left;
-      max-height: 300px;
-      background-color: #fff;
-      overflow-y: auto;
+      height: 0px;
+      overflow: hidden;
+      transition: height 0.3s;
+      background-color: rgba(0, 0, 0, 0);
       z-index: 98;
-      &.slide {
-        z-index: 98;
+      &.slideWrap {
+        height: 300px;
       }
-      .store-nav-item {
-        line-height: 50px;
-        padding-left: 20px;
-        border-top: 1rpx solid #eee;
-        &.active {
-          color: @theme-color;
+      .store-nav-list {
+        text-align: left;
+        max-height: 300px;
+        transform: translateY(-100%);
+        overflow-y: auto;
+        transition: transform 0.3s;
+        background-color: #fff;
+        &.slide {
+          // z-index: 98;
+          transform: translateY(0px);
+        }
+        .store-nav-item {
+          line-height: 50px;
+          padding-left: 20px;
+          border-top: 1rpx solid #eee;
+          &.active {
+            color: @theme-color;
+          }
         }
       }
     }
@@ -192,7 +313,7 @@ page {
       margin-bottom: 10px;
     }
     .coach-item {
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
   }
   .mask {

@@ -209,7 +209,7 @@ export default {
   mounted() {
     this.computedTime();
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
-    this.getAllCardS()
+    // this.getAllCardS()
   },
   methods: {
     // 选择时间

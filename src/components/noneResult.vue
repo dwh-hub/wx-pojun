@@ -34,7 +34,7 @@ export default {
 
   .none-result {
     text-align: center;
-    padding-top: 30px;
+    padding: 30px 0;
     >img {
       width: 120px;
       height: 120px;

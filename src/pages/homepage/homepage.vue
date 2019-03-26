@@ -72,7 +72,7 @@
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
       <team-class-item></team-class-item>
-      <coach-item></coach-item>
+      <coach-item :info="recommendCoach"></coach-item>
     </div>
   </div>
 </template>
@@ -94,7 +94,8 @@ export default {
       // }
       longitude: "", // 经度
       latitude: "", // 维度
-      bannerList: []
+      bannerList: [],
+      recommendCoach: {}
     };
   },
   components: {
@@ -112,6 +113,7 @@ export default {
       }
     });
     this.getBannerList();
+    this.getRecommendCoach();
   },
   onLoad() {
     setNavTab("前锋体育", "#2a82e4");
@@ -127,6 +129,7 @@ export default {
         url: url
       });
     },
+    // 获取轮播图
     getBannerList() {
       let that = this;
       wx.request({
@@ -143,6 +146,29 @@ export default {
           }
         }
       });
+    },
+    //　推荐团课
+    // getRecommendClass() {
+    //   HttpRequest({
+    //     url: window.api + '/teamClass/schedule/recommend',
+    //     data: {
+    //       storeId: 
+    //     },
+    //   })
+    // }
+    // 推荐教练
+    getRecommendCoach() {
+      let that = this
+      HttpRequest({
+        url: window.api + '/coach/private/appoint/recommend',
+        success(res) {
+          let _data = res.data.data
+          that.recommendCoach = {
+            userName: _data.coachName,
+            userId: _data.coachId
+          }
+        }
+      })
     }
     // touchStart(e) {
     //   // console.log(e)

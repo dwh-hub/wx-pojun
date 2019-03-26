@@ -4,20 +4,20 @@
       <div class="stay" :class="{active: currentNav==1}" @click="selectNav(1)">待上课</div>
       <div class="assess" :class="{active: currentNav==2}" @click="selectNav(2)">待评价</div>
       <div class="complete" :class="{active: currentNav==3}" @click="selectNav(3)">已完成</div>
-      <div class="other" :class="{active: currentNav==4}" @click="selectNav(4)">其他</div>
+      <!-- <div class="other" :class="{active: currentNav==4}" @click="selectNav(4)">其他</div> -->
     </div>
     <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
       <div class="stay-team-class">
-        <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <title-cell title="团课" moreText :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
         <div class="team-class-wrapper">
           <team-class-item v-for="(item, index) in teamClassList" :key="index"></team-class-item>
         </div>
         <none-result text="你还没有预约团课呢" v-if="!teamClassList.length"></none-result>
       </div>
       <div class="stay-coach">
-        <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <title-cell title="私教" moreText :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
         <div class="coach-wrapper">
-          <coach-item v-for="(item, index) in coachList" :key="index"></coach-item>
+          <coach-item :info="item" :hasBtn="false" v-for="(item, index) in coachList" :key="index"></coach-item>
         </div>
         <none-result text="你还没有预约私教呢" v-if="!coachList.length"></none-result>
       </div>
@@ -54,8 +54,11 @@ export default {
     return {
       currentNav: 1,
       showSelect: false,
+      // 当前显示的团课，私教列表
       teamClassList: [],
       coachList: [],
+      // 储存数据，尾号对应接口status状态 3 已下课/已完成
+      coachList_3: [],
       classId: "",
       // 当前登录用户的id
       customerId: "",
@@ -72,7 +75,6 @@ export default {
     this.customerId = this.userInfo = wx.getStorageSync("userInfo").id;
     this.classId = option.classId;
     setNavTab("", "#2a82e4");
-    this.getOwnClassList();
   },
   computed: {
     btnText() {
@@ -84,6 +86,18 @@ export default {
   methods: {
     selectNav(index) {
       this.currentNav = index;
+      if (index === 3) {
+        // 3 已下课/已完成
+        let _list = this.coachList_3;
+        console.log(!_list.length)
+        if (!_list.length) {
+          this.getOwnCoachClassList(3).then(() => {
+            this.coachList = this.coachList_3;
+          });
+        } else {
+          this.coachList = this.coachList_3;
+        }
+      }
     },
     toggleSelect() {
       this.showSelect = true;
@@ -108,18 +122,30 @@ export default {
     closeSelect() {
       this.showSelect = false;
     },
-    // 获取我的课程列表 status 3 已下课
-    getOwnClassList(status) {
+    // 获取我的课程 私教列表 status 3 已下课
+    getOwnCoachClassList(status) {
       let that = this;
-      HttpRequest({
-        url: window.api + "/mobile/coach/appoint/pages/own",
-        data: {
-          customerId: that.customerId,
-          status: status
-        },
-        success(res) {
-          console.log(res);
-        }
+      return new Promise(function(resolve, reject) {
+        wx.showLoading({
+          title: "加载中"
+        });
+        HttpRequest({
+          url: window.api + "/mobile/coach/appoint/pages/own",
+          data: {
+            customerId: that.customerId,
+            status: status
+          },
+          success(res) {
+            wx.hideLoading();
+            console.log(res);
+            if (res.data.code === 200) {
+              if (status == 3) {
+                that.coachList_3 = res.data.data.result;
+              }
+              resolve();
+            }
+          }
+        });
       });
     }
   }
@@ -131,6 +157,7 @@ export default {
 @import "~COMMON/less/common";
 
 .appointmentClass {
+  padding-bottom: 50px;
   .nav-tab {
     display: flex;
     border-bottom: 10px solid #f5f5f5;
@@ -153,6 +180,19 @@ export default {
   }
   .stay-list {
     padding: 0 15px;
+  }
+  .stay-coach {
+    .coach-wrapper {
+      .coach-item {
+        margin: 15px;
+        .coach-desc {
+          line-height: 20px;
+        }
+      }
+    }
+  }
+  .bottom-btn {
+    color: #fff;
   }
 }
 </style>

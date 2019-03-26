@@ -5,13 +5,13 @@
         <img>
       </div>
       <div class="coach-info">
-        <div class="coach-name">$高子涵$</div>
+        <div class="coach-name">{{coachInfo.userName}}</div>
         <div class="coach-times">$13节课 共授课19次$</div>
       </div>
     </div>
     <div class="coach-desc">
       <div class="title">个人简介</div>
-      <p>$一个很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长很长的简介$</p>
+      <p>{{coachInfo.individualResume || '暂无个人简介'}}</p>
     </div>
     <div class="coach-imgs">
       <div class="title">个人形象</div>
@@ -32,12 +32,16 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 export default {
   data() {
     return {
-      coachId: ''
+      coachId: '',
+      coachInfo: {}
     };
   },
   onLoad(option) {
     this.coachId = option.coachId
     setNavTab("", "#2a82e4");
+  },
+  mounted() {
+    this.getCoachDetail()
   },
   methods: {
     toAppoint() {
@@ -46,10 +50,13 @@ export default {
       })
     },
     getCoachDetail() {
-      // HttpRequest({
-      //   url: '',
-      //   data: {}
-      // })
+      let that = this
+      HttpRequest({
+        url: window.api + '/employee/file/datailByCus/'+ that.coachId,
+        success(res) {
+          that.coachInfo = res.data.data
+        }
+      })
     }
   }
 };

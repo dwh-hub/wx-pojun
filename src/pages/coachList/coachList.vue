@@ -28,7 +28,13 @@
         <div class="search" :class="{active: currentNav==3}" @click="selectNav(3)">搜索</div>
       </div>
       <div class="search-wrapper" :class="{'show-search':showSearch}">
-        <van-search :value="searchText" show-action @cancel="searchCancel" placeholder="请输入搜索关键词"/>
+        <van-search
+          :value="searchText"
+          show-action
+          @change="searchCoach"
+          @cancel="searchCancel"
+          placeholder="请输入教练名字"
+        />
       </div>
     </div>
     <div class="coach-list">
@@ -40,7 +46,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest,debounce  } from "COMMON/js/common.js";
 import coachItem from "COMPS/coachItem.vue";
 export default {
   data() {
@@ -149,17 +155,17 @@ export default {
     },
     // 选择门店
     selectStore(item) {
-      console.log(this.isSingin)
+      console.log(this.isSingin);
       this.showStoreList = false;
       this.curStore = item.storeName;
       this.curStoreId = item.storeId;
       if (this.isSingin) {
         this.getSingInCoachList().then(() => {
-          this.curCoachList =  this.signOnCoachList
+          this.curCoachList = this.signOnCoachList;
         });
       } else {
         this.getCoachList(item.storeId).then(() => {
-          this.curCoachList =  this.coachList
+          this.curCoachList = this.coachList;
         });
       }
     },
@@ -170,14 +176,14 @@ export default {
       if (index === 1) {
         this.curCoachStatus = "全部";
         this.isSingin = false;
-        this.getCoachList(item.storeId).then(() => {
-          this.curCoachList =  this.coachList
+        this.getCoachList(this.curStoreId).then(() => {
+          this.curCoachList = this.coachList;
         });
       } else if (index === 2) {
         this.curCoachStatus = "已签约";
         this.isSingin = true;
         this.getSingInCoachList().then(() => {
-          this.curCoachList =  this.signOnCoachList
+          this.curCoachList = this.signOnCoachList;
         });
       }
     },
@@ -221,6 +227,23 @@ export default {
         });
       });
     },
+    // 搜索教练
+    searchCoach: debounce(function (event) {
+      console.log(event.mp.detail);
+      let that = this
+      HttpRequest({
+        url: window.api + '/customer/register/userofrole',
+        data: {
+          storeId: that.curStoreId,
+          positionType: 1,
+          userName: event.mp.detail
+        },
+        success(res) {
+          console.log()
+          that.curCoachList = res.data.data
+        },
+      })
+    }, 200),
     clickMask() {
       this.showStoreList = false;
       this.showSigning = false;

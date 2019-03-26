@@ -21,24 +21,26 @@
     </swiper>
     <div class="class-name">{{classDetail.anotherName || '课程名称'}}</div>
     <div class="coach-detail">
-      <div class="cover">
-        <img scr="http://pojun-tech.cn/assets/img/morenm.png">
-        <div class="name">名字</div>
+      <div class="coach-detail-item" v-for="(item, index) in coachList" :key="index">
+        <div class="cover">
+          <img scr="http://pojun-tech.cn/assets/img/morenm.png">
+        </div>
+        <div class="name">{{item.coachName}}</div>
       </div>
       <!-- <div class="coach-info">
         <div class="coach-name">$JsonG 宁宁$</div>
         <div class="coach-desc">$简介$</div>
-      </div> -->
+      </div>-->
     </div>
     <div class="class-info">
       <!-- TODO:传课程时间 -->
-      <title-cell :title="classTime" moreText="其他时间" :moreSize="14" :titleSize="16"></title-cell>
+      <title-cell :title="classTime" moreText :moreSize="14" :titleSize="16"></title-cell>
       <div class="address-group">
         <div class="store">
           <span class="name">{{classDetail.storeName}}</span>
           <span class="range">2.4KM</span>
         </div>
-        <div class="address">$福州仓山大街商铺272号万达广场A9楼三楼$</div>
+        <div class="address">{{address || '暂无详细地址'}}</div>
       </div>
       <!-- <div class="class-type">$合同结算$</div> -->
     </div>
@@ -56,7 +58,7 @@
     </div>
     <div class="class-people">
       <div class="people-info">
-        <div class="num">已预约7人</div>
+        <div class="num">已预约（{{classDetail.appointCount}}/{{classDetail.maxPeople}}）人</div>
       </div>
     </div>
     <div class="ruler">
@@ -90,7 +92,9 @@ export default {
   data() {
     return {
       id: "",
-      classDetail: {}
+      classDetail: {},
+      coachList: [],
+      address: ""
     };
   },
   components: {
@@ -102,6 +106,7 @@ export default {
   },
   mounted() {
     this.getClassDetail();
+    this.getClassCoach();
   },
   computed: {
     statrTime() {
@@ -115,29 +120,52 @@ export default {
       }
     },
     classTime() {
-      let week = ["日","一", "二", "三", "四", "五", "六"];
+      let week = ["日", "一", "二", "三", "四", "五", "六"];
       let w = "周" + week[new Date(this.classDetail.timeStart).getDay()];
       let md = formatDate(new Date(this.classDetail.timeStart), "M月dd");
       return md + " " + w + " " + this.statrTime + "-" + this.endTime;
     }
   },
   methods: {
+    // 预约团课
     appointClass() {
-      let that = this
+      let that = this;
+      if (
+        this.classDetail.isNeedAppoint == 0 ||
+        this.classDetail.isNeedAppoint == 3
+      ) {
+        return wx.showToast({
+          title: "该课程无需预约",
+          icon: "none",
+          duration: 2000
+        });
+      }
       wx.showModal({
         title: "提示",
-        content: "是否确认预约？",
+        content: "确认预约该团课？",
         success(res) {
           if (res.confirm) {
+            // HttpRequest({
+            //   url: window.api + "/teamClass/teamAppoint/add",
+            //   data: {}
+            // });
             wx.navigateTo({
-              url: "../appointmentResult/main?classId=" + that.id
+              url:
+                "../memberCard/main?classId=" +
+                that.id +
+                "&storeId=" +
+                that.classDetail.storeId +
+                "&venueId=" +
+                that.classDetail.venueId
             });
-          } else if (res.cancel) {
-            console.log("用户点击取消");
+            // wx.navigateTo({
+            //   url: "../appointmentResult/main?classId=" + that.id
+            // });
           }
         }
       });
     },
+    // 获取团课详情
     getClassDetail() {
       let that = this;
       HttpRequest({
@@ -145,11 +173,42 @@ export default {
         data: {
           teamScheduleId: that.id
         },
+        methods: "POST",
         success(res) {
           if (res.data.code === 200) {
             that.classDetail = res.data.data;
+            that.getAddress();
           }
-          console.log(res.data.data);
+        }
+      });
+    },
+    // 获取团课的教练
+    getClassCoach() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/teamClass/teamCoach/getCoach",
+        data: {
+          teamScheduleId: that.id
+        },
+        methods: "POST",
+        success(res) {
+          if (res.data.code) {
+            that.coachList = res.data.data;
+          }
+        }
+      });
+    },
+    // 获取地址
+    getAddress() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/store/detail/" + that.classDetail.storeId,
+        success(res) {
+          let _data = res.data.data;
+          let _address = _data.parentName + _data.cityName + _data.address;
+          _address = _address.replace(/null/g, "");
+          _address = _address.replace(/[0]/gi, "");
+          that.address = _address;
         }
       });
     }
@@ -182,20 +241,21 @@ export default {
     border-top: 1rpx solid #eee;
     border-bottom: 1rpx solid #eee;
     background-color: #fff;
-    .cover {
+    overflow-y: auto;
+    .coach-detail-item {
       flex: 0 0 90px;
-      width: 90px;
-      height: 90px;
-      padding: 12px;
-      box-sizing: border-box;
-      > img {
-        width: 66px;
-        height: 66px;
-        border-radius: 50%;
-        background-color: #bfbfbf;
+      .cover {
+        width: 100%;
+        padding: 12px;
+        box-sizing: border-box;
+        > img {
+          width: 66px;
+          height: 66px;
+          border-radius: 50%;
+          background-color: #bfbfbf;
+        }
       }
       .name {
-        margin-top: 5px;
         text-align: center;
       }
     }
@@ -247,7 +307,6 @@ export default {
   }
   .class-desc,
   .ruler,
-  .class-people,
   .process {
     .title {
       font-weight: bold;
@@ -266,7 +325,9 @@ export default {
   }
   .class-people {
     color: #bababa;
-    // line-height: 64px;
+    line-height: 50px;
+    padding: 0 12px;
+    border-bottom: 1rpx solid #eee;
   }
   .ruler {
     > p {

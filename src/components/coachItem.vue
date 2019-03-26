@@ -12,7 +12,7 @@
       <div class="coach-type">$瑜伽$</div>
       <div class="coach-status">$热门$</div>
     </div>
-    <div class="appoint" @click.stop="toAppoint" v-else>预约</div>
+    <div class="appoint" v-if="hasBtn" @click.stop="toAppoint">预约</div>
   </div>
 </template>
 
@@ -29,6 +29,10 @@ export default {
     hasTag: {
       type: Boolean,
       default: false
+    },
+    hasBtn: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {

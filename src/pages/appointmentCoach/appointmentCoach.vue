@@ -5,7 +5,7 @@
         <img>
       </div>
       <div class="coach-info">
-        <div class="coach-name">$张教练$</div>
+        <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
         <div class="coach-times">$签约课数：18$</div>
       </div>
       <div class="tiems">
@@ -29,6 +29,7 @@
         @tapMore="isTimePopup = true"
       ></title-cell>
     </div>
+
     <div class="cell-list-lg">
       <title-cell
         title="扣费合同"
@@ -37,9 +38,67 @@
         :titleSize="16"
         @tapMore="isCardPopup = true"
       ></title-cell>
-      <title-cell title="预约备注" moreText="请选择" :moreSize="14" :titleSize="16"></title-cell>
+      <!-- <title-cell title="预约备注" moreText="请选择" :moreSize="14" :titleSize="16"></title-cell> -->
     </div>
-    <div class="bottom-btn appoint-coach" @click="appointCoach">发起预约</div>
+
+    <div class="cell-list-sm">
+      <title-cell
+        title="预约场馆"
+        :moreText="venueCellText"
+        :moreSize="14"
+        :titleSize="16"
+        @tapMore="showVenuePopup"
+      ></title-cell>
+      <title-cell
+        title="预约项目"
+        :moreText="projectCellText"
+        :moreSize="14"
+        :titleSize="16"
+        @tapMore="showProjectPopup"
+      ></title-cell>
+    </div>
+
+    <!-- 选择场馆 -->
+    <van-popup
+      class="venue-pop"
+      :show="isVenuePopup"
+      position="bottom"
+      @close="isVenuePopup = false"
+    >
+      <div class="pop-title">
+        <span>请选择场馆</span>
+        <img src="/static/images/icon-close.png" @click="isVenuePopup = false">
+      </div>
+      <div class="venue-list">
+        <div
+          class="venue-popup-item"
+          @click="selectVenue(item)"
+          v-for="(item, index) in venueList"
+          :key="index"
+        >{{item.venueName}}</div>
+      </div>
+    </van-popup>
+
+    <!-- 选择项目 -->
+    <van-popup
+      class="project-pop"
+      :show="isProjectPopup"
+      position="bottom"
+      @close="isProjectPopup = false"
+    >
+      <div class="pop-title">
+        <span>请选择项目</span>
+        <img src="/static/images/icon-close.png" @click="isProjectPopup = false">
+      </div>
+      <div class="project-list">
+        <div
+          class="project-popup-item"
+          @click="selectProject(item)"
+          v-for="(item, index) in projectList"
+          :key="index"
+        >{{item.projectName}}</div>
+      </div>
+    </van-popup>
 
     <!-- 选择门店弹出框 -->
     <van-popup
@@ -53,16 +112,21 @@
         <img src="/static/images/icon-close.png" @click="isStorePopup = false">
       </div>
       <div class="store-list">
-        <div class="store-popup-item" @click="selectStore">
+        <div
+          class="store-popup-item"
+          @click="selectStore(item)"
+          v-for="(item, index) in storeList"
+          :key="index"
+        >
           <div class="cover">
             <img>
           </div>
           <div class="store-info">
             <div class="name">
-              $三迪中心店$
-              <span class="range">0.81km</span>
+              {{item.storeName}}
+              <span class="range">0.81km*</span>
             </div>
-            <div class="address">福州仓山大街272号万达广场A9楼三楼</div>
+            <div class="address">{{item.address || '暂无详细地址'}}</div>
           </div>
         </div>
       </div>
@@ -82,7 +146,7 @@
             <div
               class="hour"
               v-for="(item, index) in morningTimes"
-              :class="{active: item == curTime}"
+              :class="{active: (item == curTime || item == curEndTime)}"
               :key="index"
               @click="selectHour(item)"
             >{{item}}</div>
@@ -94,7 +158,7 @@
             <div
               class="hour"
               v-for="(item, index) in noonTimes"
-              :class="{active: item == curTime}"
+              :class="{active: (item == curTime || item == curEndTime)}"
               @click="selectHour(item)"
               :key="index"
             >{{item}}</div>
@@ -106,7 +170,7 @@
             <div
               class="hour"
               v-for="(item, index) in afternoonTimes"
-              :class="{active: item == curTime}"
+              :class="{active: (item == curTime || item == curEndTime)}"
               @click="selectHour(item)"
               :key="index"
             >{{item}}</div>
@@ -118,7 +182,7 @@
             <div
               class="hour"
               v-for="(item, index) in nightTime"
-              :class="{active: item == curTime}"
+              :class="{active: (item == curTime || item == curEndTime)}"
               @click="selectHour(item)"
               :key="index"
             >{{item}}</div>
@@ -149,26 +213,38 @@
         <img src="/static/images/icon-close.png" @click="isCardPopup = false">
       </div>
       <div class="cards-list">
-        <div class="cards-popup-item" @click="selectCard">
+        <div
+          class="cards-popup-item"
+          @click="selectCard(item)"
+          v-for="(item, index) in cardList"
+          :key="index"
+        >
           <div class="cover">
             <img>
           </div>
           <div class="cards-info">
             <div class="name">
-              $常规课$
-              <span>121311</span>
+              {{item.cardClassName}}
+              <span>{{item.masterClassName}}</span>
             </div>
-            <div class="times">剩余次数：15次</div>
-            <div class="date">结束日期：2019年9月18日</div>
+            <div class="times">使用权益：{{item.balanceAuthority}}{{item.authorityUnit}}</div>
+            <div class="date">结束日期：{{item.doomsday}}</div>
           </div>
         </div>
       </div>
     </van-popup>
+
+    <div class="bottom-btn appoint-coach" @click="appointCoach">发起预约</div>
   </div>
 </template>
 
 <script>
-import { setNavTab, formatDate, window, HttpRequest } from "COMMON/js/common.js";
+import {
+  setNavTab,
+  formatDate,
+  window,
+  HttpRequest
+} from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 
@@ -176,12 +252,26 @@ export default {
   name: "appointment-coach",
   data() {
     return {
+      // 门店选择文本
       storeCellText: "请选择",
+      // 时间选择文本
       timeCellText: "请选择",
+      // 合同选择文本
       cardCellText: "请选择",
+      // 场馆选择文本
+      venueCellText: "请选择",
+      // 项目选择文本
+      projectCellText: "请选择",
+      // 门店弹窗
       isStorePopup: false,
+      // 时间弹窗
       isTimePopup: false,
+      // 合同弹窗
       isCardPopup: false,
+      // 场馆弹窗
+      isVenuePopup: false,
+      // 项目弹窗
+      isProjectPopup: false,
       // 开店时间
       startTime: "09:40:20",
       // 关店时间
@@ -194,8 +284,32 @@ export default {
       curDate: "",
       // 点击选择的时间
       curTime: "",
+      // 点击选择的时间的结束时间
+      curEndTime: "",
       coachId: "",
-      cardList: []
+      // 可使用合同列表
+      cardList: [],
+      // 授课门店列表
+      storeList: [],
+      // 场馆列表
+      venueList: [],
+      // 项目列表
+      projectList: [],
+      // 当前登录客户信息
+      userInfo: "",
+      // 预约的参数
+      // 门店id
+      selectStoreId: "",
+      // 合同id
+      selectCardId: "",
+      // 合同 cardClassId
+      cardClassId: "",
+      // 场馆id
+      venueId: "",
+      // 项目id
+      projectId: "",
+      // 教练信息
+      coachInfo: {}
     };
   },
   components: {
@@ -204,17 +318,60 @@ export default {
   },
   onLoad(option) {
     this.coachId = option.coachId;
+    this.userInfo = wx.getStorageSync("userInfo");
     setNavTab("", "#2a82e4");
   },
   mounted() {
+    this.getCoachDetail();
     this.computedTime();
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
-    // this.getAllCardS()
+    this.getCardList();
+    this.getStoreList();
   },
   methods: {
+    showVenuePopup() {
+      if (!this.selectStoreId || !this.selectCardId) {
+        return wx.showModal({
+          title: "提示",
+          content: "请先选择门店和合同",
+          showCancel: false
+        });
+      }
+      if (this.selectStoreId && this.selectCardId && !this.venueList.length) {
+        return wx.showModal({
+          title: "提示",
+          content: "未找到可消费的场馆，不可预约",
+          showCancel: false
+        });
+      }
+      this.isVenuePopup = true;
+    },
+    showProjectPopup() {
+      if (!this.venueId) {
+        return wx.showModal({
+          title: "提示",
+          content: "请先选择场馆",
+          showCancel: false
+        });
+      }
+      if (
+        this.selectStoreId &&
+        this.selectCardId &&
+        this.venueId &&
+        !this.venueList.length
+      ) {
+        return wx.showModal({
+          title: "提示",
+          content: "未找到可消费的项目，不可预约",
+          showCancel: false
+        });
+      }
+      this.isProjectPopup = true;
+    },
     // 选择时间
     selectHour(item) {
       this.curTime = item;
+      this.curEndTime = Number(item.split(":")[0]) + 1 + ":00";
     },
     // 计算可选择预约时间
     computedTime() {
@@ -222,7 +379,11 @@ export default {
       let _endTime = this.endTime.split(":")[0];
       // 上午时间段
       for (let i = 0; i < 12 - Number(_satarTime); i++) {
-        this.morningTimes.push(Number(_satarTime) + i + ":00");
+        let _time = Number(_satarTime) + i + ":00";
+        if (Number(_satarTime) + i < 10) {
+          _time = "0" + String(_time);
+        }
+        this.morningTimes.push(_time);
       }
       // 中午时间段
       if (Number(_satarTime) < 12 || Number(_endTime) > 14) {
@@ -230,11 +391,11 @@ export default {
       }
       // 下午时间段
       if (Number(_satarTime) < 15 || Number(_endTime) > 18) {
-        this.nightTime = ["15:00", "16:00", "17:00", "18:00"];
+        this.afternoonTimes = ["15:00", "16:00", "17:00", "18:00"];
       }
       // 晚上时间段
       for (let j = 0; j < Number(_endTime) - 19; j++) {
-        this.afternoonTimes.push(19 + j + ":00");
+        this.nightTime.push(19 + j + ":00");
       }
       console.log(this.morningTimes);
       console.log(this.noonTimes);
@@ -242,23 +403,66 @@ export default {
       console.log(this.nightTime);
     },
     // 选择门店
-    selectStore() {
+    selectStore(item) {
       this.isStorePopup = false;
-      this.storeCellText = "已选择门店";
-      this.isTimePopup = true;
+      this.storeCellText = item.storeName;
+      this.selectStoreId = item.storeId;
+      if (this.selectStoreId && this.selectCardId) {
+        this.getVenueList();
+      }
     },
     // 选择合同
-    selectCard() {
+    selectCard(item) {
+      // 先清空一次
+      this.selectCardId = "";
+      this.cardClassId = "";
+      this.venueCellText = "请选择";
+      this.projectCellText = "请选择";
+
       this.isCardPopup = false;
-      this.cardCellText = "已选择合同";
+      this.cardCellText = item.cardClassName;
+      this.selectCardId = item.id;
+      this.cardClassId = item.cardClassId;
+      if (this.selectStoreId && this.selectCardId) {
+        this.getVenueList();
+      }
     },
     // 选择时间
     selectDate() {
       this.isTimePopup = false;
-      this.timeCellText = this.curDate + " " + this.curTime;
+      this.timeCellText =
+        this.curDate + " " + this.curTime + "~" + this.curEndTime;
+    },
+    // 选择场馆
+    selectVenue(item) {
+      this.isVenuePopup = false;
+      this.venueId = item.venueId;
+      this.venueCellText = item.venueName;
+      this.getProList();
+    },
+    // 选择项目
+    selectProject(item) {
+      this.isProjectPopup = false;
+      this.projectId = item.projectId;
+      this.projectCellText = item.projectName;
     },
     // 确认预约
     appointCoach() {
+      let that = this;
+      // return console.log({
+      //   storeId: that.selectStoreId,
+      //   venueId: that.venueId,
+      //   coachId: that.coachId,
+      //   calendar: that.curDate,
+      //   timeStart: that.curDate + that.curTime,
+      //   timeEnd: that.curDate + that.curEndTime,
+      //   cardId: that.cardClassId,
+      //   name: that.userInfo.name,
+      //   customerId: that.userInfo.id,
+      //   phone: that.userInfo.phone,
+      //   projectId: that.projectId,
+      //   status: 0
+      // });
       if (this.storeCellText == "请选择" || this.storeCellText == "") {
         return wx.showToast({
           title: "请选择授课门店",
@@ -280,34 +484,143 @@ export default {
           duration: 1000
         });
       }
-      wx.navigateTo({
-        url: "../appointmentResult/main"
+      if (this.venueCellText == "请选择" || this.venueCellText == "") {
+        return wx.showToast({
+          title: "请选择消费场馆",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (this.ProjectCellText == "请选择" || this.ProjectCellText == "") {
+        return wx.showToast({
+          title: "请选择消费项目",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      HttpRequest({
+        url: window.api + "/coach/private/appoint/set",
+        data: {
+          storeId: that.selectStoreId,
+          venueId: that.venueId,
+          coachId: that.coachId,
+          calendar: that.curDate,
+          timeStart: that.curDate + " " + that.curTime,
+          timeEnd: that.curDate + " " + that.curEndTime,
+          cardId: that.cardClassId,
+          name: that.userInfo.name,
+          customerId: that.userInfo.id,
+          phone: that.userInfo.phone,
+          projectId: that.projectId,
+          status: 0
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            wx.showToast({
+              title: "私教预约成功",
+              icon: "success",
+              duration: 1000
+            });
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
       });
+      // wx.navigateTo({
+      //   url: "../appointmentResult/main"
+      // });
     },
     // 组件select-date返回的日期
     onDate(date) {
       this.curDate = date;
     },
-    // 获取能使用的合同列表
-    // getCardS() {
-    //   let that = this
-    //   HttpRequest({
-    //     url: window.api + "/customer/card/cardInfos",
-    //     data: {
-    //       page: 1,
-    //       pageCount: 100,
-    //       customerId: wx.getStorageSync("userInfo").id
-    //     },
-    //     success(res) {
-    //       if (res.data.code === 200) {
-    //         // that.cardList = res.data.data.result;
-    //         res.data.data.result.map((e) => {
-    //           if()
-    //         })
-    //       }
-    //     }
-    //   });
-    // }
+    // 获取教练信息
+    getCoachDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/employee/file/datailByCus/" + that.coachId,
+        success(res) {
+          if (res.data.code === 200) {
+            that.coachInfo = res.data.data;
+          }
+        }
+      });
+    },
+    // 获取教练的授课门店列表
+    getStoreList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/getAttendStoreByCus",
+        data: {
+          coachId: that.coachId
+        },
+        success(res) {
+          that.storeList = res.data.data;
+        }
+      });
+    },
+    // 获取可用合同
+    getCardList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/card/relevance/user/cardInfoPages",
+        data: {
+          customerId: that.userInfo.id,
+          isAll: 1
+        },
+        success(res) {
+          let _list = [];
+          res.data.data.result.forEach(e => {
+            if (e.teachCardType == 2 && e.cardStatus == 2) {
+              e.doomsday = e.doomsday.split(" ")[0];
+              _list.push(e);
+            }
+          });
+          that.cardList = _list;
+        }
+      });
+    },
+    // 获取场馆列表
+    getVenueList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/getAttendVenue",
+        data: {
+          storeId: that.selectStoreId,
+          cardClassId: that.cardClassId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.venueList = res.data.data;
+          } else {
+            that.venueList = [];
+          }
+        }
+      });
+    },
+    // 获取项目列表
+    getProList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/getproject",
+        data: {
+          storeId: that.selectStoreId,
+          cardClassId: that.cardClassId,
+          venueId: that.venueId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.projectList = res.data.data;
+          } else {
+            that.projectList = [];
+          }
+        }
+      });
+    }
   }
 };
 </script>
@@ -372,21 +685,21 @@ page {
     }
   }
   .cell-list-sm {
+    margin-bottom: 15px;
     .title-cell {
       padding: 0 15px;
       background-color: #fff;
     }
   }
   .cell-list-lg {
+    margin-bottom: 15px;
     .title-cell {
       height: 80px;
       line-height: 80px;
       padding: 0 15px;
-      margin-top: 15px;
       background-color: #fff;
     }
   }
-
   .pop-title {
     line-height: 50px;
     margin-left: 50px;
@@ -398,6 +711,15 @@ page {
       padding: 15px;
       width: 15px;
       height: 15px;
+    }
+  }
+  .venue-list,
+  .project-list {
+    > div {
+      line-height: 50px;
+      font-size: 18px;
+      text-align: center;
+      border-top: 1rpx solid #eee;
     }
   }
   .store-pop {

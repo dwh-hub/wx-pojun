@@ -19,7 +19,7 @@
         <div class="class" :class="{active: currentNav==2}" @click="selectNav(2)">全部课程</div>
         <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div>
         <div class="coach" :class="{active: currentNav==4}" @click="selectNav(4)">
-          全部教练
+          {{curCoach}}
           <div class="list-warpper" :class="{slideWrap: showCoachNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showCoachNav}">
               <div
@@ -70,7 +70,8 @@ export default {
       // 当前选择的日期
       curDate: "",
       // 当前选择的门店
-      curStore: "全部门店"
+      curStore: "全部门店",
+      curCoach: "全部教练"
     };
   },
   onLoad() {
@@ -134,7 +135,9 @@ export default {
     },
     // 选择教练
     selectCoach(item) {
+      this.showCoachNav = false;
       this.curCoachId = item.userId
+      this.curCoach = item.userName
       this.getClassList();
     },
     clickMask() {

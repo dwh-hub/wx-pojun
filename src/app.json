@@ -1,9 +1,9 @@
 {
   "pages": [
-    "pages/appointmentClass/main",
-    "pages/teamClassList/main",
-    "pages/teamClassDetail/main",
     "pages/coachList/main",
+    "pages/teamClassList/main",
+    "pages/appointmentClass/main",
+    "pages/teamClassDetail/main",
     "pages/allStore/main",
     "pages/message/main",
     "pages/mine/main",

@@ -4,10 +4,10 @@
     <div class="card-content">
       <div class="card-top">
         <div class="card-info pl">
-          <div class="card-name">{{info.cardClassName}}</div>
+          <div class="card-name">{{info.cardClassName || info.secondCardClass}}</div>
           <div class="card-date">{{activateDate}}~{{doomsday}}</div>
         </div>
-        <div class="card-type pr">{{info.masterClassName}}</div>
+        <div class="card-type pr">{{info.masterClassName || info.masterCradClass}}</div>
       </div>
       <div class="card-bottom">
         <div class="card-term pl">{{info.balanceAuthority}}{{type}}</div>
@@ -61,7 +61,7 @@ export default {
   },
   methods: {
     hasClick() {
-      this.$emit("hasClick", this.info.id);
+      this.$emit("hasClick", this.info);
     }
   }
 };

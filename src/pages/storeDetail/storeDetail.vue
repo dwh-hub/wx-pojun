@@ -21,7 +21,10 @@
     </swiper>
     <div class="address">
       <h4>地址</h4>
-      <div class="store">{{storeInfo.name}}<span class="range">1.4km*</span></div>
+      <div class="store">
+        {{storeInfo.name}}
+        <span class="range">1.4km*</span>
+      </div>
       <div class="address-detail">{{storeInfo.address}}</div>
     </div>
     <div class="business-hours">
@@ -45,7 +48,12 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest, formatDate } from "COMMON/js/common.js";
+import {
+  setNavTab,
+  window,
+  HttpRequest,
+  formatDate
+} from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
@@ -67,7 +75,7 @@ export default {
   },
   onLoad(option) {
     this.storeId = option.storeId;
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.getStoreDetail();
@@ -101,16 +109,16 @@ export default {
         success(res) {
           let _data = res.data.data;
           let _address = _data.parentName + _data.cityName + _data.address;
-          _address = _address.replace(/null/g, '')
-          _address = _address.replace(/[0]/ig, '')
+          _address = _address.replace(/null/g, "");
+          _address = _address.replace(/[0]/gi, "");
           let _obj = {
-            address: _address || '未设置详细地址',
+            address: _address || "未设置详细地址",
             name: _data.storeName,
             phone: _data.phone,
             bannerList: _data.images.split(",")
           };
           that.storeInfo = _obj;
-          console.log(res.data.data)
+          console.log(res.data.data);
           // Object.assign(that.storeInfo, _obj);
           console.log(that.storeInfo);
         }
@@ -134,18 +142,20 @@ export default {
     },
     // 该门店的团课
     getTeamClassList() {
-      let that = this
+      let that = this;
       HttpRequest({
-        url: window.api + '/teamClass/teamSchedule/weekView',
+        url: window.api + "/teamClass/teamSchedule/weekView",
         data: {
           storeId: that.storeId,
-          calendarStart: formatDate(new Date(), 'yyyy-MM-dd'),
-          calendarEnd: ''
+          calendarStart: formatDate(new Date(), "yyyy-MM-dd"),
+          calendarEnd: ""
         },
         success(res) {
-          that.teamClassList = res.data.data.slice(0, 1)
+          if (res.data.code === 200) {
+            that.teamClassList = res.data.data.slice(0, 1);
+          }
         }
-      })
+      });
     },
     // 该门店的教练
     getCoachList() {
@@ -157,7 +167,7 @@ export default {
           positionType: 1
         },
         success(res) {
-          that.coachList = res.data.data.slice(0,1);
+          that.coachList = res.data.data.slice(0, 1);
         }
       });
     }
@@ -187,7 +197,7 @@ export default {
       font-size: 16px;
       color: @theme-color;
       margin: 8px 0;
-      >span {
+      > span {
         display: inline-block;
         margin-left: 5px;
         color: @theme-color;

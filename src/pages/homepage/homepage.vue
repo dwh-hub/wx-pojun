@@ -13,7 +13,10 @@
       <div v-for="(item,index) in bannerList" :key="index">
         <swiper-item>
           <!-- <img :src="item" class="banner"> -->
-          <img class="banner" src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg">
+          <img
+            class="banner"
+            src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
+          >
         </swiper-item>
       </div>
     </swiper>
@@ -53,12 +56,8 @@
         @tapMore="toNav('../allStore/main')"
       ></title-cell>
       <div class="store-wrapper">
-        <div
-          class="nearby-store"
-          v-for="(item, index) in 2"
-          :key="index"
-        >
-        <!-- @click="toNav('../storeDetail/main')" -->
+        <div class="nearby-store" v-for="(item, index) in 2" :key="index">
+          <!-- @click="toNav('../storeDetail/main')" -->
           <div class="cover">
             <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg">
           </div>
@@ -82,6 +81,7 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
+import store from "../../utils/store";
 
 export default {
   data() {
@@ -116,7 +116,7 @@ export default {
     this.getRecommendCoach();
   },
   onLoad() {
-    setNavTab("前锋体育", "#2a82e4");
+    setNavTab("前锋体育");
   },
   onPullDownRefresh() {
     setTimeout(() => {
@@ -125,6 +125,13 @@ export default {
   },
   methods: {
     toNav(url) {
+      if(url.indexOf('memberCard') > -1 && !store.state.isLogin) {
+        return wx.showToast({
+          title: '请先登录',
+          icon: 'none',
+          duration: 1000
+        })
+      }
       wx.navigateTo({
         url: url
       });
@@ -139,9 +146,9 @@ export default {
         },
         success(res) {
           if (res.data.code === 200) {
-            that.bannerList = res.data.data.wxCarousel.split(",").map((e) => {
-              return e = window.api + e
-            })
+            that.bannerList = res.data.data.wxCarousel.split(",").map(e => {
+              return (e = window.api + e);
+            });
             console.log(that.bannerList);
           }
         }
@@ -152,23 +159,25 @@ export default {
     //   HttpRequest({
     //     url: window.api + '/teamClass/schedule/recommend',
     //     data: {
-    //       storeId: 
+    //       storeId:
     //     },
     //   })
     // }
     // 推荐教练
     getRecommendCoach() {
-      let that = this
+      let that = this;
       HttpRequest({
-        url: window.api + '/coach/private/appoint/recommend',
+        url: window.api + "/coach/private/appoint/recommend",
         success(res) {
-          let _data = res.data.data
-          that.recommendCoach = {
-            userName: _data.coachName,
-            userId: _data.coachId
+          if (res.data.code == 200) {
+            let _data = res.data.data;
+            that.recommendCoach = {
+              userName: _data.coachName,
+              userId: _data.coachId
+            };
           }
         }
-      })
+      });
     }
     // touchStart(e) {
     //   // console.log(e)
@@ -269,7 +278,7 @@ export default {
           }
           .range {
             font-size: 12px;
-            color: #2a82e4;
+            color: @theme-color;
           }
         }
       }

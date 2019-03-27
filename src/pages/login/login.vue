@@ -42,7 +42,7 @@ export default {
     };
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   methods: {
     // 获取验证码
@@ -129,10 +129,9 @@ export default {
               data: {
                 phone: that.phone,
                 companyId: that.userInfo.companyId,
-                smsSendLogId: that.smsSendLogId
+                // smsSendLogId: that.smsSendLogId
               },
               success(res) {
-                console.log(res.header["Set-Cookie"]);
                 wx.setStorage({
                   key: "Cookie",
                   data: res.header["Set-Cookie"]
@@ -145,7 +144,7 @@ export default {
                   });
                   store.commit("changeLogin", true);
                   setTimeout(() => {
-                    wx.switchTab({
+                    wx.reLaunch({
                       url: "../mine/main"
                     });
                   }, 1000);

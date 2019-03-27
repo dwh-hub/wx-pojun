@@ -53,10 +53,10 @@ export default {
       this.teamScheduleId = option.classId;
       this.storeId = option.storeId;
       this.venueId = option.venueId;
-      setNavTab("选择合同", "#2a82e4");
-      return
+      setNavTab("选择合同");
+      return;
     }
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.userInfo = wx.getStorageSync("userInfo");
@@ -102,7 +102,7 @@ export default {
         });
       }
     },
-    // 选择项目
+    // 选择项目 确认预约
     selectPro() {
       let that = this;
       let projectId = this.pojectList[this.selectProIndex].projectId;
@@ -116,13 +116,25 @@ export default {
           name: that.userInfo.name,
           phone: that.userInfo.phone
         },
-        success(res) {
-          that.showPopup = false
-          if (res.data.code === 200) {
+        success(data) {
+          that.showPopup = false;
+          if (data.data.code === 200) {
+            wx.showModal({
+              title: "提示",
+              content: data.data.message,
+              showCancel: false,
+              success(res) {
+                if (res.confirm) {
+                  wx.redirectTo({
+                    url: "../appointmentResult/main?id=" + data.data.data.teamAttendId
+                  });
+                }
+              }
+            });
           } else {
             wx.showModal({
               title: "提示",
-              content: res.data.message,
+              content: data.data.message,
               showCancel: false
             });
           }

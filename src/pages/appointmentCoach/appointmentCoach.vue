@@ -319,7 +319,7 @@ export default {
   onLoad(option) {
     this.coachId = option.coachId;
     this.userInfo = wx.getStorageSync("userInfo");
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.getCoachDetail();
@@ -340,7 +340,7 @@ export default {
       if (this.selectStoreId && this.selectCardId && !this.venueList.length) {
         return wx.showModal({
           title: "提示",
-          content: "未找到可消费的场馆，不可预约",
+          content: "该合同无消费的场馆，不可预约",
           showCancel: false
         });
       }
@@ -670,7 +670,7 @@ page {
         color: #bababa;
       }
       .coach-times {
-        color: #2a82e4;
+        color: @theme-color;
       }
     }
   }

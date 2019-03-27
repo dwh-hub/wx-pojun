@@ -29,6 +29,9 @@ export default {
       }
     }
   },
+  mounted(){
+    console.log(this.info)
+  },
   methods: {
     toDetail() {
       wx.navigateTo({

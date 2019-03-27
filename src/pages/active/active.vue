@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import {setNavTab} from 'COMMON/js/common.js'
+import {setNavTab,window,HttpRequest} from 'COMMON/js/common.js'
 export default {
   data() {
     return {
@@ -31,18 +31,37 @@ export default {
           title: "马戏城店",
           storeName: "马戏城店"
         }
-      ]
+      ],
+      page: 1,
     };
   },
-  mounted() {},
+  mounted() {
+    this.getActiveList()
+  },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   methods: {
     toActiveDetail() {
       wx.navigateTo({
         url: "../activeDetail/main"
       });
+    },
+    // 获取活动详情
+    getActiveList() {
+      let that = this
+      HttpRequest({
+        url: window.api+ '/wxmarketing/pages',
+        data:{
+          page: that.page,
+          pageSize: 15
+        },
+        success(res) {
+          if(res.data.code === 200){
+            that.activeList = res.data.data.result
+          }
+        }
+      })
     }
   }
 };

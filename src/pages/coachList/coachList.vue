@@ -82,7 +82,7 @@ export default {
     coachItem
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    setNavTab();
     this.customerId = wx.getStorageSync("userInfo").id;
   },
   mounted() {
@@ -259,10 +259,15 @@ page {
   background-color: #f5f5f5;
 }
 .coach-list-wrapper {
+  padding-top: 50px;
   .nav-tab {
-    position: relative;
-    margin-bottom: 8px;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 42px;
     background-color: #fff;
+    z-index: 98;
     .nav-tab-left {
       display: flex;
       > div {

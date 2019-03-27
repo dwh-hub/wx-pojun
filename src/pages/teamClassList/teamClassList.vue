@@ -16,7 +16,19 @@
             </div>
           </div>
         </div>
-        <div class="class" :class="{active: currentNav==2}" @click="selectNav(2)">全部课程</div>
+        <div class="class" :class="{active: currentNav==2}" @click="selectNav(2)">
+          {{curSchedule}}
+          <div class="list-warpper" :class="{slideWrap: showScheduleNav}" @click.stop="clickMask">
+            <div class="store-nav-list" :class="{slide: showScheduleNav}">
+              <div
+                class="store-nav-item"
+                v-for="(item, index) in scheduleNav"
+                :key="index"
+                @click.stop="selectSchedule(item)"
+              >{{item.courseTitle}}</div>
+            </div>
+          </div>
+        </div>
         <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div>
         <div class="coach" :class="{active: currentNav==4}" @click="selectNav(4)">
           {{curCoach}}
@@ -55,10 +67,13 @@ export default {
       currentNav: 1,
       showStoreNav: false,
       showCoachNav: false,
+      showScheduleNav: false,
       // nav团课列表
       storeNav: [],
       // nav教练列表
       coachNav: [],
+      // nav课程列表
+      scheduleNav: [],
       // 分页的团课
       classList: [],
       // 存储所有的团课
@@ -67,15 +82,18 @@ export default {
       curStoreId: "",
       // 当前选择的教练id
       curCoachId: "",
+      // // 当前选择的课程
+      // curSchedule: "",
       // 当前选择的日期
       curDate: "",
       // 当前选择的门店
       curStore: "全部门店",
-      curCoach: "全部教练"
+      curCoach: "全部教练",
+      curSchedule: "全部课程"
     };
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   components: {
     teamClassItem,
@@ -85,11 +103,10 @@ export default {
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.getAllStore();
     this.getClassList();
-    this.getCoachList();
   },
   computed: {
     maskShow() {
-      if (this.showStoreNav || this.showCoachNav) {
+      if (this.showStoreNav || this.showCoachNav || this.showScheduleNav) {
         return true;
       } else {
         return false;
@@ -115,13 +132,16 @@ export default {
   methods: {
     selectNav(index) {
       this.currentNav = index;
-      if (index == 4 && this.curStoreId == "") {
+      if ((index == 4 || index == 2) && this.curStoreId == "") {
         return wx.showToast({
           title: "请先选择门店",
           icon: "none",
           duration: 1000
         });
       }
+      index == 2
+        ? (this.showScheduleNav = true)
+        : (this.showScheduleNav = false);
       index == 1 ? (this.showStoreNav = true) : (this.showStoreNav = false);
       index == 4 ? (this.showCoachNav = true) : (this.showCoachNav = false);
     },
@@ -132,15 +152,23 @@ export default {
       this.curStore = item.storeName || "全部门店";
       this.getClassList();
       this.getCoachList();
+      this.getTeamSchedule();
     },
     // 选择教练
     selectCoach(item) {
       this.showCoachNav = false;
-      this.curCoachId = item.userId
-      this.curCoach = item.userName
+      this.curCoachId = item.userId;
+      this.curCoach = item.userName;
       this.getClassList();
     },
+    // 选择课程
+    selectSchedule(item) {
+      this.showScheduleNav = false;
+      this.curSchedule = item.courseTitle;
+      this.getClassList()
+    },
     clickMask() {
+      this.showScheduleNav = false;
       this.showStoreNav = false;
       this.showCoachNav = false;
     },
@@ -160,7 +188,7 @@ export default {
               storeId: e.storeId
             };
           });
-          _storeList.push({
+          _storeList.unshift({
             storeName: "全部门店",
             storeId: ""
           });
@@ -185,7 +213,8 @@ export default {
           coachId: that.curCoachId,
           storeId: that.curStoreId,
           calendarStart: that.curDate,
-          calendarEnd: that.curDate
+          calendarEnd: that.curDate,
+          courseTitle: that.curSchedule == "全部课程" ? "" : that.curSchedule
         },
         success(res) {
           wx.hideLoading();
@@ -211,15 +240,40 @@ export default {
             positionType: 1
           },
           success(res) {
-            that.coachNav = res.data.data;
-            if(!res.data.data.length) {
-              that.coachNav = that.coachNav.concat({
-                userName: '无'
-              })
-            }
             resolve();
+            if (!res.data.data.length) {
+              return that.coachNav = that.coachNav.concat({
+                userName: "无"
+              });
+            }
+            let _list = res.data.data;
+            _list.unshift({
+              userName: "全部教练",
+              userId: ""
+            })
+            that.coachNav = _list
           }
         });
+      });
+    },
+    // 获取课程
+    getTeamSchedule() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/teamClass/teamSchedule/pagesNoLimit",
+        data: {
+          storeId: that.curStoreId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            let _list = res.data.data.result;
+            _list.unshift({
+              courseTitle: "全部课程"
+            })
+            console.log(_list)
+            that.scheduleNav = _list
+          }
+        }
       });
     }
   }
@@ -230,7 +284,14 @@ export default {
 @import "~COMMON/less/common.less";
 
 .team-class-list {
+  padding-top: 120px;
   .header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    z-index: 98;
     .nav-tab {
       display: flex;
       position: relative;

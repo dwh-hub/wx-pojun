@@ -8,8 +8,8 @@
         >
       </div>
       <div class="pl mineDetail">
-        <p id="mineName">{{userInfo.name}}</p>
-        <p id="minePhone">{{userInfo.phone}}</p>
+        <p id="mineName">{{userInfo.name || '昵称'}}</p>
+        <p id="minePhone">{{userInfo.phone || '手机号'}}</p>
       </div>
     </div>
     <div class="mineDeail">
@@ -21,10 +21,10 @@
       >
         <img alt :src="item.imgUrl">
         <span class="detail_title">{{item.navName}}</span>
-        <span class="detail_contrnt">{{item.hit}}{{item.text}}</span>
+        <span class="detail_contrnt" v-if="isLogin">{{item.hit}}{{item.text}}</span>
       </div>
     </div>
-    <div class="mineExit" @click="singOut">解除绑定</div>
+    <!-- <div class="mineExit" @click="singOut">解除绑定</div> -->
   </div>
 </template>
 
@@ -85,11 +85,16 @@ export default {
   },
   onLoad() {
     this.getTimes();
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.userInfo = wx.getStorageSync('userInfo')
     store.commit("saveUserInfo", this.userInfo);
+  },
+  computed: {
+    isLogin() {
+      return store.state.isLogin
+    }
   },
   methods: {
     navTo(url) {
@@ -131,7 +136,7 @@ export default {
               }
             });
           } else {
-            wx.redirectTo({
+            wx.navigateTo({
               url: "../login/main"
             });
           }
@@ -159,9 +164,9 @@ export default {
       }
     }
     .mineDetail {
-      margin: 13px 0 0 15px;
-      > p {
-        margin: -5px 0 10px 0;
+      // margin: 13px 0 0 15px;
+      margin-left: 15px;
+      > p {line-height: 33px;
         font-size: 15px;
       }
     }

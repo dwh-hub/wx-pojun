@@ -5,8 +5,8 @@
     </div>
     <div class="coach-info">
       <div class="coach-name">{{info.userName || '教练名字'}}</div>
-      <div class="coach-desc">$我是最美最美最美最美的$</div>
-      <div class="coach-times">$13节课 共授课19次$</div>
+      <div class="coach-desc">{{info.individualResume || '暂无个人简介'}}</div>
+      <div class="coach-times">已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || ''}}</div>
     </div>
     <div class="tag" v-if="hasTag">
       <div class="coach-type">$瑜伽$</div>
@@ -17,13 +17,14 @@
 </template>
 
 <script>
+import store from "../utils/store";
 export default {
   name: "coach-item",
   props: {
     info: {
       type: Object,
       default: function() {
-        return {}
+        return {};
       }
     },
     hasTag: {
@@ -33,18 +34,32 @@ export default {
     hasBtn: {
       type: Boolean,
       default: true
+    },
+    isToDetail: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {
     toDetail() {
-      wx.navigateTo({
-        url: '../coachDetail/main?coachId=' + this.info.userId
-      })
+      if (this.isToDetail) {
+        return wx.navigateTo({
+          url: "../coachDetail/main?coachId=" + this.info.userId
+        });
+      }
+      this.$emit("clickCoach");
     },
     toAppoint() {
+      if (!store.state.isLogin) {
+        return wx.showToast({
+          title: "请先登录",
+          icon: "none",
+          duration: 1000
+        });
+      }
       wx.navigateTo({
-        url: '../appointmentCoach/main?coachId=' + this.info.userId
-      })
+        url: "../appointmentCoach/main?coachId=" + this.info.userId
+      });
     }
   }
 };
@@ -59,7 +74,7 @@ export default {
   border-radius: 2px;
   background-color: #fff;
   padding: 10px 0;
-  padding-right: 5px;
+  padding-right: 10px;
   .cover {
     flex: 0 0 90px;
     width: 90px;
@@ -94,7 +109,7 @@ export default {
       color: #bababa;
     }
     .coach-times {
-      color: #2a82e4;
+      color: @theme-color;
     }
   }
   .tag {
@@ -112,9 +127,9 @@ export default {
     }
   }
   .appoint {
-    line-height: 24px;
-    height: 24px;
-    width: 60px;
+    line-height: 26px;
+    height: 26px;
+    width: 50px;
     margin: auto;
     text-align: center;
     vertical-align: middle;

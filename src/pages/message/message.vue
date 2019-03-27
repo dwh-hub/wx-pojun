@@ -4,7 +4,7 @@
     <!-- <div class="isRead">
       <span class="read" :class="{ select: isRead }" @click="showRead">未读</span>
       <span class="read-none" :class="{ select: !isRead }" @click="showReadNone">已读</span>
-    </div> -->
+    </div>-->
     <van-tabs :active="navIndex" @change="onChange" color="#2a82e4">
       <van-tab title="未读"></van-tab>
       <van-tab title="已读"></van-tab>
@@ -44,7 +44,13 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest,formatDate } from "COMMON/js/common.js";
+import {
+  setNavTab,
+  window,
+  HttpRequest,
+  formatDate
+} from "COMMON/js/common.js";
+import store from "../../utils/store";
 export default {
   data() {
     return {
@@ -56,13 +62,16 @@ export default {
       messageNList: [],
       // 已读的页数
       messageYPage: 1,
-      messageYList: [],
+      messageYList: []
     };
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
-    this.getMessage(0, 1)
-    this.getMessage(1, 1)
+    setNavTab();
+    if (!store.state.isLogin) {
+      return;
+    }
+    this.getMessage(0, 1);
+    this.getMessage(1, 1);
   },
   methods: {
     showRead() {
@@ -72,29 +81,29 @@ export default {
       this.isRead = false;
     },
     onChange(e) {
-      this.navIndex = e.mp.detail.index
+      this.navIndex = e.mp.detail.index;
     },
     // 获取信息 status 0 未读 1 已读
     getMessage(status, page) {
-      let that = this
+      let that = this;
       HttpRequest({
-        url: window.api + '/home/wechat/message/customer/pages',
+        url: window.api + "/home/wechat/message/customer/pages",
         data: {
           status: status,
           pageNo: page
         },
         success(res) {
-          res.data.data.result.map((e) => {
-            e.addTime = formatDate(new Date(e.addTime), 'yyyy-MM-dd hh:mm')
-          })
-          if(status == 0) {
-            that.messageNList = res.data.data.result
+          res.data.data.result.map(e => {
+            e.addTime = formatDate(new Date(e.addTime), "yyyy-MM-dd hh:mm");
+          });
+          if (status == 0) {
+            that.messageNList = res.data.data.result;
           } else if (status == 1) {
-            that.messageYList = res.data.data.result
+            that.messageYList = res.data.data.result;
           }
         }
-      })
-    },
+      });
+    }
     // 标记当前页为已读
     // mulitpleMessage() {
     //   HttpRequest({

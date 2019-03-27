@@ -62,7 +62,7 @@ export default {
   },
   onLoad(option) {
     this.cardId = option.id
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.getCardDetail()

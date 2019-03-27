@@ -1,5 +1,5 @@
 <template>
-  <div class="team-class-detail">
+  <div class="team-class-detail" :class="{'isPhoneX-wrap':isPhoneX}">
     <swiper
       class="swiper"
       indicator-dots="true"
@@ -33,7 +33,6 @@
       </div>-->
     </div>
     <div class="class-info">
-      <!-- TODO:传课程时间 -->
       <title-cell :title="classTime" moreText :moreSize="14" :titleSize="16"></title-cell>
       <div class="address-group">
         <div class="store">
@@ -75,7 +74,7 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div class="bottom-btn appointment" @click="appointClass">马上预约</div>
+    <div class="bottom-btn appointment" :class="{'isPhoneX-bottom':isPhoneX}" @click="appointClass">马上预约</div>
   </div>
 </template>
 
@@ -87,6 +86,8 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
+import store from "../../utils/store";
+
 export default {
   name: "team-class-detail",
   data() {
@@ -102,7 +103,7 @@ export default {
   },
   onLoad(option) {
     this.id = option.classId;
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.getClassDetail();
@@ -124,11 +125,21 @@ export default {
       let w = "周" + week[new Date(this.classDetail.timeStart).getDay()];
       let md = formatDate(new Date(this.classDetail.timeStart), "M月dd");
       return md + " " + w + " " + this.statrTime + "-" + this.endTime;
+    },
+    isPhoneX() {
+      return store.state.isIphoneX
     }
   },
   methods: {
     // 预约团课
     appointClass() {
+      if (!store.state.isLogin) {
+        return wx.showToast({
+          title: "请先登录",
+          icon: "none",
+          duration: 1000
+        });
+      }
       let that = this;
       if (
         this.classDetail.isNeedAppoint == 0 ||
@@ -140,30 +151,30 @@ export default {
           duration: 2000
         });
       }
-      wx.showModal({
-        title: "提示",
-        content: "确认预约该团课？",
-        success(res) {
-          if (res.confirm) {
-            // HttpRequest({
-            //   url: window.api + "/teamClass/teamAppoint/add",
-            //   data: {}
-            // });
-            wx.navigateTo({
-              url:
-                "../memberCard/main?classId=" +
-                that.id +
-                "&storeId=" +
-                that.classDetail.storeId +
-                "&venueId=" +
-                that.classDetail.venueId
-            });
-            // wx.navigateTo({
-            //   url: "../appointmentResult/main?classId=" + that.id
-            // });
-          }
-        }
+      // wx.showModal({
+      //   title: "提示",
+      //   content: "确认预约该团课？",
+      //   success(res) {
+      //     if (res.confirm) {
+      // HttpRequest({
+      //   url: window.api + "/teamClass/teamAppoint/add",
+      //   data: {}
+      // });
+      wx.navigateTo({
+        url:
+          "../memberCard/main?classId=" +
+          that.id +
+          "&storeId=" +
+          that.classDetail.storeId +
+          "&venueId=" +
+          that.classDetail.venueId
       });
+      // wx.navigateTo({
+      //   url: "../appointmentResult/main?classId=" + that.id
+      // });
+      // }
+      // }
+      // });
     },
     // 获取团课详情
     getClassDetail() {

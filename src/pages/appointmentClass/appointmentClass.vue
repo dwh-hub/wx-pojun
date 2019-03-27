@@ -8,16 +8,29 @@
     </div>
     <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
       <div class="stay-team-class">
-        <title-cell title="团课" moreText :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
         <div class="team-class-wrapper">
-          <team-class-item v-for="(item, index) in teamClassList" :key="index"></team-class-item>
+          <team-class-item
+            @clickClass="toClassDetail(item)"
+            :info="item"
+            :isToDetail="false"
+            v-for="(item, index) in teamClassList"
+            :key="index"
+          ></team-class-item>
         </div>
         <none-result text="你还没有预约团课呢" v-if="!teamClassList.length"></none-result>
       </div>
       <div class="stay-coach">
-        <title-cell title="私教" moreText :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <title-cell title="私教" moreText="全部"  :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
         <div class="coach-wrapper">
-          <coach-item :info="item" :hasBtn="false" v-for="(item, index) in coachList" :key="index"></coach-item>
+          <coach-item
+            @clickCoach="toCoachDetail(item)"
+            :info="item"
+            :hasBtn="false"
+            :isToDetail="false"
+            v-for="(item, index) in coachList"
+            :key="index"
+          ></coach-item>
         </div>
         <none-result text="你还没有预约私教呢" v-if="!coachList.length"></none-result>
       </div>
@@ -48,6 +61,7 @@ import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
+import store from "../../utils/store";
 
 export default {
   data() {
@@ -57,8 +71,14 @@ export default {
       // 当前显示的团课，私教列表
       teamClassList: [],
       coachList: [],
-      // 储存数据，尾号对应接口status状态 3 已下课/已完成
+      // 储存数据 私教 1 待上课 2 待评价 3 已完成
       coachList_3: [],
+      coachList_2: [],
+      coachList_1: [],
+      // 团课 1 待上课 2 待评价 3 已完成
+      teamClass_1: [],
+      teamClass_3: [],
+      teamClass_2: [],
       classId: "",
       // 当前登录用户的id
       customerId: "",
@@ -74,28 +94,72 @@ export default {
   onLoad(option) {
     this.customerId = this.userInfo = wx.getStorageSync("userInfo").id;
     this.classId = option.classId;
-    setNavTab("", "#2a82e4");
+    setNavTab();
+  },
+  mounted() {
+    this.selectNav(this.currentNav);
   },
   computed: {
     btnText() {
       if (!this.teamClassList.length && !this.coachList.length) {
         return "试试预约";
       }
+      return "";
     }
   },
   methods: {
     selectNav(index) {
       this.currentNav = index;
-      if (index === 3) {
-        // 3 已下课/已完成
-        let _list = this.coachList_3;
-        console.log(!_list.length)
-        if (!_list.length) {
+      if (!store.state.isLogin) {
+        return;
+      }
+      if (index == 1) {
+        // 待上课
+        if (!this.coachList_1.length) {
+          this.getOwnCoachClassList(2).then(() => {
+            this.coachList = this.coachList_1;
+          });
+        } else {
+          this.coachList = this.coachList_1;
+        }
+        if (!this.teamClass_1.length) {
+          this.getOwnTeamClassList(1).then(() => {
+            this.teamClassList = this.teamClass_1;
+          });
+        } else {
+          this.teamClassList = this.teamClass_1;
+        }
+      } else if (index == 2) {
+        // 待评价
+        if (!this.coachList_2.length) {
+          this.getOwnCoachClassList(3, 1).then(() => {
+            this.coachList = this.coachList_2;
+          });
+        } else {
+          this.coachList = this.coachList_2;
+        }
+        if (!this.teamClass_2.length) {
+          this.getOwnTeamClassList(3, 1).then(() => {
+            this.teamClassList = this.teamClass_2;
+          });
+        } else {
+          this.teamClassList = this.teamClass_2;
+        }
+      } else if (index == 3) {
+        // 3 已完成 储存中有数据直接读取，没有调用接口
+        if (!this.coachList_3.length) {
           this.getOwnCoachClassList(3).then(() => {
             this.coachList = this.coachList_3;
           });
         } else {
           this.coachList = this.coachList_3;
+        }
+        if (!this.teamClass_3.length) {
+          this.getOwnTeamClassList(3).then(() => {
+            this.teamClassList = this.teamClass_3;
+          });
+        } else {
+          this.teamClassList = this.teamClass_3;
         }
       }
     },
@@ -122,30 +186,94 @@ export default {
     closeSelect() {
       this.showSelect = false;
     },
-    // 获取我的课程 私教列表 status 3 已下课
-    getOwnCoachClassList(status) {
+    /**
+     * 获取我的课程 团课列表
+     * @param {Number} status 1 待上课 3 已下课
+     * @param {Number} waitEvaluate 1 待评价
+     */
+    getOwnTeamClassList(status, waitEvaluate) {
       let that = this;
       return new Promise(function(resolve, reject) {
-        wx.showLoading({
-          title: "加载中"
-        });
         HttpRequest({
-          url: window.api + "/mobile/coach/appoint/pages/own",
+          url: window.api + "/teamClass/teamAttend/pagesNoLimit",
           data: {
             customerId: that.customerId,
-            status: status
+            status: status,
+            waitEvaluate: waitEvaluate || ""
           },
           success(res) {
-            wx.hideLoading();
-            console.log(res);
             if (res.data.code === 200) {
-              if (status == 3) {
-                that.coachList_3 = res.data.data.result;
+              let _list =
+                res.data.data.result.length > 2
+                  ? res.data.data.result.slice(0, 2)
+                  : res.data.data.result;
+              // 待上课
+              if (status == 1) {
+                that.teamClass_1 = _list;
+                // 待评价
+              } else if (status == 3 && waitEvaluate == 1) {
+                that.teamClass_2 = _list;
+                // 已完成
+              } else if (status == 3 && !waitEvaluate) {
+                that.teamClass_3 = _list;
               }
               resolve();
             }
           }
         });
+      });
+    },
+    /**
+     * 获取我的课程 私教列表
+     * @param {Number} status 3 已下课 2 待上课
+     * @param {Number} waitEvaluate 1 待评价
+     */
+    getOwnCoachClassList(status, waitEvaluate) {
+      let that = this;
+      return new Promise(function(resolve, reject) {
+        HttpRequest({
+          url: window.api + "/mobile/coach/appoint/pages/own",
+          data: {
+            customerId: that.customerId,
+            status: status,
+            waitEvaluate: waitEvaluate || ""
+          },
+          success(res) {
+            if (res.data.code === 200) {
+              let _data = res.data.data.result.map(e => {
+                return {
+                  userName: e.name,
+                  userId: e.coachId,
+                  coachAppointId: e.coachAppointId
+                };
+              });
+              _data = _data.length > 2 ? _data.slice(0, 2) : _data;
+              // 待评价
+              if (status == 3 && waitEvaluate == 1) {
+                that.coachList_2 = _data;
+                // 待上课
+              } else if (status == 2) {
+                that.coachList_1 = _data;
+                // 已完成
+              } else if (status == 3 && !waitEvaluate) {
+                that.coachList_3 = _data;
+              }
+              resolve();
+            }
+          }
+        });
+      });
+    },
+    // 跳转团课课程详情
+    toClassDetail(item) {
+      wx.navigateTo({
+        url: "../appointmentResult/main?teamAttendId=" + item.teamAttendId
+      });
+    },
+    // 跳转私教课课程详情
+    toCoachDetail(item) {
+      wx.navigateTo({
+        url: "../appointmentResult/main?coachAppointId=" + item.coachAppointId
       });
     }
   }
@@ -157,10 +285,15 @@ export default {
 @import "~COMMON/less/common";
 
 .appointmentClass {
-  padding-bottom: 50px;
+  padding: 52px 0;
   .nav-tab {
     display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     border-bottom: 10px solid #f5f5f5;
+    background-color: #fff;
     > div {
       flex: 1;
       line-height: 42px;
@@ -180,11 +313,16 @@ export default {
   }
   .stay-list {
     padding: 0 15px;
+    .team-class-wrapper {
+      .team-class-item {
+        margin-bottom: 15px;
+      }
+    }
   }
   .stay-coach {
     .coach-wrapper {
       .coach-item {
-        margin: 15px;
+        margin-bottom: 15px;
         .coach-desc {
           line-height: 20px;
         }

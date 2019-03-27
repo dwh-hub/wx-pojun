@@ -20,7 +20,7 @@ export default {
     storeItem
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.getAllStore();

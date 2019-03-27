@@ -25,9 +25,13 @@ export default {
     };
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    Object.assign(this.$data, this.$options.data())
+    setNavTab();
   },
   mounted() {
+    this.getAppointRecordList()
+  },
+  onReachBottom() {
     this.getAppointRecordList()
   },
   methods: {
@@ -40,8 +44,9 @@ export default {
           customerId: wx.getStorageSync('userInfo').id
         },
         success(res) {
-          // TODO: 分页
-          // console.log(res.data.data.result)
+          if(!res.data.data.result.length) {
+            return
+          }
           let _data = res.data.data.result.map((e) => {
             return {
               name: e.secondCardClassName,
@@ -51,8 +56,8 @@ export default {
               endTime: e.timeEnd.split(' ')[1].slice(0, 5)
             }
           })
-          that.recordList = _data
-          console.log(that.recordList)
+          that.recordList = that.recordList.concat(_data)
+          that.page++
         }
       })
     }

@@ -35,7 +35,7 @@ export {
  * @param {String} title 
  * @param {String} color 
  */
-export function setNavTab(title, color) {
+export function setNavTab(title) {
   if (title) {
     wx.setNavigationBarTitle({
       title: title
@@ -43,7 +43,7 @@ export function setNavTab(title, color) {
   }
   wx.setNavigationBarColor({
     frontColor: "#ffffff",
-    backgroundColor: color,
+    backgroundColor: "#2a82e4",
     animation: {
       duration: 200,
       timingFunc: "easeIn"

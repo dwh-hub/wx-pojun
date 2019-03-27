@@ -1,11 +1,11 @@
 <template>
-  <div class="coach-detail">
+  <div class="coach-detail" :class="{'isPhoneX-wrap':isPhoneX}">
     <div class="coach">
       <div class="cover">
         <img>
       </div>
       <div class="coach-info">
-        <div class="coach-name">{{coachInfo.userName}}</div>
+        <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
         <div class="coach-times">$13节课 共授课19次$</div>
       </div>
     </div>
@@ -16,47 +16,62 @@
     <div class="coach-imgs">
       <div class="title">个人形象</div>
       <div class="img-group">
-        <img><img><img>
+        <img>
+        <img>
+        <img>
       </div>
     </div>
     <div class="course">
       <div class="title">成长历程</div>
       <div class="course-content"></div>
     </div>
-    <div class="bottom-btn appointment-btn" @click="toAppoint">马上预约</div>  
+    <div class="bottom-btn appointment-btn" :class="{'isPhoneX-bottom':isPhoneX}" @click="toAppoint">马上预约</div>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import store from "../../utils/store";
 export default {
   data() {
     return {
-      coachId: '',
+      coachId: "",
       coachInfo: {}
     };
   },
   onLoad(option) {
-    this.coachId = option.coachId
-    setNavTab("", "#2a82e4");
+    this.coachId = option.coachId;
+    setNavTab();
   },
   mounted() {
-    this.getCoachDetail()
+    this.getCoachDetail();
+  },
+  computed: {
+    isPhoneX() {
+      return store.state.isIphoneX
+    }
   },
   methods: {
     toAppoint() {
+      if (!store.state.isLogin) {
+        return wx.showToast({
+          title: "请先登录",
+          icon: "none",
+          duration: 1000
+        });
+      }
       wx.navigateTo({
-        url: '../appointmentCoach/main?coachId=' + this.coachId
-      })
+        url: "../appointmentCoach/main?coachId=" + this.coachId
+      });
     },
     getCoachDetail() {
-      let that = this
+      let that = this;
       HttpRequest({
-        url: window.api + '/employee/file/datailByCus/'+ that.coachId,
+        url: window.api + "/employee/file/datailByCus/" + that.coachId,
         success(res) {
-          that.coachInfo = res.data.data
+          that.coachInfo = res.data.data;
         }
-      })
+      });
     }
   }
 };
@@ -118,14 +133,14 @@ export default {
     }
   }
   .coach-desc {
-    >p {
+    > p {
       color: #bababa;
     }
   }
   .coach-imgs {
     .img-group {
       display: flex;
-      >img {
+      > img {
         flex: 1;
         margin-right: 5px;
         width: 100%;

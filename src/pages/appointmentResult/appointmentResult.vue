@@ -1,48 +1,144 @@
 <template>
   <div class="appointment-result">
     <div class="header">
-      <div class="result-text success">$预约成功$</div>
-      <p class="result-p">感谢您对本课程的支持，请耐心等待开课</p>
+      <div class="result-text success">{{detail.statusChar}}</div>
+      <p class="result-p">
+        感谢您对本课程的支持
+        <span v-if="detail.status == 1">，请耐心等待开课</span>
+      </p>
       <div class="btn-group">
         <span class="cancel">取消预约</span>
-        <span class="assess" @click="assess">评价</span>
+        <span class="assess" @click="assess" v-if="!detail.evaluateId">评价</span>
         <span class="again">再约一节</span>
       </div>
     </div>
     <div class="class-info">
-      <title-cell title="课程信息" moreText="查看详情" :moreSize="14" :titleSize="16"></title-cell>
-      <div class="class-date">上课日期：$2018-4-5$</div>
-      <div class="class-name">课程名称：$动感律动单车$</div>
-      <div class="class-coach">上课教教：$张三$</div>
+      <title-cell title="课程信息" moreText :moreSize="14" :titleSize="16"></title-cell>
+      <div class="class-date">上课日期：{{timeStart}}</div>
+      <div class="class-name">课程名称：{{detail.anotherName || detail.projectName}}</div>
+      <div class="class-coach">上课教练：{{coachStr}}</div>
     </div>
-    <div class="store">
+    <div class="store" v-if="storeInfo.storeName">
       <div class="title">门店信息</div>
-      <store-item></store-item>
+      <store-item :info="storeInfo"></store-item>
     </div>
   </div>
 </template>
 
 <script>
-import { setNavTab } from "COMMON/js/common.js";
-import titleCell from "COMPS/titleCell"
-import storeItem from "COMPS/storeItem"
+import {
+  setNavTab,
+  window,
+  HttpRequest,
+  formatDate
+} from "COMMON/js/common.js";
+import titleCell from "COMPS/titleCell";
+import storeItem from "COMPS/storeItem";
 
 export default {
   data() {
-    return {};
+    return {
+      id: "",
+      detail: {},
+      storeInfo: {}
+    };
   },
   components: {
     titleCell,
     storeItem
   },
-  onLoad() {
-    setNavTab("", "#2a82e4");
+  computed: {
+    timeStart() {
+      if (this.detail.timeStart) {
+        return formatDate(new Date(this.detail.timeStart), "yyyy-MM-dd");
+      } else {
+        return "";
+      }
+    },
+    coachStr() {
+      if (JSON.stringify(this.detail) == "{}") {
+        return "";
+      }
+      if (this.detail.coachName) {
+        return this.detail.coachName;
+      }
+      if (this.detail.coachNameArrayStr) {
+        return this.detail.coachNameArrayStr;
+      }
+      return this.detail.coachNameArray.toString(" ");
+    }
+  },
+  onLoad(options) {
+    if (options.teamAttendId) {
+      this.id = options.teamAttendId;
+      this.getClassDetail();
+    }
+    if (options.coachAppointId) {
+      this.id = options.coachAppointId;
+      this.getCoachDetail();
+    }
+    setNavTab();
   },
   methods: {
     assess() {
       wx.navigateTo({
-        url: '../assess/main'
-      })
+        url: "../assess/main"
+      });
+    },
+    // 团课
+    getClassDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/teamClass/teamAttend/getOne",
+        data: {
+          teamAttendId: that.id
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.detail = res.data.data;
+            that.getStoreDetail();
+          }
+        }
+      });
+    },
+    // 私教课
+    getCoachDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/detail",
+        data: {
+          coachAppointId: that.id
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.detail = res.data.data;
+            that.getStoreDetail();
+          }
+        }
+      });
+    },
+    // 获取门店详情
+    getStoreDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/store/detail/" + that.detail.storeId,
+        success(res) {
+          if (res.data.code === 200) {
+            let _data = res.data.data;
+            let _address = _data.parentName + _data.cityName + _data.address;
+            _address = _address.replace(/null/g, "");
+            _address = _address.replace(/[0]/gi, "");
+            let _obj = {
+              address: _address || "未设置详细地址",
+              storeName: _data.storeName,
+              phone: _data.phone,
+              storeId: that.detail.storeId,
+              bannerList: _data.images.split(",")
+            };
+            that.storeInfo = _obj;
+          }
+        }
+      });
     }
   }
 };
@@ -68,12 +164,15 @@ export default {
       margin-top: 10px;
       margin-bottom: 12px;
       color: #bababa;
+      span {
+        color: #bababa;
+      }
     }
     .btn-group {
       padding-left: 25px;
       padding-bottom: 10px;
       border-bottom: 1rpx solid #eee;
-      >span {
+      > span {
         display: inline-block;
         width: 70px;
         text-align: center;

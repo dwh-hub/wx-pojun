@@ -24,7 +24,7 @@ export default {
     };
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    setNavTab();
   },
   mounted() {
     this.customerId = wx.getStorageSync("userInfo").id;

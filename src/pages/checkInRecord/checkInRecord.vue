@@ -20,7 +20,7 @@ export default {
     return {};
   },
   onLoad() {
-    setNavTab("", "#2a82e4");
+    setNavTab();
   }
 };
 </script>

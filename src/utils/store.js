@@ -7,7 +7,8 @@ const store = new Vuex.Store({
   state: {
     count: 0,
     isLogin: false,
-    userInfo: {}
+    userInfo: {},
+    isIphoneX: false,
   },
   mutations: {
     changeCount(state, value) {
@@ -18,6 +19,9 @@ const store = new Vuex.Store({
     },
     saveUserInfo(state,value) {
       state.userInfo = value
+    },
+    savePhoneType(state,value) {
+      state.isIphoneX = value
     }
   }
 })

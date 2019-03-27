@@ -6,44 +6,56 @@
     <div class="team-class-info">
       <div class="team-class-name">{{info.anotherName || '团课名称'}}</div>
       <div class="team-class-coach">{{info.coachNameArrayStr || '团课教练'}}</div>
-      <div class="team-class-time"><span>{{info.venueName || '场馆名称'}}</span>{{startTime}}~{{endTime}}</div>
+      <div class="team-class-time">
+        <span>{{info.venueName || '场馆名称'}}</span>
+        {{startTime}}~{{endTime}}
+      </div>
     </div>
     <div class="tag">
       <!-- <div class="team-class-type">$瑜伽$</div>
-      <div class="team-class-status">$热门$</div> -->
+      <div class="team-class-status">$热门$</div>-->
     </div>
   </div>
 </template>
 
 <script>
-import {formatDate} from 'COMMON/js/common.js'
+import { formatDate } from "COMMON/js/common.js";
 export default {
   name: "team-class-item",
   props: {
     info: {
       type: Object,
       default: function() {
-        return {}
+        return {};
       }
+    },
+    isToDetail: {
+      type: Boolean,
+      default: true
     }
   },
   methods: {
     toDetail() {
-      wx.navigateTo({
-        url: '../teamClassDetail/main?classId=' + this.info.teamScheduleId
-      })
+      if (this.isToDetail) {
+        return wx.navigateTo({
+          url: "../teamClassDetail/main?classId=" + this.info.teamScheduleId
+        });
+      }
+      this.$emit('clickClass')
     }
   },
   computed: {
     startTime() {
-      if(this.info.timeStart) {
-        return formatDate(new Date(this.info.timeStart), 'hh:mm')
+      if (this.info.timeStart) {
+        return formatDate(new Date(this.info.timeStart), "hh:mm");
       }
+      return "";
     },
     endTime() {
-      if(this.info.timeEnd) {
-        return formatDate(new Date(this.info.timeEnd), 'hh:mm')
+      if (this.info.timeEnd) {
+        return formatDate(new Date(this.info.timeEnd), "hh:mm");
       }
+      return "";
     }
   }
 };
@@ -88,7 +100,7 @@ export default {
       color: #333;
     }
     .team-class-time {
-      >span {
+      > span {
         font-size: 14px;
         margin-right: 5px;
         color: #999;

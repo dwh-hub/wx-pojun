@@ -73,12 +73,14 @@ export default {
       if(this.cardInfo.activateDate) {
         return this.cardInfo.cardAddTime.split(" ")[0]
       }
+      return ""
     },
     // 卡的到期时间
     doomsday() {
       if (this.cardInfo.doomsday) {
         return this.cardInfo.doomsday.split(" ")[0]
       }
+      return ""
     },
   },
   methods: {

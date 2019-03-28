@@ -25,7 +25,6 @@
 
 <script>
 import { setNavTab, checkPhoneFormat, window } from "COMMON/js/common.js";
-import { setTimeout } from "timers";
 import store from "../../utils/store";
 
 export default {
@@ -90,6 +89,9 @@ export default {
     // 登录
     login() {
       let that = this;
+      wx.showLoading({
+        title: "正在登录..."
+      });
       wx.request({
         url: window.api + "/sms/authCode/nocompany",
         data: {
@@ -128,10 +130,11 @@ export default {
               url: window.api + "/wxcustomer/bindCard",
               data: {
                 phone: that.phone,
-                companyId: that.userInfo.companyId,
+                companyId: that.userInfo.companyId
                 // smsSendLogId: that.smsSendLogId
               },
               success(res) {
+                wx.hideLoading();
                 wx.setStorage({
                   key: "Cookie",
                   data: res.header["Set-Cookie"]

@@ -1,5 +1,5 @@
 <template>
-  <div id="memberActiveDetail">
+  <div id="memberActiveDetail" :class="{'isPhoneX-wrap':isPhoneX}">
     <div class="active-cover">
       <image mode="widthFix" :src="'https://www.pojun-tech.cn' + activeDetail.thumbUrl" class="cover"></image>
     </div>
@@ -11,26 +11,44 @@
         <wxParse :content="activeDetail.content" :imageProp="{domain: 'www.pojun-tech.cn', mode: 'widthFix'}"/>
       </div>
     </div>
-    <div class="activeBottom">
+    <div class="activeBottom" :class="{'isPhoneX-bottom':isPhoneX}">
       <span class="activeBottomTitle">人数：</span>
       <div class="count-wrapper">
         <span class="decrease" @click="decrease">-</span>
         <span class="numbers">{{signNum}}</span>
         <span class="increase" @click="signNum++">+</span>
       </div>
-      <span class="sign">报名</span>
+      <span class="sign" @click="sign">报名</span>
     </div>
+    <van-popup
+      :show="showEntryBox"
+      @close="showEntryBox = false"
+      :duration="200"
+      custom-style="width:85%;border-radius: 5px;"
+    >
+      <div class="entry-box">
+        <div class="box-item"><span class="text-left">报名活动</span><span class="text-right">{{activeDetail.title}}</span></div>
+        <div class="box-item"><span class="text-left">报名人数</span><span class="text-right">{{signNum}}</span></div>
+        <div class="box-item"><span class="text-left">报名费用</span><span class="text-right">{{amount}}</span></div>
+        <div class="btn-wrapper">
+          <span class="cancel" @click="showEntryBox = false">取消</span>
+          <span class="confirm">确认</span>
+        </div>
+      </div>
+    </van-popup>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import wxParse from "mpvue-wxparse";
+import store from "../../utils/store";
 export default {
   data() {
     return {
-      signNum: "1",
+      signNum: 1,
       activeDetail: {},
+      showEntryBox: true,
       content:
         '<p><span style="background-color: rgb（255, 255, 255）; color: rgb（255, 0, 0）; font-weight: bold;">缴纳定金权益享受下述权益:</span></p><p>1.预存50元定金，可享受办卡首年免费；</p><p>2.获得会所赠送价值200的水吧券一张；</p><p>3.获得会所价值288元的运动背包；</p><p>4.享受会所价值788元的一对一私教二节及专业的健康状况评估；</p><p>5.享受停车2小时免费（卡有效期内来游泳健身）；</p><p>6.享受独立淋浴间（共15间）使用权，极大保护个人隐私；</p><p>7.享受儿童独立淋浴室；</p><p>8.优先获得参加会所举办的所有常规和户外活动的权益；</p><p>9.参加会所开业庆典活动和抽奖活动；</p><p>10.如不办卡，享受持定金单换取会所VIP贵宾券二张。</p><p><br></p><p>门店效果预览图（以门店实际装修为准）</p><p><img src="/images/activities/37/1.55065529299746E12.jpeg" style="width: 874px; float: none;"></p><p><img src="/images/activities/37/1.5506553509545596E12.jpeg" style="width: 1500px; float: none;"></p><p><img src="/images/activities/37/1.5506553654493972E12.jpeg" style="width: 1500px;"></p><p><img src="/images/activities/37/1.5506553892880002E12.jpeg" style="width: 1426px;"></p><p><img src="/images/activities/37/1.550655397923402E12.jpeg" style="width: 1152px;"></p><p><img src="/images/activities/37/1.550655407173489E12.jpeg" style="width: 1152px;"><br></p>'
     };
@@ -40,16 +58,28 @@ export default {
   },
   mounted() {
     this.getActiveDetail();
+    console.log(this.isPhoneX)
+  },
+  computed: {
+    isPhoneX() {
+      return store.state.isIphoneX;
+    },
+    amount() {
+      if(this.activeDetail.entryFee) {
+        return this.activeDetail.entryFee*this.signNum
+      }
+      return ""
+    }
   },
   components: {
     wxParse
   },
   methods: {
     decrease() {
-      if (signNum == 1) {
+      if (this.signNum == 1) {
         return;
       }
-      signNum--;
+      this.signNum--;
     },
     preview(src, e) {
       console.log(src);
@@ -99,13 +129,17 @@ export default {
           that.activeDetail = res.data.data;
         }
       });
+    },
+    sign() {
+      this.showEntryBox = true
     }
   }
 };
 </script>
 
 <style lang="less">
-@import "~COMMON/less/reset.less";
+@import "~COMMON/less/reset";
+@import "~COMMON/less/common";
 @import url("~mpvue-wxparse/src/wxParse.css");
 
 #memberActiveDetail {
@@ -155,8 +189,8 @@ export default {
     position: fixed;
     bottom: 0px;
     width: 100%;
-    height: 48px;
-    line-height: 48px;
+    height: 50px;
+    line-height: 50px;
     padding-left: 15px;
     box-sizing: border-box;
     border-top: 1px solid #eee;
@@ -192,6 +226,33 @@ export default {
       text-align: center;
       background-color: #3b97eb;
       color: #fff;
+    }
+  }
+  .entry-box {
+    line-height: 46px;
+    padding: 15px;
+    .text-right {
+      float: right;
+    }
+    .btn-wrapper {
+      display: flex;
+      >span {
+        flex: 1;
+        border-radius: 4px;
+        color: #fff;
+        line-height: 36px;
+        text-align: center;
+        margin-right: 10px;
+        &:active {
+          opacity: 0.8;
+        }
+      }
+      .cancel {
+        background-color: #fa8178;
+      }
+      .confirm {
+        background-color: @theme-color;
+      }
     }
   }
 }

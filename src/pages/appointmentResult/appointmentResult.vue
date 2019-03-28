@@ -7,8 +7,8 @@
         <span v-if="detail.status == 1">，请耐心等待开课</span>
       </p>
       <div class="btn-group">
-        <span class="cancel">取消预约</span>
-        <span class="assess" @click="assess" v-if="!detail.evaluateId">评价</span>
+        <span class="cancel" @click="cancel" v-if="detail.status == 1">取消预约</span>
+        <span class="assess" @click="assess" v-if="!detail.evaluateId && detail.status != 1">评价</span>
         <span class="again">再约一节</span>
       </div>
     </div>
@@ -34,13 +34,16 @@ import {
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
+import { setTimeout } from "timers";
 
 export default {
   data() {
     return {
       id: "",
       detail: {},
-      storeInfo: {}
+      storeInfo: {},
+      teamAttendId: null,
+      coachAppointId: null
     };
   },
   components: {
@@ -70,20 +73,27 @@ export default {
   },
   onLoad(options) {
     if (options.teamAttendId) {
-      this.id = options.teamAttendId;
+      this.teamAttendId = options.teamAttendId;
       this.getClassDetail();
     }
     if (options.coachAppointId) {
-      this.id = options.coachAppointId;
+      this.coachAppointId = options.coachAppointId;
       this.getCoachDetail();
     }
     setNavTab();
   },
   methods: {
     assess() {
-      wx.navigateTo({
-        url: "../assess/main"
-      });
+      if (this.teamAttendId) {
+        wx.navigateTo({
+          url: "../assess/main?teamAttendId=" + this.teamAttendId
+        });
+      }
+      if (this.coachAppointId) {
+        wx.navigateTo({
+          url: "../assess/main?coachAppointId=" + this.coachAppointId
+        });
+      }
     },
     // 团课
     getClassDetail() {
@@ -91,7 +101,7 @@ export default {
       HttpRequest({
         url: window.api + "/teamClass/teamAttend/getOne",
         data: {
-          teamAttendId: that.id
+          teamAttendId: that.teamAttendId
         },
         success(res) {
           if (res.data.code === 200) {
@@ -107,7 +117,7 @@ export default {
       HttpRequest({
         url: window.api + "/mobile/coach/appoint/detail",
         data: {
-          coachAppointId: that.id
+          coachAppointId: that.coachAppointId
         },
         success(res) {
           if (res.data.code === 200) {
@@ -136,6 +146,78 @@ export default {
               bannerList: _data.images.split(",")
             };
             that.storeInfo = _obj;
+          }
+        }
+      });
+    },
+    cancel() {
+      let that = this;
+      wx.showModal({
+        title: "提示",
+        content: "确认取消预约该团课？",
+        success(res) {
+          if (res.confirm) {
+            if (that.teamAttendId) {
+              that.cancelClass();
+            }
+            if (that.coachAppointId) {
+              that.getCoachDetail();
+            }
+          }
+        }
+      });
+    },
+    // 取消团课预约
+    cancelClass() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/teamClass/teamAppoint/cancel",
+        data: {
+          teamAttendId: that.teamAttendId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            wx.showToast({
+              title: "取消预约成功",
+              icon: "success",
+              duration: 1000
+            });
+            setTimeout(() => {
+              wx.navigateBack({
+                delta: 1
+              });
+            }, 1000);
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
+    },
+    // 取消私教
+    cancelCoach() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/coach/private/appoint/cancelClass",
+        data: {
+          coachAppointId: that.coachAppointId
+        },
+        success(res) {
+          wx.showModal({
+            title: "提示",
+            content: res.data.data,
+            showCancel: false
+          });
+          if (res.data.data.indexOf("成功") > -1) {
+            // 成功
+            setTimeout(() => {
+              wx.navigateBack({
+                delta: 1
+              });
+            }, 1000);
           }
         }
       });

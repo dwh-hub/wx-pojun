@@ -64,20 +64,20 @@ export default {
           hit: "",
           text: "次"
         },
-        {
-          imgUrl: "https://www.pojun-tech.cn/assets/img/integral.png",
-          navName: "我的积分",
-          navigatorUrl: "../myPoints/main",
-          hit: "",
-          text: "分"
-        },
-        {
-          imgUrl: "https://www.pojun-tech.cn/assets/img/checkFace.png",
-          navName: "人脸设置",
-          navigatorUrl: "../faceSetUp/main",
-          hit: "",
-          text: ""
-        }
+        // {
+        //   imgUrl: "https://www.pojun-tech.cn/assets/img/integral.png",
+        //   navName: "我的积分",
+        //   navigatorUrl: "../myPoints/main",
+        //   hit: "",
+        //   text: "分"
+        // },
+        // {
+        //   imgUrl: "https://www.pojun-tech.cn/assets/img/checkFace.png",
+        //   navName: "人脸设置",
+        //   navigatorUrl: "../faceSetUp/main",
+        //   hit: "",
+        //   text: ""
+        // }
       ],
       // 临时的用户数据
       userInfo: {}

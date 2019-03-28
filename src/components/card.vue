@@ -10,7 +10,7 @@
         <div class="card-type pr">{{info.masterClassName || info.masterCradClass}}</div>
       </div>
       <div class="card-bottom">
-        <div class="card-term pl">{{info.balanceAuthority}}{{type}}</div>
+        <div class="card-term pl">{{info.balanceAuthority || '0'}}{{type || ''}}</div>
         <div class="card-status pr">{{info.cardStatusChar}}</div>
       </div>
     </div>
@@ -37,12 +37,14 @@ export default {
       if(this.info.activateDate) {
         return this.info.activateDate.split(" ")[0]
       }
+      return ""
     },
     // 卡的到期时间
     doomsday() {
       if (this.info.doomsday) {
         return this.info.doomsday.split(" ")[0]
       }
+      return ""
     },
     backClass() {
       if(this.info.authorityUnit == '次' || this.info.authorityUnit == '2') {
@@ -56,6 +58,9 @@ export default {
       if(this.info.authorityUnit == '天' || this.info.authorityUnit == '1') {
         this.type = '天'
         return 'day'
+      }
+      if(this.info.cardStatus != 2) {
+        return 'none'
       }
     }
   },
@@ -100,7 +105,7 @@ export default {
       color: #ff7f44;
     }
   }
-  .none {
+  &.none {
     color: gray;
     background-image: linear-gradient(to left top, lightgray, gray);
     .card-status {

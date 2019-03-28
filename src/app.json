@@ -1,9 +1,12 @@
 {
   "pages": [
-    "pages/activeDetail/main",
-    "pages/coachList/main",
-    "pages/teamClassList/main",
+    "pages/authorizeLogin/main",
     "pages/appointmentClass/main",
+    "pages/myClassList/main",
+    "pages/coachList/main",
+    "pages/activeDetail/main",
+    "pages/assess/main",
+    "pages/teamClassList/main",
     "pages/teamClassDetail/main",
     "pages/allStore/main",
     "pages/message/main",
@@ -16,7 +19,6 @@
     "pages/login/main",
     "pages/active/main",
     "pages/coachDetail/main",
-    "pages/assess/main",
     "pages/appointmentResult/main",
     "pages/storeDetail/main",
     "pages/appointmentCards/main",

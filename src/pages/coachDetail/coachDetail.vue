@@ -6,7 +6,7 @@
       </div>
       <div class="coach-info">
         <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
-        <div class="coach-times">$13节课 共授课19次$</div>
+        <div class="coach-times">共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
       </div>
     </div>
     <div class="coach-desc">

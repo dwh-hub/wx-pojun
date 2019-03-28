@@ -31,24 +31,30 @@ export default {
   methods: {
     getAllStore() {
       let that = this;
+      wx.showLoading({
+        title: "加载中..."
+      });
       wx.request({
         url: window.api + "/store/all-store-name-list-nolimit",
         data: {
           companyId: that.companyId || ""
         },
         success(res) {
-          let _storeList = [];
-          _storeList = res.data.data.map(e => {
-            return {
-              cover: window.api + e.images.split(",")[0],
-              address: e.address,
-              range: "",
-              storeName: e.storeName,
-              storeId: e.storeId
-            };
-          });
-          that.storeList = _storeList;
-          console.log(that.storeList)
+          wx.hideLoading();
+          if (res.data.code === 200) {
+            let _storeList = [];
+            _storeList = res.data.data.map(e => {
+              return {
+                cover: window.api + e.images.split(",")[0],
+                address: e.address,
+                range: "",
+                storeName: e.storeName,
+                storeId: e.storeId
+              };
+            });
+            that.storeList = _storeList;
+          }
+          console.log(that.storeList);
         }
       });
     }

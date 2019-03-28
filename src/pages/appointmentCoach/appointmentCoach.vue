@@ -1,12 +1,12 @@
 <template>
-  <div class="appointment-coach">
+  <div class="appointment-coach" :class="{'isPhoneX-wrap':isPhoneX}">
     <div class="coach">
       <div class="cover">
         <img>
       </div>
       <div class="coach-info">
         <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
-        <div class="coach-times">$签约课数：18$</div>
+        <div class="coach-times">共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
       </div>
       <div class="tiems">
         <div class="num">$1次$</div>
@@ -133,7 +133,13 @@
     </van-popup>
 
     <!-- 选择时间弹出框 -->
-    <van-popup class="time-pop" :show="isTimePopup" position="bottom" @close="isTimePopup = false">
+    <van-popup
+      class="time-pop"
+      custom-style="width: 100%;"
+      :show="isTimePopup"
+      position="bottom"
+      @close="isTimePopup = false"
+    >
       <div class="pop-title">
         <span>选择开始时间</span>
         <img src="/static/images/icon-close.png" @click="isTimePopup = false">
@@ -141,49 +147,94 @@
       <select-date @selectWeek="onDate"></select-date>
       <div class="specific-date">
         <div class="morning">
-          <h5>上午</h5>
+          <div class="date-header">
+            <h5>上午</h5>
+            <div class="mini-data" v-show="showMiniIndex == 1">
+              <div
+                class="mini"
+                v-for="(item,index) in miniDate"
+                :key="index"
+                @click="selectHour(item)"
+                :class="{active: item == curTime}"
+              >{{item}}</div>
+            </div>
+          </div>
           <div class="hours">
             <div
               class="hour"
               v-for="(item, index) in morningTimes"
               :class="{active: (item == curTime || item == curEndTime)}"
               :key="index"
-              @click="selectHour(item)"
+              @click="selectHour(item,1)"
             >{{item}}</div>
           </div>
         </div>
         <div class="noon">
-          <h5>中午</h5>
+          <div class="date-header">
+            <h5>中午</h5>
+            <div class="mini-data" v-show="showMiniIndex == 2">
+              <div
+                class="mini"
+                v-for="(item,index) in miniDate"
+                :key="index"
+                @click="selectHour(item)"
+                :class="{active: item == curTime}"
+              >{{item}}</div>
+            </div>
+          </div>
           <div class="hours">
             <div
               class="hour"
               v-for="(item, index) in noonTimes"
               :class="{active: (item == curTime || item == curEndTime)}"
-              @click="selectHour(item)"
+              @click="selectHour(item,2)"
               :key="index"
             >{{item}}</div>
           </div>
         </div>
         <div class="afternoon">
-          <h5>下午</h5>
+          <div class="date-header">
+            <h5>下午</h5>
+            <div class="mini-data" v-show="showMiniIndex == 3">
+              <div
+                class="mini"
+                v-for="(item,index) in miniDate"
+                :key="index"
+                @click="selectHour(item)"
+                :class="{active: item == curTime}"
+              >{{item}}</div>
+            </div>
+          </div>
           <div class="hours">
             <div
               class="hour"
               v-for="(item, index) in afternoonTimes"
               :class="{active: (item == curTime || item == curEndTime)}"
-              @click="selectHour(item)"
+              @click="selectHour(item,3)"
               :key="index"
             >{{item}}</div>
           </div>
         </div>
         <div class="afternoon">
-          <h5>晚上</h5>
+          .
+          <div class="date-header">
+            <h5>晚上</h5>
+            <div class="mini-data" v-show="showMiniIndex == 4">
+              <div
+                class="mini"
+                v-for="(item,index) in miniDate"
+                :key="index"
+                @click="selectHour(item)"
+                :class="{active: item == curTime}"
+              >{{item}}</div>
+            </div>
+          </div>
           <div class="hours">
             <div
               class="hour"
               v-for="(item, index) in nightTime"
               :class="{active: (item == curTime || item == curEndTime)}"
-              @click="selectHour(item)"
+              @click="selectHour(item,4)"
               :key="index"
             >{{item}}</div>
           </div>
@@ -203,7 +254,7 @@
           <span>不可预约</span>
         </div>
       </div>
-      <div class="confirm-date" @click="selectDate">确定</div>
+      <div class="confirm-date" @click="selectDate">确定（{{confirmDate}}）</div>
     </van-popup>
 
     <!-- 选择消费合同 -->
@@ -234,7 +285,11 @@
       </div>
     </van-popup>
 
-    <div class="bottom-btn appoint-coach" @click="appointCoach">发起预约</div>
+    <div
+      class="bottom-btn appoint-coach"
+      @click="appointCoach"
+      :class="{'isPhoneX-bottom':isPhoneX}"
+    >发起预约</div>
   </div>
 </template>
 
@@ -247,6 +302,7 @@ import {
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
+import store from "../../utils/store";
 
 export default {
   name: "appointment-coach",
@@ -309,7 +365,11 @@ export default {
       // 项目id
       projectId: "",
       // 教练信息
-      coachInfo: {}
+      coachInfo: {},
+      // 小时间段
+      miniDate: [],
+      // 小时间段显示位置 1 上午 2 中午 3 下午 4 晚上
+      showMiniIndex: 0
     };
   },
   components: {
@@ -327,8 +387,21 @@ export default {
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.getCardList();
     this.getStoreList();
+    this.getPeriodTime();
+  },
+  computed: {
+    isPhoneX() {
+      return store.state.isIphoneX;
+    },
+    confirmDate() {
+      if (this.curEndTime) {
+        return this.curDate + " " + this.curTime + "~" + this.curEndTime;
+      }
+      return "";
+    }
   },
   methods: {
+    // 场馆
     showVenuePopup() {
       if (!this.selectStoreId || !this.selectCardId) {
         return wx.showModal({
@@ -346,6 +419,7 @@ export default {
       }
       this.isVenuePopup = true;
     },
+    // 项目
     showProjectPopup() {
       if (!this.venueId) {
         return wx.showModal({
@@ -369,22 +443,30 @@ export default {
       this.isProjectPopup = true;
     },
     // 选择时间
-    selectHour(item) {
+    selectHour(item, index) {
       this.curTime = item;
-      this.curEndTime = Number(item.split(":")[0]) + 1 + ":00";
+      this.showMiniIndex = index;
+      let hour = item.slice(0, 2);
+      this.miniDate = [hour + ":15", hour + ":30", hour + ":45"];
+      this.curEndTime = Number(item.split(":")[0]) + 1 +':' +item.split(':')[1];
+      console.log(this.miniDate);
     },
     // 计算可选择预约时间
     computedTime() {
       let _satarTime = this.startTime.split(":")[0];
       let _endTime = this.endTime.split(":")[0];
+
+      let _morningTimes = [];
+      let _nightTime = [];
       // 上午时间段
       for (let i = 0; i < 12 - Number(_satarTime); i++) {
         let _time = Number(_satarTime) + i + ":00";
         if (Number(_satarTime) + i < 10) {
           _time = "0" + String(_time);
         }
-        this.morningTimes.push(_time);
+        _morningTimes.push(_time);
       }
+      this.morningTimes = _morningTimes;
       // 中午时间段
       if (Number(_satarTime) < 12 || Number(_endTime) > 14) {
         this.noonTimes = ["12:00", "13:00", "14:00"];
@@ -395,12 +477,9 @@ export default {
       }
       // 晚上时间段
       for (let j = 0; j < Number(_endTime) - 19; j++) {
-        this.nightTime.push(19 + j + ":00");
+        _nightTime.push(19 + j + ":00");
       }
-      console.log(this.morningTimes);
-      console.log(this.noonTimes);
-      console.log(this.afternoonTimes);
-      console.log(this.nightTime);
+      this.nightTime = _nightTime;
     },
     // 选择门店
     selectStore(item) {
@@ -427,11 +506,10 @@ export default {
         this.getVenueList();
       }
     },
-    // 选择时间
+    // 确认选择时间
     selectDate() {
       this.isTimePopup = false;
-      this.timeCellText =
-        this.curDate + " " + this.curTime + "~" + this.curEndTime;
+      this.timeCellText = this.confirmDate
     },
     // 选择场馆
     selectVenue(item) {
@@ -559,7 +637,12 @@ export default {
           coachId: that.coachId
         },
         success(res) {
-          that.storeList = res.data.data;
+          if (res.data.code == 200) {
+            that.storeList = res.data.data;
+            if (that.storeList.length == 1) {
+              that.selectStore(that.storeList[0]);
+            }
+          }
         }
       });
     },
@@ -573,14 +656,19 @@ export default {
           isAll: 1
         },
         success(res) {
-          let _list = [];
-          res.data.data.result.forEach(e => {
-            if (e.teachCardType == 2 && e.cardStatus == 2) {
-              e.doomsday = e.doomsday.split(" ")[0];
-              _list.push(e);
+          if (res.data.code == 200) {
+            let _list = [];
+            res.data.data.result.forEach(e => {
+              if (e.teachCardType == 2 && e.cardStatus == 2) {
+                e.doomsday = e.doomsday.split(" ")[0];
+                _list.push(e);
+              }
+            });
+            that.cardList = _list;
+            if (that.cardList.length == 1) {
+              that.selectCard(that.cardList[0]);
             }
-          });
-          that.cardList = _list;
+          }
         }
       });
     },
@@ -596,6 +684,9 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             that.venueList = res.data.data;
+            if (that.venueList.length == 1) {
+              that.selectVenue(that.venueList[0]);
+            }
           } else {
             that.venueList = [];
           }
@@ -615,9 +706,26 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             that.projectList = res.data.data;
+            if (that.projectList.length == 1) {
+              that.selectProject(that.projectList[0]);
+            }
           } else {
             that.projectList = [];
           }
+        }
+      });
+    },
+    // 获取教练被占用的时间
+    getPeriodTime(date) {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/coach/private/caochTimePeriod",
+        data: {
+          coachId: that.coachId,
+          calendar: date || formatDate(new Date(), "yyyy-MM-dd")
+        },
+        success(res) {
+          console.log(res.data.data);
         }
       });
     }
@@ -767,10 +875,35 @@ page {
       .morning,
       .noon,
       .afternoon {
-        > h5 {
-          line-height: 20px;
-          font-size: 15px;
-          margin: 15px 0;
+        .date-header {
+          display: flex;
+          > h5 {
+            flex: 0 0 50px;
+            text-align: center;
+            line-height: 20px;
+            font-size: 15px;
+            margin: 15px 0;
+          }
+          .mini-data {
+            flex: 1;
+            .mini {
+              display: inline-block;
+              width: 60px;
+              margin-top: 7px;
+              margin-right: 5px;
+              line-height: 36px;
+              text-align: center;
+              font-size: 13px;
+              border: 1rpx solid #eee;
+              &.active {
+                background-color: #43cf7c;
+                color: #fff;
+              }
+              &.none {
+                background-color: #ccc;
+              }
+            }
+          }
         }
         .hours {
           display: flex;

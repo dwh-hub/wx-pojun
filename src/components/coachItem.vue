@@ -6,7 +6,7 @@
     <div class="coach-info">
       <div class="coach-name">{{info.userName || '教练名字'}}</div>
       <div class="coach-desc">{{info.individualResume || '暂无个人简介'}}</div>
-      <div class="coach-times">已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || ''}}</div>
+      <div class="coach-times">已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || '0'}}节</div>
     </div>
     <div class="tag" v-if="hasTag">
       <div class="coach-type">$瑜伽$</div>

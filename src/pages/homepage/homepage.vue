@@ -70,8 +70,8 @@
     </div>
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
-      <team-class-item></team-class-item>
-      <coach-item :info="recommendCoach"></coach-item>
+      <team-class-item :info="recommendClass" v-if="recommendClass.anotherName"></team-class-item>
+      <coach-item :info="recommendCoach" v-if="recommendCoach.userName"></coach-item>
     </div>
   </div>
 </template>
@@ -95,7 +95,8 @@ export default {
       longitude: "", // 经度
       latitude: "", // 维度
       bannerList: [],
-      recommendCoach: {}
+      recommendCoach: {},
+      recommendClass: {}
     };
   },
   components: {
@@ -108,12 +109,15 @@ export default {
     wx.getLocation({
       type: "wgs84",
       success(res) {
+        console.log('经度:'+ res.longitude)
+        console.log('维度:'+ res.latitude)
         that.latitude = res.latitude;
         that.longitude = res.longitude;
       }
     });
     this.getBannerList();
     this.getRecommendCoach();
+    this.getRecommendClass()
   },
   onLoad() {
     setNavTab("前锋体育");
@@ -155,14 +159,20 @@ export default {
       });
     },
     //　推荐团课
-    // getRecommendClass() {
-    //   HttpRequest({
-    //     url: window.api + '/teamClass/schedule/recommend',
-    //     data: {
-    //       storeId:
-    //     },
-    //   })
-    // }
+    getRecommendClass() {
+      let that = this
+      HttpRequest({
+        url: window.api + '/teamClass/schedule/recommend',
+        data: {
+          storeId: '',
+        },
+        success(res) {
+          if(res.data.code == 200) {
+            that.recommendClass = res.data.data
+          }
+        }
+      })
+    },
     // 推荐教练
     getRecommendCoach() {
       let that = this;
@@ -212,7 +222,7 @@ export default {
 <style lang="less">
 @import "~COMMON/less/reset.less";
 @import "~COMMON/less/common.less";
-
+page{background-color: #f6f6f6;height: 100%;}
 .homepage {
   padding-bottom: 20px;
   background-color: #f6f6f6;

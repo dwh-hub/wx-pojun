@@ -8,7 +8,7 @@
     </div>
     <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
       <div class="stay-team-class">
-        <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllList(1)"></title-cell>
         <div class="team-class-wrapper">
           <team-class-item
             @clickClass="toClassDetail(item)"
@@ -21,7 +21,7 @@
         <none-result text="你还没有预约团课呢" v-if="!teamClassList.length"></none-result>
       </div>
       <div class="stay-coach">
-        <title-cell title="私教" moreText="全部"  :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+        <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllList(2)"></title-cell>
         <div class="coach-wrapper">
           <coach-item
             @clickCoach="toCoachDetail(item)"
@@ -66,6 +66,7 @@ import store from "../../utils/store";
 export default {
   data() {
     return {
+      // 1 待上课 2 待评价 3 已完成
       currentNav: 1,
       showSelect: false,
       // 当前显示的团课，私教列表
@@ -166,9 +167,26 @@ export default {
     toggleSelect() {
       this.showSelect = true;
     },
-    toAllStore() {
+    toAllList(type) {
+      // type 1 团课 2 私教课
+      let status;
+      let waitEvaluate;
+      if (type == 1 && this.currentNav == 1) {
+        // 团课待上课
+        status = 1;
+      } else if (this.currentNav == 2) {
+        // 团课/私教待评价
+        status = 3
+        waitEvaluate = 1
+      } else if (this.currentNav == 3) {
+        // 团课/私教已完成
+        status = 3
+      }else if (type == 2 && this.currentNav == 1) {
+        // 私教待上课
+        status = 2;
+      }
       wx.navigateTo({
-        url: "../allStore/main"
+        url: `../myClassList/main?type=${type}&status=${status}&waitEvaluate=${waitEvaluate}`
       });
     },
     selectCur(event) {

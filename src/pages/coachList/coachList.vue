@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest,debounce  } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest, debounce } from "COMMON/js/common.js";
 import coachItem from "COMPS/coachItem.vue";
 export default {
   data() {
@@ -190,6 +190,9 @@ export default {
     // 获取教练列表
     getCoachList(id) {
       let that = this;
+      wx.showLoading({
+        title: "加载中..."
+      });
       return new Promise(function(resolve, reject) {
         HttpRequest({
           url: window.api + "/customer/register/userofrole",
@@ -198,13 +201,16 @@ export default {
             positionType: 1
           },
           success(res) {
-            that.allCoachList = res.data.data;
-            if (res.data.data.length > 20) {
-              that.coachList = res.data.data.slice(0, 20);
-            } else {
-              that.coachList = res.data.data;
+            wx.hideLoading();
+            if (res.data.code === 200) {
+              that.allCoachList = res.data.data;
+              if (res.data.data.length > 20) {
+                that.coachList = res.data.data.slice(0, 20);
+              } else {
+                that.coachList = res.data.data;
+              }
+              resolve();
             }
-            resolve();
           }
         });
       });
@@ -228,21 +234,21 @@ export default {
       });
     },
     // 搜索教练
-    searchCoach: debounce(function (event) {
+    searchCoach: debounce(function(event) {
       console.log(event.mp.detail);
-      let that = this
+      let that = this;
       HttpRequest({
-        url: window.api + '/customer/register/userofrole',
+        url: window.api + "/customer/register/userofrole",
         data: {
           storeId: that.curStoreId,
           positionType: 1,
           userName: event.mp.detail
         },
         success(res) {
-          console.log()
-          that.curCoachList = res.data.data
-        },
-      })
+          console.log();
+          that.curCoachList = res.data.data;
+        }
+      });
     }, 200),
     clickMask() {
       this.showStoreList = false;

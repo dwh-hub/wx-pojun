@@ -555,7 +555,7 @@ export default {
           duration: 1000
         });
       }
-      if (this.timeCellText == "请选择" || this.timeCellText == "") {
+      if (this.cardCellText == "请选择" || this.cardCellText == "") {
         return wx.showToast({
           title: "请选择扣费合同",
           icon: "none",
@@ -575,7 +575,10 @@ export default {
           icon: "none",
           duration: 1000
         });
-      }
+      }      
+      wx.showLoading({
+        title: "预约中..."
+      });
       HttpRequest({
         url: window.api + "/coach/private/appoint/set",
         data: {
@@ -593,6 +596,7 @@ export default {
           status: 0
         },
         success(res) {
+          wx.hideLoading();
           if (res.data.code === 200) {
             wx.showToast({
               title: "私教预约成功",

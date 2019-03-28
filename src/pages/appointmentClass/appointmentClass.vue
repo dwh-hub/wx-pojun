@@ -21,7 +21,7 @@
         <none-result text="你还没有预约团课呢" v-if="!teamClassList.length"></none-result>
       </div>
       <div class="stay-coach">
-        <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllList(2)"></title-cell>
+        <title-cell title="私教课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllList(2)"></title-cell>
         <div class="coach-wrapper">
           <coach-item
             @clickCoach="toCoachDetail(item)"
@@ -168,6 +168,20 @@ export default {
       this.showSelect = true;
     },
     toAllList(type) {
+      if (type == 1 && this.teamClassList.length < 2) {
+        return wx.showToast({
+          title: "暂无更多团课",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (type == 2 && this.coachList.length < 2) {
+        return wx.showToast({
+          title: "暂无更多私教课",
+          icon: "none",
+          duration: 1000
+        });
+      }
       // type 1 团课 2 私教课
       let status;
       let waitEvaluate;
@@ -176,12 +190,12 @@ export default {
         status = 1;
       } else if (this.currentNav == 2) {
         // 团课/私教待评价
-        status = 3
-        waitEvaluate = 1
+        status = 3;
+        waitEvaluate = 1;
       } else if (this.currentNav == 3) {
         // 团课/私教已完成
-        status = 3
-      }else if (type == 2 && this.currentNav == 1) {
+        status = 3;
+      } else if (type == 2 && this.currentNav == 1) {
         // 私教待上课
         status = 2;
       }

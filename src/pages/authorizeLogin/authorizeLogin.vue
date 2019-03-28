@@ -1,5 +1,7 @@
 <template>
   <div class="authorize-login">
+    <!-- <image src="https://www.pojun-tech.com/images/company_log/3/1.5355962923289521E12.png"></image> -->
+    <div class="tip">请完成微信授权以继续使用</div>
     <button type="primary" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button>
   </div>
 </template>

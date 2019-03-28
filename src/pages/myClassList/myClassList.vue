@@ -51,6 +51,10 @@ export default {
       this.getOwnCoachClassList(options.status, options.waitEvaluate);
     }
   },
+  onUnload() {
+    this.list = []
+    this.page = 1
+  },
   onReachBottom() {
     if (this.options.type == 1) {
       this.getOwnTeamClassList(this.options.status, this.options.waitEvaluate);

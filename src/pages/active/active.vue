@@ -2,8 +2,8 @@
   <div class="active">
     <div class="active-item" v-for="(item, index) in activeList" :key="index" @click="toActiveDetail">
       <div class="active-cover">
-        <!-- TODO: :src="info.cover" -->
-        <img>
+        <!-- TODO: :src="item.thumbUrl" -->
+        <img :src="item.thumbUrl">
       </div>
       <div class="active-info">
         <div class="active-top">
@@ -12,24 +12,21 @@
         <div class="active-bottom">{{item.storeName || '暂无地址'}}</div>
       </div>
     </div>
+    <none-result v-if="!activeList.length" text="暂无活动"></none-result>
   </div>
 </template>
 
 <script>
 import {setNavTab,window,HttpRequest} from 'COMMON/js/common.js'
+import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
     return {
       activeList: [
         {
-          cover: "",
-          title: "马戏城店创始会员预定活动",
-          storeName: "马戏城店"
-        },
-        {
-          cover: "",
-          title: "马戏城店",
-          storeName: "马戏城店"
+          thumbUrl: "",
+          title: "",
+          storeName: ""
         }
       ],
       page: 1,
@@ -41,14 +38,20 @@ export default {
   onLoad() {
     setNavTab();
   },
+  components: {
+    noneResult
+  },
   methods: {
     toActiveDetail() {
       wx.navigateTo({
         url: "../activeDetail/main"
       });
     },
-    // 获取活动详情
+    // 获取活动列表
     getActiveList() {
+      wx.showLoading({
+        title: "加载中..."
+      });
       let that = this
       HttpRequest({
         url: window.api+ '/wxmarketing/pages',
@@ -57,8 +60,10 @@ export default {
           pageSize: 15
         },
         success(res) {
+          wx.hideLoading();
           if(res.data.code === 200){
             that.activeList = res.data.data.result
+            console.log(that.activeList)
           }
         }
       })

@@ -21,16 +21,29 @@
         <none-result text="你还没有预约团课呢" v-if="!teamClassList.length"></none-result>
       </div>
       <div class="stay-coach">
-        <title-cell title="私教课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllList(2)"></title-cell>
+        <title-cell
+          title="私教课"
+          moreText="全部"
+          :moreSize="14"
+          :titleSize="16"
+          @tapMore="toAllList(2)"
+        ></title-cell>
         <div class="coach-wrapper">
-          <coach-item
+          <!-- <coach-item
             @clickCoach="toCoachDetail(item)"
             :info="item"
             :hasBtn="false"
             :isToDetail="false"
             v-for="(item, index) in coachList"
             :key="index"
-          ></coach-item>
+          ></coach-item>-->
+          <team-class-item
+            @clickClass="toCoachDetail(item)"
+            :info="item"
+            :isToDetail="false"
+            v-for="(item, index) in coachList"
+            :key="index"
+          ></team-class-item>
         </div>
         <none-result text="你还没有预约私教呢" v-if="!coachList.length"></none-result>
       </div>
@@ -60,7 +73,6 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
-import coachItem from "COMPS/coachItem.vue";
 import store from "../../utils/store";
 
 export default {
@@ -89,14 +101,28 @@ export default {
   components: {
     noneResult,
     titleCell,
-    teamClassItem,
-    coachItem
+    teamClassItem
   },
   onLoad(option) {
     this.customerId = this.userInfo = wx.getStorageSync("userInfo").id;
     this.classId = option.classId;
     setNavTab();
   },
+  // onShow() {
+  //   this.selectNav(this.currentNav);
+  // },
+  // onHide() {
+  //   console.log('unload')
+  //   this.showSelect = false;
+  //   this.teamClassList = [];
+  //   this.coachList = [];
+  //   this.coachList_3 = [];
+  //   this.coachList_2 = [];
+  //   this.coachList_1 = [];
+  //   this.teamClass_1 = [];
+  //   this.teamClass_3 = [];
+  //   this.teamClass_2 = [];
+  // },
   mounted() {
     this.selectNav(this.currentNav);
   },
@@ -224,15 +250,28 @@ export default {
      * @param {Number} waitEvaluate 1 待评价
      */
     getOwnTeamClassList(status, waitEvaluate) {
+      // 待评价
+      if (status == 3 && waitEvaluate == 1) {
+        return this.getTWaitEvaluate();
+      }
       let that = this;
+      let _data = {};
+      if (status == 1) {
+        _data = {
+          customerId: that.customerId,
+          statusType: status
+        };
+      } else {
+        _data = {
+          customerId: that.customerId,
+          status: status,
+          waitEvaluate: waitEvaluate || ""
+        };
+      }
       return new Promise(function(resolve, reject) {
         HttpRequest({
           url: window.api + "/teamClass/teamAttend/pagesNoLimit",
-          data: {
-            customerId: that.customerId,
-            status: status,
-            waitEvaluate: waitEvaluate || ""
-          },
+          data: _data,
           success(res) {
             if (res.data.code === 200) {
               let _list =
@@ -242,9 +281,6 @@ export default {
               // 待上课
               if (status == 1) {
                 that.teamClass_1 = _list;
-                // 待评价
-              } else if (status == 3 && waitEvaluate == 1) {
-                that.teamClass_2 = _list;
                 // 已完成
               } else if (status == 3 && !waitEvaluate) {
                 that.teamClass_3 = _list;
@@ -261,35 +297,90 @@ export default {
      * @param {Number} waitEvaluate 1 待评价
      */
     getOwnCoachClassList(status, waitEvaluate) {
+      // 待评价
+      if (status == 3 && waitEvaluate == 1) {
+        return this.getWaitEvaluateList();
+      }
       let that = this;
+      let _data = {};
+      if (status == 2) {
+        _data = {
+          customerId: that.customerId,
+          statusType: status
+        };
+      } else {
+        _data = {
+          customerId: that.customerId,
+          status: status,
+          waitEvaluate: waitEvaluate || ""
+        };
+      }
       return new Promise(function(resolve, reject) {
         HttpRequest({
           url: window.api + "/mobile/coach/appoint/pages/own",
-          data: {
-            customerId: that.customerId,
-            status: status,
-            waitEvaluate: waitEvaluate || ""
-          },
+          data: _data,
           success(res) {
             if (res.data.code === 200) {
               let _data = res.data.data.result.map(e => {
                 return {
-                  userName: e.name,
+                  anotherName: e.projectName,
                   userId: e.coachId,
-                  coachAppointId: e.coachAppointId
+                  coachAppointId: e.coachAppointId,
+                  timeStart: e.timeStart,
+                  timeEnd: e.timeEnd,
+                  storeName: e.storeName,
+                  venueName: e.venueName,
+                  coachNameArrayStr: e.coachName
                 };
               });
               _data = _data.length > 2 ? _data.slice(0, 2) : _data;
               // 待评价
-              if (status == 3 && waitEvaluate == 1) {
-                that.coachList_2 = _data;
-                // 待上课
-              } else if (status == 2) {
+              if (status == 2) {
                 that.coachList_1 = _data;
                 // 已完成
               } else if (status == 3 && !waitEvaluate) {
                 that.coachList_3 = _data;
               }
+              resolve();
+            }
+          }
+        });
+      });
+    },
+    // 获取私教待评价列表
+    getWaitEvaluateList() {
+      let that = this;
+      return new Promise(function(resolve) {
+        HttpRequest({
+          url: window.api + "/mobile/coach/waitEvaluatePages",
+          data: {
+            customerId: that.customerId,
+            page: 1,
+            pageSize: 2
+          },
+          success(res) {
+            if (res.data.code === 200) {
+              that.coachList_2 = res.data.data.result;
+              resolve();
+            }
+          }
+        });
+      });
+    },
+    // 获取团课待评价列表
+    getTWaitEvaluate() {
+      let that = this;
+      return new Promise(function(resolve) {
+        HttpRequest({
+          url: window.api + "/teamClass/waitEvaluatePages",
+          data: {
+            customerId: that.customerId,
+            page: 1,
+            pageSize: 2
+          },
+          success(res) {
+            if (res.data.code === 200) {
+              that.teamClass_2 = res.data.data.result;
               resolve();
             }
           }
@@ -353,7 +444,8 @@ export default {
   }
   .stay-coach {
     .coach-wrapper {
-      .coach-item {
+      .coach-item,
+      .team-class-item {
         margin-bottom: 15px;
         .coach-desc {
           line-height: 20px;

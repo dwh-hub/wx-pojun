@@ -10,6 +10,9 @@
       </div>
       <div class="flex-right">{{item.passModeValue}}</div>
     </div>
+    <div class="loading" v-show="isLoading">
+      <van-loading color="#999" custom-class="loading"/>
+    </div>
   </div>
 </template>
 
@@ -20,7 +23,8 @@ export default {
     return {
       customerId: "",
       page: 1,
-      list: []
+      list: [],
+      isLoading: false
     };
   },
   onLoad() {
@@ -29,6 +33,7 @@ export default {
     this.getConsumption();
   },
   onReachBottom() {
+    this.isLoading = false
     this.getConsumption();
   },
   methods: {
@@ -41,6 +46,7 @@ export default {
           pageNo: that.page
         },
         success(res) {
+          that.isLoading = false
           if (res.data.code === 200) {
             if (!res.data.data.result.length) {
               return;

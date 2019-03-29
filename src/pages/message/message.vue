@@ -6,13 +6,13 @@
       <span class="read-none" :class="{ select: !isRead }" @click="showReadNone">已读</span>
     </div>-->
     <div class="header">
-      <van-tabs :active="navIndex" @change="onChange" color="#2a82e4">
+      <van-tabs :active="navIndex" @change="onChange" :duration="0" color="#2a82e4">
         <van-tab title="未读"></van-tab>
         <van-tab title="已读"></van-tab>
       </van-tabs>
       <!-- <div class="search">
         <input type="text" placeholder="请输入名字/手机号回车搜索" placeholder-style="color: #ccc;">
-      </div> -->
+      </div>-->
     </div>
     <div class="readContent" v-show="navIndex == 0">
       <div
@@ -32,6 +32,7 @@
           <div class="message-text">{{item.userMessageParam}}</div>
         </div>
       </div>
+      <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
     </div>
     <div class="readContent" v-show="navIndex == 1">
       <div
@@ -51,6 +52,7 @@
           <div class="message-text">{{item.userMessageParam}}</div>
         </div>
       </div>
+      <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
     </div>
     <van-popup
       position="right"
@@ -85,6 +87,7 @@ import {
 } from "COMMON/js/common.js";
 import store from "../../utils/store";
 import wxParse from "mpvue-wxparse";
+import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
     return {
@@ -97,7 +100,9 @@ export default {
       messageYPage: 1,
       messageYList: [],
       curMessage: {},
-      showMessageBox: false
+      showMessageBox: false,
+      // 未读信息id数组
+      arrId: []
     };
   },
   onLoad() {
@@ -110,14 +115,15 @@ export default {
   },
   onReachBottom() {
     if (this.navIndex == 0) {
-      this.getMessage(0, this.messageNpage);
+      this.getMessage(0, 1);
     }
     if (this.navIndex == 1) {
       this.getMessage(1, this.messageYPage);
     }
   },
   components: {
-    wxParse
+    wxParse,
+    noneResult
   },
   methods: {
     onChange(e) {
@@ -134,23 +140,30 @@ export default {
         },
         success(res) {
           if (res.data.code === 200) {
-            if(!res.data.data.result.length) {
-              return
+            if (!res.data.data.result.length) {
+              return;
             }
+            let _arrId = [];
             res.data.data.result.map(e => {
               e.addTime = formatDate(new Date(e.addTime), "yyyy-MM-dd hh:mm");
+              _arrId.push(e.userMessageId);
             });
+            that.arrId = _arrId;
             if (status == 0) {
-              that.messageNList = that.messageNList.concat(res.data.data.result);
-              that.messageNPage++
+              that.messageNList = res.data.data.result;
+              that.mulitpleMessage();
+              // that.messageNPage++
             } else if (status == 1) {
-              that.messageYList = that.messageYList.concat(res.data.data.result);
-              that.messageYPage++
+              that.messageYList = that.messageYList.concat(
+                res.data.data.result
+              );
+              that.messageYPage++;
             }
           }
         }
       });
     },
+    // 显示消息详情
     showDetail(item) {
       item.addTime = formatDate(new Date(item.addTime), "yyyy-MM-dd hh:mm");
       let _arr = item.userMessageParam.split(",");
@@ -165,10 +178,47 @@ export default {
     },
     // 标记当前页为已读
     mulitpleMessage(id) {
+      let that = this;
       HttpRequest({
         url: window.api + "/home/wechat/message/customer/read/mulitple",
         data: {
-          msgIdArray: id
+          msgIdArray: String(that.arrId)
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.getMessageCount();
+          }
+        }
+      });
+    },
+    // 设置消息未读个数
+    getMessageCount() {
+      HttpRequest({
+        url: window.api + "/home/wechat/message/customer/pages",
+        data: {
+          status: 0,
+          pageNo: 1
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            if (res.data.data.recCount > 99) {
+              return wx.setTabBarBadge({
+                index: 3,
+                text: "99+"
+              });
+            }
+            if (res.data.data.recCount <= 99 && res.data.data.recCount > 0) {
+              return wx.setTabBarBadge({
+                index: 3,
+                text: String(res.data.data.recCount)
+              });
+            } else {
+              return wx.setTabBarBadge({
+                index: 3,
+                text: null
+              });
+            }
+          }
         }
       });
     }

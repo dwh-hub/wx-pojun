@@ -1,8 +1,8 @@
 <template>
   <div class="store-item" @click="toDetail">
     <div class="store-cover">
-      <!-- TODO: :src="info.cover" -->
-      <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg">
+      <!--src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"-->
+      <img :src="info.cover">
     </div>
     <div class="store-info">
       <div class="store-top">
@@ -30,7 +30,6 @@ export default {
     }
   },
   mounted(){
-    console.log(this.info)
   },
   methods: {
     toDetail() {

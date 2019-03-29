@@ -1,3 +1,6 @@
 {
-    "navigationBarTitleText": "签到记录"
+  "navigationBarTitleText": "签到记录",
+  "usingComponents": {
+    "van-loading": "../../../static/vant/loading/index"
   }
+}

@@ -29,7 +29,7 @@
             </div>
           </div>
         </div>
-        <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div>
+        <!-- <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div> -->
         <div class="coach" :class="{active: currentNav==4}" @click="selectNav(4)">
           {{curCoach}}
           <div class="list-warpper" :class="{slideWrap: showCoachNav}" @click.stop="clickMask">

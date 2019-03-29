@@ -44,10 +44,10 @@ function getMessage() {
             text: '99+'
           })
         }
-        if (0 < res.data.data.recCount <= 99) {
+        if (res.data.data.recCount <= 99 && res.data.data.recCount > 0) {
           return wx.setTabBarBadge({
             index: 3,
-            text: res.data.data.recCount
+            text: String(res.data.data.recCount)
           })
         }
       } else {
@@ -58,6 +58,7 @@ function getMessage() {
 }
 
 isIphoneX()
+
 function isIphoneX() {
   wx.getSystemInfo({
     success: function (res) {
@@ -69,3 +70,46 @@ function isIphoneX() {
     }
   });
 }
+
+
+if (wx.getStorageSync("sessionKey")) {
+  wx.checkSession({
+    success() {
+      console.log('success')
+      console.log(wx.getStorageSync("sessionKey"))
+      // session_key 未过期，并且在本生命周期一直有效
+    },
+    fail() {
+      wxLogin()
+    }
+  })
+} else {
+  wxLogin()
+}
+
+
+function wxLogin() {
+  wx.login({
+    success(res) {
+      if (res.code) {
+        wx.request({
+          url: window.api + '/mini/getsession',
+          data: {
+            code: res.code
+          },
+          success(data) {
+            console.log(data)
+            wx.setStorage({
+              key: "sessionKey",
+              data: data.data.data.sessionKey
+            });
+          }
+        })
+      }
+    }
+  })
+}
+
+// wx.request({
+//   url: window.api + '/wxcustomer'
+// })

@@ -8,8 +8,8 @@
       </p>
       <div class="btn-group">
         <span class="cancel" @click="cancel" v-if="detail.status == 1">取消预约</span>
-        <span class="assess" @click="assess" v-if="!detail.evaluateId && detail.status != 1">评价</span>
-        <span class="again">再约一节</span>
+        <span class="assess" @click="assess" v-if="!detail.evaluateId && detail.status == 3">评价</span>
+        <span class="again" @click="again">再约一节</span>
       </div>
     </div>
     <div class="class-info">
@@ -35,6 +35,7 @@ import {
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
 import { setTimeout } from "timers";
+import store from "../../utils/store";
 
 export default {
   data() {
@@ -43,7 +44,9 @@ export default {
       detail: {},
       storeInfo: {},
       teamAttendId: null,
-      coachAppointId: null
+      coachAppointId: null,
+      longitude: "", // 经度
+      latitude: "" // 纬度
     };
   },
   components: {
@@ -72,6 +75,8 @@ export default {
     }
   },
   onLoad(options) {
+    this.longitude = store.state.longitude;
+    this.latitude = store.state.latitude;
     if (options.teamAttendId) {
       this.teamAttendId = options.teamAttendId;
       this.getClassDetail();
@@ -84,14 +89,19 @@ export default {
   },
   methods: {
     assess() {
+      let detailStr = JSON.stringify(this.detail);
       if (this.teamAttendId) {
         wx.navigateTo({
-          url: "../assess/main?teamAttendId=" + this.teamAttendId
+          url: `../assess/main?teamAttendId=${
+            this.teamAttendId
+          }&detail=${detailStr}`
         });
       }
       if (this.coachAppointId) {
         wx.navigateTo({
-          url: "../assess/main?coachAppointId=" + this.coachAppointId
+          url: `../assess/main?coachAppointId=${
+            this.coachAppointId
+          }&detail=${detailStr}`
         });
       }
     },
@@ -135,13 +145,20 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             let _data = res.data.data;
+            let _range
             let _address = _data.parentName + _data.cityName + _data.address;
             _address = _address.replace(/null/g, "");
             _address = _address.replace(/[0]/gi, "");
+            if (_data.mapPoint) {
+              let _lat = _data.mapPoint.split(",")[1];
+              let _lng = _data.mapPoint.split(",")[0];
+              _range = getRange(that.latitude, that.longitude, _lat, _lng);
+            }
             let _obj = {
               address: _address || "未设置详细地址",
               storeName: _data.storeName,
               phone: _data.phone,
+              range: _range,
               storeId: that.detail.storeId,
               bannerList: _data.images.split(",")
             };
@@ -221,6 +238,18 @@ export default {
           }
         }
       });
+    },
+    again() {
+      if (this.teamAttendId) {
+        wx.redirectTo({
+          url: '../teamClassList/main'
+        });
+      }
+      if (this.coachAppointId) {
+        wx.redirectTo({
+          url: '../coachList/main'
+        });
+      }
     }
   }
 };

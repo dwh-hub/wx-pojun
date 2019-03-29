@@ -42,12 +42,14 @@
       <coach-item :info="item" v-for="(item, index) in curCoachList" :key="index"></coach-item>
     </div>
     <div class="mask" v-show="maskShow" @click="clickMask"></div>
+    <none-result v-if="!curCoachList.length"></none-result>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest, debounce } from "COMMON/js/common.js";
 import coachItem from "COMPS/coachItem.vue";
+import noneResult from "COMPS/noneResult"
 export default {
   data() {
     return {
@@ -79,7 +81,8 @@ export default {
     };
   },
   components: {
-    coachItem
+    coachItem,
+    noneResult
   },
   onLoad() {
     setNavTab();

@@ -20,6 +20,9 @@
         </div>
       </div>
     </van-popup>
+    <div class="loading" v-show="isLoading">
+      <van-loading color="#999" custom-class="loading"/>
+    </div>
   </div>
 </template>
 
@@ -41,7 +44,8 @@ export default {
       showPopup: false,
       // 选择的项目
       selectProIndex: 0,
-      selectCardInfo: {}
+      selectCardInfo: {},
+      isLoading: false
     };
   },
   components: {
@@ -126,7 +130,9 @@ export default {
               success(res) {
                 if (res.confirm) {
                   wx.redirectTo({
-                    url: "../appointmentResult/main?id=" + data.data.data.teamAttendId
+                    url:
+                      "../appointmentResult/main?teamAttendId=" +
+                      data.data.data.teamAttendId
                   });
                 }
               }
@@ -219,6 +225,9 @@ export default {
         text-align: center;
         border-radius: 4px;
         width: 45%;
+        &:active {
+          opacity: 0.8;
+        }
       }
       .cancel {
         margin-right: 10%;

@@ -6,14 +6,17 @@
 
 <script>
 import storeItem from "COMPS/storeItem.vue";
-import { setNavTab, window } from "COMMON/js/common.js";
+import { setNavTab, window, getRange } from "COMMON/js/common.js";
+import store from "../../utils/store";
 
 export default {
   name: "all-store",
   data() {
     return {
       storeList: [],
-      companyId: ""
+      companyId: "",
+      longitude: "", // 经度
+      latitude: "" // 纬度
     };
   },
   components: {
@@ -23,6 +26,8 @@ export default {
     setNavTab();
   },
   mounted() {
+    this.longitude = store.state.longitude;
+    this.latitude = store.state.latitude;
     this.getAllStore();
     if (wx.getStorageSync("userInfo")) {
       this.companyId = wx.getStorageSync("userInfo").companyId;
@@ -44,14 +49,21 @@ export default {
           if (res.data.code === 200) {
             let _storeList = [];
             _storeList = res.data.data.map(e => {
+              let _range;
+              if (e.mapPoint) {
+                let _lat = e.mapPoint.split(",")[1];
+                let _lng = e.mapPoint.split(",")[0];
+                _range = getRange(that.latitude, that.longitude, _lat, _lng);
+              }
               return {
-                cover: window.api + e.images.split(",")[0],
+                cover: e.images ? window.api + e.images.split(",")[0] : "",
                 address: e.address,
-                range: "",
+                range: _range,
                 storeName: e.storeName,
                 storeId: e.storeId
               };
             });
+            console.log(_storeList);
             that.storeList = _storeList;
           }
           console.log(that.storeList);

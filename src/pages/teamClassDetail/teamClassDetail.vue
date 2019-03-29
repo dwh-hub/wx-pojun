@@ -37,7 +37,7 @@
       <div class="address-group">
         <div class="store">
           <span class="name">{{classDetail.storeName}}</span>
-          <span class="range">2.4KM</span>
+          <span class="range">{{range}}</span>
         </div>
         <div class="address">{{address || '暂无详细地址'}}</div>
       </div>
@@ -74,7 +74,11 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div class="bottom-btn appointment" :class="{'isPhoneX-bottom':isPhoneX}" @click="appointClass">马上预约</div>
+    <div
+      class="bottom-btn appointment"
+      :class="{'isPhoneX-bottom':isPhoneX}"
+      @click="appointClass"
+    >马上预约</div>
   </div>
 </template>
 
@@ -95,7 +99,10 @@ export default {
       id: "",
       classDetail: {},
       coachList: [],
-      address: ""
+      address: "",
+      range: "",
+      longitude: "", // 经度
+      latitude: "" // 纬度
     };
   },
   components: {
@@ -106,6 +113,8 @@ export default {
     setNavTab();
   },
   mounted() {
+    this.longitude = store.state.longitude;
+    this.latitude = store.state.latitude;
     this.getClassDetail();
     this.getClassCoach();
   },
@@ -127,7 +136,7 @@ export default {
       return md + " " + w + " " + this.statrTime + "-" + this.endTime;
     },
     isPhoneX() {
-      return store.state.isIphoneX
+      return store.state.isIphoneX;
     }
   },
   methods: {
@@ -220,6 +229,12 @@ export default {
           _address = _address.replace(/null/g, "");
           _address = _address.replace(/[0]/gi, "");
           that.address = _address;
+          if (_data.mapPoint) {
+            let _lat = _data.mapPoint.split(",")[1];
+            let _lng = _data.mapPoint.split(",")[0];
+            let _range = getRange(that.latitude, that.longitude, _lat, _lng);
+            that.range = _range
+          }
         }
       });
     }

@@ -1,6 +1,6 @@
 <template>
   <div class="assess">
-    <div class="coach">
+    <!-- <div class="coach">
       <div class="cover">
         <img>
       </div>
@@ -12,29 +12,34 @@
         $趣味有氧$
         <img class="arrow" src="/static/images/icon-right-arrow.png">
       </div>
-    </div>
+    </div>-->
+    <team-class-item :info="detail" :isToDetail="false"></team-class-item>
     <div class="coach-assess">
       <div class="assess-title">服务评价</div>
       <van-rate :value="coachRateVaule" :size="36" @change="onCoachRate"/>
     </div>
     <div class="store">
       <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg" alt>
-      <span class="store-name">$三体店$</span>
+      <span class="store-name">{{detail.storeName}}</span>
     </div>
     <div class="store-assess">
       <div class="assess-title">商家评价</div>
       <van-rate :value="storeRateVaule" :size="36" @change="onStoreRate"/>
     </div>
-    <div class="remarks">
-      备注
-    </div>
-    <textarea class="remarks-text" placeholder="请写下您对该课程的评价..." placeholder-style="color:#bababa;" v-model="remarks" />
+    <div class="remarks">备注</div>
+    <textarea
+      class="remarks-text"
+      placeholder="请写下您对该课程的评价..."
+      placeholder-style="color:#bababa;"
+      v-model="remarks"
+    />
     <div class="assess-btn bottom-btn" @click="assess">立即评价</div>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import teamClassItem from "COMPS/teamClassItem.vue";
 export default {
   data() {
     return {
@@ -43,17 +48,24 @@ export default {
       teamClasVaule: 5,
       remarks: "",
       teamAttendId: null,
-      coachAppointId: null
+      coachAppointId: null,
+      detail: {}
     };
   },
   onLoad(options) {
+    this.detail = JSON.parse(options.detail);
+    console.log(JSON.parse(options.detail));
     if (options.teamAttendId) {
       this.teamAttendId = options.teamAttendId;
     }
     if (options.coachAppointId) {
       this.coachAppointId = options.coachAppointId;
+      this.detail['anotherName'] = this.detail.projectName
     }
     setNavTab();
+  },
+  components: {
+    teamClassItem
   },
   methods: {
     assess() {
@@ -71,7 +83,7 @@ export default {
         };
       }
       if (this.coachAppointId) {
-        url= "/wxcustomer/class/evalute/save"
+        url = "/wxcustomer/class/evaluate/save";
         data = {
           coachAppointId: this.coachAppointId,
           coachStarLevel: this.teamClasVaule,
@@ -79,8 +91,7 @@ export default {
           remarks: this.remarks
         };
       }
-    console.log(url)
-    console.log(data)
+      console.log(data);
       let that = this;
       wx.showModal({
         title: "确认",
@@ -93,16 +104,20 @@ export default {
             HttpRequest({
               url: window.api + url,
               data: data,
-              method: 'PSOT',
+              method: "POST",
               success(res) {
                 if (res.data.code == 200) {
                   wx.hideLoading();
                   wx.showToast({
-                    title: "评价成功",
+                    title: res.data.message,
                     icon: "success",
                     duration: 1000
                   });
-                  setTimeout(() => {}, 1000);
+                  setTimeout(() => {
+                    wx.switchTab({
+                      url: "/pages/appointmentClass/main"
+                    });
+                  }, 500);
                 }
               }
             });
@@ -130,49 +145,52 @@ page {
 .assess {
   padding: 15px;
   padding-bottom: 50px;
-  .coach {
-    display: flex;
-    .cover {
-      flex: 0 0 70px;
-      width: 70px;
-      height: 70px;
-      box-sizing: border-box;
-      > img {
-        width: 70px;
-        height: 70px;
-        border-radius: 50%;
-        background-color: #bfbfbf;
-      }
-    }
-    .coach-info {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      padding-left: 10px;
-      > div {
-        flex: 1;
-        line-height: 35px;
-        .Mult-line(1);
-      }
-      .coach-name {
-        font-size: 16px;
-        font-weight: bold;
-        color: #333;
-      }
-      .coach-date {
-        font-size: 14px;
-        color: @theme-color;
-      }
-    }
-    .more-text {
-      color: #bababa;
-      line-height: 70px;
-      .arrow {
-        width: 20px;
-        height: 20px;
-      }
-    }
+  // .coach {
+  //   display: flex;
+  //   .cover {
+  //     flex: 0 0 70px;
+  //     width: 70px;
+  //     height: 70px;
+  //     box-sizing: border-box;
+  //     > img {
+  //       width: 70px;
+  //       height: 70px;
+  //       border-radius: 50%;
+  //       background-color: #bfbfbf;
+  //     }
+  //   }
+  //   .coach-info {
+  //     flex: 1;
+  //     display: flex;
+  //     flex-direction: column;
+  //     box-sizing: border-box;
+  //     padding-left: 10px;
+  //     > div {
+  //       flex: 1;
+  //       line-height: 35px;
+  //       .Mult-line(1);
+  //     }
+  //     .coach-name {
+  //       font-size: 16px;
+  //       font-weight: bold;
+  //       color: #333;
+  //     }
+  //     .coach-date {
+  //       font-size: 14px;
+  //       color: @theme-color;
+  //     }
+  //   }
+  //   .more-text {
+  //     color: #bababa;
+  //     line-height: 70px;
+  //     .arrow {
+  //       width: 20px;
+  //       height: 20px;
+  //     }
+  //   }
+  // }
+  .team-class-item {
+    box-shadow: none;
   }
   .store {
     > img {

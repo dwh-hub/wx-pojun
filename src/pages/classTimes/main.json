@@ -1,3 +1,6 @@
 {
-    "navigationBarTitleText": "上课次数"
+  "navigationBarTitleText": "上课次数",
+  "usingComponents": {
+    "van-loading": "../../../static/vant/loading/index"
   }
+}

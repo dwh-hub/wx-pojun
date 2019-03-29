@@ -4,10 +4,10 @@
       <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg">
     </div>
     <div class="team-class-info">
-      <div class="team-class-name">{{info.anotherName || '团课名称'}}</div>
-      <div class="team-class-coach">{{info.coachNameArrayStr || '团课教练'}}</div>
+      <div class="team-class-name">{{info.anotherName || info.projectName || '团课名称'}}</div>
+      <div class="team-class-coach">{{coachStr || '团课教练'}}</div>
       <div class="team-class-time">
-        <span>{{info.venueName || '场馆名称'}}</span>
+        <span>{{info.storeName}}-{{info.venueName || '场馆名称'}}</span>
         {{startTime}}~{{endTime}}
       </div>
     </div>
@@ -56,6 +56,18 @@ export default {
         return formatDate(new Date(this.info.timeEnd), "hh:mm");
       }
       return "";
+    },
+    coachStr() {
+      if (JSON.stringify(this.info) == "{}") {
+        return "";
+      }
+      if (this.info.coachName) {
+        return this.info.coachName;
+      }
+      if (this.info.coachNameArrayStr) {
+        return this.info.coachNameArrayStr;
+      }
+      return this.info.coachNameArray.toString(" ");
     }
   }
 };

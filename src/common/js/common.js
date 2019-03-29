@@ -1,5 +1,5 @@
 const window = {}
-window.api = 'http://192.168.1.115'
+window.api = 'https://www.pojun-tech.cn'
 window.DEBUGGING = true
 let Cookie = ""
 
@@ -19,7 +19,6 @@ function initsessionKey() {
 function initCookie() {
   // if (SetCookie) {
   let _Cookie = wx.getStorageSync("Cookie");
-  console.log("获取Cookie:" + _Cookie);
   Cookie = _Cookie
   return Promise.resolve(_Cookie);
   // }
@@ -125,23 +124,6 @@ export function formatDate(date, fmt) {
   return fmt;
 }
 
-export function wxLogin() {
-  wx.login({
-    success(res) {
-      if (res.code) {
-        wx.request({
-          url: window.api + '/mini/getsession',
-          data: {
-            code: res.code
-          },
-          success(data) {
-            console.log(data)
-          }
-        })
-      }
-    }
-  })
-}
 
 /**
  *
@@ -174,6 +156,55 @@ export function debounce(fn, delay) {
   }
 }
 
+var EARTH_RADIUS = 6378137.0; //单位M
+var PI = Math.PI;
+
+function getRad(d) {
+  return d * PI / 180.0;
+}
+/**
+ * 计算两个坐标点的距离 返回单位 M
+ * @param {Number} lat1 纬度1
+ * @param {Number} lng1 经度1
+ * @param {Number} lat2 纬度2
+ * @param {Number} lng2 经度2
+ */
+export function getRange(lat1, lng1, lat2, lng2) {
+
+  var f = getRad((Number(lat1) + Number(lat2)) / 2);
+  var g = getRad((Number(lat1) - Number(lat2)) / 2);
+  var l = getRad((Number(lng1) - Number(lng2)) / 2);
+
+  var sg = Math.sin(g);
+  var sl = Math.sin(l);
+  var sf = Math.sin(f);
+
+  var s, c, w, r, d, h1, h2;
+  var a = EARTH_RADIUS;
+  var fl = 1 / 298.257;
+
+  sg = sg * sg;
+  sl = sl * sl;
+  sf = sf * sf;
+
+  s = sg * (1 - sl) + (1 - sf) * sl;
+  c = (1 - sg) * (1 - sl) + sf * sl;
+
+  w = Math.atan(Math.sqrt(s / c));
+  r = Math.sqrt(s * c) / w;
+  d = 2 * w * a;
+  h1 = (3 * r - 1) / 2 / c;
+  h2 = (3 * r + 1) / 2 / s;
+
+  let range = d * (1 + fl * (h1 * sf * (1 - sg) - h2 * (1 - sf) * sg))
+
+  if (parseInt(range) < 1000) {
+    return range.toFixed(2) + ' m'
+  } else {
+    return (range / 1000).toFixed(2) + ' km'
+  }
+}
+
 export default {
   window,
   setNavTab,
@@ -181,6 +212,6 @@ export default {
   checkPhoneFormat,
   getCookie,
   formatDate,
-  wxLogin,
-  debounce
+  debounce,
+  getRange
 }

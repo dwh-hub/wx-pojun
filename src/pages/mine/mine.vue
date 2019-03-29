@@ -24,7 +24,7 @@
         <span class="detail_contrnt" v-if="isLogin">{{item.hit}}{{item.text}}</span>
       </div>
     </div>
-    <!-- <div class="mineExit" @click="singOut">解除绑定</div> -->
+    <div class="mineExit" @click="singOut">解除绑定</div>
   </div>
 </template>
 
@@ -63,7 +63,7 @@ export default {
           navigatorUrl: "../checkInRecord/main",
           hit: "",
           text: "次"
-        },
+        }
         // {
         //   imgUrl: "https://www.pojun-tech.cn/assets/img/integral.png",
         //   navName: "我的积分",
@@ -88,12 +88,12 @@ export default {
     setNavTab();
   },
   mounted() {
-    this.userInfo = wx.getStorageSync('userInfo')
+    this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);
   },
   computed: {
     isLogin() {
-      return store.state.isLogin
+      return store.state.isLogin;
     }
   },
   methods: {
@@ -108,9 +108,26 @@ export default {
         content: "确认解除绑定吗？",
         success(res) {
           if (res.confirm) {
-            console.log("用户点击确定");
+            HttpRequest({
+              url: window.api + "/wxcustomer/exit",
+              success(res) {
+                if (res.data.code === 200) {
+                  wx.removeStorage({
+                    key: "userInfo",
+                    success(res) {}
+                  });
+                  wx.showToast({
+                    title: "解绑成功",
+                    icon: "success",
+                    duration: 1000
+                  });
+                  wx.reLaunch({
+                    url: '../mine/main'
+                  })
+                }
+              }
+            });
           } else if (res.cancel) {
-            console.log("用户点击取消");
           }
         }
       });
@@ -137,6 +154,7 @@ export default {
             });
           } else {
             wx.navigateTo({
+              // url: "../authorizeLogin/main"
               url: "../login/main"
             });
           }
@@ -166,7 +184,8 @@ export default {
     .mineDetail {
       // margin: 13px 0 0 15px;
       margin-left: 15px;
-      > p {line-height: 33px;
+      > p {
+        line-height: 33px;
         font-size: 15px;
       }
     }

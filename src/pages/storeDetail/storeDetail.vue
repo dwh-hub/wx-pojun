@@ -23,7 +23,7 @@
       <h4>地址</h4>
       <div class="store">
         {{storeInfo.name}}
-        <span class="range">1.4km*</span>
+        <span class="range">{{storeInfo.range || ''}}</span>
       </div>
       <div class="address-detail">{{storeInfo.address}}</div>
     </div>
@@ -52,11 +52,13 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  getRange
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
+import store from "../../utils/store";
 export default {
   name: "storeDetail",
   data() {
@@ -65,7 +67,9 @@ export default {
       storeInfo: {},
       teamClassList: [],
       coachList: [],
-      businessTime: ""
+      businessTime: "",
+      longitude: "", // 经度
+      latitude: "" // 纬度
     };
   },
   components: {
@@ -78,6 +82,8 @@ export default {
     setNavTab();
   },
   mounted() {
+    this.longitude = store.state.longitude;
+    this.latitude = store.state.latitude;
     this.getStoreDetail();
     this.getStoreQuery();
     this.getTeamClassList();
@@ -108,17 +114,25 @@ export default {
         url: window.api + "/store/detail/" + that.storeId,
         success(res) {
           let _data = res.data.data;
+          let _range
           let _address = _data.parentName + _data.cityName + _data.address;
           _address = _address.replace(/null/g, "");
           _address = _address.replace(/[0]/gi, "");
+          if (_data.mapPoint) {
+            let _lat = _data.mapPoint.split(",")[1];
+            let _lng = _data.mapPoint.split(",")[0];
+            _range = getRange(that.latitude, that.longitude, _lat, _lng);
+            console.log(_data.mapPoint)
+            console.log(_range)
+          }
           let _obj = {
             address: _address || "未设置详细地址",
             name: _data.storeName,
+            range: _range,
             phone: _data.phone,
             bannerList: _data.images.split(",")
           };
           that.storeInfo = _obj;
-          console.log(res.data.data);
           // Object.assign(that.storeInfo, _obj);
           console.log(that.storeInfo);
         }
@@ -133,7 +147,7 @@ export default {
           storeId: that.storeId
         },
         success(res) {
-          if (res.data.data.openTimeStart && res.data.data.openTimeEnd) {
+          if (res.data.data.openTimeStart && res.data.data.openTimeStart) {
             that.businessTime =
               res.data.data.openTimeStart + "~" + res.data.data.openTimeEnd;
           }

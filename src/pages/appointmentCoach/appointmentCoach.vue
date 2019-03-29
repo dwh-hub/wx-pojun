@@ -6,7 +6,9 @@
       </div>
       <div class="coach-info">
         <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
-        <div class="coach-times">共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
+        <div
+          class="coach-times"
+        >共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
       </div>
       <div class="tiems">
         <div class="num">$1次$</div>
@@ -124,7 +126,7 @@
           <div class="store-info">
             <div class="name">
               {{item.storeName}}
-              <span class="range">0.81km*</span>
+              <!-- <span class="range">0.81km*</span> -->
             </div>
             <div class="address">{{item.address || '暂无详细地址'}}</div>
           </div>
@@ -448,7 +450,8 @@ export default {
       this.showMiniIndex = index;
       let hour = item.slice(0, 2);
       this.miniDate = [hour + ":15", hour + ":30", hour + ":45"];
-      this.curEndTime = Number(item.split(":")[0]) + 1 +':' +item.split(':')[1];
+      this.curEndTime =
+        Number(item.split(":")[0]) + 1 + ":" + item.split(":")[1];
       console.log(this.miniDate);
     },
     // 计算可选择预约时间
@@ -509,7 +512,7 @@ export default {
     // 确认选择时间
     selectDate() {
       this.isTimePopup = false;
-      this.timeCellText = this.confirmDate
+      this.timeCellText = this.confirmDate;
     },
     // 选择场馆
     selectVenue(item) {
@@ -575,19 +578,20 @@ export default {
           icon: "none",
           duration: 1000
         });
-      }      
+      }
       wx.showLoading({
         title: "预约中..."
       });
       HttpRequest({
-        url: window.api + "/coach/private/appoint/set",
+        url: window.api + "/mobile/coach/appoint/set/customer",
         data: {
+          addAppointType: "customer",
           storeId: that.selectStoreId,
           venueId: that.venueId,
           coachId: that.coachId,
-          calendar: that.curDate,
-          timeStart: that.curDate + " " + that.curTime,
-          timeEnd: that.curDate + " " + that.curEndTime,
+          calendar: that.curDate + " " + "00:00:00",
+          timeStart: that.curDate + " " + that.curTime + ":00",
+          timeEnd: that.curDate + " " + that.curEndTime + ":00",
           cardId: that.cardClassId,
           name: that.userInfo.name,
           customerId: that.userInfo.id,
@@ -602,6 +606,11 @@ export default {
               title: "私教预约成功",
               icon: "success",
               duration: 1000
+            });
+            wx.redirectTo({
+              url:
+                "../appointmentResult/main?coachAppointId=" +
+                data.data.data.coachAppointId
             });
           } else {
             wx.showModal({
@@ -729,6 +738,8 @@ export default {
           calendar: date || formatDate(new Date(), "yyyy-MM-dd")
         },
         success(res) {
+          // timeStart:1553850000000
+          // timeEnd:1553853599000
           console.log(res.data.data);
         }
       });

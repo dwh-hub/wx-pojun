@@ -9,19 +9,27 @@ const store = new Vuex.Store({
     isLogin: false,
     userInfo: {},
     isIphoneX: false,
+    longitude: '', // 经度
+    latitude: '' // 纬度
   },
   mutations: {
     changeCount(state, value) {
       state.count = value
     },
-    changeLogin(state,value) {
+    changeLogin(state, value) {
       state.isLogin = value
     },
-    saveUserInfo(state,value) {
+    saveUserInfo(state, value) {
       state.userInfo = value
     },
-    savePhoneType(state,value) {
+    savePhoneType(state, value) {
       state.isIphoneX = value
+    },
+    saveLongitude(state, value) {
+      state.longitude = value
+    },
+    saveLatitude(state, value) {
+      state.latitude = value
     }
   }
 })

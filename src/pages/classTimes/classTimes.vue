@@ -10,6 +10,9 @@
       </div>
       <div class="tiems flex-right">{{item.consumeAuthority}}次</div>
     </div>
+    <div class="loading" v-show="isLoading">
+      <van-loading color="#999" custom-class="loading"/>
+    </div>
   </div>
 </template>
 
@@ -20,11 +23,16 @@ export default {
     return {
       customerId: "",
       classRecord: [],
-      page: 1
+      page: 1,
+      isLoading: false
     };
   },
   onLoad() {
     setNavTab();
+  },
+  onReachBottom() {
+    this.isLoading = true;
+    this.getClassRecord();
   },
   mounted() {
     this.customerId = wx.getStorageSync("userInfo").id;
@@ -37,13 +45,19 @@ export default {
       HttpRequest({
         url: window.api + "/consumption/log/pages/customer",
         data: {
-          pageON: 1,
+          pageON: that.page,
           customerId: that.customerId,
           signInType: 2
         },
         success(res) {
-          that.classRecord = res.data.data.result;
-          console.log(that.classRecord);
+          that.isLoading = false;
+          if (res.data.code === 200) {
+            if(!res.data.data.result.length) {
+              return
+            }
+            that.page++
+            that.classRecord = that.classRecord.concat(res.data.data.result);
+          }
         }
       });
     }

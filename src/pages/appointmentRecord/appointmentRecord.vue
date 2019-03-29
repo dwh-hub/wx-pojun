@@ -12,6 +12,9 @@
         <div class="time">{{item.startTime}}~{{item.endTime}}</div>
       </div>
     </div>
+    <div class="loading" v-show="isLoading">
+      <van-loading color="#999" custom-class="loading"/>
+    </div>
   </div>
 </template>
 
@@ -21,7 +24,8 @@ export default {
   data() {
     return {
       recordList: [],
-      page: 1
+      page: 1,
+      isLoading: false
     };
   },
   onLoad() {
@@ -32,6 +36,7 @@ export default {
     this.getAppointRecordList()
   },
   onReachBottom() {
+    that.isLoading = true
     this.getAppointRecordList()
   },
   methods: {
@@ -44,12 +49,13 @@ export default {
           customerId: wx.getStorageSync('userInfo').id
         },
         success(res) {
+          that.isLoading = false
           if(!res.data.data.result.length) {
             return
           }
           let _data = res.data.data.result.map((e) => {
             return {
-              name: e.secondCardClassName,
+              name: e.secondCardClassName || '',
               status: e.statusChar,
               date: e.timeEnd.split(' ')[0],
               startTime: e.timeStart.split(' ')[1].slice(0, 5),
@@ -94,8 +100,9 @@ export default {
         font-weight: bold;
       }
       .type {
+        display: inline-block;
         color: #fff;
-        width: 48px;
+        padding: 0 5px;
         margin: 0 auto;
         text-align: center;
         line-height: 20px;

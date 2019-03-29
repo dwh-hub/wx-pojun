@@ -12,11 +12,11 @@
     >
       <div v-for="(item,index) in bannerList" :key="index">
         <swiper-item>
-          <!-- <img :src="item" class="banner"> -->
-          <img
+          <img :src="item" class="banner">
+          <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
-          >
+          > -->
         </swiper-item>
       </div>
     </swiper>
@@ -42,7 +42,7 @@
         <img src="/static/images/icon-member.png" alt>
         <div class="text">会员卡</div>
       </div>
-      <div class="tab-item">
+      <div class="tab-item" @click="toNav()">
         <img src="/static/images/icon-notice.png" alt>
         <div class="text">公告</div>
       </div>
@@ -56,14 +56,19 @@
         @tapMore="toNav('../allStore/main')"
       ></title-cell>
       <div class="store-wrapper">
-        <div class="nearby-store" v-for="(item, index) in 2" :key="index">
-          <!-- @click="toNav('../storeDetail/main')" -->
+        <div
+          class="nearby-store"
+          v-for="(item, index) in nearbyStoreList"
+          :key="index"
+          @click="toNav(`../storeDetail/main?storeId=${item.storeId}`)"
+        >
+          <!-- http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg -->
           <div class="cover">
-            <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg">
+            <img :src="item.cover">
           </div>
           <div class="nearby-bottom">
-            <span class="name">$推荐店名$</span>
-            <span class="range">$距离KM$</span>
+            <span class="name">{{item.storeName}}</span>
+            <span class="range">{{item.range}}</span>
           </div>
         </div>
       </div>
@@ -77,7 +82,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest, getRange } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
@@ -96,7 +101,24 @@ export default {
       latitude: "", // 维度
       bannerList: [],
       recommendCoach: {},
-      recommendClass: {}
+      recommendClass: {},
+      companyId: "",
+      nearbyStoreList: [
+        {
+          cover: "",
+          address: "",
+          range: "",
+          storeName: "",
+          storeId: ""
+        },
+        {
+          cover: "",
+          address: "",
+          range: "",
+          storeName: "",
+          storeId: ""
+        }
+      ]
     };
   },
   components: {
@@ -109,18 +131,24 @@ export default {
     wx.getLocation({
       type: "wgs84",
       success(res) {
-        console.log('经度:'+ res.longitude)
-        console.log('维度:'+ res.latitude)
+        console.log("经度:" + res.longitude);
+        console.log("维度:" + res.latitude);
         that.latitude = res.latitude;
         that.longitude = res.longitude;
+        store.commit("saveLongitude", res.longitude);
+        store.commit("saveLatitude", res.latitude);
+        that.getNearbyStoreList();
       }
     });
     this.getBannerList();
     this.getRecommendCoach();
-    this.getRecommendClass()
+    this.getRecommendClass();
   },
   onLoad() {
     setNavTab("前锋体育");
+    if (wx.getStorageSync("userInfo")) {
+      this.companyId = wx.getStorageSync("userInfo").companyId;
+    }
   },
   onPullDownRefresh() {
     setTimeout(() => {
@@ -129,12 +157,19 @@ export default {
   },
   methods: {
     toNav(url) {
-      if(url.indexOf('memberCard') > -1 && !store.state.isLogin) {
+      if (!url) {
         return wx.showToast({
-          title: '请先登录',
-          icon: 'none',
+          title: "暂未开放",
+          icon: "none",
           duration: 1000
-        })
+        });
+      }
+      if (url.indexOf("memberCard") > -1 && !store.state.isLogin) {
+        return wx.showToast({
+          title: "请先登录",
+          icon: "none",
+          duration: 1000
+        });
       }
       wx.navigateTo({
         url: url
@@ -160,18 +195,19 @@ export default {
     },
     //　推荐团课
     getRecommendClass() {
-      let that = this
+      let that = this;
       HttpRequest({
-        url: window.api + '/teamClass/schedule/recommend',
+        url: window.api + "/teamClass/schedule/recommend",
         data: {
-          storeId: '',
+          companyId: that.companyId,
+          storeId: that.nearbyStoreList[0] ? that.nearbyStoreList[0].storeId : ''
         },
         success(res) {
-          if(res.data.code == 200) {
-            that.recommendClass = res.data.data
+          if (res.data.code == 200) {
+            that.recommendClass = res.data.data;
           }
         }
-      })
+      });
     },
     // 推荐教练
     getRecommendCoach() {
@@ -188,6 +224,54 @@ export default {
           }
         }
       });
+    },
+    // 获取附近门店列表
+    getNearbyStoreList() {
+      let that = this;
+      wx.request({
+        url: window.api + "/store/all-store-name-list-nolimit",
+        data: {
+          companyId: that.companyId || ""
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            let _list = res.data.data
+            let _storeList = [];
+            res.data.data.forEach(e => {
+              let _range;
+              if (e.mapPoint) {
+                let _lat = e.mapPoint.split(",")[1];
+                let _lng = e.mapPoint.split(",")[0];
+                _range = getRange(that.latitude, that.longitude, _lat, _lng);
+              }
+              let _data = {
+                cover: e.images ? window.api + e.images.split(",")[0] : "",
+                address: e.address,
+                range: _range,
+                storeName: e.storeName,
+                storeId: e.storeId
+              };
+              if (_range) {
+                _storeList.push(_data);
+              }
+            });
+            _storeList.sort(that.compare("range"));
+            if(!_storeList.length) {
+              that.nearbyStoreList = _list.slice(0,3)
+            }
+            that.nearbyStoreList = _storeList;
+            that.getRecommendClass();
+          }
+          // console.log(that.nearbyStoreList);
+        }
+      });
+    },
+    compare(property) {
+      return function(a, b) {
+        var value1 = a[property];
+        var value2 = b[property];
+        return value1 - value2;
+      };
     }
     // touchStart(e) {
     //   // console.log(e)
@@ -222,7 +306,10 @@ export default {
 <style lang="less">
 @import "~COMMON/less/reset.less";
 @import "~COMMON/less/common.less";
-page{background-color: #f6f6f6;height: 100%;}
+page {
+  background-color: #f6f6f6;
+  height: 100%;
+}
 .homepage {
   padding-bottom: 20px;
   background-color: #f6f6f6;

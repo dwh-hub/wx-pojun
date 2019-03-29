@@ -31,19 +31,19 @@
     </div>-->
     <div class="tab-list">
       <div class="tab-item" @click="toNav('../teamClassList/main')">
-        <img src="/static/images/icon-team.png" alt>
+        <img src="/static/images/icon-team.png" :style="themeColor">
         <div class="text">团课</div>
       </div>
       <div class="tab-item" @click="toNav('../coachList/main')">
-        <img src="/static/images/icon-team.png" alt>
+        <img src="/static/images/icon-team.png" :style="themeColor">
         <div class="text">私教</div>
       </div>
       <div class="tab-item" @click="toNav('../memberCard/main')">
-        <img src="/static/images/icon-member.png" alt>
+        <img src="/static/images/icon-member.png" :style="themeColor">
         <div class="text">会员卡</div>
       </div>
       <div class="tab-item" @click="toNav()">
-        <img src="/static/images/icon-notice.png" alt>
+        <img src="/static/images/icon-notice.png" :style="themeColor">
         <div class="text">公告</div>
       </div>
     </div>
@@ -148,6 +148,11 @@ export default {
     setNavTab("前锋体育");
     if (wx.getStorageSync("userInfo")) {
       this.companyId = wx.getStorageSync("userInfo").companyId;
+    }
+  },
+  computed: {
+    themeColor() {
+      return `background-color:${window.color}`
     }
   },
   onPullDownRefresh() {
@@ -333,7 +338,7 @@ page {
         width: 20px;
         height: 20px;
         padding: 10px;
-        background-color: @theme-color;
+        // background-color: @theme-color;
         border-radius: 50%;
       }
       .text {

@@ -98,6 +98,13 @@ export default {
   },
   methods: {
     navTo(url) {
+      if(!store.state.isLogin) {
+        return wx.showToast({
+          title: '请登录',
+          icon: 'none',
+          duration: 1000
+        })
+      }
       wx.navigateTo({
         url: url
       });

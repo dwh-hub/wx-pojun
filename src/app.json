@@ -49,23 +49,23 @@
       },{
         "pagePath": "pages/active/main",
         "text": "活动",
-        "iconPath": "static/tabs/orders.png",
-        "selectedIconPath": "static/tabs/orders-active.png"
+        "iconPath": "static/tabs/active.png",
+        "selectedIconPath": "static/tabs/active-active.png"
       },{
         "pagePath": "pages/appointmentClass/main",
         "text": "约课",
-        "iconPath": "static/tabs/orders.png",
-        "selectedIconPath": "static/tabs/orders-active.png"
+        "iconPath": "static/tabs/appoint.png",
+        "selectedIconPath": "static/tabs/appoint-active.png"
       },{
         "pagePath": "pages/message/main",
         "text": "消息",
-        "iconPath": "static/tabs/orders.png",
-        "selectedIconPath": "static/tabs/orders-active.png"
+        "iconPath": "static/tabs/message.png",
+        "selectedIconPath": "static/tabs/message-active.png"
       },{
         "pagePath": "pages/mine/main",
         "text": "我的",
-        "iconPath": "static/tabs/orders.png",
-        "selectedIconPath": "static/tabs/orders-active.png"
+        "iconPath": "static/tabs/mine.png",
+        "selectedIconPath": "static/tabs/mine-active.png"
       }]
     }
 }

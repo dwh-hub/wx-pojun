@@ -5,7 +5,7 @@
       class="swiper"
       indicator-dots="true"
       indicator-color="#fff"
-      indicator-active-color="rgba(74, 134, 232, 1)"
+      :indicator-active-color="themeColor"
       :autoplay="true"
       :circular="true"
       :loop="true"
@@ -31,19 +31,19 @@
     </div>-->
     <div class="tab-list">
       <div class="tab-item" @click="toNav('../teamClassList/main')">
-        <img src="/static/images/icon-team.png" :style="themeColor">
+        <img src="/static/images/icon-team.png" :style="{'background-color': themeColor}">
         <div class="text">团课</div>
       </div>
       <div class="tab-item" @click="toNav('../coachList/main')">
-        <img src="/static/images/icon-team.png" :style="themeColor">
+        <img src="/static/images/icon-team.png" :style="{'background-color': themeColor}">
         <div class="text">私教</div>
       </div>
       <div class="tab-item" @click="toNav('../memberCard/main')">
-        <img src="/static/images/icon-member.png" :style="themeColor">
+        <img src="/static/images/icon-member.png" :style="{'background-color': themeColor}">
         <div class="text">会员卡</div>
       </div>
       <div class="tab-item" @click="toNav()">
-        <img src="/static/images/icon-notice.png" :style="themeColor">
+        <img src="/static/images/icon-notice.png" :style="{'background-color': themeColor}">
         <div class="text">公告</div>
       </div>
     </div>
@@ -152,7 +152,7 @@ export default {
   },
   computed: {
     themeColor() {
-      return `background-color:${window.color}`
+      return window.color
     }
   },
   onPullDownRefresh() {

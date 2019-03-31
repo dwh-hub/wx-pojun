@@ -1,6 +1,7 @@
 const window = {}
 window.api = 'https://www.pojun-tech.cn'
 window.DEBUGGING = true
+window.color= "#2a82e4"
 let Cookie = ""
 
 // 获取sessionKey 需调用wx.login获取sessionKey

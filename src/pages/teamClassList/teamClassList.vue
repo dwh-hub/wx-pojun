@@ -292,6 +292,7 @@ export default {
     width: 100%;
     height: 120px;
     z-index: 98;
+    background-color: #fff;
     .nav-tab {
       display: flex;
       position: relative;

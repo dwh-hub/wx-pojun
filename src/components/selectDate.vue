@@ -28,6 +28,7 @@ export default {
       // 今天至今天+6的日期
       weekArray: [],
       dayArray: [],
+      dateArray: [],
       // 今日礼拜几
       curWeek: "",
       // 今日几号
@@ -43,6 +44,7 @@ export default {
     getDateArray() {
       let date = new Date();
       let week = [
+        "周日",
         "周一",
         "周二",
         "周三",
@@ -55,27 +57,31 @@ export default {
         "周三",
         "周四",
         "周五",
-        "周六",
-        "周日"
+        "周六"
       ];
       let _weekArray = [];
       let _dayArray = [];
+      let _dateArray = [];
       let day = date.getDate();
       let weekIndex = date.getDay();
-      this.curWeek = week[weekIndex - 1];
+      let timesStamp = date.getTime()
+      this.curWeek = week[weekIndex];
       this.curDay = day;
 
       for (let i = 0; i < 7; i++) {
-        _weekArray.push(week[weekIndex - 1 + i]);
-        _dayArray.push(day + i);
+        _weekArray.push(week[weekIndex + i]);
+        _dayArray.push(new Date(timesStamp + 24*60*60*1000*i).getDate())
+        _dateArray.push(formatDate(new Date(timesStamp + 24*60*60*1000*i), 'yyyy-MM-dd'));
       }
       this.weekArray = _weekArray;
       this.dayArray = _dayArray;
+      this.dateArray = _dateArray
+      console.log(_dateArray)
     },
     selectWeek(index) {
       this.selectDateIndex = index;
       formatDate(new Date(), 'yyyy-MM')
-      let date = formatDate(new Date(), 'yyyy-MM') + '-' + this.dayArray[index]
+      let date = this.dateArray[index]
       this.$emit("selectWeek", date);
     }
   }

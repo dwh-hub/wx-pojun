@@ -7,7 +7,10 @@
           :src="userInfo.headImgPath || 'https://pojun-tech.cn/assets/img/morenTo.png'"
         >
       </div>
-      <div class="pl mineDetail">
+      <div class="pl mineDetail" @click="singIn" v-if="!isLogin">
+        <p id="mineName">未登录</p>
+      </div>
+      <div class="pl mineDetail" v-else>
         <p id="mineName">{{userInfo.name || '昵称'}}</p>
         <p id="minePhone">{{userInfo.phone || '手机号'}}</p>
       </div>
@@ -24,7 +27,8 @@
         <span class="detail_contrnt" v-if="isLogin">{{item.hit}}{{item.text}}</span>
       </div>
     </div>
-    <div class="mineExit" @click="singOut">解除绑定</div>
+    <div class="mineExit" @click="singOut" v-if="isLogin">解除绑定</div>
+    <!-- <div class="mineExit" @click="singIn" v-else>去登录</div> -->
   </div>
 </template>
 
@@ -80,7 +84,8 @@ export default {
         // }
       ],
       // 临时的用户数据
-      userInfo: {}
+      userInfo: {},
+      isLogin: false
     };
   },
   onLoad() {
@@ -90,6 +95,7 @@ export default {
   mounted() {
     this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);
+    this.isLogin = store.state.isLogin
   },
   computed: {
     isLogin() {
@@ -98,17 +104,18 @@ export default {
   },
   methods: {
     navTo(url) {
-      if(!store.state.isLogin) {
+      if (!store.state.isLogin) {
         return wx.showToast({
-          title: '请登录',
-          icon: 'none',
+          title: "请登录",
+          icon: "none",
           duration: 1000
-        })
+        });
       }
       wx.navigateTo({
         url: url
       });
     },
+    // 退出登录
     singOut() {
       wx.showModal({
         title: "提示",
@@ -129,14 +136,20 @@ export default {
                     duration: 1000
                   });
                   wx.reLaunch({
-                    url: '../mine/main'
-                  })
+                    url: "../mine/main"
+                  });
                 }
               }
             });
           } else if (res.cancel) {
           }
         }
+      });
+    },
+    // 登录
+    singIn() {
+      wx.navigateTo({
+        url: "../login/main"
       });
     },
     getTimes() {

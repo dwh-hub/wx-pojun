@@ -89,7 +89,8 @@ export default {
       // 当前选择的门店
       curStore: "全部门店",
       curCoach: "全部教练",
-      curSchedule: "全部课程"
+      curSchedule: "全部课程",
+      companyId: ""
     };
   },
   onLoad() {
@@ -103,6 +104,7 @@ export default {
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.getAllStore();
     this.getClassList();
+    this.companyId = wx.getStorageSync("companyId");
   },
   computed: {
     maskShow() {
@@ -150,6 +152,10 @@ export default {
       this.showStoreNav = false;
       this.curStoreId = item.storeId;
       this.curStore = item.storeName || "全部门店";
+      if(item.storeName == "全部门店") {
+        this.curCoach = "全部教练"
+        this.curCoachId = ""
+      }
       this.getClassList();
       this.getCoachList();
       this.getTeamSchedule();

@@ -13,6 +13,12 @@ const app = new Vue(App)
 app.$mount()
 Vue.prototype.globalData = getApp().globalData
 
+// TODO: 测试公司id
+wx.setStorage({
+  key: "companyId",
+  data: 37
+});
+
 if (!wx.getStorageSync("Cookie")) {
   wx.request({
     url: window.api + '/loginPage',
@@ -102,6 +108,10 @@ function wxLogin() {
             wx.setStorage({
               key: "sessionKey",
               data: data.data.data.sessionKey
+            });
+            wx.setStorage({
+              key: "openId",
+              data: data.data.data.openId
             });
           }
         })

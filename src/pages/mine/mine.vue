@@ -8,7 +8,7 @@
         >
       </div>
       <div class="pl mineDetail" @click="singIn" v-if="!isLogin">
-        <p id="mineName">未登录</p>
+        <p class="toLogin">去登录</p>
       </div>
       <div class="pl mineDetail" v-else>
         <p id="mineName">{{userInfo.name || '昵称'}}</p>
@@ -149,7 +149,8 @@ export default {
     // 登录
     singIn() {
       wx.navigateTo({
-        url: "../login/main"
+        // url: "../login/main"
+        url: "../authorizeLogin/main"
       });
     },
     getTimes() {
@@ -174,8 +175,8 @@ export default {
             });
           } else {
             wx.navigateTo({
-              // url: "../authorizeLogin/main"
-              url: "../login/main"
+              url: "../authorizeLogin/main"
+              // url: "../login/main"
             });
           }
         }
@@ -207,6 +208,9 @@ export default {
       > p {
         line-height: 33px;
         font-size: 15px;
+      }
+      .toLogin {
+        height: 66px;
       }
     }
   }

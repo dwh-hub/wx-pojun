@@ -47,10 +47,7 @@
       <div class="title">课程介绍</div>
       <div class="desc-text">
         <p>
-          步入BODYCOMBAT的课程，你会通过拳击、踢腿动作
-          进行锻炼、全程可以燃烧高达740卡路里的热量。此项
-          课程受众好。这个内容我还可以在瞎掰。如果没有内容
-          就按下面显示。
+          {{classDetail.description || '暂无课程介绍'}}
         </p>
         <!-- <p>课程还没有填写简介</p> -->
       </div>
@@ -102,7 +99,8 @@ export default {
       address: "",
       range: "",
       longitude: "", // 经度
-      latitude: "" // 纬度
+      latitude: "", // 纬度,
+      companyId: ""
     };
   },
   components: {
@@ -113,6 +111,7 @@ export default {
     setNavTab();
   },
   mounted() {
+    this.companyId = wx.getStorageSync("companyId");
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     this.getClassDetail();
@@ -191,7 +190,8 @@ export default {
       HttpRequest({
         url: window.api + "/teamClass/teamSchedule/getOne",
         data: {
-          teamScheduleId: that.id
+          teamScheduleId: that.id,
+          companyId: that.companyId
         },
         methods: "POST",
         success(res) {
@@ -208,7 +208,8 @@ export default {
       HttpRequest({
         url: window.api + "/teamClass/teamCoach/getCoach",
         data: {
-          teamScheduleId: that.id
+          teamScheduleId: that.id,
+          companyId: that.companyId
         },
         methods: "POST",
         success(res) {

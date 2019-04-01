@@ -29,9 +29,10 @@ export default {
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     this.getAllStore();
-    if (wx.getStorageSync("userInfo")) {
-      this.companyId = wx.getStorageSync("userInfo").companyId;
-    }
+    // if (wx.getStorageSync("userInfo")) {
+    //   this.companyId = wx.getStorageSync("userInfo").companyId;
+    // }
+    this.companyId = wx.getStorageSync("companyId");
   },
   methods: {
     getAllStore() {

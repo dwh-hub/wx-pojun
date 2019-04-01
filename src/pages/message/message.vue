@@ -91,7 +91,7 @@ import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
     return {
-      // 当前激活的标签 1 未读 2已读
+      // 当前激活的标签 0 未读 1 已读
       navIndex: 0,
       // 未读的页数
       messageNpage: 1,

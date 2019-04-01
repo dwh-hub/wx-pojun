@@ -1,6 +1,6 @@
 <template>
   <div class="authorize-login">
-    <!-- <image src="https://www.pojun-tech.com/images/company_log/3/1.5355962923289521E12.png"></image> -->
+    <image src="https://www.pojun-tech.com/images/company_log/37/1.5344641783646104E12.png"></image>
     <div class="tip">请完成微信授权以继续使用</div>
     <button class="authorize" type="primary" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button>
 
@@ -51,9 +51,6 @@ export default {
   methods: {
     // 获取微信加密数据
     getPhoneNumber(e) {
-      console.log(e.mp.detail.errMsg);
-      console.log(e.mp.detail.iv);
-      console.log(e.mp.detail.encryptedData);
       let that = this;
       HttpRequest({
         url: window.api + "/mini/getphone",
@@ -63,7 +60,6 @@ export default {
           iv: e.mp.detail.iv
         },
         success(res) {
-          console.log(res.data.data);
           that.phone = res.data.data;
           wx.setStorage({
             key: "phone",
@@ -97,7 +93,8 @@ export default {
         url: window.api + "/wxcustomer/bindCard",
         data: {
           phone: that.phone,
-          companyId: that.userInfo.companyId
+          companyId: that.userInfo.companyId,
+          miniOpenId: wx.getStorageSync("openId")
           // smsSendLogId: that.smsSendLogId
         },
         success(res) {
@@ -139,8 +136,14 @@ export default {
               if (!res.data.data.length) {
                 return wx.showModal({
                   title: "提示",
-                  content: "没有找到您的登记信息",
-                  showCancel: false
+                  content: "没有找到您的登记信息，请先登记信息",
+                  success(res) {
+                    if (res.confirm) {
+                      wx.navigateTo({
+                        url: "../register/main"
+                      })
+                    }
+                  }
                 });
               }
               if (res.data.data.length == 1) {
@@ -176,6 +179,10 @@ export default {
 
 .authorize-login {
   padding: 15px;
+  // padding-top: 200px;
+  >image {
+    width: 100%;
+  }
   .tip {
     text-align: center;
     line-height: 36px;

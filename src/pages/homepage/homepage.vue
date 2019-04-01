@@ -16,7 +16,7 @@
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
-          > -->
+          >-->
         </swiper-item>
       </div>
     </swiper>
@@ -75,8 +75,8 @@
     </div>
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
-      <team-class-item :info="recommendClass" v-if="recommendClass.anotherName"></team-class-item>
-      <coach-item :info="recommendCoach" v-if="recommendCoach.userName"></coach-item>
+      <team-class-item :info="recommendClass" v-if="recommendClass.length > 1"></team-class-item>
+      <coach-item :info="recommendCoach" v-if="recommendCoach.length > 1"></coach-item>
     </div>
   </div>
 </template>
@@ -142,17 +142,21 @@ export default {
     });
     this.getBannerList();
     this.getRecommendCoach();
-    this.getRecommendClass();
   },
   onLoad() {
     setNavTab("前锋体育");
-    if (wx.getStorageSync("userInfo")) {
-      this.companyId = wx.getStorageSync("userInfo").companyId;
-    }
+    // if (wx.getStorageSync("userInfo")) {
+    //   this.companyId = wx.getStorageSync("userInfo").companyId;
+    // }
+    this.companyId = wx.getStorageSync("companyId");
+    this.getWxoauth();
   },
   computed: {
     themeColor() {
-      return window.color
+      return window.color;
+    },
+    window() {
+      return window;
     }
   },
   onPullDownRefresh() {
@@ -193,7 +197,6 @@ export default {
             that.bannerList = res.data.data.wxCarousel.split(",").map(e => {
               return (e = window.api + e);
             });
-            console.log(that.bannerList);
           }
         }
       });
@@ -205,7 +208,9 @@ export default {
         url: window.api + "/teamClass/schedule/recommend",
         data: {
           companyId: that.companyId,
-          storeId: that.nearbyStoreList[0] ? that.nearbyStoreList[0].storeId : ''
+          storeId: that.nearbyStoreList[0]
+            ? that.nearbyStoreList[0].storeId
+            : ""
         },
         success(res) {
           if (res.data.code == 200) {
@@ -240,7 +245,7 @@ export default {
         },
         success(res) {
           if (res.data.code === 200) {
-            let _list = res.data.data
+            let _list = res.data.data;
             let _storeList = [];
             res.data.data.forEach(e => {
               let _range;
@@ -261,13 +266,24 @@ export default {
               }
             });
             _storeList.sort(that.compare("range"));
-            if(!_storeList.length) {
-              that.nearbyStoreList = _list.slice(0,3)
-            }
             that.nearbyStoreList = _storeList;
+            if (!_storeList.length) {
+              that.nearbyStoreList = _list.slice(0, 2);
+              that.nearbyStoreList = that.nearbyStoreList.map(e => {
+                return {
+                  cover: e.images ? window.api + e.images.split(",")[0] : "",
+                  address: e.address,
+                  range: "",
+                  storeName: e.storeName,
+                  storeId: e.storeId
+                };
+              });
+            }
             that.getRecommendClass();
+          } else {
+            that.nearbyStoreList = [];
           }
-          // console.log(that.nearbyStoreList);
+          console.log(that.nearbyStoreList);
         }
       });
     },
@@ -277,6 +293,34 @@ export default {
         var value2 = b[property];
         return value1 - value2;
       };
+    },
+    // 获取微信公众号信息
+    getWxoauth() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/wxopen/wxoauth/wxcustomer",
+        data: {
+          appid: "wx842adcf8a0ea1c9a"
+        },
+        success(res) {
+          if (res.data.code) {
+            HttpRequest({
+              url: window.api + "/wxopen/wxoauth/wxlogin",
+              data: {
+                appid: "wx842adcf8a0ea1c9a"
+              },
+              success(res) {
+                console.log(res);
+                console.log(res.data.data.companyId);
+                // wx.setStorage({
+                //   key: "companyId",
+                //   data: res.data.data.companyId
+                // });
+              }
+            });
+          }
+        }
+      });
     }
     // touchStart(e) {
     //   // console.log(e)

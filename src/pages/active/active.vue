@@ -1,9 +1,14 @@
 <template>
   <div class="active">
-    <div class="active-item" v-for="(item, index) in activeList" :key="index" @click="toActiveDetail">
+    <div
+      class="active-item"
+      v-for="(item, index) in activeList"
+      :key="index"
+      @click="toActiveDetail(item)"
+    >
       <div class="active-cover">
         <!-- TODO: :src="item.thumbUrl" -->
-        <img :src="item.thumbUrl">
+        <img :src="window.api + item.thumbUrl">
       </div>
       <div class="active-info">
         <div class="active-top">
@@ -17,7 +22,7 @@
 </template>
 
 <script>
-import {setNavTab,window,HttpRequest} from 'COMMON/js/common.js'
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
@@ -30,10 +35,15 @@ export default {
         }
       ],
       page: 1,
+      companyId: ""
     };
   },
   mounted() {
-    this.getActiveList()
+    // if (wx.getStorageSync("userInfo")) {
+    //   this.companyId = wx.getStorageSync("userInfo").companyId;
+    // }
+    this.companyId = wx.getStorageSync("companyId");
+    this.getActiveList();
   },
   onLoad() {
     setNavTab();
@@ -41,10 +51,15 @@ export default {
   components: {
     noneResult
   },
+  computed: {
+    window() {
+      return window;
+    }
+  },
   methods: {
-    toActiveDetail() {
+    toActiveDetail(item) {
       wx.navigateTo({
-        url: "../activeDetail/main"
+        url: "../activeDetail/main?markId=" + item.markId
       });
     },
     // 获取活动列表
@@ -52,21 +67,21 @@ export default {
       wx.showLoading({
         title: "加载中..."
       });
-      let that = this
+      let that = this;
       HttpRequest({
-        url: window.api+ '/wxmarketing/pages',
-        data:{
-          page: that.page,
-          pageSize: 15
+        url: window.api + "/wxmarketing/pagesAndEntryInfo",
+        data: {
+          companyId: that.companyId
         },
         success(res) {
           wx.hideLoading();
-          if(res.data.code === 200){
-            that.activeList = res.data.data.result
-            console.log(that.activeList)
+          if (res.data.code === 200) {
+            that.activeList = res.data.data.result;
+          } else {
+            that.activeList = []
           }
         }
-      })
+      });
     }
   }
 };

@@ -1,7 +1,7 @@
 const window = {}
-window.api = 'https://www.pojun-tech.cn'
-window.DEBUGGING = true
-window.color= "#2a82e4"
+window.DEBUGGING = false
+window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
+window.color = "#2a82e4"
 let Cookie = ""
 
 // 获取sessionKey 需调用wx.login获取sessionKey
@@ -70,7 +70,6 @@ export function HttpRequest(obj) {
  * @param {String} rejectPrompt 错误提示
  */
 export function checkPhoneFormat(phone, rejectPrompt = "手机号格式不正确") {
-
   if (!phone || "" == phone) {
     return Promise.reject("请输入手机号");
   }

@@ -1,8 +1,10 @@
 {
   "pages": [
+    "pages/homepage/main",
+    "pages/register/main",
+    "pages/authorizeLogin/main",
     "pages/mine/main",
     "pages/login/main",
-    "pages/authorizeLogin/main",
     "pages/appointmentClass/main",
     "pages/myClassList/main",
     "pages/coachList/main",
@@ -13,7 +15,6 @@
     "pages/allStore/main",
     "pages/message/main",
     "pages/appointmentCoach/main",
-    "pages/homepage/main",
     "pages/memberCard/main",
     "pages/appointmentRecord/main",
     "pages/classTimes/main",
@@ -40,7 +41,8 @@
     "onReachBottomDistance": 50
   },
    "tabBar": {
-      "selectedColor": "#1296db",
+      "color": "#999999",
+      "selectedColor": "#333333",
       "list": [{
         "pagePath": "pages/homepage/main",
         "text": "首页",

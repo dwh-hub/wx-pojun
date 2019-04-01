@@ -51,7 +51,7 @@ export default {
   data() {
     return {
       isSend: false,
-      phone: "",
+      phone: "18259260870", // 15159125113
       // 验证码
       vCode: "",
       // TODO: 短信验证码id

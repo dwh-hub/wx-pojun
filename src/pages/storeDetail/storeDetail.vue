@@ -9,13 +9,13 @@
       :circular="true"
       :loop="true"
     >
-      <div v-for="(item,index) in 3" :key="index">
+      <div v-for="(item,index) in storeInfo.bannerList" :key="index">
         <swiper-item>
-          <!-- <img :src="item" class="banner"> -->
-          <img
+          <img :src="window.api + item" class="banner">
+          <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
-          >
+          > -->
         </swiper-item>
       </div>
     </swiper>
@@ -88,6 +88,11 @@ export default {
     this.getStoreQuery();
     this.getTeamClassList();
     this.getCoachList();
+  },
+  computed: {
+    window() {
+      return window
+    }
   },
   methods: {
     toAllStore() {

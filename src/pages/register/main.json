@@ -1,0 +1,9 @@
+{
+    "navigationBarTitleText": "登记信息",
+    "usingComponents": {
+      "van-field": "../../../static/vant/field/index",
+      "van-button": "../../../static/vant/button/index",
+      "van-picker": "../../../static/vant/picker/index",
+      "van-action-sheet": "../../../static/vant/action-sheet/index"
+    }
+  }

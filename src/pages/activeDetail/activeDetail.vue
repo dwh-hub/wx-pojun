@@ -1,7 +1,7 @@
 <template>
   <div id="memberActiveDetail" :class="{'isPhoneX-wrap':isPhoneX}">
     <div class="active-cover">
-      <image mode="widthFix" :src="'https://www.pojun-tech.cn' + activeDetail.thumbUrl" class="cover"></image>
+      <image mode="widthFix" :src="window.api + activeDetail.thumbUrl" class="cover"></image>
     </div>
     <div class="active-title">{{activeDetail.title}}</div>
     <div class="active-num">{{activeDetail.digest}}</div>
@@ -29,7 +29,7 @@
       <div class="entry-box">
         <div class="box-item"><span class="text-left">报名活动</span><span class="text-right">{{activeDetail.title}}</span></div>
         <div class="box-item"><span class="text-left">报名人数</span><span class="text-right">{{signNum}}</span></div>
-        <div class="box-item"><span class="text-left">报名费用</span><span class="text-right">{{amount}}</span></div>
+        <div class="box-item"><span class="text-left">报名费用</span><span class="text-right">{{activeDetail.entryFee*signNum}}</span></div>
         <div class="btn-wrapper">
           <span class="cancel" @click="showEntryBox = false">取消</span>
           <span class="confirm">确认</span>
@@ -48,15 +48,21 @@ export default {
     return {
       signNum: 1,
       activeDetail: {},
-      showEntryBox: true,
+      showEntryBox: false,
+      markId: "",
       content:
-        '<p><span style="background-color: rgb（255, 255, 255）; color: rgb（255, 0, 0）; font-weight: bold;">缴纳定金权益享受下述权益:</span></p><p>1.预存50元定金，可享受办卡首年免费；</p><p>2.获得会所赠送价值200的水吧券一张；</p><p>3.获得会所价值288元的运动背包；</p><p>4.享受会所价值788元的一对一私教二节及专业的健康状况评估；</p><p>5.享受停车2小时免费（卡有效期内来游泳健身）；</p><p>6.享受独立淋浴间（共15间）使用权，极大保护个人隐私；</p><p>7.享受儿童独立淋浴室；</p><p>8.优先获得参加会所举办的所有常规和户外活动的权益；</p><p>9.参加会所开业庆典活动和抽奖活动；</p><p>10.如不办卡，享受持定金单换取会所VIP贵宾券二张。</p><p><br></p><p>门店效果预览图（以门店实际装修为准）</p><p><img src="/images/activities/37/1.55065529299746E12.jpeg" style="width: 874px; float: none;"></p><p><img src="/images/activities/37/1.5506553509545596E12.jpeg" style="width: 1500px; float: none;"></p><p><img src="/images/activities/37/1.5506553654493972E12.jpeg" style="width: 1500px;"></p><p><img src="/images/activities/37/1.5506553892880002E12.jpeg" style="width: 1426px;"></p><p><img src="/images/activities/37/1.550655397923402E12.jpeg" style="width: 1152px;"></p><p><img src="/images/activities/37/1.550655407173489E12.jpeg" style="width: 1152px;"><br></p>'
+        '<p><span style="background-color: rgb（255, 255, 255）; color: rgb（255, 0, 0）; font-weight: bold;">缴纳定金权益享受下述权益:</span></p><p>1.预存50元定金，可享受办卡首年免费；</p><p>2.获得会所赠送价值200的水吧券一张；</p><p>3.获得会所价值288元的运动背包；</p><p>4.享受会所价值788元的一对一私教二节及专业的健康状况评估；</p><p>5.享受停车2小时免费（卡有效期内来游泳健身）；</p><p>6.享受独立淋浴间（共15间）使用权，极大保护个人隐私；</p><p>7.享受儿童独立淋浴室；</p><p>8.优先获得参加会所举办的所有常规和户外活动的权益；</p><p>9.参加会所开业庆典活动和抽奖活动；</p><p>10.如不办卡，享受持定金单换取会所VIP贵宾券二张。</p><p><br></p><p>门店效果预览图（以门店实际装修为准）</p><p><img src="/images/activities/37/1.55065529299746E12.jpeg" style="width: 874px; float: none;"></p><p><img src="/images/activities/37/1.5506553509545596E12.jpeg" style="width: 1500px; float: none;"></p><p><img src="/images/activities/37/1.5506553654493972E12.jpeg" style="width: 1500px;"></p><p><img src="/images/activities/37/1.5506553892880002E12.jpeg" style="width: 1426px;"></p><p><img src="/images/activities/37/1.550655397923402E12.jpeg" style="width: 1152px;"></p><p><img src="/images/activities/37/1.550655407173489E12.jpeg" style="width: 1152px;"><br></p>',
+      companyId: ''
     };
   },
-  onLoad() {
+  onLoad(options) {
+    this.markId = options.markId
     setNavTab();
   },
   mounted() {
+    if (wx.getStorageSync("userInfo")) {
+      this.companyId = wx.getStorageSync("companyId");
+    }
     this.getActiveDetail();
     console.log(this.isPhoneX)
   },
@@ -64,15 +70,20 @@ export default {
     isPhoneX() {
       return store.state.isIphoneX;
     },
-    amount() {
-      if(this.activeDetail.entryFee) {
-        return this.activeDetail.entryFee*this.signNum
-      }
-      return ""
-    }
+    // amount() {
+    //   if(this.activeDetail.entryFee) {
+    //     return this.activeDetail.entryFee*this.signNum
+    //   }
+    //   return ""
+    // }
   },
   components: {
     wxParse
+  },
+  computed: {
+    window() {
+      return window
+    }
   },
   methods: {
     decrease() {
@@ -86,51 +97,54 @@ export default {
     },
     getActiveDetail() {
       let that = this;
-      return that.activeDetail = {
-        addTime: null,
-        addUserId: 1,
-        addUserName: null,
-        companyId: 37,
-        content: `<p><span style="background-color: rgb（255, 255, 255）; color: rgb（255, 0, 0）; font-weight: bold;">缴纳定金权益享受下述权益:</span></p><p>1.预存50元定金，可享受办卡首年免费；</p><p>2.获得会所赠送价值200的水吧券一张；</p><p>3.获得会所价值288元的运动背包；</p><p>4.享受会所价值788元的一对一私教二节及专业的健康状况评估；</p><p>5.享受停车2小时免费（卡有效期内来游泳健身）；</p><p>6.享受独立淋浴间（共15间）使用权，极大保护个人隐私；</p><p>7.享受儿童独立淋浴室；</p><p>8.优先获得参加会所举办的所有常规和户外活动的权益；</p><p>9.参加会所开业庆典活动和抽奖活动；</p><p>10.如不办卡，享受持定金单换取会所VIP贵宾券二张。</p><p><br></p><p>门店效果预览图（以门店实际装修为准）</p><p><img src="/images/activities/37/1.55065529299746E12.jpeg" style="width: 874px; float: none;"></p><p><img src="/images/activities/37/1.5506553509545596E12.jpeg" style="width: 1500px; float: none;"></p><p><img src="/images/activities/37/1.5506553654493972E12.jpeg" style="width: 1500px;"></p><p><img src="/images/activities/37/1.5506553892880002E12.jpeg" style="width: 1426px;"></p><p><img src="/images/activities/37/1.550655397923402E12.jpeg" style="width: 1152px;"></p><p><img src="/images/activities/37/1.550655407173489E12.jpeg" style="width: 1152px;"><br></p>`,
-        digest: "仅限前300名",
-        enterType: "1,2",
-        entryFee: 0.01,
-        entryFeeCount: null,
-        entryNum: 10,
-        isEnter: 1,
-        isEntryFee: 1,
-        isLimitNum: 1,
-        isSelfMaxLimit: 1,
-        limitNum: 300,
-        markId: 7,
-        modifyTime: null,
-        modifyUserId: 1,
-        modifyUserName: null,
-        noRegisterNum: 34,
-        registerNum: 94,
-        selfMaxLimit: 1,
-        showUrl: null,
-        state: 1,
-        stateChar: null,
-        storeId: "101",
-        storeName: "马戏城店",
-        thumbUrl: "/images/activities/37/1.5506552470484482E12.jpeg",
-        title: "前锋体育马戏城店创始会员预定活动",
-        venueId: null,
-        venueName: null,
-        viewNum: 128
-      };
+      // return that.activeDetail = {
+      //   addTime: null,
+      //   addUserId: 1,
+      //   addUserName: null,
+      //   companyId: 37,
+      //   content: `<p><span style="background-color: rgb（255, 255, 255）; color: rgb（255, 0, 0）; font-weight: bold;">缴纳定金权益享受下述权益:</span></p><p>1.预存50元定金，可享受办卡首年免费；</p><p>2.获得会所赠送价值200的水吧券一张；</p><p>3.获得会所价值288元的运动背包；</p><p>4.享受会所价值788元的一对一私教二节及专业的健康状况评估；</p><p>5.享受停车2小时免费（卡有效期内来游泳健身）；</p><p>6.享受独立淋浴间（共15间）使用权，极大保护个人隐私；</p><p>7.享受儿童独立淋浴室；</p><p>8.优先获得参加会所举办的所有常规和户外活动的权益；</p><p>9.参加会所开业庆典活动和抽奖活动；</p><p>10.如不办卡，享受持定金单换取会所VIP贵宾券二张。</p><p><br></p><p>门店效果预览图（以门店实际装修为准）</p><p><img src="/images/activities/37/1.55065529299746E12.jpeg" style="width: 874px; float: none;"></p><p><img src="/images/activities/37/1.5506553509545596E12.jpeg" style="width: 1500px; float: none;"></p><p><img src="/images/activities/37/1.5506553654493972E12.jpeg" style="width: 1500px;"></p><p><img src="/images/activities/37/1.5506553892880002E12.jpeg" style="width: 1426px;"></p><p><img src="/images/activities/37/1.550655397923402E12.jpeg" style="width: 1152px;"></p><p><img src="/images/activities/37/1.550655407173489E12.jpeg" style="width: 1152px;"><br></p>`,
+      //   digest: "仅限前300名",
+      //   enterType: "1,2",
+      //   entryFee: 0.01,
+      //   entryFeeCount: null,
+      //   entryNum: 10,
+      //   isEnter: 1,
+      //   isEntryFee: 1,
+      //   isLimitNum: 1,
+      //   isSelfMaxLimit: 1,
+      //   limitNum: 300,
+      //   markId: 7,
+      //   modifyTime: null,
+      //   modifyUserId: 1,
+      //   modifyUserName: null,
+      //   noRegisterNum: 34,
+      //   registerNum: 94,
+      //   selfMaxLimit: 1,
+      //   showUrl: null,
+      //   state: 1,
+      //   stateChar: null,
+      //   storeId: "101",
+      //   storeName: "马戏城店",
+      //   thumbUrl: "/images/activities/37/1.5506552470484482E12.jpeg",
+      //   title: "前锋体育马戏城店创始会员预定活动",
+      //   venueId: null,
+      //   venueName: null,
+      //   viewNum: 128
+      // };
       HttpRequest({
         url: window.api + "/wxmarketing/detail",
         data: {
-          markId: 7
+          companyId: that.companyId,
+          markId: that.markId
         },
         success(res) {
           that.activeDetail = res.data.data;
         }
       });
     },
+    // 报名
     sign() {
+      // TODO: 跳转h5的活动页面去支付
       this.showEntryBox = true
     }
   }

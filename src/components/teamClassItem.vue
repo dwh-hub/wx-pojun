@@ -1,7 +1,8 @@
 <template>
   <div class="team-class-item" @click="toDetail">
     <div class="cover">
-      <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg">
+      <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
+      <img :src="window.api + info.masterImg">
     </div>
     <div class="team-class-info">
       <div class="team-class-name">{{info.anotherName || info.projectName || '团课名称'}}</div>
@@ -19,7 +20,7 @@
 </template>
 
 <script>
-import { formatDate } from "COMMON/js/common.js";
+import { formatDate, window } from "COMMON/js/common.js";
 export default {
   name: "team-class-item",
   props: {
@@ -41,7 +42,7 @@ export default {
           url: "../teamClassDetail/main?classId=" + this.info.teamScheduleId
         });
       }
-      this.$emit('clickClass')
+      this.$emit("clickClass");
     }
   },
   computed: {
@@ -68,6 +69,9 @@ export default {
         return this.info.coachNameArrayStr;
       }
       return this.info.coachNameArray.toString(" ");
+    },
+    window() {
+      return window;
     }
   }
 };

@@ -1,7 +1,7 @@
 <template>
   <div class="coach-item" @click="toDetail">
     <div class="cover">
-      <img src="http://pojun-tech.cn/assets/img/morenm.png">
+      <img :src="imgUrl">
     </div>
     <div class="coach-info">
       <div class="coach-name">{{info.userName || '教练名字'}}</div>
@@ -18,6 +18,7 @@
 
 <script>
 import store from "../utils/store";
+import {window} from "COMMON/js/common"
 export default {
   name: "coach-item",
   props: {
@@ -38,6 +39,14 @@ export default {
     isToDetail: {
       type: Boolean,
       default: true
+    }
+  },
+  computed: {
+    imgUrl() {
+      if(this.info.headImgPath) {
+        return window.api + this.info.headImgPath
+      }
+      return "http://pojun-tech.cn/assets/img/morenm.png"
     }
   },
   methods: {

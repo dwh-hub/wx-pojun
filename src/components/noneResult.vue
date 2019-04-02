@@ -1,6 +1,7 @@
 <template>
   <div class="none-result">
-    <img src="" alt="">
+    <!-- <img src="/static/images/none-result.png" alt=""> -->
+    <image src="/static/images/none-result.png" mode="aspectFit"></image>
     <p>{{text}}</p>
     <div class="result-btn" v-if="buttonText" @click="tapBtn">{{buttonText}}</div>
   </div>
@@ -35,10 +36,10 @@ export default {
   .none-result {
     text-align: center;
     padding: 30px 0;
-    >img {
-      width: 120px;
-      height: 120px;
-      background-color: #eee;
+    >image {
+      width: 100px;
+      height: 100px;
+      // background-color: #eee;
     }
     >p {
       margin-top: 10px;

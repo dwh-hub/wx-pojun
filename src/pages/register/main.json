@@ -4,6 +4,8 @@
       "van-field": "../../../static/vant/field/index",
       "van-button": "../../../static/vant/button/index",
       "van-picker": "../../../static/vant/picker/index",
-      "van-action-sheet": "../../../static/vant/action-sheet/index"
+      "van-action-sheet": "../../../static/vant/action-sheet/index",
+      "van-radio": "../../../static/vant/radio/index",
+      "van-radio-group": "../../../static/vant/radio-group/index"
     }
   }

@@ -42,14 +42,14 @@
       <coach-item :info="item" v-for="(item, index) in curCoachList" :key="index"></coach-item>
     </div>
     <div class="mask" v-show="maskShow" @click="clickMask"></div>
-    <none-result v-if="!curCoachList.length"></none-result>
+    <none-result v-if="isNoneResult"></none-result>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest, debounce } from "COMMON/js/common.js";
 import coachItem from "COMPS/coachItem.vue";
-import noneResult from "COMPS/noneResult"
+import noneResult from "COMPS/noneResult";
 export default {
   data() {
     return {
@@ -77,7 +77,8 @@ export default {
       // 当前显示的教练列表
       curCoachList: [],
       // 是否签约 false 全部 true 已签约
-      isSingin: false
+      isSingin: false,
+      isNoneResult: false
     };
   },
   components: {
@@ -207,6 +208,10 @@ export default {
             wx.hideLoading();
             if (res.data.code === 200) {
               that.allCoachList = res.data.data;
+              if (!res.data.data.length) {
+                return (that.isNoneResult = true);
+              }
+              that.isNoneResult = false;
               if (res.data.data.length > 20) {
                 that.coachList = res.data.data.slice(0, 20);
               } else {
@@ -231,6 +236,11 @@ export default {
           success(res) {
             // console.log(res.data.data);
             that.signOnCoachList = res.data.data;
+            if (that.signOnCoachList.length) {
+              that.isNoneResult = false;
+            } else {
+              that.isNoneResult = true;
+            }
             resolve();
           }
         });
@@ -250,6 +260,11 @@ export default {
         success(res) {
           console.log();
           that.curCoachList = res.data.data;
+          if (that.curCoachList.length) {
+            that.isNoneResult = false;
+          } else {
+            that.isNoneResult = true;
+          }
         }
       });
     }, 200),

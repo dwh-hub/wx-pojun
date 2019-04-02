@@ -21,10 +21,10 @@ export default {
       type: Object,
       default: function() {
         return {
-          storeId: 94,
-          storeName: '门店名称',
-          range: '1.2km',
-          address: '思明区群鸿商业城28号58号楼'
+          storeId: "",
+          storeName: '',
+          range: '',
+          address: ''
         }
       }
     }

@@ -2,7 +2,7 @@
   <div class="check-in-record">
     <div class="flex-wrapper" v-for="(item, index) in list" :key="index">
       <div class="cover flex-left">
-        <img>
+        <img src="http://pojun-tech.cn/assets/img/morenTo.png">
       </div>
       <div class="flex-middle">
         <div class="flex-middle-item">{{item.secondCardClassName}}</div>
@@ -35,6 +35,11 @@ export default {
   onReachBottom() {
     this.isLoading = false
     this.getConsumption();
+  },
+  computed: {
+    window() {
+      return window
+    }
   },
   methods: {
     getConsumption() {

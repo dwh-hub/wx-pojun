@@ -160,7 +160,7 @@ export default {
               phone: _data.phone,
               range: _range,
               storeId: that.detail.storeId,
-              bannerList: _data.images.split(",")
+              cover: window.api + _data.images.split(",")[0]
             };
             that.storeInfo = _obj;
           }

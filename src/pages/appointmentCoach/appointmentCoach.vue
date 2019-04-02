@@ -11,8 +11,8 @@
         >共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
       </div>
       <div class="tiems">
-        <div class="num">$1次$</div>
-        <div class="text">本次扣费</div>
+        <!-- <div class="num">$1次$</div> -->
+        <!-- <div class="text">本次扣费</div> -->
       </div>
     </div>
     <div class="cell-list-sm">
@@ -68,7 +68,7 @@
       @close="isVenuePopup = false"
     >
       <div class="pop-title">
-        <span>请选择场馆</span>
+        <span>请选择本次消费的场馆</span>
         <img src="/static/images/icon-close.png" @click="isVenuePopup = false">
       </div>
       <div class="venue-list">
@@ -89,7 +89,7 @@
       @close="isProjectPopup = false"
     >
       <div class="pop-title">
-        <span>请选择项目</span>
+        <span>请选择本次消费的项目</span>
         <img src="/static/images/icon-close.png" @click="isProjectPopup = false">
       </div>
       <div class="project-list">
@@ -137,126 +137,132 @@
     <!-- 选择时间弹出框 -->
     <van-popup
       class="time-pop"
-      custom-style="width: 100%;"
+      custom-style="width: 100%;height: 100vh;"
       :show="isTimePopup"
       position="bottom"
       @close="isTimePopup = false"
     >
-      <div class="pop-title">
-        <span>选择开始时间</span>
-        <img src="/static/images/icon-close.png" @click="isTimePopup = false">
+      <div class="date-group">
+        <div class="date-group-header">
+          <div class="pop-title">
+            <span>选择开始时间</span>
+            <img src="/static/images/icon-close.png" @click="isTimePopup = false">
+          </div>
+          <select-date @selectWeek="onDate"></select-date>
+        </div>
+        <div class="specific-date">
+          <div class="morning">
+            <div class="date-header">
+              <h5>上午</h5>
+              <div class="mini-data" v-show="showMiniIndex == 1">
+                <div
+                  class="mini"
+                  v-for="(item,index) in miniDate"
+                  :key="index"
+                  @click="selectHour(item)"
+                  :class="{active: item == curTime}"
+                >{{item}}</div>
+              </div>
+            </div>
+            <div class="hours">
+              <div
+                class="hour"
+                v-for="(item, index) in morningTimes"
+                :class="{active: (item == curTime || item == curEndTime)}"
+                :key="index"
+                @click="selectHour(item,1)"
+              >{{item}}</div>
+            </div>
+          </div>
+          <div class="noon">
+            <div class="date-header">
+              <h5>中午</h5>
+              <div class="mini-data" v-show="showMiniIndex == 2">
+                <div
+                  class="mini"
+                  v-for="(item,index) in miniDate"
+                  :key="index"
+                  @click="selectHour(item)"
+                  :class="{active: item == curTime}"
+                >{{item}}</div>
+              </div>
+            </div>
+            <div class="hours">
+              <div
+                class="hour"
+                v-for="(item, index) in noonTimes"
+                :class="{active: (item == curTime || item == curEndTime)}"
+                @click="selectHour(item,2)"
+                :key="index"
+              >{{item}}</div>
+            </div>
+          </div>
+          <div class="afternoon">
+            <div class="date-header">
+              <h5>下午</h5>
+              <div class="mini-data" v-show="showMiniIndex == 3">
+                <div
+                  class="mini"
+                  v-for="(item,index) in miniDate"
+                  :key="index"
+                  @click="selectHour(item)"
+                  :class="{active: item == curTime}"
+                >{{item}}</div>
+              </div>
+            </div>
+            <div class="hours">
+              <div
+                class="hour"
+                v-for="(item, index) in afternoonTimes"
+                :class="{active: (item == curTime || item == curEndTime)}"
+                @click="selectHour(item,3)"
+                :key="index"
+              >{{item}}</div>
+            </div>
+          </div>
+          <div class="afternoon">
+            .
+            <div class="date-header">
+              <h5>晚上</h5>
+              <div class="mini-data" v-show="showMiniIndex == 4">
+                <div
+                  class="mini"
+                  v-for="(item,index) in miniDate"
+                  :key="index"
+                  @click="selectHour(item)"
+                  :class="{active: item == curTime}"
+                >{{item}}</div>
+              </div>
+            </div>
+            <div class="hours">
+              <div
+                class="hour"
+                v-for="(item, index) in nightTime"
+                :class="{active: (item == curTime || item == curEndTime)}"
+                @click="selectHour(item,4)"
+                :key="index"
+              >{{item}}</div>
+            </div>
+          </div>
+        </div>
+        <div class="date-group-footer">
+          <div class="tips">
+            <div class="already">
+              <span class="already-block"></span>
+              <span>已选择</span>
+            </div>
+            <div class="can">
+              <span class="can-block"></span>
+              <span>可预约</span>
+            </div>
+            <div class="none">
+              <span class="none-block"></span>
+              <span>不可预约</span>
+            </div>
+          </div>
+          <div class="confirm-date" @click="selectDate">确定（{{confirmDate}}）</div>
+        </div>
       </div>
-      <select-date @selectWeek="onDate"></select-date>
-      <div class="specific-date">
-        <div class="morning">
-          <div class="date-header">
-            <h5>上午</h5>
-            <div class="mini-data" v-show="showMiniIndex == 1">
-              <div
-                class="mini"
-                v-for="(item,index) in miniDate"
-                :key="index"
-                @click="selectHour(item)"
-                :class="{active: item == curTime}"
-              >{{item}}</div>
-            </div>
-          </div>
-          <div class="hours">
-            <div
-              class="hour"
-              v-for="(item, index) in morningTimes"
-              :class="{active: (item == curTime || item == curEndTime)}"
-              :key="index"
-              @click="selectHour(item,1)"
-            >{{item}}</div>
-          </div>
-        </div>
-        <div class="noon">
-          <div class="date-header">
-            <h5>中午</h5>
-            <div class="mini-data" v-show="showMiniIndex == 2">
-              <div
-                class="mini"
-                v-for="(item,index) in miniDate"
-                :key="index"
-                @click="selectHour(item)"
-                :class="{active: item == curTime}"
-              >{{item}}</div>
-            </div>
-          </div>
-          <div class="hours">
-            <div
-              class="hour"
-              v-for="(item, index) in noonTimes"
-              :class="{active: (item == curTime || item == curEndTime)}"
-              @click="selectHour(item,2)"
-              :key="index"
-            >{{item}}</div>
-          </div>
-        </div>
-        <div class="afternoon">
-          <div class="date-header">
-            <h5>下午</h5>
-            <div class="mini-data" v-show="showMiniIndex == 3">
-              <div
-                class="mini"
-                v-for="(item,index) in miniDate"
-                :key="index"
-                @click="selectHour(item)"
-                :class="{active: item == curTime}"
-              >{{item}}</div>
-            </div>
-          </div>
-          <div class="hours">
-            <div
-              class="hour"
-              v-for="(item, index) in afternoonTimes"
-              :class="{active: (item == curTime || item == curEndTime)}"
-              @click="selectHour(item,3)"
-              :key="index"
-            >{{item}}</div>
-          </div>
-        </div>
-        <div class="afternoon">
-          .
-          <div class="date-header">
-            <h5>晚上</h5>
-            <div class="mini-data" v-show="showMiniIndex == 4">
-              <div
-                class="mini"
-                v-for="(item,index) in miniDate"
-                :key="index"
-                @click="selectHour(item)"
-                :class="{active: item == curTime}"
-              >{{item}}</div>
-            </div>
-          </div>
-          <div class="hours">
-            <div
-              class="hour"
-              v-for="(item, index) in nightTime"
-              :class="{active: (item == curTime || item == curEndTime)}"
-              @click="selectHour(item,4)"
-              :key="index"
-            >{{item}}</div>
-          </div>
-        </div>
-      </div>
-      <div class="tips">
-        <div class="already">
-          <span class="already-block"></span>
-          <span>已选择</span>
-        </div>
-        <div class="can">
-          <span class="can-block"></span>
-          <span>可预约</span>
-        </div>
-        <div class="none">
-          <span class="none-block"></span>
-          <span>不可预约</span>
-        </div>
-      </div>
-      <div class="confirm-date" @click="selectDate">确定（{{confirmDate}}）</div>
     </van-popup>
 
     <!-- 选择消费合同 -->
@@ -287,11 +293,10 @@
       </div>
     </van-popup>
 
-    <div
-      class="bottom-btn appoint-coach"
-      @click="appointCoach"
-      :class="{'isPhoneX-bottom':isPhoneX}"
-    >发起预约</div>
+    <div class="bottom-btn appoint-coach" @click="appointCoach">
+      发起预约
+      <div class="block" v-if="isPhoneX"></div>
+    </div>
   </div>
 </template>
 
@@ -331,9 +336,9 @@ export default {
       // 项目弹窗
       isProjectPopup: false,
       // 开店时间
-      startTime: "09:40:20",
+      openTimeStart: "09:40:20",
       // 关店时间
-      endTime: "22:00:00",
+      openTimeEnd: "22:00:00",
       morningTimes: [],
       noonTimes: [],
       afternoonTimes: [],
@@ -371,7 +376,9 @@ export default {
       // 小时间段
       miniDate: [],
       // 小时间段显示位置 1 上午 2 中午 3 下午 4 晚上
-      showMiniIndex: 0
+      showMiniIndex: 0,
+      // 不能预约的时间
+      todayPeriodTime: []
     };
   },
   components: {
@@ -385,7 +392,7 @@ export default {
   },
   mounted() {
     this.getCoachDetail();
-    this.computedTime();
+    // this.computedTime();
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.getCardList();
     this.getStoreList();
@@ -450,15 +457,23 @@ export default {
       this.showMiniIndex = index;
       let hour = item.slice(0, 2);
       this.miniDate = [hour + ":15", hour + ":30", hour + ":45"];
-      this.curEndTime =
+      // this.curEndTime =
+      let _curEndtime =
         Number(item.split(":")[0]) + 1 + ":" + item.split(":")[1];
-      console.log(this.miniDate);
+      if (Number(_curEndtime.split(":")[0]) < 10) {
+        this.curEndTime = "0" + String(_curEndtime);
+      } else {
+        this.curEndTime = _curEndtime;
+      }
     },
     // 计算可选择预约时间
     computedTime() {
-      let _satarTime = this.startTime.split(":")[0];
-      let _endTime = this.endTime.split(":")[0];
-
+      let _satarTime = this.openTimeStart.split(":")[0] || "09";
+      let _endTime = this.openTimeEnd.split(":")[0] || "22";
+      console.log(this.openTimeStart);
+      console.log(this.openTimeEnd);
+      console.log(_satarTime);
+      console.log(_endTime);
       let _morningTimes = [];
       let _nightTime = [];
       // 上午时间段
@@ -492,6 +507,10 @@ export default {
       if (this.selectStoreId && this.selectCardId) {
         this.getVenueList();
       }
+      this.getStoreQuery().then(() => {
+        console.log("getStoreQuery");
+        this.isTimePopup = true;
+      });
     },
     // 选择合同
     selectCard(item) {
@@ -508,11 +527,17 @@ export default {
       if (this.selectStoreId && this.selectCardId) {
         this.getVenueList();
       }
+      if (!this.venueId) {
+        this.isVenuePopup = true;
+      }
     },
     // 确认选择时间
     selectDate() {
       this.isTimePopup = false;
       this.timeCellText = this.confirmDate;
+      if (!this.cardClassId) {
+        this.isCardPopup = true;
+      }
     },
     // 选择场馆
     selectVenue(item) {
@@ -520,6 +545,9 @@ export default {
       this.venueId = item.venueId;
       this.venueCellText = item.venueName;
       this.getProList();
+      if (!this.projectId) {
+        this.isProjectPopup = true;
+      }
     },
     // 选择项目
     selectProject(item) {
@@ -592,7 +620,7 @@ export default {
           calendar: that.curDate + " " + "00:00:00",
           timeStart: that.curDate + " " + that.curTime + ":00",
           timeEnd: that.curDate + " " + that.curEndTime + ":00",
-          cardId: that.cardClassId,
+          cardId: that.selectCardId,
           name: that.userInfo.name,
           customerId: that.userInfo.id,
           phone: that.userInfo.phone,
@@ -603,14 +631,14 @@ export default {
           wx.hideLoading();
           if (res.data.code === 200) {
             wx.showToast({
-              title: "私教预约成功",
+              title: res.data.message,
               icon: "success",
               duration: 1000
             });
             wx.redirectTo({
               url:
                 "../appointmentResult/main?coachAppointId=" +
-                data.data.data.coachAppointId
+                res.data.data.coachAppointId
             });
           } else {
             wx.showModal({
@@ -627,6 +655,7 @@ export default {
     },
     // 组件select-date返回的日期
     onDate(date) {
+      getPeriodTime(date)
       this.curDate = date;
     },
     // 获取教练信息
@@ -654,6 +683,8 @@ export default {
             that.storeList = res.data.data;
             if (that.storeList.length == 1) {
               that.selectStore(that.storeList[0]);
+            } else {
+              that.isStorePopup = true;
             }
           }
         }
@@ -738,10 +769,64 @@ export default {
           calendar: date || formatDate(new Date(), "yyyy-MM-dd")
         },
         success(res) {
-          // timeStart:1553850000000
-          // timeEnd:1553853599000
-          console.log(res.data.data);
+          let _todayPeriodTime = [];
+          res.data.data.forEach(e => {
+            console.log(e)
+            let _timeStart = formatDate(new Date(e.timeStart), "hh:mm");
+            let _endTime = formatDate(new Date(e.timeEnd), "hh:mm");
+            let _timeStartH = _timeStart.split(":")[0];
+            let _timeStartS = _timeStart.split(":")[1];
+            let _endTimeH = _endTime.split(":")[0];
+            let _endTimeS = _endTime.split(":")[1];
+            let second
+            if(_endTimeS-_timeStartS < 16 && _endTimeS-_timeStartS > 0){
+              second = "15"
+            } else if (_endTimeS-_timeStartS < 31 && _endTimeS-_timeStartS >15) {
+              second = "30"
+            } else if (_endTimeS-_timeStartS < 46 && _endTimeS-_timeStartS >30) {
+              second = "45"
+            } else {
+              second = "00"
+            }
+            _todayPeriodTime.push(`${_timeStartH}:${second}`)
+            _todayPeriodTime.push(`${Number(_timeStartH)+1}:${second}`)
+            // console.log(formatDate(new Date(e.timeStart), "hh:mm"))
+            // console.log(formatDate(new Date(e.timeEnd), "hh:mm"))
+            // for(let i=0;i<(_endTimeH - _timeStartH);i++) {
+            //   console.log(i)
+            // }
+          });
+          console.log(_todayPeriodTime)
+          that.todayPeriodTime = _todayPeriodTime
+          // console.log(formatDate(new Date(1553850000000), 'yyyy-MM-dd hh:mm'))
+          // console.log(formatDate(new Date(1553853599000), 'yyyy-MM-dd hh:mm'))
+          // [{
+          //   timeStart: 1553850000000,
+          //   timeEnd:1553853599000
+          // }]
         }
+      });
+    },
+    // 门店系统设置，获取营业时间
+    getStoreQuery() {
+      let that = this;
+      return new Promise(function(resolve) {
+        HttpRequest({
+          url: window.api + "/system/setup/store/query",
+          data: {
+            storeId: that.selectStoreId
+          },
+          success(res) {
+            if (res.data.data.openingHoursStart) {
+              that.openTimeStart = res.data.data.openingHoursStart;
+              that.openTimeEnd = res.data.data.openingHoursEnd;
+              that.computedTime();
+              resolve();
+              // that.businessTime =
+              //   res.data.data.openTimeStart + "~" + res.data.data.openTimeEnd;
+            }
+          }
+        });
       });
     }
   }
@@ -882,22 +967,57 @@ page {
     }
   }
   .time-pop {
+    .date-group {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: #fff;
+      z-index: 9999;
+      .date-group-header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 140px;
+      }
+      .specific-date {
+        position: absolute;
+        top: 140px;
+        bottom: 130px;
+        width: 100%;
+        overflow: auto;
+      }
+      .date-group-footer {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 120px;
+      }
+    }
     .select-date {
       border-bottom: 1rpx solid #eee;
+      border-top: 1rpx solid #eee;
+      margin-bottom: 10px;
     }
     .specific-date {
       padding: 0 15px;
+      box-sizing: border-box;
       .morning,
       .noon,
       .afternoon {
         .date-header {
           display: flex;
+          margin-bottom: 15px;
+          align-items: center;
           > h5 {
             flex: 0 0 50px;
             text-align: center;
             line-height: 20px;
             font-size: 15px;
-            margin: 15px 0;
+            // margin-bottom: 15px;
           }
           .mini-data {
             flex: 1;
@@ -929,6 +1049,7 @@ page {
             box-sizing: border-box;
             text-align: center;
             margin-right: 1%;
+            margin-bottom: 10px;
             line-height: 45px;
             font-size: 16px;
             border: 1rpx solid #eee;

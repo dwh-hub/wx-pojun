@@ -48,6 +48,9 @@ export default {
     console.log(options);
     // type 1 团课 2 私教课
     this.options = options;
+    wx.showLoading({
+      title: '加载中...'
+    })
     // if (options.type == 1) {
     //   this.getOwnTeamClassList(options.status, options.waitEvaluate);
     // } else if (options.type == 2) {
@@ -127,6 +130,7 @@ export default {
             that.list = that.list.concat(res.data.data.result);
             that.page++;
           }
+          wx.hideLoading()
         }
       });
     },
@@ -177,6 +181,7 @@ export default {
             that.page++;
             that.list = that.list.concat(_data);
           }
+          wx.hideLoading()
         }
       });
     },
@@ -196,6 +201,7 @@ export default {
               that.list = res.data.data.result;
               resolve();
             }
+            wx.hideLoading()
           }
         });
       });
@@ -216,6 +222,7 @@ export default {
               that.list = res.data.data.result;
               resolve();
             }
+            wx.hideLoading()
           }
         });
       });

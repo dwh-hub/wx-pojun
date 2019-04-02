@@ -11,14 +11,17 @@
         <wxParse :content="activeDetail.content" :imageProp="{domain: 'www.pojun-tech.cn', mode: 'widthFix'}"/>
       </div>
     </div>
-    <div class="activeBottom" :class="{'isPhoneX-bottom':isPhoneX}">
-      <span class="activeBottomTitle">人数：</span>
-      <div class="count-wrapper">
-        <span class="decrease" @click="decrease">-</span>
-        <span class="numbers">{{signNum}}</span>
-        <span class="increase" @click="signNum++">+</span>
+    <div class="activeBottom">
+      <div>
+        <span class="activeBottomTitle">人数：</span>
+        <div class="count-wrapper">
+          <span class="decrease" @click="decrease">-</span>
+          <span class="numbers">{{signNum}}</span>
+          <span class="increase" @click="signNum++">+</span>
+        </div>
+        <span class="sign" @click="sign">报名</span>
       </div>
-      <span class="sign" @click="sign">报名</span>
+      <div class="block" v-if="isPhoneX"></div>
     </div>
     <van-popup
       :show="showEntryBox"
@@ -64,7 +67,6 @@ export default {
       this.companyId = wx.getStorageSync("companyId");
     }
     this.getActiveDetail();
-    console.log(this.isPhoneX)
   },
   computed: {
     isPhoneX() {

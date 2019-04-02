@@ -6,7 +6,9 @@
       </div>
       <div class="coach-info">
         <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
-        <div class="coach-times">共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
+        <div
+          class="coach-times"
+        >共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
       </div>
     </div>
     <div class="coach-desc">
@@ -25,7 +27,13 @@
       <div class="title">成长历程</div>
       <div class="course-content"></div>
     </div>
-    <div class="bottom-btn appointment-btn" :class="{'isPhoneX-bottom':isPhoneX}" @click="toAppoint">马上预约</div>
+    <div
+      class="bottom-btn appointment-btn"
+      @click="toAppoint"
+    >
+      马上预约
+      <div class="block" v-if="isPhoneX"></div>
+    </div>
   </div>
 </template>
 
@@ -48,7 +56,7 @@ export default {
   },
   computed: {
     isPhoneX() {
-      return store.state.isIphoneX
+      return store.state.isIphoneX;
     }
   },
   methods: {

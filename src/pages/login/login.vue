@@ -37,7 +37,7 @@
             @click="selectCompany(item)"
           >{{item.companyName}}</span>
         </div>
-        <span class="showTooltips" @click="bind">绑定</span>
+        <span class="showTooltips" @click="bind(index)">绑定</span>
       </div>
     </van-popup>
   </div>
@@ -122,6 +122,10 @@ export default {
       wx.setStorage({
         key: "userInfo",
         data: this.curCompany
+      });
+      wx.setStorage({
+        key: "companyId",
+        data: this.curCompany.companyId
       });
       this.bindMethod();
     },
@@ -231,6 +235,10 @@ export default {
                 wx.setStorage({
                   key: "userInfo",
                   data: res.data.data[0]
+                });
+                wx.setStorage({
+                  key: "companyId",
+                  data: res.data.data[0].companyId
                 });
                 return resolve();
               }

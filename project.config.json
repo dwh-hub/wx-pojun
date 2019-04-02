@@ -30,7 +30,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 1,
+			"current": 3,
 			"list": [
 				{
 					"id": -1,
@@ -43,6 +43,21 @@
 					"id": -1,
 					"name": "登录",
 					"pathName": "pages/login/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 2,
+					"name": "注册",
+					"pathName": "pages/register/main",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": 3,
+					"name": "教练列表",
+					"pathName": "pages/coachList/main",
+					"query": "",
 					"scene": null
 				}
 			]

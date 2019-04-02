@@ -83,7 +83,7 @@ export default {
 .team-class-item {
   display: flex;
   padding-right: 10px;
-  box-shadow: 0px 0px 5px #ccc;
+  box-shadow: 0px 0px 10px #eee;
   border-radius: 2px;
   background-color: #fff;
   .cover {

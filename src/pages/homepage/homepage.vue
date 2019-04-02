@@ -75,8 +75,8 @@
     </div>
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
-      <team-class-item :info="recommendClass" v-if="recommendClass.length > 1"></team-class-item>
-      <coach-item :info="recommendCoach" v-if="recommendCoach.length > 1"></coach-item>
+      <team-class-item :info="recommendClass" v-if="recommendClass.anotherName"></team-class-item>
+      <coach-item :info="recommendCoach" v-if="recommendCoach.userName"></coach-item>
     </div>
   </div>
 </template>
@@ -149,7 +149,7 @@ export default {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }
     this.companyId = wx.getStorageSync("companyId");
-    this.getWxoauth();
+    // this.getWxoauth();
   },
   computed: {
     themeColor() {
@@ -225,12 +225,16 @@ export default {
       HttpRequest({
         url: window.api + "/coach/private/appoint/recommend",
         success(res) {
-          if (res.data.code == 200) {
+          if (res.data.code == 200 && res.data.data) {
             let _data = res.data.data;
             that.recommendCoach = {
               userName: _data.coachName,
-              userId: _data.coachId
+              userId: _data.coachId,
+              individualResume: _data.individualResume,
+              teamCountByCoach: _data.teamCountByCoach,
+              privateCountByCoach: _data.privateCountByCoach
             };
+            console.log(that.recommendCoach)
           }
         }
       });
@@ -283,7 +287,6 @@ export default {
           } else {
             that.nearbyStoreList = [];
           }
-          console.log(that.nearbyStoreList);
         }
       });
     },
@@ -311,7 +314,6 @@ export default {
               },
               success(res) {
                 console.log(res);
-                console.log(res.data.data.companyId);
                 // wx.setStorage({
                 //   key: "companyId",
                 //   data: res.data.data.companyId

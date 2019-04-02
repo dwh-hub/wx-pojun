@@ -17,7 +17,7 @@
         <div class="active-bottom">{{item.storeName || '暂无地址'}}</div>
       </div>
     </div>
-    <none-result v-if="!activeList.length" text="暂无活动"></none-result>
+    <none-result v-if="isNoneResult" text="暂无活动"></none-result>
   </div>
 </template>
 
@@ -35,7 +35,8 @@ export default {
         }
       ],
       page: 1,
-      companyId: ""
+      companyId: "",
+      isNoneResult: false
     };
   },
   mounted() {
@@ -78,7 +79,11 @@ export default {
           if (res.data.code === 200) {
             that.activeList = res.data.data.result;
           } else {
-            that.activeList = []
+            that.activeList = [];
+          }
+
+          if (!that.activeList.length) {
+            return (that.isNoneResult = true);
           }
         }
       });

@@ -9,6 +9,12 @@
         @blur="getName"
         placeholder="请输入用户名"
       />
+      <div class="sex">
+        <van-radio-group :value="sexValue" @change="getSex" custom-class="radio-group">
+          <van-radio name="1" custom-class="radio" checked-color="#07c160">男</van-radio>
+          <van-radio name="2" custom-class="radio" checked-color="#07c160">女</van-radio>
+        </van-radio-group>
+      </div>
       <van-field
         :value="store"
         icon="arrow-down"
@@ -66,6 +72,7 @@ export default {
       username: "",
       phone: "",
       sms: "",
+      sexValue: "2",
       store: "",
       storeId: "",
       storeList: [],
@@ -168,6 +175,9 @@ export default {
     getSms(event) {
       this.sms = event.mp.detail.value;
     },
+    getSex(event) {
+      this.sexValue = event.mp.detail;
+    },
     // 注册
     register() {
       let that = this;
@@ -178,7 +188,8 @@ export default {
           name: that.username,
           storeId: that.storeId,
           phone: that.phone,
-          smsSendLogId: that.smsSendLogId
+          smsSendLogId: that.smsSendLogId || 15679,
+          sex: that.sexValue
         },
         success(res) {
           if (res.data.code === 200) {
@@ -220,6 +231,18 @@ export default {
     margin-top: 15px;
     font-size: 16px;
     line-height: 36px;
+  }
+  .sex {
+    border-bottom: 1rpx solid #eee;
+    margin-left: 15px;
+    margin-right: 5px;
+  }
+  .radio-group {
+    border: 1rpx solid #eee;
+  }
+  .radio {
+    display: inline-block;
+    margin: 10px 20px 5px 10px;
   }
 }
 </style>

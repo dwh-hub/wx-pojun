@@ -1,5 +1,5 @@
 <template>
-  <div class="assess">
+  <div class="assess" :class="{'isPhoneX-wrap':isPhoneX}">
     <!-- <div class="coach">
       <div class="cover">
         <img>
@@ -33,13 +33,17 @@
       placeholder-style="color:#bababa;"
       v-model="remarks"
     />
-    <div class="assess-btn bottom-btn" @click="assess">立即评价</div>
+    <div class="assess-btn bottom-btn" @click="assess">立即评价
+      <div class="block" v-if="isPhoneX"></div>
+    </div>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem.vue";
+import store from "../../utils/store";
+
 export default {
   data() {
     return {
@@ -54,6 +58,7 @@ export default {
   },
   onLoad(options) {
     this.detail = JSON.parse(options.detail);
+    this.detail['masterImg'] = window.api + this.detail.headImgPath
     console.log(JSON.parse(options.detail));
     if (options.teamAttendId) {
       this.teamAttendId = options.teamAttendId;
@@ -67,10 +72,16 @@ export default {
   components: {
     teamClassItem
   },
+  computed: {
+    window() {
+      return window
+    },
+    isPhoneX() {
+      return store.state.isIphoneX;
+    }
+  },
   methods: {
     assess() {
-      console.log(this.coachRateVaule);
-      console.log(this.storeRateVaule);
       let url;
       let data = {};
       if (this.teamAttendId) {

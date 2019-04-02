@@ -13,11 +13,13 @@ const app = new Vue(App)
 app.$mount()
 Vue.prototype.globalData = getApp().globalData
 
-// TODO: 测试公司id
-wx.setStorage({
-  key: "companyId",
-  data: 37
-});
+// TODO: 目前沒有公司id就默认前锋
+if (!wx.getStorageSync("companyId")) {
+  wx.setStorage({
+    key: "companyId",
+    data: 37
+  });
+}
 
 if (!wx.getStorageSync("Cookie")) {
   wx.request({
@@ -42,6 +44,7 @@ function getMessage() {
       pageNo: 1
     },
     success(res) {
+      console.log(res)
       if (res.data.code == 200) {
         store.commit('changeLogin', true)
         if (res.data.data.recCount > 99) {

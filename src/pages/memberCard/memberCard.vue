@@ -74,10 +74,14 @@ export default {
     closePopup() {
       this.showPopup = false;
     },
+    // 跳转合同详情/获取消费项目
     toCardDetail(item) {
       let that = this;
       this.selectCardInfo = item;
       if (this.teamScheduleId) {
+        wx.showLoading({
+          title: "获取可消费项目..."
+        });
         HttpRequest({
           url: window.api + "/teamClass/getProject",
           data: {
@@ -87,6 +91,7 @@ export default {
             teamScheduleId: that.teamScheduleId
           },
           success(res) {
+            wx.hideLoading();
             if (res.data.code === 200) {
               that.pojectList = res.data.data;
               that.showPopup = true;
@@ -110,6 +115,9 @@ export default {
     selectPro() {
       let that = this;
       let projectId = this.pojectList[this.selectProIndex].projectId;
+      wx.showLoading({
+        title: "确认预约..."
+      });
       HttpRequest({
         url: window.api + "/teamClass/teamAppoint/add",
         data: {
@@ -121,6 +129,7 @@ export default {
           phone: that.userInfo.phone
         },
         success(data) {
+          wx.hideLoading();
           that.showPopup = false;
           if (data.data.code === 200) {
             wx.showModal({

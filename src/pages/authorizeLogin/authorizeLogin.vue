@@ -84,6 +84,10 @@ export default {
         key: "userInfo",
         data: this.curCompany
       });
+      wx.setStorage({
+        key: "companyId",
+        data: this.curCompany.companyId
+      });
       this.bindMethod();
     },
     // 绑定方法
@@ -153,7 +157,11 @@ export default {
                   key: "userInfo",
                   data: res.data.data[0]
                 });
-                return;
+                wx.setStorage({
+                  key: "companyId",
+                  data: res.data.data[0].companyId
+                });
+                return resolve();
               }
               that.showBindBox = true;
               that.companyList = res.data.data;

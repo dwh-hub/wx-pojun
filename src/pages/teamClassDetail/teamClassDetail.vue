@@ -9,13 +9,13 @@
       :circular="true"
       :loop="true"
     >
-      <div v-for="(item,index) in 3" :key="index">
+      <div v-for="(item,index) in classDetail.masterImg" :key="index">
         <swiper-item>
-          <!-- <img :src="item" class="banner"> -->
-          <img
+          <img :src="window.api + item" class="banner">
+          <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
-          >
+          > -->
         </swiper-item>
       </div>
     </swiper>
@@ -23,7 +23,7 @@
     <div class="coach-detail">
       <div class="coach-detail-item" v-for="(item, index) in coachList" :key="index">
         <div class="cover">
-          <img scr="http://pojun-tech.cn/assets/img/morenm.png">
+          <img :scr="window.api + item.coachHeadImg">
         </div>
         <div class="name">{{item.coachName}}</div>
       </div>
@@ -46,9 +46,7 @@
     <div class="class-desc">
       <div class="title">课程介绍</div>
       <div class="desc-text">
-        <p>
-          {{classDetail.description || '暂无课程介绍'}}
-        </p>
+        <p>{{classDetail.description || '暂无课程介绍'}}</p>
         <!-- <p>课程还没有填写简介</p> -->
       </div>
     </div>
@@ -71,11 +69,10 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div
-      class="bottom-btn appointment"
-      :class="{'isPhoneX-bottom':isPhoneX}"
-      @click="appointClass"
-    >马上预约</div>
+    <div class="bottom-btn appointment" @click="appointClass">
+      马上预约
+      <div class="block" v-if="isPhoneX"></div>
+    </div>
   </div>
 </template>
 
@@ -129,13 +126,19 @@ export default {
       }
     },
     classTime() {
-      let week = ["日", "一", "二", "三", "四", "五", "六"];
-      let w = "周" + week[new Date(this.classDetail.timeStart).getDay()];
-      let md = formatDate(new Date(this.classDetail.timeStart), "M月dd");
-      return md + " " + w + " " + this.statrTime + "-" + this.endTime;
+      if (this.classDetail.timeStart) {
+        let week = ["日", "一", "二", "三", "四", "五", "六"];
+        let w = "周" + week[new Date(this.classDetail.timeStart).getDay()];
+        let md = formatDate(new Date(this.classDetail.timeStart), "M月dd");
+        return md + " " + w + " " + this.statrTime + "-" + this.endTime;
+      }
+      return "";
     },
     isPhoneX() {
       return store.state.isIphoneX;
+    },
+    window() {
+      return window
     }
   },
   methods: {
@@ -196,6 +199,7 @@ export default {
         methods: "POST",
         success(res) {
           if (res.data.code === 200) {
+            res.data.data.masterImg = res.data.data.masterImg.split(",")
             that.classDetail = res.data.data;
             that.getAddress();
           }
@@ -234,7 +238,7 @@ export default {
             let _lat = _data.mapPoint.split(",")[1];
             let _lng = _data.mapPoint.split(",")[0];
             let _range = getRange(that.latitude, that.longitude, _lat, _lng);
-            that.range = _range
+            that.range = _range;
           }
         }
       });

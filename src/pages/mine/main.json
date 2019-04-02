@@ -1,6 +1,6 @@
 {
     "navigationBarTitleText": "我的",
     "usingComponents": {
-      "van-button": "../../../static/vant/button/index"
+      "van-popup": "../../../static/vant/popup/index"
     }
   }

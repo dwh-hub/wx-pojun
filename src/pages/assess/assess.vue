@@ -33,7 +33,8 @@
       placeholder-style="color:#bababa;"
       v-model="remarks"
     />
-    <div class="assess-btn bottom-btn" @click="assess">立即评价
+    <div class="assess-btn bottom-btn" :style="{'background-color': themeColor}" @click="assess">
+      立即评价
       <div class="block" v-if="isPhoneX"></div>
     </div>
   </div>
@@ -58,14 +59,14 @@ export default {
   },
   onLoad(options) {
     this.detail = JSON.parse(options.detail);
-    this.detail['masterImg'] = window.api + this.detail.headImgPath
+    this.detail["masterImg"] = window.api + this.detail.headImgPath;
     console.log(JSON.parse(options.detail));
     if (options.teamAttendId) {
       this.teamAttendId = options.teamAttendId;
     }
     if (options.coachAppointId) {
       this.coachAppointId = options.coachAppointId;
-      this.detail['anotherName'] = this.detail.projectName
+      this.detail["anotherName"] = this.detail.projectName;
     }
     setNavTab();
   },
@@ -74,10 +75,13 @@ export default {
   },
   computed: {
     window() {
-      return window
+      return window;
     },
     isPhoneX() {
       return store.state.isIphoneX;
+    },
+    themeColor() {
+      return window.color;
     }
   },
   methods: {

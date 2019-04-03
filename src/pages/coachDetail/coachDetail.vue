@@ -2,7 +2,7 @@
   <div class="coach-detail" :class="{'isPhoneX-wrap':isPhoneX}">
     <div class="coach">
       <div class="cover">
-        <img>
+        <img :src="window.api + coachInfo.headImgPath">
       </div>
       <div class="coach-info">
         <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
@@ -18,18 +18,19 @@
     <div class="coach-imgs">
       <div class="title">个人形象</div>
       <div class="img-group">
-        <img>
-        <img>
-        <img>
+        <img :src="window.api + item" v-for="(item, index) in personalImage" :key="index">
       </div>
     </div>
     <div class="course">
       <div class="title">成长历程</div>
-      <div class="course-content"></div>
+      <div class="course-content">
+        <wxParse :content="coachInfo.growthProcess || '<p>无</p>'" :imageProp="{domain: window, mode: 'widthFix'}"/>
+      </div>
     </div>
     <div
       class="bottom-btn appointment-btn"
       @click="toAppoint"
+      :style="{'background-color': window.color}"
     >
       马上预约
       <div class="block" v-if="isPhoneX"></div>
@@ -40,6 +41,8 @@
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import store from "../../utils/store";
+import wxParse from "mpvue-wxparse";
+
 export default {
   data() {
     return {
@@ -54,9 +57,15 @@ export default {
   mounted() {
     this.getCoachDetail();
   },
+  components: {
+    wxParse
+  },
   computed: {
     isPhoneX() {
       return store.state.isIphoneX;
+    },
+    window() {
+      return window
     }
   },
   methods: {
@@ -78,6 +87,7 @@ export default {
         url: window.api + "/employee/file/datailByCus/" + that.coachId,
         success(res) {
           that.coachInfo = res.data.data;
+          console.log(that.coachInfo)
         }
       });
     }
@@ -87,6 +97,7 @@ export default {
 
 <style lang="less">
 @import "~COMMON/less/common.less";
+@import url("~mpvue-wxparse/src/wxParse.css");
 
 .coach-detail {
   padding-bottom: 60px;
@@ -163,10 +174,10 @@ export default {
   }
   .course {
     .course-content {
-      width: 100%;
-      height: 270px;
-      border-radius: 15px;
-      background-color: #eee;
+      // width: 100%;
+      // height: 270px;
+      // border-radius: 15px;
+      // background-color: #eee;
     }
   }
 }

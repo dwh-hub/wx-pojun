@@ -6,19 +6,19 @@
     <div class="coach-info">
       <div class="coach-name">{{info.userName || '教练名字'}}</div>
       <div class="coach-desc">{{info.individualResume || '暂无个人简介'}}</div>
-      <div class="coach-times">已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || '0'}}节</div>
+      <div class="coach-times" :style="{'color': themeColor}">已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || '0'}}节</div>
     </div>
     <div class="tag" v-if="hasTag">
       <div class="coach-type">$瑜伽$</div>
       <div class="coach-status">$热门$</div>
     </div>
-    <div class="appoint" v-if="hasBtn" @click.stop="toAppoint">预约</div>
+    <div class="appoint" :style="{'background-color': themeColor}" v-if="hasBtn" @click.stop="toAppoint">预约</div>
   </div>
 </template>
 
 <script>
 import store from "../utils/store";
-import {window} from "COMMON/js/common"
+import { window } from "COMMON/js/common";
 export default {
   name: "coach-item",
   props: {
@@ -43,10 +43,13 @@ export default {
   },
   computed: {
     imgUrl() {
-      if(this.info.headImgPath) {
-        return window.api + this.info.headImgPath
+      if (this.info.headImgPath) {
+        return window.api + this.info.headImgPath;
       }
-      return "http://pojun-tech.cn/assets/img/morenm.png"
+      return "http://pojun-tech.cn/assets/img/morenm.png";
+    },
+    themeColor() {
+      return window.color;
     }
   },
   methods: {
@@ -117,9 +120,6 @@ export default {
     .coach-desc {
       color: #bababa;
     }
-    .coach-times {
-      color: @theme-color;
-    }
   }
   .tag {
     .coach-type {
@@ -143,7 +143,6 @@ export default {
     text-align: center;
     vertical-align: middle;
     border-radius: 2px;
-    background-color: @theme-color;
     color: #fff;
   }
 }

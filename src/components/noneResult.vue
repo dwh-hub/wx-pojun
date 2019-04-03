@@ -3,11 +3,12 @@
     <!-- <img src="/static/images/none-result.png" alt=""> -->
     <image src="/static/images/none-result.png" mode="aspectFit"></image>
     <p>{{text}}</p>
-    <div class="result-btn" v-if="buttonText" @click="tapBtn">{{buttonText}}</div>
+    <div class="result-btn" :style="{'background-color': themeColor}" v-if="buttonText" @click="tapBtn">{{buttonText}}</div>
   </div>
 </template>
 
 <script>
+import {window} from "COMMON/js/common.js";
 export default {
   name: 'none-result',
   props: {
@@ -21,6 +22,11 @@ export default {
   },
   data() {
     return {}
+  },
+  computed: {
+    themeColor() {
+      return window.color;
+    }
   },
   methods: {
     tapBtn() {
@@ -52,7 +58,6 @@ export default {
       margin-top: 15px;
       border-radius: 16px;
       color: #fff;
-      background-color: @theme-color;
       &:active {
         opacity: 0.8;
       }

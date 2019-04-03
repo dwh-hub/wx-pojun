@@ -7,15 +7,24 @@
       @click="toActiveDetail(item)"
     >
       <div class="active-cover">
-        <!-- TODO: :src="item.thumbUrl" -->
         <img :src="window.api + item.thumbUrl">
       </div>
-      <div class="active-info">
-        <div class="active-top">
-          <span class="active-name">{{item.title}}</span>
+      <div class="active-info clearfix">
+        <div class="active-detail-left">
+          <div class="active-top">
+            <span class="active-name">{{item.title}}</span>
+          </div>
+          <div class="active-bottom">{{item.storeName || '暂无地址'}}</div>
         </div>
-        <div class="active-bottom">{{item.storeName || '暂无地址'}}</div>
+        <div class="active-detail">
+          <div>报名日期：{{item.addTime}}</div>
+          <div>报名人数：{{item.entryNum}}人</div>
+          <div>总金额：{{item.totalPay || 0}}元</div>
+        </div>
       </div>
+    </div>
+    <div class="loading" v-show="isLoading">
+      <van-loading color="#999" custom-class="loading"/>
     </div>
     <none-result v-if="isNoneResult" text="暂无活动"></none-result>
   </div>
@@ -28,14 +37,15 @@ export default {
   data() {
     return {
       activeList: [
-        {
-          thumbUrl: "",
-          title: "",
-          storeName: ""
-        }
+        // {
+        //   thumbUrl: "",
+        //   title: "",
+        //   storeName: ""
+        // }
       ],
       page: 1,
       companyId: "",
+      isLoading: false,
       isNoneResult: false
     };
   },
@@ -57,6 +67,9 @@ export default {
       return window;
     }
   },
+  onReachBottom() {
+    this.getActiveList();
+  },
   methods: {
     toActiveDetail(item) {
       wx.navigateTo({
@@ -65,25 +78,31 @@ export default {
     },
     // 获取活动列表
     getActiveList() {
-      wx.showLoading({
-        title: "加载中..."
-      });
+      this.isLoading = false
       let that = this;
       HttpRequest({
         url: window.api + "/wxmarketing/pagesAndEntryInfo",
         data: {
+          page :that.page,
           companyId: that.companyId
         },
         success(res) {
-          wx.hideLoading();
+          that.isLoading = false
           if (res.data.code === 200) {
-            that.activeList = res.data.data.result;
+            let _data = res.data.data.result
+            if (!_data.length) {
+              if(that.page == 1) {
+                return that.isNoneResult = true;
+              }
+              return;
+            }
+            _data.forEach(e=>{
+              e.addTime = e.addTime.substr(0,13) + '点';
+            })
+            that.activeList = that.activeList.concat(_data);
+            that.page++
           } else {
-            that.activeList = [];
-          }
-
-          if (!that.activeList.length) {
-            return (that.isNoneResult = true);
+            that.isNoneResult = true;
           }
         }
       });
@@ -94,6 +113,7 @@ export default {
 
 <style lang="less">
 @import "~COMMON/less/reset.less";
+@import "~COMMON/less/common.less";
 
 // .active {
 //   box-sizing: border-box;
@@ -152,18 +172,33 @@ export default {
       }
     }
     .active-info {
-      padding: 10px 10px 10px 10px;
-      .active-top {
-        margin-bottom: 8px;
-        .active-name {
-          font-size: 16px;
-          color: #333;
-          font-weight: bold;
+      padding: 10px;
+      padding-right: 0px;
+      display: flex;
+      .active-detail-left {
+        flex: 1;
+        overflow: hidden;
+        word-break: break-all;
+        // flex-basis: auto;
+        .active-top {
+          margin-bottom: 8px;
+          .active-name {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+          }
+        }
+        .active-bottom {
+          font-size: 14px;
+          color: #bababa;
         }
       }
-      .active-bottom {
-        font-size: 14px;
-        color: #bababa;
+      .active-detail {
+        flex: 0 0 160px;
+        // flex-basis: auto;
+        > div {
+          font-size: 12px;
+        }
       }
     }
   }

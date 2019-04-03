@@ -40,6 +40,11 @@ export default {
   mounted() {
     this.getDateArray();
   },
+  // computed: {
+  //   activeThemeColor() {
+
+  //   }
+  // },
   methods: {
     getDateArray() {
       let date = new Date();

@@ -62,6 +62,7 @@
     ></none-result>
     <div
       class="bottom-btn"
+      :style="{'background-color': themeColor}"
       v-if="teamClassList.length || coachList.length"
       @click="toggleSelect"
     >继续预约</div>
@@ -132,6 +133,9 @@ export default {
         return "试试预约";
       }
       return "";
+    },
+    themeColor() {
+      return window.color;
     }
   },
   methods: {

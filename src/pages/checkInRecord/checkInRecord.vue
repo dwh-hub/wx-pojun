@@ -13,18 +13,21 @@
     <div class="loading" v-show="isLoading">
       <van-loading color="#999" custom-class="loading"/>
     </div>
+    <none-result v-if="isNoneResult" text="暂无记录"></none-result>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
     return {
       customerId: "",
       page: 1,
       list: [],
-      isLoading: false
+      isLoading: false,
+      isNoneResult: false
     };
   },
   onLoad() {
@@ -33,8 +36,10 @@ export default {
     this.getConsumption();
   },
   onReachBottom() {
-    this.isLoading = false
     this.getConsumption();
+  },  
+  components: {
+    noneResult
   },
   computed: {
     window() {
@@ -43,6 +48,7 @@ export default {
   },
   methods: {
     getConsumption() {
+      this.isLoading = false
       let that = this;
       HttpRequest({
         url: window.api + "/consumption/log/pages/customer",
@@ -54,9 +60,15 @@ export default {
           that.isLoading = false
           if (res.data.code === 200) {
             if (!res.data.data.result.length) {
+              if(that.page == 1) {
+                return that.isNoneResult = true;
+              }
               return;
             }
+            that.page++
             that.list = that.list.concat(res.data.data.result);
+          } else {
+            that.isNoneResult = true;
           }
         }
       });

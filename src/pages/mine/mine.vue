@@ -1,13 +1,13 @@
 <template>
-  <div id="memberMineTab" class="clickTab">
-    <div class="mine_top">
-      <div class="mineImgDiv pl">
+  <div class="memberMineTab">
+    <div class="mine_top" :style="{'background-color': themeColor}">
+      <div class="mineImgDiv">
         <img
           class="mineImg"
           :src="userInfo.headImgPath || 'https://pojun-tech.cn/assets/img/morenTo.png'"
         >
       </div>
-      <div class="pl mineDetail" @click="singIn" v-if="!isLogin">
+      <div class="mineDetail" @click="singIn" v-if="!isLogin">
         <button
           class="authorize"
           type="default"
@@ -15,24 +15,42 @@
           @getphonenumber="getPhoneNumber"
         >点击登录</button>
       </div>
-      <div class="pl mineDetail" v-else>
-        <p id="mineName">{{userInfo.name || '昵称'}}</p>
-        <p id="minePhone">{{userInfo.phone || '手机号'}}</p>
+      <div class="mineDetail" v-else>
+        <p class="mineName">{{userInfo.name || '昵称'}}</p>
+        <p class="minePhone">{{encryptPhone || '手机号'}}</p>
       </div>
     </div>
+
     <div class="mineDeail">
+      <div class="detail-block">
+        <div class="block-flex" @click="navTo(mineNav[0].navigatorUrl)">
+          <div class="count" v-if="isLogin">{{mineNav[0].hit || 0}}</div>
+          <div class="count" v-else>0</div>
+          <div class="count-text">会员卡</div>
+        </div>
+        <div class="block-flex">
+          <div class="count">{{myPoints || 0}}</div>
+          <div class="count-text">积分</div>
+        </div>
+      </div>
       <div
         class="detail_item"
         v-for="(item, index) in mineNav"
         :key="index"
         @click="navTo(item.navigatorUrl)"
+        v-show="item.navName != '会员卡'"
       >
         <img alt :src="item.imgUrl">
         <span class="detail_title">{{item.navName}}</span>
         <span class="detail_contrnt" v-if="isLogin">{{item.hit}}{{item.text}}</span>
       </div>
     </div>
-    <div class="mineExit" @click="singOut" v-if="isLogin">解除绑定</div>
+    <div
+      class="mineExit"
+      :style="{'background-color': themeColor}"
+      @click="singOut"
+      v-if="isLogin"
+    >解除绑定</div>
     <!-- <div class="mineExit" @click="singIn" v-else>去登录</div> -->
     <van-popup
       :show="showBindBox"
@@ -114,7 +132,9 @@ export default {
       showBindBox: false,
       companyList: [],
       // 选择的公司
-      curCompany: {}
+      curCompany: {},
+      // 积分
+      myPoints: ""
     };
   },
   onLoad() {
@@ -129,6 +149,19 @@ export default {
   computed: {
     isLogin() {
       return store.state.isLogin;
+    },
+    encryptPhone() {
+      if (this.userInfo.phone) {
+        return (
+          this.userInfo.phone.substr(0, 3) +
+          "****" +
+          this.userInfo.phone.substr(7)
+        );
+      }
+      return "";
+    },
+    themeColor() {
+      return window.color;
     }
   },
   methods: {
@@ -146,6 +179,7 @@ export default {
     },
     // 退出登录
     singOut() {
+      let that = this
       wx.showModal({
         title: "提示",
         content: "确认解除绑定吗？",
@@ -159,8 +193,9 @@ export default {
                   //   key: "userInfo",
                   //   success(res) {}
                   // });
-                  wx.clearStorageSync()
-                  store.commit('changeLogin', false)
+                  wx.removeStorageSync('userInfo')
+                  wx.removeStorageSync('phone')
+                  store.commit("changeLogin", false);
                   wx.showToast({
                     title: "解绑成功",
                     icon: "success",
@@ -191,6 +226,7 @@ export default {
         method: "POST",
         success(res) {
           if (res.data.code === 200) {
+            that.myPoints = res.data.data.selfIntegral;
             that.mineNav.forEach(function(e) {
               if (e.navName == "会员卡") {
                 e.hit = res.data.data.cardCount;
@@ -200,9 +236,10 @@ export default {
                 e.hit = res.data.data.appointCount;
               } else if (e.navName == "签到记录") {
                 e.hit = res.data.data.consumeLogCount;
-              } else if (e.navName == "我的积分") {
-                e.hit = res.data.data.selfIntegral;
               }
+              // else if (e.navName == "我的积分") {
+              //   e.hit = res.data.data.selfIntegral;
+              // }
             });
           } else {
             // wx.navigateTo({
@@ -224,12 +261,14 @@ export default {
           iv: e.mp.detail.iv
         },
         success(res) {
-          that.phone = res.data.data;
-          wx.setStorage({
-            key: "phone",
-            data: res.data.data
-          });
-          that.login();
+          if (res.data.code == 200) {
+            that.phone = res.data.data;
+            wx.setStorage({
+              key: "phone",
+              data: res.data.data
+            });
+            that.login();
+          }
         }
       });
     },
@@ -282,6 +321,12 @@ export default {
                 url: "../mine/main"
               });
             }, 1000);
+          } else {
+            return wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
           }
         }
       });
@@ -349,46 +394,78 @@ export default {
 <style lang="less">
 @import "~COMMON/less/reset.less";
 
-#memberMineTab {
+page {
+  background-color: #f5f6f7;
+}
+.memberMineTab {
   .mine_top {
-    padding: 20px 30px;
+    height: 50vw;
+    padding: 30px 20px;
     box-sizing: border-box;
-    height: 110px;
+    display: flex;
     .mineImgDiv {
       border-radius: 50%;
+      flex: 0 0 66px;
       .mineImg {
         width: 66px;
         height: 66px;
-        border-radius: 5px;
+        border-radius: 50%;
       }
     }
     .mineDetail {
-      // margin: 13px 0 0 15px;
-      margin-left: 15px;
+      flex: 1;
+      margin-left: 10px;
       .authorize {
         &::after {
           border: 0;
         }
-        background-color: rgba(0,0,0,0);
-        color: #333;
+        text-align: left;
+        background-color: rgba(0, 0, 0, 0);
+        color: #fff;
       }
       > p {
-        line-height: 33px;
-        font-size: 15px;
+        line-height: 32px;
       }
-      .toLogin {
-        height: 66px;
+      .mineName {
+        color: #fff;
+        font-size: 18px;
+        font-weight: bold;
+      }
+      .minePhone {
+        color: rgba(255, 255, 255, 0.7);
       }
     }
   }
   .mineDeail {
-    border-top: 10px solid #f4f4f4;
+    margin: 0 20px;
+    margin-top: -47px;
+    .detail-block {
+      height: 94px;
+      background-color: #fff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      .block-flex {
+        flex: 1;
+        text-align: center;
+        .count {
+          font-size: 18px;
+          font-weight: bold;
+        }
+        .count-text {
+          color: #909090;
+          margin-top: 10px;
+        }
+      }
+    }
     .detail_item {
-      height: 46px;
-      line-height: 46px;
+      height: 50px;
+      line-height: 50px;
       font-size: 15px;
       padding-left: 15px;
-      border-bottom: 1px solid #ededed;
+      border-radius: 4px;
+      margin-top: 10px;
+      background-color: #fff;
       > img {
         display: inline-block;
         vertical-align: middle;
@@ -408,14 +485,13 @@ export default {
   .mineExit {
     position: absolute;
     bottom: 15px;
-    left: 4%;
-    width: 92%;
+    left: 5%;
+    width: 90%;
     height: 40px;
     line-height: 40px;
     color: white;
     text-align: center;
     border-radius: 5px;
-    background: @theme-color;
     &:active {
       opacity: 0.8;
     }
@@ -447,6 +523,106 @@ export default {
     }
   }
 }
+
+// .memberMineTab {
+//   .mine_top {
+//     padding: 20px 30px;
+//     box-sizing: border-box;
+//     height: 110px;
+//     .mineImgDiv {
+//       float: left;
+//       border-radius: 50%;
+//       .mineImg {
+//         width: 66px;
+//         height: 66px;
+//         border-radius: 5px;
+//       }
+//     }
+//     .mineDetail {
+//       // margin: 13px 0 0 15px;
+//       float: left;
+//       margin-left: 15px;
+//       .authorize {
+//         &::after {
+//           border: 0;
+//         }
+//         background-color: rgba(0, 0, 0, 0);
+//         color: #333;
+//       }
+//       > p {
+//         line-height: 33px;
+//         font-size: 15px;
+//       }
+//       .toLogin {
+//         height: 66px;
+//       }
+//     }
+//   }
+//   .mineDeail {
+//     border-top: 10px solid #f5f6f7;
+//     .detail_item {
+//       height: 46px;
+//       line-height: 46px;
+//       font-size: 15px;
+//       padding-left: 15px;
+//       border-bottom: 1px solid #ededed;
+//       > img {
+//         display: inline-block;
+//         vertical-align: middle;
+//         width: 25px;
+//         height: 25px;
+//       }
+//       .detail_title {
+//         vertical-align: middle;
+//         margin-left: 10px;
+//       }
+//       .detail_contrnt {
+//         float: right;
+//         margin-right: 15px;
+//       }
+//     }
+//   }
+//   .mineExit {
+//     position: absolute;
+//     bottom: 15px;
+//     left: 4%;
+//     width: 92%;
+//     height: 40px;
+//     line-height: 40px;
+//     color: white;
+//     text-align: center;
+//     border-radius: 5px;
+//     &:active {
+//       opacity: 0.8;
+//     }
+//   }
+//   .companyList {
+//     padding: 15px;
+//     background: white;
+//     .companyMain {
+//       > span {
+//         &.active {
+//           color: @theme-color;
+//           border: 1rpx solid @theme-color;
+//         }
+//       }
+//     }
+//     > p {
+//       width: 100%;
+//       text-align: center;
+//     }
+//     span {
+//       display: block;
+//       height: 40px;
+//       line-height: 40px;
+//       width: 100%;
+//       text-align: center;
+//       border-radius: 5px;
+//       border: 1px solid #cccccc;
+//       margin-top: 20px;
+//     }
+//   }
+// }
 </style>
 
 

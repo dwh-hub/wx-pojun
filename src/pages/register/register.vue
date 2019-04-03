@@ -85,8 +85,8 @@ export default {
     };
   },
   mounted() {
-    this.getAllStore();
     this.companyId = wx.getStorageSync("companyId");
+    this.getAllStore();
   },
   computed: {
     btnText() {
@@ -152,7 +152,7 @@ export default {
       wx.request({
         url: window.api + "/store/all-store-name-list-nolimit",
         data: {
-          companyId: that.companyId || ""
+          companyId: that.companyId
         },
         success(res) {
           if (res.data.code === 200) {
@@ -194,7 +194,7 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             wx.showToast({
-              title: "登记成功",
+              title: res.data.message,
               icon: "success",
               duration: 1000
             });

@@ -4,7 +4,7 @@
       class="swiper"
       indicator-dots="true"
       indicator-color="#fff"
-      indicator-active-color="rgba(74, 134, 232, 1)"
+      :indicator-active-color="window.color"
       :autoplay="true"
       :circular="true"
       :loop="true"
@@ -69,7 +69,7 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div class="bottom-btn appointment" @click="appointClass">
+    <div class="bottom-btn appointment" @click="appointClass" :style="{'background-color': window.color}">
       马上预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
@@ -316,9 +316,6 @@ export default {
     .address-group {
       .store {
         margin-bottom: 10px;
-        > span {
-          color: @theme-color;
-        }
         .name {
           font-size: 16px;
           margin-right: 10px;

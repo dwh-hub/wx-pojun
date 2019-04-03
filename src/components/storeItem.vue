@@ -7,7 +7,7 @@
     <div class="store-info">
       <div class="store-top">
         <span class="store-name">{{info.storeName}}</span>
-        <span class="store-range">{{info.range}}</span>
+        <span class="store-range" :style="{'color': themeColor}">{{info.range}}</span>
       </div>
       <div class="store-bottom">{{info.address || '未设置详细地址'}}</div>
     </div>
@@ -15,6 +15,7 @@
 </template>
 
 <script>
+import { window } from "COMMON/js/common.js";
 export default {
   props: {
     info: {
@@ -22,20 +23,23 @@ export default {
       default: function() {
         return {
           storeId: "",
-          storeName: '',
-          range: '',
-          address: ''
-        }
+          storeName: "",
+          range: "",
+          address: ""
+        };
       }
     }
   },
-  mounted(){
+  computed: {
+    themeColor() {
+      return window.color;
+    }
   },
   methods: {
     toDetail() {
       wx.navigateTo({
-        url: '../storeDetail/main?storeId='+ this.info.storeId
-      })
+        url: "../storeDetail/main?storeId=" + this.info.storeId
+      });
     }
   }
 };
@@ -69,7 +73,6 @@ export default {
       .store-range {
         float: right;
         font-size: 14px;
-        color: @theme-color;
       }
     }
     .store-bottom {

@@ -4,7 +4,7 @@
       class="swiper"
       indicator-dots="true"
       indicator-color="#fff"
-      indicator-active-color="rgba(74, 134, 232, 1)"
+      :indicator-active-color="themeColor"
       :autoplay="true"
       :circular="true"
       :loop="true"
@@ -15,15 +15,15 @@
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
-          > -->
+          >-->
         </swiper-item>
       </div>
     </swiper>
     <div class="address">
       <h4>地址</h4>
-      <div class="store">
+      <div class="store" :style="{'color': themeColor}">
         {{storeInfo.name}}
-        <span class="range">{{storeInfo.range || ''}}</span>
+        <span class="range" :style="{'color': themeColor}">{{storeInfo.range || ''}}</span>
       </div>
       <div class="address-detail">{{storeInfo.address}}</div>
     </div>
@@ -91,7 +91,10 @@ export default {
   },
   computed: {
     window() {
-      return window
+      return window;
+    },
+    themeColor() {
+      return window.color;
     }
   },
   methods: {
@@ -119,7 +122,7 @@ export default {
         url: window.api + "/store/detail/" + that.storeId,
         success(res) {
           let _data = res.data.data;
-          let _range
+          let _range;
           let _address = _data.parentName + _data.cityName + _data.address;
           _address = _address.replace(/null/g, "");
           _address = _address.replace(/[0]/gi, "");
@@ -127,8 +130,8 @@ export default {
             let _lat = _data.mapPoint.split(",")[1];
             let _lng = _data.mapPoint.split(",")[0];
             _range = getRange(that.latitude, that.longitude, _lat, _lng);
-            console.log(_data.mapPoint)
-            console.log(_range)
+            console.log(_data.mapPoint);
+            console.log(_range);
           }
           let _obj = {
             address: _address || "未设置详细地址",
@@ -214,12 +217,10 @@ export default {
     }
     .store {
       font-size: 16px;
-      color: @theme-color;
       margin: 8px 0;
       > span {
         display: inline-block;
         margin-left: 5px;
-        color: @theme-color;
         font-size: 12px;
       }
     }

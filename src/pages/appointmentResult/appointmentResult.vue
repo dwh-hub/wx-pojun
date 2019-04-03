@@ -8,8 +8,8 @@
       </p>
       <div class="btn-group">
         <span class="cancel" @click="cancel" v-if="detail.status == 1">取消预约</span>
-        <span class="assess" @click="assess" v-if="!detail.evaluateId && detail.status == 3">评价</span>
-        <span class="again" @click="again">再约一节</span>
+        <span class="assess" :style="{'background-color': themeColor}" @click="assess" v-if="!detail.evaluateId && detail.status == 3">评价</span>
+        <span class="again" :style="{'background-color': themeColor}" @click="again">再约一节</span>
       </div>
     </div>
     <div class="class-info">
@@ -72,6 +72,9 @@ export default {
         return this.detail.coachNameArrayStr;
       }
       return this.detail.coachNameArray.toString(" ");
+    },
+    themeColor() {
+      return window.color;
     }
   },
   onLoad(options) {
@@ -145,7 +148,7 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             let _data = res.data.data;
-            let _range
+            let _range;
             let _address = _data.parentName + _data.cityName + _data.address;
             _address = _address.replace(/null/g, "");
             _address = _address.replace(/[0]/gi, "");
@@ -242,12 +245,12 @@ export default {
     again() {
       if (this.teamAttendId) {
         wx.redirectTo({
-          url: '../teamClassList/main'
+          url: "../teamClassList/main"
         });
       }
       if (this.coachAppointId) {
         wx.redirectTo({
-          url: '../coachList/main'
+          url: "../coachList/main"
         });
       }
     }
@@ -297,7 +300,6 @@ export default {
       }
       .assess,
       .again {
-        background-color: @theme-color;
         color: #fff;
       }
     }

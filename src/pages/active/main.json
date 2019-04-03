@@ -1,4 +1,7 @@
 {
-    "navigationBarTitleText": "活动"
+    "navigationBarTitleText": "活动",
+    "usingComponents": {
+      "van-loading": "../../../static/vant/loading/index"
+    }
   }
   

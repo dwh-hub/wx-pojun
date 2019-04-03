@@ -23,6 +23,7 @@
     <div class="loading" v-show="isLoading">
       <van-loading color="#999" custom-class="loading"/>
     </div>
+    <none-result v-if="isNoneResult" text="暂无可用合同"></none-result>
   </div>
 </template>
 
@@ -30,6 +31,7 @@
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import card from "COMPS/card";
 import store from "../../utils/store";
+import noneResult from "COMPS/noneResult.vue";
 
 export default {
   data() {
@@ -45,11 +47,14 @@ export default {
       // 选择的项目
       selectProIndex: 0,
       selectCardInfo: {},
-      isLoading: false
+      isLoading: false,
+      isNoneResult: false,
+      page: 1
     };
   },
   components: {
-    card
+    card,
+    noneResult
   },
   onLoad(option) {
     console.log(option);
@@ -64,6 +69,13 @@ export default {
   },
   mounted() {
     this.userInfo = wx.getStorageSync("userInfo");
+    if (this.teamScheduleId) {
+      this.getCanuseCards();
+    } else {
+      this.getCards();
+    }
+  },
+  onReachBottom() {
     if (this.teamScheduleId) {
       this.getCanuseCards();
     } else {
@@ -158,27 +170,34 @@ export default {
     },
     // 获取全部合同
     getCards() {
+      this.isLoading = true;
       let that = this;
-      wx.showLoading({
-        title: "加载中"
-      });
       HttpRequest({
         url: window.api + "/customer/card/cardInfos",
         data: {
-          page: 1,
-          pageCount: 100,
+          page: that.page,
+          pageCount: 20,
           customerId: that.userInfo.id
         },
         success(res) {
-          wx.hideLoading();
-          if (res.data.code) {
-            that.cardInfoList = res.data.data.result;
+          that.isLoading = false;
+          if (res.data.code == 200) {
+            if (!res.data.data.result.length) {
+              if (that.page == 1) {
+                return (that.isNoneResult = true);
+              }
+              return;
+            }
+            that.cardInfoList = that.cardInfoList.concat(res.data.data.result);
+          } else {
+            that.isNoneResult = true;
           }
         }
       });
     },
     // 获取可上课的合同
     getCanuseCards() {
+      this.isLoading = true;
       let that = this;
       HttpRequest({
         url: window.api + "/teamClass/getCardInfos",
@@ -188,8 +207,13 @@ export default {
           customerId: that.userInfo.id
         },
         success(res) {
-          console.log(res.data.data);
-          that.cardInfoList = res.data.data;
+          that.isLoading = false;
+          if (res.data.code == 200) {
+            that.cardInfoList = res.data.data;
+          }
+          if (!that.cardInfoList.length) {
+            that.isNoneResult = true;
+          }
         }
       });
     }

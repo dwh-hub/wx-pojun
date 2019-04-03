@@ -68,7 +68,7 @@
           </div>
           <div class="nearby-bottom">
             <span class="name">{{item.storeName}}</span>
-            <span class="range">{{item.range}}</span>
+            <span class="range" :style="{'color': themeColor}">{{item.range}}</span>
           </div>
         </div>
       </div>
@@ -384,7 +384,6 @@ page {
         width: 20px;
         height: 20px;
         padding: 10px;
-        // background-color: @theme-color;
         border-radius: 50%;
       }
       .text {
@@ -426,7 +425,6 @@ page {
           }
           .range {
             font-size: 12px;
-            color: @theme-color;
           }
         }
       }

@@ -6,7 +6,7 @@
       <span class="read-none" :class="{ select: !isRead }" @click="showReadNone">已读</span>
     </div>-->
     <div class="header">
-      <van-tabs :active="navIndex" @change="onChange" :duration="0" color="#2a82e4">
+      <van-tabs :active="navIndex" @change="onChange" :duration="0" :color="themeColor">
         <van-tab title="未读"></van-tab>
         <van-tab title="已读"></van-tab>
       </van-tabs>
@@ -124,6 +124,11 @@ export default {
   components: {
     wxParse,
     noneResult
+  },
+  computed: {
+    themeColor() {
+      return window.color;
+    }
   },
   methods: {
     onChange(e) {

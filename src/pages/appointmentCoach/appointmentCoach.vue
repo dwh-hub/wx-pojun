@@ -8,6 +8,7 @@
         <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
         <div
           class="coach-times"
+          :style="{'color': themeColor}"
         >共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
       </div>
       <div class="tiems">
@@ -28,7 +29,7 @@
         :moreText="timeCellText"
         :moreSize="14"
         :titleSize="16"
-        @tapMore="isTimePopup = true"
+        @tapMore="showTimePopup"
       ></title-cell>
     </div>
 
@@ -38,7 +39,7 @@
         :moreText="cardCellText"
         :moreSize="14"
         :titleSize="16"
-        @tapMore="isCardPopup = true"
+        @tapMore="showCardPopop"
       ></title-cell>
       <!-- <title-cell title="预约备注" moreText="请选择" :moreSize="14" :titleSize="16"></title-cell> -->
     </div>
@@ -260,7 +261,11 @@
               <span>不可预约</span>
             </div>
           </div>
-          <div class="confirm-date" @click="selectDate">确定（{{confirmDate}}）</div>
+          <div
+            class="confirm-date"
+            :style="{'background-color': themeColor}"
+            @click="selectDate"
+          >确定（{{confirmDate}}）</div>
         </div>
       </div>
     </van-popup>
@@ -293,7 +298,11 @@
       </div>
     </van-popup>
 
-    <div class="bottom-btn appoint-coach" @click="appointCoach">
+    <div
+      class="bottom-btn appoint-coach"
+      @click="appointCoach"
+      :style="{'background-color': themeColor}"
+    >
       发起预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
@@ -407,9 +416,34 @@ export default {
         return this.curDate + " " + this.curTime + "~" + this.curEndTime;
       }
       return "";
+    },
+    themeColor() {
+      return window.color;
     }
   },
   methods: {
+    // 时间
+    showTimePopup() {
+      if (!this.selectStoreId) {
+        return wx.showModal({
+          title: "提示",
+          content: "请先选择门店",
+          showCancel: false
+        });
+      }
+      this.isTimePopup = true;
+    },
+    // 合同
+    showCardPopop() {
+      if (!this.cardList.length) {
+        return wx.showModal({
+          title: "提示",
+          content: "未找到可消费合同",
+          showCancel: false
+        });
+      }
+      this.isCardPopup = true;
+    },
     // 场馆
     showVenuePopup() {
       if (!this.selectStoreId || !this.selectCardId) {
@@ -536,7 +570,8 @@ export default {
       this.isTimePopup = false;
       this.timeCellText = this.confirmDate;
       if (!this.cardClassId) {
-        this.isCardPopup = true;
+        // this.isCardPopup = true;
+        this.showCardPopop();
       }
     },
     // 选择场馆
@@ -655,7 +690,7 @@ export default {
     },
     // 组件select-date返回的日期
     onDate(date) {
-      getPeriodTime(date)
+      getPeriodTime(date);
       this.curDate = date;
     },
     // 获取教练信息
@@ -771,33 +806,39 @@ export default {
         success(res) {
           let _todayPeriodTime = [];
           res.data.data.forEach(e => {
-            console.log(e)
+            console.log(e);
             let _timeStart = formatDate(new Date(e.timeStart), "hh:mm");
             let _endTime = formatDate(new Date(e.timeEnd), "hh:mm");
             let _timeStartH = _timeStart.split(":")[0];
             let _timeStartS = _timeStart.split(":")[1];
             let _endTimeH = _endTime.split(":")[0];
             let _endTimeS = _endTime.split(":")[1];
-            let second
-            if(_endTimeS-_timeStartS < 16 && _endTimeS-_timeStartS > 0){
-              second = "15"
-            } else if (_endTimeS-_timeStartS < 31 && _endTimeS-_timeStartS >15) {
-              second = "30"
-            } else if (_endTimeS-_timeStartS < 46 && _endTimeS-_timeStartS >30) {
-              second = "45"
+            let second;
+            if (_endTimeS - _timeStartS < 16 && _endTimeS - _timeStartS > 0) {
+              second = "15";
+            } else if (
+              _endTimeS - _timeStartS < 31 &&
+              _endTimeS - _timeStartS > 15
+            ) {
+              second = "30";
+            } else if (
+              _endTimeS - _timeStartS < 46 &&
+              _endTimeS - _timeStartS > 30
+            ) {
+              second = "45";
             } else {
-              second = "00"
+              second = "00";
             }
-            _todayPeriodTime.push(`${_timeStartH}:${second}`)
-            _todayPeriodTime.push(`${Number(_timeStartH)+1}:${second}`)
+            _todayPeriodTime.push(`${_timeStartH}:${second}`);
+            _todayPeriodTime.push(`${Number(_timeStartH) + 1}:${second}`);
             // console.log(formatDate(new Date(e.timeStart), "hh:mm"))
             // console.log(formatDate(new Date(e.timeEnd), "hh:mm"))
             // for(let i=0;i<(_endTimeH - _timeStartH);i++) {
             //   console.log(i)
             // }
           });
-          console.log(_todayPeriodTime)
-          that.todayPeriodTime = _todayPeriodTime
+          console.log(_todayPeriodTime);
+          that.todayPeriodTime = _todayPeriodTime;
           // console.log(formatDate(new Date(1553850000000), 'yyyy-MM-dd hh:mm'))
           // console.log(formatDate(new Date(1553853599000), 'yyyy-MM-dd hh:mm'))
           // [{
@@ -876,9 +917,6 @@ page {
       }
       .coach-desc {
         color: #bababa;
-      }
-      .coach-times {
-        color: @theme-color;
       }
     }
   }
@@ -1097,7 +1135,6 @@ page {
     .confirm-date {
       margin: 15px;
       line-height: 42px;
-      background-color: @theme-color;
       color: #fff;
       font-size: 16px;
       text-align: center;

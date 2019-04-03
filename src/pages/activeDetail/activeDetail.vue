@@ -8,7 +8,7 @@
     <div class="active-content-wrapper">
       <div class="active-content-t">活动内容</div>
       <div class="active-content">
-        <wxParse :content="activeDetail.content" :imageProp="{domain: 'www.pojun-tech.cn', mode: 'widthFix'}"/>
+        <wxParse :content="activeDetail.content||'<p></p>'" :imageProp="{domain: window.api, mode: 'widthFix'}"/>
       </div>
     </div>
     <div class="activeBottom">
@@ -19,7 +19,7 @@
           <span class="numbers">{{signNum}}</span>
           <span class="increase" @click="signNum++">+</span>
         </div>
-        <span class="sign" @click="sign">报名</span>
+        <span class="sign" :style="{'background-color': window.color}" @click="showEntryBox = true">报名</span>
       </div>
       <div class="block" v-if="isPhoneX"></div>
     </div>
@@ -35,7 +35,7 @@
         <div class="box-item"><span class="text-left">报名费用</span><span class="text-right">{{activeDetail.entryFee*signNum}}</span></div>
         <div class="btn-wrapper">
           <span class="cancel" @click="showEntryBox = false">取消</span>
-          <span class="confirm">确认</span>
+          <span class="confirm" @click="confirmSignUp">确认</span>
         </div>
       </div>
     </van-popup>
@@ -72,6 +72,9 @@ export default {
     isPhoneX() {
       return store.state.isIphoneX;
     },
+    window() {
+      return window
+    }
     // amount() {
     //   if(this.activeDetail.entryFee) {
     //     return this.activeDetail.entryFee*this.signNum
@@ -144,10 +147,8 @@ export default {
         }
       });
     },
-    // 报名
-    sign() {
+    confirmSignUp() {
       // TODO: 跳转h5的活动页面去支付
-      this.showEntryBox = true
     }
   }
 };
@@ -240,7 +241,6 @@ export default {
       display: block;
       width: 90px;
       text-align: center;
-      background-color: #3b97eb;
       color: #fff;
     }
   }

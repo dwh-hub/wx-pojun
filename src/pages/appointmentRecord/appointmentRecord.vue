@@ -15,57 +15,67 @@
     <div class="loading" v-show="isLoading">
       <van-loading color="#999" custom-class="loading"/>
     </div>
+    <none-result v-if="isNoneResult" text="暂无记录"></none-result>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import noneResult from "COMPS/noneResult.vue";
+
 export default {
   data() {
     return {
       recordList: [],
       page: 1,
-      isLoading: false
+      isLoading: false,
+      isNoneResult: false
     };
   },
   onLoad() {
-    Object.assign(this.$data, this.$options.data())
+    Object.assign(this.$data, this.$options.data());
     setNavTab();
   },
   mounted() {
-    this.getAppointRecordList()
+    this.getAppointRecordList();
   },
   onReachBottom() {
-    that.isLoading = true
-    this.getAppointRecordList()
+    this.getAppointRecordList();
+  },
+  components: {
+    noneResult
   },
   methods: {
     getAppointRecordList() {
-      let that = this
+      this.isLoading = true;
+      let that = this;
       HttpRequest({
-        url: window.api + '/mobile/coach/appoint/pages/own',
+        url: window.api + "/mobile/coach/appoint/pages/own",
         data: {
           pageNo: that.page,
-          customerId: wx.getStorageSync('userInfo').id
+          customerId: wx.getStorageSync("userInfo").id
         },
         success(res) {
-          that.isLoading = false
-          if(!res.data.data.result.length) {
-            return
-          }
-          let _data = res.data.data.result.map((e) => {
-            return {
-              name: e.secondCardClassName || '',
-              status: e.statusChar,
-              date: e.timeEnd.split(' ')[0],
-              startTime: e.timeStart.split(' ')[1].slice(0, 5),
-              endTime: e.timeEnd.split(' ')[1].slice(0, 5)
+          that.isLoading = false;
+          if (!res.data.data.result.length) {
+            if(that.page == 1) {
+              that.isNoneResult = true
             }
-          })
-          that.recordList = that.recordList.concat(_data)
-          that.page++
+            return;
+          }
+          let _data = res.data.data.result.map(e => {
+            return {
+              name: e.secondCardClassName || "",
+              status: e.statusChar,
+              date: e.timeEnd.split(" ")[0],
+              startTime: e.timeStart.split(" ")[1].slice(0, 5),
+              endTime: e.timeEnd.split(" ")[1].slice(0, 5)
+            };
+          });
+          that.recordList = that.recordList.concat(_data);
+          that.page++;
         }
-      })
+      });
     }
   }
 };

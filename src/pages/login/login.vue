@@ -19,7 +19,7 @@
     <div class="boundDiv">
       <input class type="text" v-model="vCode" placeholder="请输入验证码">
     </div>
-    <span class="showTooltips" @click="login">绑定</span>
+    <span class="showTooltips" @click="login">登录</span>
 
     <van-popup
       :show="showBindBox"
@@ -177,7 +177,8 @@ export default {
         url: window.api + "/wxcustomer/bindCard",
         data: {
           phone: that.phone,
-          companyId: that.userInfo.companyId
+          companyId: that.userInfo.companyId,
+          miniOpenId: wx.getStorageSync("openId")
           // smsSendLogId: that.smsSendLogId
         },
         success(res) {

@@ -13,18 +13,21 @@
     </div>
     <div class="coach-desc">
       <div class="title">个人简介</div>
-      <p>{{coachInfo.individualResume || '暂无个人简介'}}</p>
+      <p>{{coachInfo.individualResume || 'Ta还没有填写个人简介'}}</p>
     </div>
     <div class="coach-imgs">
       <div class="title">个人形象</div>
       <div class="img-group">
         <img :src="window.api + item" v-for="(item, index) in personalImage" :key="index">
       </div>
+      <div class="img-group" v-if="!personalImage">
+        暂无个人形象
+      </div>
     </div>
     <div class="course">
       <div class="title">成长历程</div>
       <div class="course-content">
-        <wxParse :content="coachInfo.growthProcess || '<p>无</p>'" :imageProp="{domain: window, mode: 'widthFix'}"/>
+        <wxParse :content="coachInfo.growthProcess || '<p>暂无成长历程</p>'" :imageProp="{domain: window, mode: 'widthFix'}"/>
       </div>
     </div>
     <div

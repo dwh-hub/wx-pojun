@@ -57,7 +57,7 @@ export default {
     noneResult
   },
   onLoad(option) {
-    console.log(option);
+    this.showPopup = false;
     if (option.classId) {
       this.teamScheduleId = option.classId;
       this.storeId = option.storeId;
@@ -65,6 +65,7 @@ export default {
       setNavTab("选择合同");
       return;
     }
+    this.teamScheduleId = "";
     setNavTab();
   },
   mounted() {
@@ -90,6 +91,7 @@ export default {
     toCardDetail(item) {
       let that = this;
       this.selectCardInfo = item;
+      console.log("this.teamScheduleId:"+this.teamScheduleId)
       if (this.teamScheduleId) {
         wx.showLoading({
           title: "获取可消费项目..."

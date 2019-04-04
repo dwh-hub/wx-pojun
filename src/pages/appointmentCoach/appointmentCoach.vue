@@ -169,10 +169,10 @@
               <div
                 class="hour"
                 v-for="(item, index) in morningTimes"
-                :class="{active: (item == curTime || item == curEndTime)}"
+                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
                 :key="index"
                 @click="selectHour(item,1)"
-              >{{item}}</div>
+              >{{item.hour}}</div>
             </div>
           </div>
           <div class="noon">
@@ -192,10 +192,10 @@
               <div
                 class="hour"
                 v-for="(item, index) in noonTimes"
-                :class="{active: (item == curTime || item == curEndTime)}"
+                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
                 @click="selectHour(item,2)"
                 :key="index"
-              >{{item}}</div>
+              >{{item.hour}}</div>
             </div>
           </div>
           <div class="afternoon">
@@ -215,14 +215,13 @@
               <div
                 class="hour"
                 v-for="(item, index) in afternoonTimes"
-                :class="{active: (item == curTime || item == curEndTime)}"
+                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
                 @click="selectHour(item,3)"
                 :key="index"
-              >{{item}}</div>
+              >{{item.hour}}</div>
             </div>
           </div>
           <div class="afternoon">
-            .
             <div class="date-header">
               <h5>晚上</h5>
               <div class="mini-data" v-show="showMiniIndex == 4">
@@ -239,10 +238,10 @@
               <div
                 class="hour"
                 v-for="(item, index) in nightTime"
-                :class="{active: (item == curTime || item == curEndTime)}"
+                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
                 @click="selectHour(item,4)"
                 :key="index"
-              >{{item}}</div>
+              >{{item.hour}}</div>
             </div>
           </div>
         </div>
@@ -395,6 +394,8 @@ export default {
     selectDate
   },
   onLoad(option) {
+    // 进页面前先清空数据
+    Object.assign(this.$data, this.$options.data())
     this.coachId = option.coachId;
     this.userInfo = wx.getStorageSync("userInfo");
     setNavTab();
@@ -435,6 +436,13 @@ export default {
     },
     // 合同
     showCardPopop() {
+      if(!this.selectStoreId) {
+        return wx.showModal({
+          title: "提示",
+          content: "请先选择门店",
+          showCancel: false
+        });
+      }
       if (!this.cardList.length) {
         return wx.showModal({
           title: "提示",
@@ -487,13 +495,22 @@ export default {
     },
     // 选择时间
     selectHour(item, index) {
-      this.curTime = item;
+      if(item.disable && item.hour) {
+        return
+      }
+      let _item
+      if(item.hour) {
+        _item = item.hour
+      } else {
+        _item = item
+      }
+      this.curTime = _item;
       this.showMiniIndex = index;
-      let hour = item.slice(0, 2);
+      let hour = _item.slice(0, 2);
       this.miniDate = [hour + ":15", hour + ":30", hour + ":45"];
       // this.curEndTime =
       let _curEndtime =
-        Number(item.split(":")[0]) + 1 + ":" + item.split(":")[1];
+        Number(_item.split(":")[0]) + 1 + ":" + _item.split(":")[1];
       if (Number(_curEndtime.split(":")[0]) < 10) {
         this.curEndTime = "0" + String(_curEndtime);
       } else {
@@ -504,34 +521,80 @@ export default {
     computedTime() {
       let _satarTime = this.openTimeStart.split(":")[0] || "09";
       let _endTime = this.openTimeEnd.split(":")[0] || "22";
-      console.log(this.openTimeStart);
-      console.log(this.openTimeEnd);
-      console.log(_satarTime);
-      console.log(_endTime);
       let _morningTimes = [];
       let _nightTime = [];
-      // 上午时间段
-      for (let i = 0; i < 12 - Number(_satarTime); i++) {
-        let _time = Number(_satarTime) + i + ":00";
-        if (Number(_satarTime) + i < 10) {
-          _time = "0" + String(_time);
+      let _noonTimes = [];
+      let _afternoonTimes = [];
+
+      let _allTime = [];
+
+      // 门店营业时间
+      for (let h = _satarTime; h <= _endTime; h++) {
+        if (h < 10 && h > 0) {
+          _allTime.push("0"+h + ":00");
+        } else {
+          _allTime.push(h + ":00");
         }
-        _morningTimes.push(_time);
       }
+      // 不可预约时间
+      _allTime = _allTime.map(e => {
+        let _timestamp = new Date("2018-04-04 " + e).getTime();
+        for (let i in this.todayPeriodTime) {
+          if (
+            _timestamp >= this.todayPeriodTime[i].timeStart &&
+            _timestamp <= this.todayPeriodTime[i].timeEnd
+          ) {
+            return {
+              hour: e,
+              disable: true
+            };
+          }
+        }
+        return {
+          hour: e,
+          disable: false
+        };
+      });
+      // 时间分段
+      _allTime.forEach(e => {
+        let _hour = Number(e.hour.split(":")[0]);
+        if (_hour < 12 && _hour >= 0) {
+          _morningTimes.push(e);
+        } else if (_hour >= 12 && _hour <= 14) {
+          _noonTimes.push(e);
+        } else if (_hour > 14 && _hour <= 18) {
+          _afternoonTimes.push(e);
+        } else {
+          _nightTime.push(e);
+        }
+      });
       this.morningTimes = _morningTimes;
-      // 中午时间段
-      if (Number(_satarTime) < 12 || Number(_endTime) > 14) {
-        this.noonTimes = ["12:00", "13:00", "14:00"];
-      }
-      // 下午时间段
-      if (Number(_satarTime) < 15 || Number(_endTime) > 18) {
-        this.afternoonTimes = ["15:00", "16:00", "17:00", "18:00"];
-      }
-      // 晚上时间段
-      for (let j = 0; j < Number(_endTime) - 19; j++) {
-        _nightTime.push(19 + j + ":00");
-      }
+      this.noonTimes = _noonTimes;
+      this.afternoonTimes = _afternoonTimes;
       this.nightTime = _nightTime;
+
+      // // 上午时间段
+      // for (let i = 0; i < 12 - Number(_satarTime); i++) {
+      //   let _time = Number(_satarTime) + i + ":00";
+      //   if (Number(_satarTime) + i < 10) {
+      //     _time = "0" + String(_time);
+      //   }
+      //   _morningTimes.push(_time);
+      // }
+      // this.morningTimes = _morningTimes;
+      // // 中午时间段
+      // if (Number(_satarTime) < 12 || Number(_endTime) > 14) {
+      //   this.noonTimes = ["12:00", "13:00", "14:00"];
+      // }
+      // // 下午时间段
+      // if (Number(_satarTime) < 15 || Number(_endTime) > 18) {
+      //   this.afternoonTimes = ["15:00", "16:00", "17:00", "18:00"];
+      // }
+      // // 晚上时间段
+      // for (let j = 0; j < Number(_endTime) - 19; j++) {
+      //   _nightTime.push(19 + j + ":00");
+      // }
+      // this.nightTime = _nightTime;
     },
     // 选择门店
     selectStore(item) {
@@ -690,7 +753,7 @@ export default {
     },
     // 组件select-date返回的日期
     onDate(date) {
-      getPeriodTime(date);
+      this.getPeriodTime(date);
       this.curDate = date;
     },
     // 获取教练信息
@@ -804,6 +867,13 @@ export default {
           calendar: date || formatDate(new Date(), "yyyy-MM-dd")
         },
         success(res) {
+          if(res.data.code == 200) {
+            that.todayPeriodTime = res.data.data;
+            that.computedTime()
+          } else {
+            that.todayPeriodTime = []
+          }
+          /* 
           let _todayPeriodTime = [];
           res.data.data.forEach(e => {
             console.log(e);
@@ -831,20 +901,17 @@ export default {
             }
             _todayPeriodTime.push(`${_timeStartH}:${second}`);
             _todayPeriodTime.push(`${Number(_timeStartH) + 1}:${second}`);
-            // console.log(formatDate(new Date(e.timeStart), "hh:mm"))
-            // console.log(formatDate(new Date(e.timeEnd), "hh:mm"))
             // for(let i=0;i<(_endTimeH - _timeStartH);i++) {
             //   console.log(i)
             // }
           });
           console.log(_todayPeriodTime);
           that.todayPeriodTime = _todayPeriodTime;
-          // console.log(formatDate(new Date(1553850000000), 'yyyy-MM-dd hh:mm'))
-          // console.log(formatDate(new Date(1553853599000), 'yyyy-MM-dd hh:mm'))
           // [{
-          //   timeStart: 1553850000000,
-          //   timeEnd:1553853599000
+          //   timeStart: 1522814400000,
+          //   timeEnd:1522818000000
           // }]
+          */
         }
       });
     },
@@ -1072,8 +1139,9 @@ page {
                 background-color: #43cf7c;
                 color: #fff;
               }
-              &.none {
-                background-color: #ccc;
+              &.disable {
+                background-color: #ccc !important;
+                color: #999 !important;
               }
             }
           }
@@ -1095,8 +1163,9 @@ page {
               background-color: #43cf7c;
               color: #fff;
             }
-            &.none {
-              background-color: #ccc;
+            &.disable {
+              background-color: #ccc !important;
+              color: #999 !important;
             }
           }
         }
@@ -1178,4 +1247,3 @@ page {
   }
 }
 </style>
-

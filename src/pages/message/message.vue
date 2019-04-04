@@ -107,6 +107,8 @@ export default {
   },
   onLoad() {
     setNavTab();
+  },
+  onShow() {
     if (!store.state.isLogin) {
       return;
     }

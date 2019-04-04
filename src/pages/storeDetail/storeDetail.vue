@@ -37,11 +37,11 @@
       </div>
     </div>
     <div class="team-class-part">
-      <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+      <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore('../teamClassList/main')"></title-cell>
       <team-class-item :info="item" v-for="(item, index)  in teamClassList" :key="index"></team-class-item>
     </div>
     <div class="coach-part">
-      <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore"></title-cell>
+      <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore('../coachList/main')"></title-cell>
       <coach-item :info="item" v-for="(item, index) in coachList" :key="index"></coach-item>
     </div>
   </div>
@@ -98,10 +98,10 @@ export default {
     }
   },
   methods: {
-    toAllStore() {
-      // wx.navigateTo({
-      //   url: "../allStore/main"
-      // });
+    toAllStore(url) {
+      wx.navigateTo({
+        url: url
+      });
     },
     call() {
       if (!this.storeInfo.phone) {

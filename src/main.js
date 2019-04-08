@@ -2,7 +2,9 @@ import Vue from 'vue'
 import App from './App'
 import {
   window,
-  HttpRequest
+  wxLogin,
+  HttpRequest,
+  getThemeColor
 } from "COMMON/js/common.js";
 import store from "./utils/store"
 
@@ -15,11 +17,20 @@ Vue.prototype.globalData = getApp().globalData
 
 // TODO: 目前沒有公司id就默认前锋
 if (!wx.getStorageSync("companyId")) {
-  wx.setStorage({
-    key: "companyId",
-    data: 37
-  });
+  if(window.DEBUGGING) {
+    wx.setStorage({
+      key: "companyId",
+      data: 44
+    });
+  } else {
+    wx.setStorage({
+      key: "companyId",
+      data: 37
+    });
+  }
 }
+
+getThemeColor()
 
 if (!wx.getStorageSync("Cookie")) {
   wx.request({
@@ -84,45 +95,17 @@ function isIphoneX() {
 if (wx.getStorageSync("sessionKey")) {
   wx.checkSession({
     success() {
-      console.log('success')
+      console.log('未过期')
       console.log(wx.getStorageSync("sessionKey"))
       // session_key 未过期，并且在本生命周期一直有效
     },
     fail() {
+      console.log("过期");
       wxLogin()
     }
   })
 } else {
+  console.log("不存在，重新获取");
   wxLogin()
 }
 
-
-function wxLogin() {
-  wx.login({
-    success(res) {
-      if (res.code) {
-        wx.request({
-          url: window.api + '/mini/getsession',
-          data: {
-            code: res.code
-          },
-          success(data) {
-            console.log(data)
-            wx.setStorage({
-              key: "sessionKey",
-              data: data.data.data.sessionKey
-            });
-            wx.setStorage({
-              key: "openId",
-              data: data.data.data.openId
-            });
-          }
-        })
-      }
-    }
-  })
-}
-
-// wx.request({
-//   url: window.api + '/wxcustomer'
-// })

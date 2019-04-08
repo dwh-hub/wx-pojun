@@ -30,6 +30,52 @@ export {
   window
 }
 
+// 获取公司主题色
+export function getThemeColor() {
+  HttpRequest({
+    url: window.api + '/system/set/wxcompanyinfo',
+    data: {
+      companyId: wx.getStorageSync("companyId")
+    },
+    success(res) {
+      if(res.data.code == 200) {
+        window.color = res.data.data.themeColor || "#2a82e4"
+      } else {
+        window.color = "#2a82e4"
+      }
+    }
+  })
+}
+
+export function wxLogin() {
+  return new Promise(function (resolve) {
+    wx.login({
+      success(res) {
+        if (res.code) {
+          wx.request({
+            url: window.api + '/mini/getsession',
+            data: {
+              code: res.code
+            },
+            success(data) {
+              console.log(data)
+              wx.setStorage({
+                key: "sessionKey",
+                data: data.data.data.sessionKey
+              });
+              wx.setStorage({
+                key: "openId",
+                data: data.data.data.openId
+              });
+              resolve()
+            }
+          })
+        }
+      }
+    })
+  })
+}
+
 /**
  * 设置页面导航条的标题和颜色
  * @param {String} title 
@@ -213,5 +259,7 @@ export default {
   getCookie,
   formatDate,
   debounce,
-  getRange
+  getRange,
+  wxLogin,
+  getThemeColor
 }

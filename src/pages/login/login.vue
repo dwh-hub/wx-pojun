@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { setNavTab, checkPhoneFormat, window } from "COMMON/js/common.js";
+import { setNavTab, checkPhoneFormat, window,getThemeColor } from "COMMON/js/common.js";
 import store from "../../utils/store";
 
 export default {
@@ -193,6 +193,7 @@ export default {
               duration: 1000
             });
             store.commit("changeLogin", true);
+            getThemeColor()
             setTimeout(() => {
               wx.reLaunch({
                 url: "../mine/main"

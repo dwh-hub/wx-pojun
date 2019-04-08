@@ -2,10 +2,13 @@
   <div class="memberMineTab">
     <div class="mine_top" :style="{'background-color': themeColor}">
       <div class="mineImgDiv">
-        <img
+        <!-- <img
           class="mineImg"
           :src="userInfo.headImgPath || 'https://pojun-tech.cn/assets/img/morenTo.png'"
-        >
+        >-->
+        <div class="mineImg">
+          <open-data type="userAvatarUrl"></open-data>
+        </div>
       </div>
       <div class="mineDetail" @click="singIn" v-if="!isLogin">
         <button
@@ -75,7 +78,14 @@
 </template>
 
 <script>
-import { setNavTab, window, getCookie, HttpRequest } from "COMMON/js/common.js";
+import {
+  setNavTab,
+  window,
+  wxLogin,
+  getCookie,
+  HttpRequest,
+  getThemeColor
+} from "COMMON/js/common.js";
 import store from "../../utils/store";
 
 export default {
@@ -141,6 +151,22 @@ export default {
     this.getTimes();
     setNavTab();
   },
+  onShow() {
+    if (wx.getStorageSync("sessionKey")) {
+      wx.checkSession({
+        success() {
+          console.log("未过期");
+        },
+        fail() {
+          console.log("过期");
+          wxLogin();
+        }
+      });
+    } else {
+      console.log("不存在，重新获取");
+      wxLogin();
+    }
+  },
   mounted() {
     this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);
@@ -179,7 +205,8 @@ export default {
     },
     // 退出登录
     singOut() {
-      let that = this
+      // return wx.clearStorage()
+      let that = this;
       wx.showModal({
         title: "提示",
         content: "确认解除绑定吗？",
@@ -193,8 +220,8 @@ export default {
                   //   key: "userInfo",
                   //   success(res) {}
                   // });
-                  wx.removeStorageSync('userInfo')
-                  wx.removeStorageSync('phone')
+                  wx.removeStorageSync("userInfo");
+                  wx.removeStorageSync("phone");
                   store.commit("changeLogin", false);
                   wx.showToast({
                     title: "解绑成功",
@@ -250,9 +277,35 @@ export default {
         }
       });
     },
+    // 判断是否有sessionKey/sessionKey是否过期
+    // getPhoneNumberBefore(e) {
+    //   // let that = this;
+    //   // if (wx.getStorageSync("sessionKey")) {
+    //   //   wx.checkSession({
+    //   //     success() {
+    //   //       console.log("未过期");
+    //   //       that.getPhoneNumber(e);
+    //   //     },
+    //   //     fail() {
+    //   //       console.log("过期");
+    //   //       wxLogin().then(() => {
+    //   //         that.getPhoneNumber(e);
+    //   //       });
+    //   //     }
+    //   //   });
+    //   // } else {
+    //   // console.log("不存在，重新获取");
+    //   wxLogin().then(() => {
+    //     this.getPhoneNumber(e);
+    //   });
+    //   // }
+    // },
     // 获取微信加密数据
     getPhoneNumber(e) {
       let that = this;
+      wx.showLoading({
+        title: "登录中..."
+      });
       HttpRequest({
         url: window.api + "/mini/getphone",
         data: {
@@ -268,6 +321,8 @@ export default {
               data: res.data.data
             });
             that.login();
+          } else {
+            wx.hideLoading();
           }
         }
       });
@@ -316,6 +371,7 @@ export default {
               duration: 1000
             });
             store.commit("changeLogin", true);
+            getThemeColor();
             setTimeout(() => {
               wx.reLaunch({
                 url: "../mine/main"
@@ -333,9 +389,9 @@ export default {
     },
     // 获取用户信息
     getUserInfo() {
-      wx.showLoading({
-        title: "正在登录..."
-      });
+      // wx.showLoading({
+      //   title: "正在登录..."
+      // });
       let that = this;
       return new Promise(function(resolve) {
         wx.request({
@@ -410,6 +466,7 @@ page {
         width: 66px;
         height: 66px;
         border-radius: 50%;
+        overflow: hidden;
       }
     }
     .mineDetail {

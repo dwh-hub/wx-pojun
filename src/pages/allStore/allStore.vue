@@ -24,6 +24,7 @@ export default {
   },
   onLoad() {
     setNavTab();
+    this.companyId = wx.getStorageSync("companyId");
   },
   mounted() {
     this.longitude = store.state.longitude;

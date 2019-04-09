@@ -78,7 +78,8 @@ export default {
       curCoachList: [],
       // 是否签约 false 全部 true 已签约
       isSingin: false,
-      isNoneResult: false
+      isNoneResult: false,
+      companyId: ''
     };
   },
   components: {
@@ -88,6 +89,7 @@ export default {
   onLoad() {
     setNavTab();
     this.customerId = wx.getStorageSync("userInfo").id;
+    this.companyId = wx.getStorageSync("companyId");
   },
   mounted() {
     this.getAllStore();
@@ -202,7 +204,8 @@ export default {
           url: window.api + "/customer/register/userofrole",
           data: {
             storeId: id || "",
-            positionType: 1
+            positionType: 1,
+            companyId: that.companyId
           },
           success(res) {
             wx.hideLoading();
@@ -255,10 +258,10 @@ export default {
         data: {
           storeId: that.curStoreId,
           positionType: 1,
+          companyId: that.companyId,
           userName: event.mp.detail
         },
         success(res) {
-          console.log();
           that.curCoachList = res.data.data;
           if (that.curCoachList.length) {
             that.isNoneResult = false;

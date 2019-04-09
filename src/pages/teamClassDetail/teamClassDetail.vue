@@ -57,7 +57,7 @@
     </div>
     <div class="ruler">
       <div class="title">预约规则</div>
-      <p>1.开课前24小时可以预约。2.开课前24小时可以预约。</p>
+      <p>1.开课前24小时可以预约。</p>
     </div>
     <div class="process">
       <div class="title">上课流程</div>
@@ -69,8 +69,12 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div class="bottom-btn appointment" @click="appointClass" :style="{'background-color': window.color}">
+    <div class="bottom-btn appointment" @click="appointClass" :style="{'background-color': window.color}" v-if="canAppoint">
       马上预约
+      <div class="block" v-if="isPhoneX"></div>
+    </div>
+    <div class="bottom-btn appointmentNone" v-else>
+      不可预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
   </div>
@@ -97,7 +101,9 @@ export default {
       range: "",
       longitude: "", // 经度
       latitude: "", // 纬度,
-      companyId: ""
+      companyId: "",
+      // 团课时间是否过期
+      canAppoint: true
     };
   },
   components: {
@@ -199,6 +205,9 @@ export default {
         methods: "POST",
         success(res) {
           if (res.data.code === 200) {
+            if(new Date().getTime() > res.data.data.timeStart) {
+              that.canAppoint = false
+            }
             res.data.data.masterImg = res.data.data.masterImg.split(",")
             that.classDetail = res.data.data;
             that.getAddress();
@@ -376,6 +385,9 @@ export default {
         height: 30px;
       }
     }
+  }
+  .appointmentNone {
+    background-color: #bfbfbf;
   }
 }
 </style>

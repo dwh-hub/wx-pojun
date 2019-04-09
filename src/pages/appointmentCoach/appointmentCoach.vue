@@ -1197,12 +1197,12 @@ page {
       .date-hours {
         display: flex;
         align-items: center;
-        height: 164px;
+        height: 246px;
         .time-icon {
           flex: 0 0 40px;
           .day,
           .night {
-            height: 81px;
+            height: 122px;
             border-top: 1rpx solid #e5e5e5;
           }
           .night {
@@ -1214,7 +1214,7 @@ page {
             width: 25px;
             height: 25px;
             margin-left: 8px;
-            margin-top: 28px;
+            margin-top: 50px;
             background-repeat: no-repeat;
             background-size: cover;
           }
@@ -1229,7 +1229,8 @@ page {
           flex: 1;
           width: 100%;
           display: grid;
-          grid-template-columns: 16.6% 16.6% 16.6% 16.6% 16.6% 16.6%;
+          // grid-template-columns: 16.6% 16.6% 16.6% 16.6% 16.6% 16.6%;
+          grid-template-columns: 25% 25% 25% 25%;
           grid-template-rows: auto;
           border-top: 1rpx solid #e5e5e5;
           .hour {

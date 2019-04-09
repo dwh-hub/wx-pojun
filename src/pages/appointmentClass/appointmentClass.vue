@@ -3,7 +3,7 @@
     <div class="nav-tab">
       <div class="stay" :class="{active: currentNav==1}" @click="selectNav(1)">待上课</div>
       <div class="assess" :class="{active: currentNav==2}" @click="selectNav(2)">待评价</div>
-      <div class="complete" :class="{active: currentNav==3}" @click="selectNav(3)">已完成</div>
+      <div class="complete" :class="{active: currentNav==3}" @click="selectNav(3)">已评价</div>
       <!-- <div class="other" :class="{active: currentNav==4}" @click="selectNav(4)">其他</div> -->
     </div>
     <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
@@ -254,6 +254,9 @@ export default {
      * @param {Number} waitEvaluate 1 待评价
      */
     getOwnTeamClassList(status, waitEvaluate) {
+      wx.showLoading({
+        title: '加载中...'
+      })
       // 待评价
       if (status == 3 && waitEvaluate == 1) {
         return this.getTWaitEvaluate();
@@ -291,6 +294,7 @@ export default {
               }
               resolve();
             }
+            wx.hideLoading()
           }
         });
       });
@@ -301,6 +305,9 @@ export default {
      * @param {Number} waitEvaluate 1 待评价
      */
     getOwnCoachClassList(status, waitEvaluate) {
+      wx.showLoading({
+        title: '加载中...'
+      })
       // 待评价
       if (status == 3 && waitEvaluate == 1) {
         return this.getWaitEvaluateList();
@@ -347,12 +354,16 @@ export default {
               }
               resolve();
             }
+            wx.hideLoading()
           }
         });
       });
     },
     // 获取私教待评价列表
     getWaitEvaluateList() {
+      wx.showLoading({
+        title: '加载中...'
+      })
       let that = this;
       return new Promise(function(resolve) {
         HttpRequest({
@@ -367,12 +378,16 @@ export default {
               that.coachList_2 = res.data.data.result;
               resolve();
             }
+            wx.hideLoading()
           }
         });
       });
     },
     // 获取团课待评价列表
     getTWaitEvaluate() {
+      wx.showLoading({
+        title: '加载中...'
+      })
       let that = this;
       return new Promise(function(resolve) {
         HttpRequest({
@@ -387,6 +402,7 @@ export default {
               that.teamClass_2 = res.data.data.result;
               resolve();
             }
+            wx.hideLoading()
           }
         });
       });

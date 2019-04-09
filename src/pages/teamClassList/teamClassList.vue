@@ -102,9 +102,9 @@ export default {
   },
   mounted() {
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
+    this.companyId = wx.getStorageSync("companyId");
     this.getAllStore();
     this.getClassList();
-    this.companyId = wx.getStorageSync("companyId");
   },
   computed: {
     maskShow() {
@@ -216,6 +216,7 @@ export default {
         url: window.api + "/teamClass/teamSchedule/weekView",
         methods: "POST",
         data: {
+          companyId: that.companyId,
           coachId: that.curCoachId,
           storeId: that.curStoreId,
           calendarStart: that.curDate,

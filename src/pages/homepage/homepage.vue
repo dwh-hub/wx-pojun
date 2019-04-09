@@ -270,7 +270,7 @@ export default {
               }
             });
             _storeList.sort(that.compare("range"));
-            that.nearbyStoreList = _storeList;
+            that.nearbyStoreList = _storeList.slice(0, 2);
             if (!_storeList.length) {
               that.nearbyStoreList = _list.slice(0, 2);
               that.nearbyStoreList = that.nearbyStoreList.map(e => {
@@ -418,12 +418,16 @@ page {
         }
         .nearby-bottom {
           padding-top: 10px;
+          display: flex;
           .name {
+            flex: 1;
+            .Mult-line(1);
             font-size: 15px;
             margin-right: 5px;
             color: #505050;
           }
           .range {
+            flex: 0 0 70px;
             font-size: 12px;
           }
         }

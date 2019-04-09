@@ -181,7 +181,7 @@ export default {
               that.cancelClass();
             }
             if (that.coachAppointId) {
-              that.getCoachDetail();
+              that.cancelCoach();
             }
           }
         }

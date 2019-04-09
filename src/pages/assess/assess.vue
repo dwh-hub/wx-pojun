@@ -15,7 +15,7 @@
     </div>-->
     <team-class-item :info="detail" :isToDetail="false"></team-class-item>
     <div class="coach-assess">
-      <div class="assess-title">服务评价</div>
+      <div class="assess-title">{{typeText}}服务评价</div>
       <van-rate :value="coachRateVaule" :size="36" @change="onCoachRate"/>
     </div>
     <div class="store">
@@ -52,6 +52,7 @@ export default {
       storeRateVaule: 5,
       teamClasVaule: 5,
       remarks: "",
+      typeText: "",
       teamAttendId: null,
       coachAppointId: null,
       detail: {}
@@ -62,9 +63,11 @@ export default {
     this.detail["masterImg"] = window.api + this.detail.headImgPath;
     console.log(JSON.parse(options.detail));
     if (options.teamAttendId) {
+      this.typeText = "团课"
       this.teamAttendId = options.teamAttendId;
     }
     if (options.coachAppointId) {
+      this.typeText = "教练"
       this.coachAppointId = options.coachAppointId;
       this.detail["anotherName"] = this.detail.projectName;
     }
@@ -224,14 +227,13 @@ page {
   .coach-assess,
   .store-assess {
     width: 100%;
-    height: 180px;
+    height: 120px;
     margin: 15px 0;
     text-align: center;
     background-color: #fff;
     border-radius: 2px;
     .assess-title {
-      padding-top: 15px;
-      margin-bottom: 30px;
+      padding: 15px 0;
       font-size: 18px;
       font-weight: bold;
     }

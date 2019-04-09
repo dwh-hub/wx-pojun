@@ -26,7 +26,7 @@
         @click="showSelect = true"
       />
       <!-- <van-picker :columns="storeList" @change="onChange"/> -->
-      <van-field
+      <!-- <van-field
         :value="phone"
         @blur="getPhone"
         label="手机号"
@@ -42,8 +42,8 @@
         label="短信验证码"
         placeholder="请输入短信验证码"
         use-button-slot
-      >
-        <van-button
+      > -->
+        <!-- <van-button
           slot="button"
           size="small"
           type="primary"
@@ -51,8 +51,8 @@
           :disabled="isSend"
           @click="getVCode"
           v-show="!isSend"
-        >{{btnText}}</van-button>
-      </van-field>
+        >{{btnText}}</van-button> -->
+      <!-- </van-field> -->
     </van-cell-group>
     <van-action-sheet
       :show="showSelect"
@@ -60,7 +60,7 @@
       @close="showSelect = false;"
       @select="selectCur"
     ></van-action-sheet>
-    <button type="primary" @click="register">确认注册</button>
+    <button type="primary" @click="register">确认登记</button>
   </div>
 </template>
 
@@ -70,82 +70,83 @@ export default {
   data() {
     return {
       username: "",
-      phone: "",
-      sms: "",
+      // phone: "",
+      // sms: "",
       sexValue: "2",
       store: "",
       storeId: "",
       storeList: [],
-      isSend: false,
-      CDTime: 0,
-      smsSendLogId: "",
+      // isSend: false,
+      // CDTime: 0,
+      // smsSendLogId: "",
       companyId: "",
       showSelect: false,
-      actions: [{ name: "团课" }, { name: "私教" }]
+      actions: []
     };
   },
   mounted() {
     this.companyId = wx.getStorageSync("companyId");
+    // this.phone = wx.getStorageSync("phone");
     this.getAllStore();
   },
   computed: {
-    btnText() {
-      if (!this.isSend) {
-        return "发送验证码";
-      }
-      return "重新发送(" + this.CDTime + "s)";
-    }
+    // btnText() {
+    //   if (!this.isSend) {
+    //     return "发送验证码";
+    //   }
+    //   return "重新发送(" + this.CDTime + "s)";
+    // }
   },
   methods: {
     // 获取验证码
-    getVCode() {
-      let that = this;
-      console.log(this.phone);
-      // 手机验证
-      checkPhoneFormat(this.phone)
-        .then(() => {
-          console.log("res");
-          // 开始倒计时
-          this.codeCountdown();
-          // 校验验证码or拿短信id
-          wx.request({
-            url: window.api + "/sms/sendcode/nocompany",
-            data: {
-              phone: that.phone
-            },
-            success(res) {
-              console.log(res);
-              // TODO: smsSendLogId
-              that.smsSendLogId = res.data.data;
-            }
-          });
-        })
-        .catch(() => {
-          console.log("catch");
-          wx.showToast({
-            title: "手机号格式不正确",
-            icon: "none",
-            duration: 1000
-          });
-        });
-    },
+    // getVCode() {
+    //   let that = this;
+    //   console.log(this.phone);
+    //   // 手机验证
+    //   checkPhoneFormat(this.phone)
+    //     .then(() => {
+    //       console.log("res");
+    //       // 开始倒计时
+    //       this.codeCountdown();
+    //       // 校验验证码or拿短信id
+    //       wx.request({
+    //         url: window.api + "/sms/sendcode/nocompany",
+    //         data: {
+    //           phone: that.phone
+    //         },
+    //         success(res) {
+    //           console.log(res);
+    //           // TODO: smsSendLogId
+    //           that.smsSendLogId = res.data.data;
+    //         }
+    //       });
+    //     })
+    //     .catch(() => {
+    //       console.log("catch");
+    //       wx.showToast({
+    //         title: "手机号格式不正确",
+    //         icon: "none",
+    //         duration: 1000
+    //       });
+    //     });
+    // },
     // 倒计时
-    codeCountdown: function() {
-      this.CDTime = 60;
-      this.isSend = true;
-      let that = this;
-      var interval = setInterval(function() {
-        that.CDTime--;
-        if (that.CDTime < 1) {
-          that.isSend = false;
-          clearInterval(interval);
-        }
-      }, 1000);
-    },
-    onChange(event) {
-      const { picker, value, index } = event.detail;
-      Toast(`当前值：${value}, 当前索引：${index}`);
-    },
+    // codeCountdown: function() {
+    //   this.CDTime = 60;
+    //   this.isSend = true;
+    //   let that = this;
+    //   var interval = setInterval(function() {
+    //     that.CDTime--;
+    //     if (that.CDTime < 1) {
+    //       that.isSend = false;
+    //       clearInterval(interval);
+    //     }
+    //   }, 1000);
+    // },
+    // onChange(event) {
+    //   const { picker, value, index } = event.detail;
+    //   Toast(`当前值：${value}, 当前索引：${index}`);
+    // },
     // 获取全部门店
     getAllStore() {
       let that = this;
@@ -166,15 +167,15 @@ export default {
         }
       });
     },
-    getPhone(event) {
-      this.phone = event.mp.detail.value;
-    },
+    // getPhone(event) {
+    //   this.phone = event.mp.detail.value;
+    // },
     getName(event) {
       this.username = event.mp.detail.value;
     },
-    getSms(event) {
-      this.sms = event.mp.detail.value;
-    },
+    // getSms(event) {
+    //   this.sms = event.mp.detail.value;
+    // },
     getSex(event) {
       this.sexValue = event.mp.detail;
     },
@@ -187,8 +188,8 @@ export default {
           companyId: that.companyId,
           name: that.username,
           storeId: that.storeId,
-          phone: that.phone,
-          smsSendLogId: that.smsSendLogId || 15679,
+          phone: wx.getStorageSync("phone"),
+          // smsSendLogId: that.smsSendLogId || 15679,
           sex: that.sexValue
         },
         success(res) {

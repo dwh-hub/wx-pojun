@@ -82,7 +82,13 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest, getRange,getWXCompany } from "COMMON/js/common.js";
+import {
+  setNavTab,
+  window,
+  HttpRequest,
+  getRange,
+  getWXCompany
+} from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
@@ -129,7 +135,6 @@ export default {
   },
   mounted() {
     setNavTab("前锋体育");
-    getWXCompany('wx842adcf8a0ea1c9a')
     this.companyId = wx.getStorageSync("companyId");
     let that = this;
     wx.getLocation({
@@ -144,11 +149,14 @@ export default {
         that.getNearbyStoreList();
       }
     });
-    this.themeColor = window.color
+    this.themeColor = window.color;
     this.getBannerList();
     this.getRecommendCoach();
   },
-  onLoad() {
+  onLoad(options) {
+    if (options.appid) {
+      getWXCompany(options.appid);
+    }
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }

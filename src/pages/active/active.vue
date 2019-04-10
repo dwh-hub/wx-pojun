@@ -53,11 +53,9 @@ export default {
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }
+    setNavTab();
     this.companyId = wx.getStorageSync("companyId");
     this.getActiveList();
-  },
-  onLoad() {
-    setNavTab();
   },
   components: {
     noneResult

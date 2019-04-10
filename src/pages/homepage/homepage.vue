@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest, getRange } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest, getRange,getWXCompany } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
@@ -118,7 +118,8 @@ export default {
           storeName: "",
           storeId: ""
         }
-      ]
+      ],
+      themeColor: ""
     };
   },
   components: {
@@ -127,6 +128,9 @@ export default {
     coachItem
   },
   mounted() {
+    setNavTab("前锋体育");
+    getWXCompany('wx842adcf8a0ea1c9a')
+    this.companyId = wx.getStorageSync("companyId");
     let that = this;
     wx.getLocation({
       type: "wgs84",
@@ -140,21 +144,17 @@ export default {
         that.getNearbyStoreList();
       }
     });
+    this.themeColor = window.color
     this.getBannerList();
     this.getRecommendCoach();
   },
   onLoad() {
-    setNavTab("前锋体育");
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }
-    this.companyId = wx.getStorageSync("companyId");
     // this.getWxoauth();
   },
   computed: {
-    themeColor() {
-      return window.color;
-    },
     window() {
       return window;
     }
@@ -234,7 +234,6 @@ export default {
               teamCountByCoach: _data.teamCountByCoach,
               privateCountByCoach: _data.privateCountByCoach
             };
-            console.log(that.recommendCoach)
           }
         }
       });

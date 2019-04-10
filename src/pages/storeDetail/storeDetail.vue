@@ -78,6 +78,8 @@ export default {
     coachItem
   },
   onLoad(option) {
+    // 进页面前先清空数据
+    Object.assign(this.$data, this.$options.data());
     this.storeId = option.storeId;
     setNavTab();
   },

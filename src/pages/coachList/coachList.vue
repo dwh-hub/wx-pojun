@@ -3,7 +3,7 @@
     <div class="nav-tab">
       <div class="nav-tab-left">
         <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
-          {{curStore}}
+          {{curStore}}<i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showStoreList}">
             <div class="store-nav-list" :class="{slide: showStoreList}">
               <div
@@ -17,6 +17,7 @@
         </div>
         <div class="signing" :class="{active: currentNav==2}" @click="selectNav(2)">
           {{curCoachStatus}}
+          <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showSigning}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showSigning}">
               <div class="store-nav-item" @click.stop="selectCoach(1)">全部教练</div>
@@ -69,7 +70,7 @@ export default {
       signOnCoachList: [],
       storeNav: {},
       // 当前选择的选择门店
-      curStore: "全部门店",
+      curStore: "选择门店",
       curCoachStatus: "全部",
       curStoreId: "",
       // 当前登录用户的ID
@@ -87,11 +88,11 @@ export default {
     noneResult
   },
   onLoad() {
-    setNavTab();
     this.customerId = wx.getStorageSync("userInfo").id;
     this.companyId = wx.getStorageSync("companyId");
   },
   mounted() {
+    setNavTab();
     this.getAllStore();
     // .then(() => {
     //   this.getSingInCoachList();
@@ -309,6 +310,18 @@ page {
         }
         &.active {
           color: @theme-color;
+        }
+      }
+      .triangle-icon {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        vertical-align: middle;
+        background-size: 100%;
+        background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTU0ODg1MDMwOTQ5IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIxODgiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTUxMS45OTk0ODggODE5LjQxMzQ2MiA3Mi44Mzc0IDIwNC41ODY1MzggOTUxLjE2MjYgMjA0LjU4NjUzOFoiIHAtaWQ9IjIxODkiIGZpbGw9IiM5OTk5OTkiPjwvcGF0aD48L3N2Zz4=');
+        transition: transform 0.3s;
+        &.active {
+          transform: rotate(-180deg);
         }
       }
     }

@@ -75,6 +75,7 @@ import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
+import { setTimeout } from 'timers';
 
 export default {
   data() {
@@ -93,7 +94,7 @@ export default {
       teamClass_1: [],
       teamClass_3: [],
       teamClass_2: [],
-      classId: "",
+      // classId: "",
       // 当前登录用户的id
       customerId: "",
       actions: [{ name: "团课" }, { name: "私教" }]
@@ -105,27 +106,10 @@ export default {
     teamClassItem
   },
   onLoad(option) {
-    this.customerId = this.userInfo = wx.getStorageSync("userInfo").id;
-    this.classId = option.classId;
-    setNavTab();
+    this._onLoad(option);
   },
-  // onShow() {
-  //   this.selectNav(this.currentNav);
-  // },
-  // onHide() {
-  //   console.log('unload')
-  //   this.showSelect = false;
-  //   this.teamClassList = [];
-  //   this.coachList = [];
-  //   this.coachList_3 = [];
-  //   this.coachList_2 = [];
-  //   this.coachList_1 = [];
-  //   this.teamClass_1 = [];
-  //   this.teamClass_3 = [];
-  //   this.teamClass_2 = [];
-  // },
-  mounted() {
-    this.selectNav(this.currentNav);
+  onShow() {
+    this._onLoad();
   },
   computed: {
     btnText() {
@@ -139,60 +123,83 @@ export default {
     }
   },
   methods: {
+    _onLoad(option) {
+      // 进页面前先清空数据
+      // Object.assign(this.$data, this.$options.data());
+      this.clearData();
+      this.customerId = wx.getStorageSync("userInfo").id;
+      // this.classId = option.classId;
+      setNavTab();
+      this.selectNav(this.currentNav);
+    },
+    clearData() {
+      this.showSelect = false;
+      this.teamClassList = [{},{}];
+      this.coachList = [{},{}];
+      this.coachList_3 = [{},{}];
+      this.coachList_2 = [{},{}];
+      this.coachList_1 = [{},{}];
+      this.teamClass_1 = [{},{}];
+      this.teamClass_3 = [{},{}];
+      this.teamClass_2 = [{},{}];
+    },
     selectNav(index) {
+      this.clearData()
+      // setTimeout(() => {
       this.currentNav = index;
       if (!store.state.isLogin) {
         return;
       }
       if (index == 1) {
         // 待上课
-        if (!this.coachList_1.length) {
+        // if (!this.coachList_1.length) {
           this.getOwnCoachClassList(2).then(() => {
             this.coachList = this.coachList_1;
           });
-        } else {
-          this.coachList = this.coachList_1;
-        }
-        if (!this.teamClass_1.length) {
+        // } else {
+          // this.coachList = this.coachList_1;
+        // }
+        // if (!this.teamClass_1.length) {
           this.getOwnTeamClassList(1).then(() => {
             this.teamClassList = this.teamClass_1;
           });
-        } else {
-          this.teamClassList = this.teamClass_1;
-        }
+        // } else {
+          // this.teamClassList = this.teamClass_1;
+        // }
       } else if (index == 2) {
         // 待评价
-        if (!this.coachList_2.length) {
+        // if (!this.coachList_2.length) {
           this.getOwnCoachClassList(3, 1).then(() => {
             this.coachList = this.coachList_2;
           });
-        } else {
-          this.coachList = this.coachList_2;
-        }
-        if (!this.teamClass_2.length) {
+        // } else {
+          // this.coachList = this.coachList_2;
+        // }
+        // if (!this.teamClass_2.length) {
           this.getOwnTeamClassList(3, 1).then(() => {
             this.teamClassList = this.teamClass_2;
           });
-        } else {
-          this.teamClassList = this.teamClass_2;
-        }
+        // } else {
+          // this.teamClassList = this.teamClass_2;
+        // }
       } else if (index == 3) {
         // 3 已完成 储存中有数据直接读取，没有调用接口
-        if (!this.coachList_3.length) {
+        // if (!this.coachList_3.length) {
           this.getOwnCoachClassList(3).then(() => {
             this.coachList = this.coachList_3;
           });
-        } else {
-          this.coachList = this.coachList_3;
-        }
-        if (!this.teamClass_3.length) {
+        // } else {
+          // this.coachList = this.coachList_3;
+        // }
+        // if (!this.teamClass_3.length) {
           this.getOwnTeamClassList(3).then(() => {
             this.teamClassList = this.teamClass_3;
           });
-        } else {
-          this.teamClassList = this.teamClass_3;
-        }
+        // } else {
+          // this.teamClassList = this.teamClass_3;
+        // }
       }
+      // }, 1000)
     },
     toggleSelect() {
       this.showSelect = true;
@@ -254,9 +261,9 @@ export default {
      * @param {Number} waitEvaluate 1 待评价
      */
     getOwnTeamClassList(status, waitEvaluate) {
-      wx.showLoading({
-        title: '加载中...'
-      })
+      // wx.showLoading({
+      //   title: "加载中..."
+      // });
       // 待评价
       if (status == 3 && waitEvaluate == 1) {
         return this.getTWaitEvaluate();
@@ -294,7 +301,7 @@ export default {
               }
               resolve();
             }
-            wx.hideLoading()
+            // wx.hideLoading();
           }
         });
       });
@@ -305,9 +312,9 @@ export default {
      * @param {Number} waitEvaluate 1 待评价
      */
     getOwnCoachClassList(status, waitEvaluate) {
-      wx.showLoading({
-        title: '加载中...'
-      })
+      // wx.showLoading({
+      //   title: "加载中..."
+      // });
       // 待评价
       if (status == 3 && waitEvaluate == 1) {
         return this.getWaitEvaluateList();
@@ -354,16 +361,16 @@ export default {
               }
               resolve();
             }
-            wx.hideLoading()
+            // wx.hideLoading();
           }
         });
       });
     },
     // 获取私教待评价列表
     getWaitEvaluateList() {
-      wx.showLoading({
-        title: '加载中...'
-      })
+      // wx.showLoading({
+      //   title: "加载中..."
+      // });
       let that = this;
       return new Promise(function(resolve) {
         HttpRequest({
@@ -378,16 +385,16 @@ export default {
               that.coachList_2 = res.data.data.result;
               resolve();
             }
-            wx.hideLoading()
+            // wx.hideLoading();
           }
         });
       });
     },
     // 获取团课待评价列表
     getTWaitEvaluate() {
-      wx.showLoading({
-        title: '加载中...'
-      })
+      // wx.showLoading({
+      //   title: "加载中..."
+      // });
       let that = this;
       return new Promise(function(resolve) {
         HttpRequest({
@@ -402,7 +409,7 @@ export default {
               that.teamClass_2 = res.data.data.result;
               resolve();
             }
-            wx.hideLoading()
+            // wx.hideLoading();
           }
         });
       });

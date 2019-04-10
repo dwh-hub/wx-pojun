@@ -15,13 +15,13 @@
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
-          > -->
+          >-->
         </swiper-item>
       </div>
     </swiper>
     <div class="class-name">{{classDetail.anotherName || '课程名称'}}</div>
     <div class="coach-detail">
-      <div class="coach-detail-item" v-for="(item, index) in coachList" :key="index">
+      <div class="coach-detail-item" v-for="(item, index) in coachList" :key="index" @click="toNav(item.coachId)">
         <div class="cover">
           <img :scr="window.api + item.coachHeadImg">
         </div>
@@ -69,7 +69,12 @@
         <span class="process-item">成功上课</span>
       </div>
     </div>
-    <div class="bottom-btn appointment" @click="appointClass" :style="{'background-color': window.color}" v-if="canAppoint">
+    <div
+      class="bottom-btn appointment"
+      @click="appointClass"
+      :style="{'background-color': window.color}"
+      v-if="canAppoint"
+    >
       马上预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
@@ -110,6 +115,8 @@ export default {
     titleCell
   },
   onLoad(option) {
+    // 进页面前先清空数据
+    Object.assign(this.$data, this.$options.data());
     this.id = option.classId;
     setNavTab();
   },
@@ -144,10 +151,15 @@ export default {
       return store.state.isIphoneX;
     },
     window() {
-      return window
+      return window;
     }
   },
   methods: {
+    toNav(id) {
+      wx.navigateTo({
+        url: "../coachDetail/main?coachId="+id
+      });
+    },
     // 预约团课
     appointClass() {
       if (!store.state.isLogin) {
@@ -205,10 +217,10 @@ export default {
         methods: "POST",
         success(res) {
           if (res.data.code === 200) {
-            if(new Date().getTime() > res.data.data.timeStart) {
-              that.canAppoint = false
+            if (new Date().getTime() > res.data.data.timeStart) {
+              that.canAppoint = false;
             }
-            res.data.data.masterImg = res.data.data.masterImg.split(",")
+            res.data.data.masterImg = res.data.data.masterImg.split(",");
             that.classDetail = res.data.data;
             that.getAddress();
           }

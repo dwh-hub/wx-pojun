@@ -1,20 +1,34 @@
 <template>
-  <div class="team-class-item" @click="toDetail">
-    <div class="cover">
-      <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
-      <img :src="window.api + info.masterImg">
-    </div>
-    <div class="team-class-info">
-      <div class="team-class-name">{{info.anotherName || info.projectName || '团课名称'}}</div>
-      <div class="team-class-coach">{{coachStr || '团课教练'}}</div>
-      <div class="team-class-time">
-        <span>{{info.storeName}}-{{info.venueName || '场馆名称'}}</span>
-        {{startTime}}~{{endTime}}
+  <div class="team-class-item">
+    <div v-if="info.teamScheduleId || info.coachAppointId" @click="toDetail">
+      <div class="cover">
+        <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
+        <img :src="window.api + info.masterImg">
+      </div>
+      <div class="team-class-info">
+        <div class="team-class-name">{{info.anotherName || info.projectName || '团课名称'}}</div>
+        <div class="team-class-coach">{{coachStr || '团课教练'}}</div>
+        <div class="team-class-time">
+          <span>{{info.storeName}}-{{info.venueName || '场馆名称'}}</span>
+          {{startTime}}~{{endTime}}
+        </div>
+      </div>
+      <div class="tag">
+        <!-- <div class="team-class-type">$瑜伽$</div>
+        <div class="team-class-status">$热门$</div>-->
       </div>
     </div>
-    <div class="tag">
-      <!-- <div class="team-class-type">$瑜伽$</div>
-      <div class="team-class-status">$热门$</div>-->
+    <div v-else>
+      <div class="cover"></div>
+      <div class="skeleton-wrapper">
+        <div class="skeleton-name"></div>
+        <div class="skeleton-coach"></div>
+        <div class="skeleton-time">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -81,19 +95,21 @@ export default {
 @import "~COMMON/less/common.less";
 
 .team-class-item {
-  display: flex;
-  padding-right: 10px;
-  box-shadow: 0px 0px 10px #eee;
-  border-radius: 2px;
-  background-color: #fff;
+  > div {
+    display: flex;
+    padding-right: 10px;
+    box-shadow: 0px 0px 10px #eee;
+    border-radius: 2px;
+    background-color: #fff;
+  }
   .cover {
     flex: 0 0 90px;
     width: 90px;
     height: 90px;
+    background-color: #eee;
     > img {
       width: 100%;
       height: 100%;
-      background-color: #eee;
     }
   }
   .team-class-info {
@@ -123,6 +139,31 @@ export default {
       }
       font-size: 12px;
       color: #bababa;
+    }
+  }
+  .skeleton-wrapper {
+    padding: 0 12px;
+    width: 100%;
+    > div {
+      margin-top: 12px;
+    }
+    .skeleton-name {
+      height: 14px;
+      background-color: #eee;
+    }
+    .skeleton-coach {
+      height: 10px;
+      background-color: #eee;
+    }
+    .skeleton-time {
+      > span {
+        display: inline-block;
+        margin-top: 8px;
+        height: 8px;
+        width: 40px;
+        margin-right: 10px;
+        background-color: #eee;
+      }
     }
   }
   .tag {

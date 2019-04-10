@@ -30,7 +30,8 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  getRange
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
@@ -78,6 +79,8 @@ export default {
     }
   },
   onLoad(options) {
+    // 进页面前先清空数据
+    Object.assign(this.$data, this.$options.data());
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     if (options.teamAttendId) {

@@ -5,6 +5,7 @@
       <div class="nav-tab">
         <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
           {{curStore}}
+          <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showStoreNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showStoreNav}">
               <div
@@ -18,6 +19,7 @@
         </div>
         <div class="class" :class="{active: currentNav==2}" @click="selectNav(2)">
           {{curSchedule}}
+          <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showScheduleNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showScheduleNav}">
               <div
@@ -32,6 +34,7 @@
         <!-- <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div> -->
         <div class="coach" :class="{active: currentNav==4}" @click="selectNav(4)">
           {{curCoach}}
+          <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showCoachNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showCoachNav}">
               <div
@@ -39,7 +42,10 @@
                 v-for="(item, index) in coachNav"
                 :key="index"
                 @click.stop="selectCoach(item)"
-              >{{item.userName}}</div>
+              >
+                <img :src="window.api +item.headImgPath">
+                <span>{{item.userName}}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -93,14 +99,12 @@ export default {
       companyId: ""
     };
   },
-  onLoad() {
-    setNavTab();
-  },
   components: {
     teamClassItem,
     selectDate
   },
   mounted() {
+    setNavTab();
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.companyId = wx.getStorageSync("companyId");
     this.getAllStore();
@@ -113,6 +117,9 @@ export default {
       } else {
         return false;
       }
+    },
+    window() {
+      return window;
     }
   },
   // 触底刷新
@@ -152,9 +159,9 @@ export default {
       this.showStoreNav = false;
       this.curStoreId = item.storeId;
       this.curStore = item.storeName || "全部门店";
-      if(item.storeName == "全部门店") {
-        this.curCoach = "全部教练"
-        this.curCoachId = ""
+      if (item.storeName == "全部门店") {
+        this.curCoach = "全部教练";
+        this.curCoachId = "";
       }
       this.getClassList();
       this.getCoachList();
@@ -171,7 +178,7 @@ export default {
     selectSchedule(item) {
       this.showScheduleNav = false;
       this.curSchedule = item.courseTitle;
-      this.getClassList()
+      this.getClassList();
     },
     clickMask() {
       this.showScheduleNav = false;
@@ -249,16 +256,16 @@ export default {
           success(res) {
             resolve();
             if (!res.data.data.length) {
-              return that.coachNav = that.coachNav.concat({
+              return (that.coachNav = that.coachNav.concat({
                 userName: "无"
-              });
+              }));
             }
             let _list = res.data.data;
             _list.unshift({
               userName: "全部教练",
               userId: ""
-            })
-            that.coachNav = _list
+            });
+            that.coachNav = _list;
           }
         });
       });
@@ -276,9 +283,9 @@ export default {
             let _list = res.data.data.result;
             _list.unshift({
               courseTitle: "全部课程"
-            })
-            console.log(_list)
-            that.scheduleNav = _list
+            });
+            console.log(_list);
+            that.scheduleNav = _list;
           }
         }
       });
@@ -303,6 +310,18 @@ export default {
     .nav-tab {
       display: flex;
       position: relative;
+      .triangle-icon {
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        vertical-align: middle;
+        background-size: 100%;
+        background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTU0ODg1MDMwOTQ5IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIxODgiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTUxMS45OTk0ODggODE5LjQxMzQ2MiA3Mi44Mzc0IDIwNC41ODY1MzggOTUxLjE2MjYgMjA0LjU4NjUzOFoiIHAtaWQ9IjIxODkiIGZpbGw9IiM5OTk5OTkiPjwvcGF0aD48L3N2Zz4=");
+        transition: transform 0.3s;
+        &.active {
+          transform: rotate(-180deg);
+        }
+      }
       > div {
         flex: 1;
         line-height: 42px;
@@ -344,6 +363,17 @@ export default {
             line-height: 50px;
             padding-left: 20px;
             border-top: 1rpx solid #eee;
+            > img {
+              margin-right: 10px;
+              width: 36px;
+              height: 36px;
+              background-color: #eee;
+              border-radius: 50%;
+            }
+            > span {
+              display: inline-block;
+              vertical-align: middle;
+            }
             &.active {
               color: @theme-color;
             }

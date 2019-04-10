@@ -105,7 +105,7 @@ export default {
       arrId: []
     };
   },
-  onLoad() {
+  mounted() {
     setNavTab();
   },
   onShow() {

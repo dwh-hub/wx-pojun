@@ -1,7 +1,7 @@
 <template>
   <div class="store-item" @click="toDetail">
     <div class="store-cover">
-      <!--src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"-->
+      <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
       <img :src="info.cover">
     </div>
     <div class="store-info">

@@ -26,14 +26,14 @@
 
     <div class="mineDeail">
       <div class="detail-block">
-        <div class="block-flex" @click="navTo(mineNav[0].navigatorUrl)">
-          <div class="count" v-if="isLogin">{{mineNav[0].hit || 0}}</div>
+        <div class="block-flex" @click="navTo('../memberCard/main')">
+          <div class="count" v-if="isLogin">{{cardNum || 0}}</div>
           <div class="count" v-else>0</div>
           <div class="count-text">会员卡</div>
         </div>
-        <div class="block-flex">
-          <div class="count">{{myPoints || 0}}</div>
-          <div class="count-text">积分</div>
+        <div class="block-flex" @click="navTo('../classTimes/main')">
+          <div class="count">{{FreeCount || 0}}</div>
+          <div class="count-text">消费次数</div>
         </div>
       </div>
       <div
@@ -92,20 +92,20 @@ export default {
   data() {
     return {
       mineNav: [
-        {
-          imgUrl: "https://www.pojun-tech.cn/assets/img/mineCar.png",
-          navName: "会员卡",
-          navigatorUrl: "../memberCard/main",
-          hit: "",
-          text: "张"
-        },
-        {
-          imgUrl: "https://www.pojun-tech.cn/assets/img/lessons.png",
-          navName: "上课次数",
-          navigatorUrl: "../classTimes/main",
-          hit: "",
-          text: "次"
-        },
+        // {
+        //   imgUrl: "https://www.pojun-tech.cn/assets/img/mineCar.png",
+        //   navName: "会员卡",
+        //   navigatorUrl: "../memberCard/main",
+        //   hit: "",
+        //   text: "张"
+        // },
+        // {
+        //   imgUrl: "https://www.pojun-tech.cn/assets/img/lessons.png",
+        //   navName: "上课次数",
+        //   navigatorUrl: "../classTimes/main",
+        //   hit: "",
+        //   text: "次"
+        // },
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/appiont.png",
           navName: "预约记录",
@@ -143,13 +143,14 @@ export default {
       companyList: [],
       // 选择的公司
       curCompany: {},
+      // 会员卡张数
+      cardNum: "",
       // 积分
-      myPoints: ""
+      myPoints: "",
+      // 消费次数
+      FreeCount:"",
+      themeColor: ""
     };
-  },
-  onLoad() {
-    this.getTimes();
-    setNavTab();
   },
   onShow() {
     if (wx.getStorageSync("sessionKey")) {
@@ -168,9 +169,12 @@ export default {
     }
   },
   mounted() {
+    this.getTimes();
+    setNavTab();
     this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);
     this.isLogin = store.state.isLogin;
+    this.themeColor = window.color
   },
   computed: {
     isLogin() {
@@ -185,9 +189,6 @@ export default {
         );
       }
       return "";
-    },
-    themeColor() {
-      return window.color;
     }
   },
   methods: {
@@ -205,7 +206,6 @@ export default {
     },
     // 退出登录
     singOut() {
-      // return wx.clearStorage()
       let that = this;
       wx.showModal({
         title: "提示",
@@ -239,13 +239,6 @@ export default {
         }
       });
     },
-    // 登录
-    // singIn() {
-    // wx.navigateTo({
-    //   // url: "../login/main"
-    //   url: "../authorizeLogin/main"
-    // });
-    // },
     getTimes() {
       let that = this;
       HttpRequest({
@@ -254,6 +247,8 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             that.myPoints = res.data.data.selfIntegral;
+            that.FreeCount = res.data.data.attendClassCount;
+            that.cardNum = res.data.data.cardCount;
             that.mineNav.forEach(function(e) {
               if (e.navName == "会员卡") {
                 e.hit = res.data.data.cardCount;
@@ -269,6 +264,7 @@ export default {
               // }
             });
           } else {
+            store.commit("changeLogin", false);
             // wx.navigateTo({
             //   url: "../authorizeLogin/main"
             //   // url: "../login/main"
@@ -277,29 +273,6 @@ export default {
         }
       });
     },
-    // 判断是否有sessionKey/sessionKey是否过期
-    // getPhoneNumberBefore(e) {
-    //   // let that = this;
-    //   // if (wx.getStorageSync("sessionKey")) {
-    //   //   wx.checkSession({
-    //   //     success() {
-    //   //       console.log("未过期");
-    //   //       that.getPhoneNumber(e);
-    //   //     },
-    //   //     fail() {
-    //   //       console.log("过期");
-    //   //       wxLogin().then(() => {
-    //   //         that.getPhoneNumber(e);
-    //   //       });
-    //   //     }
-    //   //   });
-    //   // } else {
-    //   // console.log("不存在，重新获取");
-    //   wxLogin().then(() => {
-    //     this.getPhoneNumber(e);
-    //   });
-    //   // }
-    // },
     // 获取微信加密数据
     getPhoneNumber(e) {
       let that = this;
@@ -580,106 +553,6 @@ page {
     }
   }
 }
-
-// .memberMineTab {
-//   .mine_top {
-//     padding: 20px 30px;
-//     box-sizing: border-box;
-//     height: 110px;
-//     .mineImgDiv {
-//       float: left;
-//       border-radius: 50%;
-//       .mineImg {
-//         width: 66px;
-//         height: 66px;
-//         border-radius: 5px;
-//       }
-//     }
-//     .mineDetail {
-//       // margin: 13px 0 0 15px;
-//       float: left;
-//       margin-left: 15px;
-//       .authorize {
-//         &::after {
-//           border: 0;
-//         }
-//         background-color: rgba(0, 0, 0, 0);
-//         color: #333;
-//       }
-//       > p {
-//         line-height: 33px;
-//         font-size: 15px;
-//       }
-//       .toLogin {
-//         height: 66px;
-//       }
-//     }
-//   }
-//   .mineDeail {
-//     border-top: 10px solid #f5f6f7;
-//     .detail_item {
-//       height: 46px;
-//       line-height: 46px;
-//       font-size: 15px;
-//       padding-left: 15px;
-//       border-bottom: 1px solid #ededed;
-//       > img {
-//         display: inline-block;
-//         vertical-align: middle;
-//         width: 25px;
-//         height: 25px;
-//       }
-//       .detail_title {
-//         vertical-align: middle;
-//         margin-left: 10px;
-//       }
-//       .detail_contrnt {
-//         float: right;
-//         margin-right: 15px;
-//       }
-//     }
-//   }
-//   .mineExit {
-//     position: absolute;
-//     bottom: 15px;
-//     left: 4%;
-//     width: 92%;
-//     height: 40px;
-//     line-height: 40px;
-//     color: white;
-//     text-align: center;
-//     border-radius: 5px;
-//     &:active {
-//       opacity: 0.8;
-//     }
-//   }
-//   .companyList {
-//     padding: 15px;
-//     background: white;
-//     .companyMain {
-//       > span {
-//         &.active {
-//           color: @theme-color;
-//           border: 1rpx solid @theme-color;
-//         }
-//       }
-//     }
-//     > p {
-//       width: 100%;
-//       text-align: center;
-//     }
-//     span {
-//       display: block;
-//       height: 40px;
-//       line-height: 40px;
-//       width: 100%;
-//       text-align: center;
-//       border-radius: 5px;
-//       border: 1px solid #cccccc;
-//       margin-top: 20px;
-//     }
-//   }
-// }
 </style>
 
 

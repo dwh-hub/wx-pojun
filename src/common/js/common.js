@@ -1,7 +1,7 @@
 const window = {}
 window.DEBUGGING = true
 window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
-window.color = "#2a82e4" // "#00c2a9"
+window.color = "" // "#00c2a9"
 let Cookie = ""
 
 // 获取sessionKey 需调用wx.login获取sessionKey
@@ -38,8 +38,8 @@ export function getThemeColor() {
       companyId: wx.getStorageSync("companyId")
     },
     success(res) {
-      if(res.data.code == 200) {
-        window.color = res.data.data.themeColor || "#2a82e4"
+      if (res.data.code == 200) {
+        window.color = JSON.parse(res.data.data.baseInfo).themeColor || '#2a82e4'
       } else {
         window.color = "#2a82e4"
       }
@@ -95,6 +95,25 @@ export function setNavTab(title) {
       timingFunc: "easeIn"
     }
   });
+}
+
+/**
+ * 获取公众号的公司信息
+ * @param {String} appid 微信公众号的appid
+ */
+export function getWXCompany(appid) {
+  wx.request({
+    url: window.api + '/wxopen/getCompanyByAuthAppId',
+    data: {
+      authAppId: appid
+    },
+    success(res) {
+      wx.setStorageSync({
+        key: "companyId",
+        data: res.data.data
+      });
+    }
+  })
 }
 
 /**
@@ -253,6 +272,7 @@ export function getRange(lat1, lng1, lat2, lng2) {
 
 export default {
   window,
+  getThemeColor,
   setNavTab,
   HttpRequest,
   checkPhoneFormat,
@@ -260,6 +280,5 @@ export default {
   formatDate,
   debounce,
   getRange,
-  wxLogin,
-  getThemeColor
+  wxLogin
 }

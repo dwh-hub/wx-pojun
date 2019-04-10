@@ -1,6 +1,7 @@
 <template>
   <div class="coach-item" @click="toDetail">
     <div class="cover">
+      <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
       <img :src="imgUrl">
     </div>
     <div class="coach-info">

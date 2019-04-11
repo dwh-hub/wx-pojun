@@ -29,9 +29,7 @@ export default {
       weekArray: [],
       dayArray: [],
       dateArray: [],
-      // 今日礼拜几
       curWeek: "",
-      // 今日几号
       curDay: "",
       // 选择的日期index
       selectDateIndex: 0

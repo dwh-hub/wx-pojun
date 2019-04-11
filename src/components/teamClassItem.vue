@@ -1,6 +1,6 @@
 <template>
   <div class="team-class-item">
-    <div v-if="info.teamScheduleId || info.coachAppointId" @click="toDetail">
+    <div v-if="info.teamScheduleId || info.coachAppointId" @click="toDetail" class="team-class-item-y">
       <div class="cover">
         <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
         <img :src="window.api + info.masterImg">
@@ -13,10 +13,7 @@
           {{startTime}}~{{endTime}}
         </div>
       </div>
-      <div class="tag">
-        <!-- <div class="team-class-type">$瑜伽$</div>
-        <div class="team-class-status">$热门$</div>-->
-      </div>
+      <div class="tag" v-if="isTag" :style="{'background-color': tag.color}">{{tag.text}}</div>
     </div>
     <div v-else>
       <div class="cover"></div>
@@ -35,6 +32,7 @@
 
 <script>
 import { formatDate, window } from "COMMON/js/common.js";
+import { setTimeout } from "timers";
 export default {
   name: "team-class-item",
   props: {
@@ -47,6 +45,10 @@ export default {
     isToDetail: {
       type: Boolean,
       default: true
+    },
+    isTag: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
@@ -60,6 +62,38 @@ export default {
     }
   },
   computed: {
+    tag() {
+      if (this.info.status == "1") {
+        return {
+          text: "已预约",
+          color: "#70b624"
+        }
+      } else if (this.info.status == "3") {
+        return {
+          text: this.info.statusChar,
+          color: "#2ab4fc"
+        }
+      } else if (this.info.status == "0") {
+        return {
+          text: this.info.statusChar,
+          color: "#ff9800"
+        }
+      } else if (this.info.status == "9") {
+        return {
+          text: "前台已确认",
+          color: "#ffcccc"
+        }
+      } else {
+        return {
+          text: this.info.statusChar,
+          color: "#ef4f4f"
+        }
+      }
+      return {
+          text: "",
+          color: ""
+        };
+    },
     startTime() {
       if (this.info.timeStart) {
         return formatDate(new Date(this.info.timeStart), "hh:mm");
@@ -166,20 +200,36 @@ export default {
       }
     }
   }
-  .tag {
-    .team-class-type {
-      font-size: 10px;
-      padding: 2px 5px;
-      color: #999;
-      border: 1px solid #ccc;
-    }
-    .team-class-status {
-      font-size: 10px;
-      padding: 2px 5px;
-      color: #f17f55;
-      background-color: #feeee9;
+  .team-class-item-y {
+    position: relative;
+    overflow: hidden;
+    .tag {
+      position: absolute;
+      right: -30px;
+      top: 12px;
+      width: 120px;
+      line-height: 20px;
+      text-align: center;
+      color: #fff;
+      position: absolute;
+      transform: rotate(32deg);
+      font-size: 12px;
     }
   }
+  // .tag {
+    // .team-class-type {
+    //   font-size: 10px;
+    //   padding: 2px 5px;
+    //   color: #999;
+    //   border: 1px solid #ccc;
+    // }
+    // .team-class-status {
+    //   font-size: 10px;
+    //   padding: 2px 5px;
+    //   color: #f17f55;
+    //   background-color: #feeee9;
+    // }
+  // }
 }
 </style>
 

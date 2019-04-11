@@ -3,7 +3,7 @@
     <div class="appointment-item" v-for="(item, index) in recordList" :key="index">
       <div class="record-left">
         <div class="time">{{item.endTime}}</div>
-        <div class="type success" :class="{fail: item.status == '已取消'}">{{item.status}}</div>
+        <div class="type success" :class="{fail: (item.status == 5 || item.status == 7|| item.status == 9)}">{{item.statusChar}}</div>
         <span class="dot"></span>
       </div>
       <div class="record-right">
@@ -65,8 +65,9 @@ export default {
           }
           let _data = res.data.data.result.map(e => {
             return {
-              name: e.secondCardClassName || "",
-              status: e.statusChar,
+              name: e.cardClassName || "",
+              statusChar: e.statusChar,
+              status: e.status,
               date: e.timeEnd.split(" ")[0],
               startTime: e.timeStart.split(" ")[1].slice(0, 5),
               endTime: e.timeEnd.split(" ")[1].slice(0, 5)

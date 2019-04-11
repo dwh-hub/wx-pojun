@@ -97,7 +97,7 @@ import store from "../../utils/store";
 export default {
   data() {
     return {
-      bannerArr: ["https://www.pojun-tech.com/assets/img/morenImg.jpg"],
+      // bannerArr: ["https://www.pojun-tech.com/assets/img/morenImg.jpg"],
       storeList: [],
       // touch: {
       //   x: "",
@@ -109,22 +109,7 @@ export default {
       recommendCoach: {},
       recommendClass: {},
       companyId: "",
-      nearbyStoreList: [
-        {
-          cover: "",
-          address: "",
-          range: "",
-          storeName: "",
-          storeId: ""
-        },
-        {
-          cover: "",
-          address: "",
-          range: "",
-          storeName: "",
-          storeId: ""
-        }
-      ],
+      nearbyStoreList: [],
       themeColor: ""
     };
   },
@@ -134,7 +119,7 @@ export default {
     coachItem
   },
   mounted() {
-    setNavTab("前锋体育");
+    setNavTab(wx.getStorageSync("companyName"));
     this.companyId = wx.getStorageSync("companyId");
     let that = this;
     wx.getLocation({
@@ -152,6 +137,12 @@ export default {
     this.themeColor = window.color;
     this.getBannerList();
     this.getRecommendCoach();
+  },
+  onShow() {
+    if (this.themeColor == "" || this.themeColor == "#fff") {
+      this.themeColor = window.color;
+      setNavTab(wx.getStorageSync("companyName"));
+    }
   },
   onLoad(options) {
     if (options.appid) {
@@ -303,34 +294,34 @@ export default {
         var value2 = b[property];
         return value1 - value2;
       };
-    },
-    // 获取微信公众号信息
-    getWxoauth() {
-      let that = this;
-      HttpRequest({
-        url: window.api + "/wxopen/wxoauth/wxcustomer",
-        data: {
-          appid: "wx842adcf8a0ea1c9a"
-        },
-        success(res) {
-          if (res.data.code) {
-            HttpRequest({
-              url: window.api + "/wxopen/wxoauth/wxlogin",
-              data: {
-                appid: "wx842adcf8a0ea1c9a"
-              },
-              success(res) {
-                console.log(res);
-                // wx.setStorage({
-                //   key: "companyId",
-                //   data: res.data.data.companyId
-                // });
-              }
-            });
-          }
-        }
-      });
     }
+    // 获取微信公众号信息
+    // getWxoauth() {
+    //   let that = this;
+    //   HttpRequest({
+    //     url: window.api + "/wxopen/wxoauth/wxcustomer",
+    //     data: {
+    //       appid: "wx842adcf8a0ea1c9a"
+    //     },
+    //     success(res) {
+    //       if (res.data.code) {
+    //         HttpRequest({
+    //           url: window.api + "/wxopen/wxoauth/wxlogin",
+    //           data: {
+    //             appid: "wx842adcf8a0ea1c9a"
+    //           },
+    //           success(res) {
+    //             console.log(res);
+    //             // wx.setStorage({
+    //             //   key: "companyId",
+    //             //   data: res.data.data.companyId
+    //             // });
+    //           }
+    //         });
+    //       }
+    //     }
+    //   });
+    // }
     // touchStart(e) {
     //   // console.log(e)
     //   this.touch.x = e.clientX;

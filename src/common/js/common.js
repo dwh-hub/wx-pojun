@@ -110,8 +110,14 @@ export function getWXCompany(appid) {
     success(res) {
       wx.setStorageSync({
         key: "companyId",
-        data: res.data.data
+        data: res.data.data.companyId
       });
+      wx.setStorageSync({
+        key: "companyName",
+        data: res.data.data.companyName
+      });
+      getThemeColor()
+      // res.data.data.companyName
     }
   })
 }

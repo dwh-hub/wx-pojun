@@ -253,7 +253,7 @@ export default {
       }
       if (this.coachAppointId) {
         wx.redirectTo({
-          url: "../coachList/main"
+          url: "../appointmentCoach/main?coachId=" + this.detail.coachId
         });
       }
     }

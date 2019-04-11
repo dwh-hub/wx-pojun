@@ -41,7 +41,6 @@
         v-for="(item, index) in mineNav"
         :key="index"
         @click="navTo(item.navigatorUrl)"
-        v-show="item.navName != '会员卡'"
       >
         <img alt :src="item.imgUrl">
         <span class="detail_title">{{item.navName}}</span>
@@ -153,20 +152,22 @@ export default {
     };
   },
   onShow() {
-    if (wx.getStorageSync("sessionKey")) {
-      wx.checkSession({
-        success() {
-          console.log("未过期");
-        },
-        fail() {
-          console.log("过期");
-          wxLogin();
-        }
-      });
-    } else {
-      console.log("不存在，重新获取");
+    // if (wx.getStorageSync("sessionKey")) {
+    //   wx.checkSession({
+    //     success() {
+    //       console.log("未过期");
+    //     },
+    //     fail() {
+    //       console.log("过期");
+    //       wxLogin();
+    //     }
+    //   });
+    // } else {
+    //   console.log("不存在，重新获取");
+    if(store.state.isLogin == false) {
       wxLogin();
     }
+    // }
   },
   mounted() {
     this.getTimes();
@@ -230,6 +231,12 @@ export default {
                   });
                   wx.reLaunch({
                     url: "../mine/main"
+                  });
+                } else {
+                  wx.showModal({
+                    title: "提示",
+                    content: res.data.message,
+                    showCancel: false
                   });
                 }
               }

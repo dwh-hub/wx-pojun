@@ -7,6 +7,7 @@
         :isToDetail="false"
         v-for="(item, index) in list"
         :key="index"
+        :isTag="true"
       ></team-class-item>
     </div>
     <div class="coach-group" v-else>
@@ -16,6 +17,7 @@
         :isToDetail="false"
         v-for="(item, index) in list"
         :key="index"
+        :isTag="true"
       ></team-class-item>
     </div>
     <div class="loading" v-show="isLoading">
@@ -49,8 +51,8 @@ export default {
     // type 1 团课 2 私教课
     this.options = options;
     wx.showLoading({
-      title: '加载中...'
-    })
+      title: "加载中..."
+    });
     // if (options.type == 1) {
     //   this.getOwnTeamClassList(options.status, options.waitEvaluate);
     // } else if (options.type == 2) {
@@ -78,6 +80,9 @@ export default {
     getList() {
       // type 1 团课 2 私教课
       if (this.options.type == 1) {
+        wx.setNavigationBarTitle({
+          title: "我的团课"
+        });
         if (this.options.status == 3 && this.options.waitEvaluate == 1) {
           return this.getTWaitEvaluate();
         }
@@ -86,6 +91,9 @@ export default {
           this.options.waitEvaluate
         );
       } else if (this.options.type == 2) {
+        wx.setNavigationBarTitle({
+          title: "我的私教"
+        });
         if (this.options.status == 3 && this.options.waitEvaluate == 1) {
           return this.getWaitEvaluateList();
         }
@@ -130,7 +138,7 @@ export default {
             that.list = that.list.concat(res.data.data.result);
             that.page++;
           }
-          wx.hideLoading()
+          wx.hideLoading();
         }
       });
     },
@@ -175,13 +183,15 @@ export default {
                 timeEnd: e.timeEnd,
                 storeName: e.storeName,
                 venueName: e.venueName,
-                coachNameArrayStr: e.coachName
+                coachNameArrayStr: e.coachName,
+                status: e.status,
+                statusChar: e.statusChar
               };
             });
             that.page++;
             that.list = that.list.concat(_data);
           }
-          wx.hideLoading()
+          wx.hideLoading();
         }
       });
     },
@@ -201,7 +211,7 @@ export default {
               that.list = res.data.data.result;
               resolve();
             }
-            wx.hideLoading()
+            wx.hideLoading();
           }
         });
       });
@@ -222,7 +232,7 @@ export default {
               that.list = res.data.data.result;
               resolve();
             }
-            wx.hideLoading()
+            wx.hideLoading();
           }
         });
       });

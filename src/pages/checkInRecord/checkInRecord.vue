@@ -2,13 +2,16 @@
   <div class="check-in-record">
     <div class="flex-wrapper" v-for="(item, index) in list" :key="index">
       <div class="cover flex-left">
-        <img src="http://pojun-tech.cn/assets/img/morenTo.png">
+        <!-- <img src="http://pojun-tech.cn/assets/img/morenTo.png"> -->
+        <div class="day">{{item.day}}</div>
+        <div class="month">{{item.month}}月</div>
       </div>
       <div class="flex-middle">
         <div class="flex-middle-item">{{item.secondCardClassName}}</div>
-        <div class="flex-middle-item">{{item.addTime}}</div>
+        <!-- <div class="flex-middle-item">{{item.addTime}}</div> -->
+        <div class="flex-middle-item">{{item.passModeValue}}</div>
       </div>
-      <div class="flex-right">{{item.passModeValue}}</div>
+      <!-- <div class="flex-right">{{item.passModeValue}}</div> -->
     </div>
     <div class="loading" v-show="isLoading">
       <van-loading color="#999" custom-class="loading"/>
@@ -65,8 +68,18 @@ export default {
               }
               return;
             }
+            let _list = res.data.data.result;
+            _list = _list.map(e => {
+              return {
+                month: e.startTime.slice(5, 7),
+                day: e.startTime.slice(8, 10),
+                passModeValue: e.passModeValue,
+                secondCardClassName: e.secondCardClassName,
+                consumeAuthority: e.consumeAuthority
+              };
+            });
+            that.list = that.list.concat(_list);
             that.page++
-            that.list = that.list.concat(res.data.data.result);
           } else {
             that.isNoneResult = true;
           }
@@ -80,6 +93,37 @@ export default {
 <style lang="less">
 @import "~COMMON/less/reset";
 @import "~COMMON/less/common";
+
+.check-in-record {
+  .flex-wrapper {
+    padding: 0;
+    padding-right: 15px;
+    align-items: center;
+    border: none;
+    border-bottom: 1rpx solid #eee;
+    .flex-left {
+      flex: 0 0 50px;
+      padding: 10px 15px;
+      margin-right: 15px;
+      border-right: 1rpx solid #eee;
+      >div {
+        text-align: center;
+        font-weight: bold;
+      }
+      .month {
+        font-size: 15px;
+        color: gray;
+      }
+      .day {
+        font-size: 30px;
+        color: #333;
+      }
+    }
+    .flex-middle {
+      padding: 10px 0;
+    }
+  }
+}
 </style>
 
 

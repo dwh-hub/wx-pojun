@@ -16,6 +16,7 @@
             :isToDetail="false"
             v-for="(item, index) in teamClassList"
             :key="index"
+            :isTag="true"
           ></team-class-item>
         </div>
         <none-result text="你还没有预约团课呢" v-if="!teamClassList.length"></none-result>
@@ -43,6 +44,7 @@
             :isToDetail="false"
             v-for="(item, index) in coachList"
             :key="index"
+            :isTag="true"
           ></team-class-item>
         </div>
         <none-result text="你还没有预约私教呢" v-if="!coachList.length"></none-result>
@@ -56,14 +58,14 @@
     ></van-action-sheet>
     <none-result
       text="你还没有准备好吗"
-      :buttonText="btnText"
+      buttonText="试试预约"
       @tapBtn="toggleSelect"
       v-if="!teamClassList.length && !coachList.length"
     ></none-result>
     <div
       class="bottom-btn"
       :style="{'background-color': themeColor}"
-      v-if="teamClassList.length || coachList.length"
+      v-if="isBottomAppoint"
       @click="toggleSelect"
     >继续预约</div>
   </div>
@@ -112,11 +114,20 @@ export default {
     this._onLoad();
   },
   computed: {
-    btnText() {
-      if (!this.teamClassList.length && !this.coachList.length) {
-        return "试试预约";
+    // btnText() {
+    //   if (!this.teamClassList.length && !this.coachList.length) {
+    //     return "试试预约";
+    //   }
+    //   return "";
+    // },
+    isBottomAppoint() {
+      if(this.teamClassList.length || this.coachList.length) {
+        if(this.teamClassList[0].teamAttendId || this.coachList[0].coachAppointId) {
+          return true
+        }
+        return false
       }
-      return "";
+      return false
     },
     themeColor() {
       return window.color;
@@ -148,9 +159,12 @@ export default {
       // setTimeout(() => {
       this.currentNav = index;
       if (!store.state.isLogin) {
+        this.teamClassList = []
+        this.coachList = []
         return;
       }
       if (index == 1) {
+        console.log('selectNav == 1')
         // 待上课
         // if (!this.coachList_1.length) {
           this.getOwnCoachClassList(2).then(() => {
@@ -183,7 +197,7 @@ export default {
           // this.teamClassList = this.teamClass_2;
         // }
       } else if (index == 3) {
-        // 3 已完成 储存中有数据直接读取，没有调用接口
+        // 3 已完成
         // if (!this.coachList_3.length) {
           this.getOwnCoachClassList(3).then(() => {
             this.coachList = this.coachList_3;
@@ -348,7 +362,9 @@ export default {
                   timeEnd: e.timeEnd,
                   storeName: e.storeName,
                   venueName: e.venueName,
-                  coachNameArrayStr: e.coachName
+                  coachNameArrayStr: e.coachName,
+                  status: e.status,
+                  statusChar: e.statusChar
                 };
               });
               _data = _data.length > 2 ? _data.slice(0, 2) : _data;

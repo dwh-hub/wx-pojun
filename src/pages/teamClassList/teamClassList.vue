@@ -67,6 +67,7 @@ import {
 } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem";
 import selectDate from "COMPS/selectDate";
+import { setTimeout } from "timers";
 export default {
   data() {
     return {
@@ -212,12 +213,13 @@ export default {
     },
     // 获取团课列表
     getClassList(date) {
+      this.classList = [{}, {}, {}, {}];
       if (date) {
         this.curDate = date;
       }
-      wx.showLoading({
-        title: "加载中"
-      });
+      // wx.showLoading({
+      //   title: "加载中"
+      // });
       let that = this;
       HttpRequest({
         url: window.api + "/teamClass/teamSchedule/weekView",
@@ -231,7 +233,8 @@ export default {
           courseTitle: that.curSchedule == "全部课程" ? "" : that.curSchedule
         },
         success(res) {
-          wx.hideLoading();
+          // wx.hideLoading();
+          // setTimeout(() => {
           if (res.data.code === 200) {
             that.allClassList = res.data.data;
             if (res.data.data.length > 20) {
@@ -239,7 +242,10 @@ export default {
             } else {
               that.classList = res.data.data;
             }
+          } else {
+            that.classList = [];
           }
+          // },2000)
         }
       });
     },
@@ -281,11 +287,19 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             let _list = res.data.data.result;
-            _list.unshift({
+            let _classList = [];
+            _list.forEach(e => {
+              for (let k = 0; k < _classList.length; k++) {
+                if ((_classList[k] = e)) {
+                  return;
+                }
+              }
+              _classList.push(e);
+            });
+            _classList.unshift({
               courseTitle: "全部课程"
             });
-            console.log(_list);
-            that.scheduleNav = _list;
+            that.scheduleNav = _classList;
           }
         }
       });

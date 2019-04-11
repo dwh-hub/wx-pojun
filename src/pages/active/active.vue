@@ -17,9 +17,9 @@
           <div class="active-bottom">{{item.storeName || '暂无地址'}}</div>
         </div>
         <div class="active-detail">
-          <div>报名日期：{{item.addTime}}</div>
-          <div>报名人数：{{item.entryNum}}人</div>
-          <div>总金额：{{item.totalPay || 0}}元</div>
+          <div>报名日期:{{item.addTime}}</div>
+          <div>报名人数:{{item.entryNum}}人</div>
+          <div>总金额:{{item.totalPay || 0}}元</div>
         </div>
       </div>
     </div>
@@ -172,6 +172,7 @@ export default {
     .active-info {
       padding: 10px;
       padding-right: 0px;
+      box-sizing: border-box;
       display: flex;
       .active-detail-left {
         flex: 1;
@@ -193,6 +194,7 @@ export default {
       }
       .active-detail {
         flex: 0 0 160px;
+        font-size: 0px;
         // flex-basis: auto;
         > div {
           font-size: 12px;

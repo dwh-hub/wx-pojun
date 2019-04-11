@@ -559,6 +559,9 @@ export default {
       }
     },
     selectSecond(item,index) {
+      if(this.curHourIndex == -1){
+        return
+      }
       this.curTime = this.curTime.split(":")[0] + item
       this.curEndTime = this.curEndTime.split(":")[0] + item
       this.curSecondIndex = index;

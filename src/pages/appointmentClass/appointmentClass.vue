@@ -77,7 +77,6 @@ import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
-import { setTimeout } from 'timers';
 
 export default {
   data() {
@@ -164,7 +163,6 @@ export default {
         return;
       }
       if (index == 1) {
-        console.log('selectNav == 1')
         // 待上课
         // if (!this.coachList_1.length) {
           this.getOwnCoachClassList(2).then(() => {

@@ -35,7 +35,7 @@
         <div class="text">团课</div>
       </div>
       <div class="tab-item" @click="toNav('../coachList/main')">
-        <img src="/static/images/icon-team.png" :style="{'background-color': themeColor}">
+        <img src="/static/images/icon-coach.png" :style="{'background-color': themeColor}">
         <div class="text">私教</div>
       </div>
       <div class="tab-item" @click="toNav('../memberCard/main')">
@@ -141,6 +141,7 @@ export default {
   onShow() {
     if (this.themeColor == "" || this.themeColor == "#fff") {
       this.themeColor = window.color;
+      console.log("companyName:"+wx.getStorageSync("companyName"))
       setNavTab(wx.getStorageSync("companyName"));
     }
   },
@@ -154,15 +155,15 @@ export default {
     // this.getWxoauth();
   },
   computed: {
-    window() {
-      return window;
+    windowColor() {
+      return window.color;
     }
   },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh;
-    }, 2000);
-  },
+  // onPullDownRefresh() {
+  //   setTimeout(() => {
+  //     wx.stopPullDownRefresh;
+  //   }, 2000);
+  // },
   methods: {
     toNav(url) {
       if (!url) {
@@ -189,7 +190,7 @@ export default {
       wx.request({
         url: window.api + "/system/set/wxcompanyinfo",
         data: {
-          companyId: ""
+          companyId: that.companyId
         },
         success(res) {
           if (res.data.code === 200) {

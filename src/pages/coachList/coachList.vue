@@ -78,7 +78,7 @@ export default {
       // 当前登录用户的ID
       customerId: "",
       // 当前显示的教练列表
-      curCoachList: [],
+      curCoachList: [{}, {}, {}, {}, {}],
       // 是否签约 false 全部 true 已签约
       isSingin: false,
       isNoneResult: false,
@@ -92,6 +92,9 @@ export default {
   onLoad() {
     this.customerId = wx.getStorageSync("userInfo").id;
     this.companyId = wx.getStorageSync("companyId");
+  },
+  onUnload() {
+    this.curCoachList = [{}, {}, {}, {}, {}];
   },
   mounted() {
     setNavTab();
@@ -206,9 +209,10 @@ export default {
     // 获取教练列表
     getCoachList(id) {
       let that = this;
-      wx.showLoading({
-        title: "加载中..."
-      });
+      this.curCoachList = [{}, {}, {}, {}, {}];
+      // wx.showLoading({
+      //   title: "加载中..."
+      // });
       return new Promise(function(resolve, reject) {
         HttpRequest({
           url: window.api + "/customer/register/userofrole",
@@ -218,19 +222,35 @@ export default {
             companyId: that.companyId
           },
           success(res) {
-            wx.hideLoading();
+            // wx.hideLoading();
             if (res.data.code === 200) {
-              that.allCoachList = res.data.data;
               if (!res.data.data.length) {
                 return (that.isNoneResult = true);
               }
               that.isNoneResult = false;
-              if (res.data.data.length > 20) {
-                that.coachList = res.data.data.slice(0, 20);
+              let _list = res.data.data;
+              let _signList = that.signOnCoachList;
+              _list.map(e => {
+                for (let k in _signList) {
+                  if (_signList[k].userId == e.userId) {
+                    e.isSign = true;
+                    return e;
+                  } else {
+                    e.isSign = false;
+                    return e;
+                  }
+                }
+              });
+              that.allCoachList = _list;
+              if (_list.length > 20) {
+                that.coachList = _list.slice(0, 20);
               } else {
-                that.coachList = res.data.data;
+                that.coachList = _list;
               }
+              // console.log(that.coachList)
               resolve();
+            } else {
+              that.coachList = [];
             }
           }
         });
@@ -239,6 +259,7 @@ export default {
     // 获取签约教练
     getSingInCoachList() {
       let that = this;
+      this.curCoachList = [{}, {}, {}, {}, {}];
       return new Promise(function(resolve, reject) {
         HttpRequest({
           url: window.api + "/customer/card/selectSignOnCoach",
@@ -247,21 +268,24 @@ export default {
             customerId: that.customerId
           },
           success(res) {
-            // console.log(res.data.data);
-            that.signOnCoachList = res.data.data;
-            if (that.signOnCoachList.length) {
-              that.isNoneResult = false;
+            if (res.data.code == 200) {
+              // console.log(res.data.data);
+              that.signOnCoachList = res.data.data;
+              if (that.signOnCoachList.length) {
+                that.isNoneResult = false;
+              } else {
+                that.isNoneResult = true;
+              }
+              resolve();
             } else {
-              that.isNoneResult = true;
+              that.signOnCoachList = [];
             }
-            resolve();
           }
         });
       });
     },
     // 搜索教练
     searchCoach: debounce(function(event) {
-      console.log(event.mp.detail);
       let that = this;
       HttpRequest({
         url: window.api + "/customer/register/userofrole",

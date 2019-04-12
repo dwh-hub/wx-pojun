@@ -1,19 +1,37 @@
 <template>
-  <div class="coach-item" @click="toDetail">
-    <div class="cover">
-      <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
-      <img :src="imgUrl">
+  <div class="coach-item">
+    <div @click="toDetail" v-if="info.userId">
+      <div class="cover">
+        <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
+        <img :src="imgUrl">
+      </div>
+      <div class="coach-info">
+        <div class="coach-name">{{info.userName || '教练名字'}}</div>
+        <div class="coach-desc">{{info.individualResume || '暂无个人简介'}}</div>
+        <div
+          class="coach-times"
+          :style="{'color': themeColor}"
+        >已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || '0'}}节</div>
+      </div>
+      <div class="tag" v-if="hasTag">
+        <div class="coach-type">$瑜伽$</div>
+        <div class="coach-status">$热门$</div>
+      </div>
+      <div
+        class="appoint"
+        :style="{'background-color': themeColor}"
+        v-if="hasBtn"
+        @click.stop="toAppoint"
+      >预约</div>
     </div>
-    <div class="coach-info">
-      <div class="coach-name">{{info.userName || '教练名字'}}</div>
-      <div class="coach-desc">{{info.individualResume || '暂无个人简介'}}</div>
-      <div class="coach-times" :style="{'color': themeColor}">已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || '0'}}节</div>
+    <div class="coach-skeleton" v-else>
+      <div class="cover"><img></div>
+      <div class="skeleton-wrapper">
+        <div class="skeleton-name"></div>
+        <div class="skeleton-desc"></div>
+        <div class="skeleton-time"></div>
+      </div>
     </div>
-    <div class="tag" v-if="hasTag">
-      <div class="coach-type">$瑜伽$</div>
-      <div class="coach-status">$热门$</div>
-    </div>
-    <div class="appoint" :style="{'background-color': themeColor}" v-if="hasBtn" @click.stop="toAppoint">预约</div>
   </div>
 </template>
 
@@ -82,12 +100,14 @@ export default {
 @import "~COMMON/less/common.less";
 
 .coach-item {
-  display: flex;
-  box-shadow: 0px 0px 10px #eee;
-  border-radius: 2px;
-  background-color: #fff;
-  padding: 10px 0;
-  padding-right: 10px;
+  > div {
+    display: flex;
+    box-shadow: 0px 0px 10px #eee;
+    border-radius: 2px;
+    background-color: #fff;
+    padding: 10px 0;
+    padding-right: 10px;
+  }
   .cover {
     flex: 0 0 90px;
     width: 90px;
@@ -145,6 +165,35 @@ export default {
     vertical-align: middle;
     border-radius: 2px;
     color: #fff;
+  }
+  .coach-skeleton {
+    .cover {
+      >img {
+        background-color: #eee;
+      }
+    }
+    .skeleton-wrapper {
+      padding: 0 12px;
+      width: 100%;
+      .skeleton-name {
+        margin-top: 8px;
+        height: 16px;
+        background-color: #eee;
+      }
+      .skeleton-desc {
+        margin-top: 12px;
+        height: 12px;
+        width: 200px;
+        background-color: #eee;
+      }
+      .skeleton-time {
+        margin-top: 12px;
+        height: 10px;
+        width: 100px;
+        margin-right: 10px;
+        background-color: #eee;
+      }
+    }
   }
 }
 </style>

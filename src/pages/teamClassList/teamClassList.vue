@@ -82,7 +82,7 @@ export default {
       // nav课程列表
       scheduleNav: [],
       // 分页的团课
-      classList: [],
+      classList: [{},{},{},{}],
       // 存储所有的团课
       allClassList: [],
       // 当前选择的门店

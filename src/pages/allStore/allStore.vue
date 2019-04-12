@@ -13,7 +13,7 @@ export default {
   name: "all-store",
   data() {
     return {
-      storeList: [],
+      storeList: [{},{},{}],
       companyId: "",
       longitude: "", // 经度
       latitude: "" // 纬度
@@ -29,7 +29,10 @@ export default {
   mounted() {
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
-    this.getAllStore();
+    setTimeout(() => {
+this.getAllStore();
+    }, 2000)
+    
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }
@@ -38,16 +41,15 @@ export default {
   methods: {
     getAllStore() {
       let that = this;
-      wx.showLoading({
-        title: "加载中..."
-      });
+      // wx.showLoading({
+      //   title: "加载中..."
+      // });
       wx.request({
         url: window.api + "/store/all-store-name-list-nolimit",
         data: {
           companyId: that.companyId || ""
         },
         success(res) {
-          wx.hideLoading();
           if (res.data.code === 200) {
             let _storeList = [];
             _storeList = res.data.data.map(e => {
@@ -65,10 +67,11 @@ export default {
                 storeId: e.storeId
               };
             });
-            console.log(_storeList);
             that.storeList = _storeList;
+          } else {
+            that.storeList = []
           }
-          console.log(that.storeList);
+          // wx.hideLoading();
         }
       });
     }

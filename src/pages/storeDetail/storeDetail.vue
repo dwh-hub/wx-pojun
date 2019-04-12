@@ -132,8 +132,6 @@ export default {
             let _lat = _data.mapPoint.split(",")[1];
             let _lng = _data.mapPoint.split(",")[0];
             _range = getRange(that.latitude, that.longitude, _lat, _lng);
-            console.log(_data.mapPoint);
-            console.log(_range);
           }
           let _obj = {
             address: _address || "未设置详细地址",
@@ -143,8 +141,6 @@ export default {
             bannerList: _data.images.split(",")
           };
           that.storeInfo = _obj;
-          // Object.assign(that.storeInfo, _obj);
-          console.log(that.storeInfo);
         }
       });
     },

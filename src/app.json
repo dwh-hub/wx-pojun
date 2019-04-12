@@ -41,8 +41,9 @@
     "onReachBottomDistance": 50
   },
    "tabBar": {
-      "color": "#999999",
-      "selectedColor": "#333333",
+      "color": "#dbdbdb",
+      "selectedColor": "#fff",
+      "borderStyle": "white",
       "list": [{
         "pagePath": "pages/homepage/main",
         "text": "首页",

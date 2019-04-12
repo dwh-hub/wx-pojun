@@ -1,15 +1,27 @@
 <template>
-  <div class="store-item" @click="toDetail">
-    <div class="store-cover">
-      <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
-      <img :src="info.cover">
-    </div>
-    <div class="store-info">
-      <div class="store-top">
-        <span class="store-name">{{info.storeName}}</span>
-        <span class="store-range" :style="{'color': themeColor}">{{info.range}}</span>
+  <div class="store-item">
+    <div v-if="info.storeId" @click="toDetail">
+      <div class="store-cover">
+        <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
+        <img :src="info.cover">
       </div>
-      <div class="store-bottom">{{info.address || '未设置详细地址'}}</div>
+      <div class="store-info">
+        <div class="store-top">
+          <span class="store-name">{{info.storeName}}</span>
+          <span class="store-range" :style="{'color': themeColor}">{{info.range}}</span>
+        </div>
+        <div class="store-bottom">{{info.address || '未设置详细地址'}}</div>
+      </div>
+    </div>
+    <div class="store-skeleton" v-else>
+      <div class="store-cover">
+      </div>
+      <div class="store-info">
+        <div class="store-top">
+          <span class="store-name"></span>
+        </div>
+        <div class="store-bottom"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -78,6 +90,19 @@ export default {
     .store-bottom {
       font-size: 14px;
       color: #bababa;
+    }
+  }
+  .store-skeleton {
+    .store-cover,.store-top,.store-bottom {
+      background-color: #eee;
+    }
+    .store-top {
+      height: 18px;
+      width: 200px;
+    }
+    .store-bottom {
+      height: 14px;
+      width: 100px;
     }
   }
 }

@@ -52,7 +52,7 @@
     </div>
     <div class="class-people">
       <div class="people-info">
-        <div class="num">已预约（{{classDetail.appointCount}}/{{classDetail.maxPeople}}）人</div>
+        <div class="num">已预约（{{classDetail.appointCount}}<span v-if="classDetail.maxPeople">/{{classDetail.maxPeople}}</span>）人</div>
       </div>
     </div>
     <div class="ruler">

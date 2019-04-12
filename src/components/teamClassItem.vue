@@ -6,10 +6,10 @@
         <img :src="window.api + info.masterImg">
       </div>
       <div class="team-class-info">
-        <div class="team-class-name">{{info.anotherName || info.projectName || '团课名称'}}</div>
-        <div class="team-class-coach">{{coachStr || '团课教练'}}</div>
+        <div class="team-class-name">{{info.anotherName || info.projectName || ''}}</div>
+        <div class="team-class-coach">{{coachStr || ''}}</div>
         <div class="team-class-time">
-          <span>{{info.storeName}}-{{info.venueName || '场馆名称'}}</span>
+          <span>{{info.storeName || ''}}-{{info.venueName || ''}}</span>
           {{startTime}}~{{endTime}}
         </div>
       </div>
@@ -111,12 +111,12 @@ export default {
         return "";
       }
       if (this.info.coachName) {
-        return this.info.coachName;
+        return this.info.coachName.replace(/null/g,'');
       }
       if (this.info.coachNameArrayStr) {
-        return this.info.coachNameArrayStr;
+        return this.info.coachNameArrayStr.replace(/null/g,'');
       }
-      return this.info.coachNameArray.toString(" ");
+      return this.info.coachNameArray.toString(" ").replace(/null/g,'');
     },
     window() {
       return window;

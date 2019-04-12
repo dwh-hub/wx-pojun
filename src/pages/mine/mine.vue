@@ -66,7 +66,7 @@
           <span
             v-for="(item, index) in companyList"
             :key="index"
-            :class="{active:　item.companyId == curCompany.companyId}"
+            :class="{active: item.companyId == curCompany.companyId}"
             @click="selectCompany(item)"
           >{{item.companyName}}</span>
         </div>
@@ -286,6 +286,7 @@ export default {
       wx.showLoading({
         title: "登录中..."
       });
+      return console.log(wx.getStorageSync("sessionKey"))
       HttpRequest({
         url: window.api + "/mini/getphone",
         data: {
@@ -325,6 +326,10 @@ export default {
       wx.setStorage({
         key: "companyId",
         data: this.curCompany.companyId
+      });
+      wx.setStorage({
+        key: "companyName",
+        data: this.curCompany.companyName
       });
       this.bindMethod();
     },
@@ -405,6 +410,10 @@ export default {
                 wx.setStorage({
                   key: "companyId",
                   data: res.data.data[0].companyId
+                });
+                wx.setStorage({
+                  key: "companyName",
+                  data: res.data.data[0].companyName
                 });
                 return resolve();
               }

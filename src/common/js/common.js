@@ -1,5 +1,5 @@
 const window = {}
-window.DEBUGGING = true
+window.DEBUGGING = false
 window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
 window.color = "" // "#00c2a9"
 let Cookie = ""
@@ -89,12 +89,15 @@ export function setNavTab(title) {
   }
   wx.setNavigationBarColor({
     frontColor: "#ffffff",
-    backgroundColor: window.color,
+    backgroundColor: window.color || "#2a82e4",
     animation: {
       duration: 200,
       timingFunc: "easeIn"
     }
   });
+  wx.setTabBarStyle({
+    backgroundColor: window.color || "#2a82e4"
+  })
 }
 
 /**

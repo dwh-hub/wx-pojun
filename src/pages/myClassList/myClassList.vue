@@ -73,7 +73,7 @@ export default {
     this.isLoading = true;
     setTimeout(() => {
       this.isLoading = false;
-    }, 3000);
+    }, 2000);
     this.getList();
   },
   methods: {

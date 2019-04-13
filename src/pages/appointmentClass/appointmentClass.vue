@@ -106,9 +106,9 @@ export default {
     titleCell,
     teamClassItem
   },
-  onLoad(option) {
-    this._onLoad(option);
-  },
+  // onLoad(option) {
+  //   this._onLoad(option);
+  // },
   onShow() {
     this._onLoad();
   },
@@ -121,7 +121,7 @@ export default {
     // },
     isBottomAppoint() {
       if(this.teamClassList.length || this.coachList.length) {
-        if(this.teamClassList[0].teamAttendId || this.coachList[0].coachAppointId) {
+        if(this.teamClassList[0] || this.coachList[0]) {
           return true
         }
         return false
@@ -133,12 +133,10 @@ export default {
     }
   },
   methods: {
-    _onLoad(option) {
+    _onLoad() {
       // 进页面前先清空数据
-      // Object.assign(this.$data, this.$options.data());
       this.clearData();
       this.customerId = wx.getStorageSync("userInfo").id;
-      // this.classId = option.classId;
       setNavTab();
       this.selectNav(this.currentNav);
     },

@@ -44,7 +44,7 @@
       <coach-item :info="item" v-for="(item, index) in curCoachList" :key="index"></coach-item>
     </div>
     <div class="mask" v-show="maskShow" @click="clickMask"></div>
-    <none-result v-if="isNoneResult"></none-result>
+    <none-result v-if="!curCoachList.length"></none-result>
   </div>
 </template>
 
@@ -81,7 +81,7 @@ export default {
       curCoachList: [{}, {}, {}, {}, {}],
       // 是否签约 false 全部 true 已签约
       isSingin: false,
-      isNoneResult: false,
+      // isNoneResult: false,
       companyId: ""
     };
   },
@@ -105,6 +105,9 @@ export default {
   },
   // 触底刷新
   onReachBottom() {
+    if(!this.curCoachList.length || !this.curCoachList[0].userId) {
+      return
+    }
     let allLen = this.allCoachList.length;
     let len = this.coachList.length;
     if (allLen > 20 && allLen > len) {
@@ -214,6 +217,7 @@ export default {
       //   title: "加载中..."
       // });
       return new Promise(function(resolve, reject) {
+      // setTimeout(()=> {
         HttpRequest({
           url: window.api + "/customer/register/userofrole",
           data: {
@@ -224,10 +228,10 @@ export default {
           success(res) {
             // wx.hideLoading();
             if (res.data.code === 200) {
-              if (!res.data.data.length) {
-                return (that.isNoneResult = true);
-              }
-              that.isNoneResult = false;
+              // if (!res.data.data.length) {
+              //   return (that.isNoneResult = true);
+              // }
+              // that.isNoneResult = false;
               let _list = res.data.data;
               let _signList = that.signOnCoachList;
               _list.map(e => {
@@ -250,10 +254,11 @@ export default {
               // console.log(that.coachList)
               resolve();
             } else {
-              that.coachList = [];
+              that.curCoachList = [];
             }
           }
         });
+      // }, 2000)
       });
     },
     // 获取签约教练
@@ -271,14 +276,14 @@ export default {
             if (res.data.code == 200) {
               // console.log(res.data.data);
               that.signOnCoachList = res.data.data;
-              if (that.signOnCoachList.length) {
-                that.isNoneResult = false;
-              } else {
-                that.isNoneResult = true;
-              }
+              // if (that.signOnCoachList.length) {
+              //   that.isNoneResult = false;
+              // } else {
+              //   that.isNoneResult = true;
+              // }
               resolve();
             } else {
-              that.signOnCoachList = [];
+              that.curCoachList = [];
             }
           }
         });
@@ -297,11 +302,11 @@ export default {
         },
         success(res) {
           that.curCoachList = res.data.data;
-          if (that.curCoachList.length) {
-            that.isNoneResult = false;
-          } else {
-            that.isNoneResult = true;
-          }
+          // if (that.curCoachList.length) {
+          //   that.isNoneResult = false;
+          // } else {
+          //   that.isNoneResult = true;
+          // }
         }
       });
     }, 200),

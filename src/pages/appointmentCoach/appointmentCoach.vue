@@ -122,7 +122,7 @@
           :key="index"
         >
           <div class="cover">
-            <img>
+            <img :src="window.api + item.images">
           </div>
           <div class="store-info">
             <div class="name">
@@ -373,9 +373,9 @@ export default {
       // 项目弹窗
       isProjectPopup: false,
       // 开店时间
-      openTimeStart: "09:40:20",
+      openTimeStart: "",
       // 关店时间
-      openTimeEnd: "22:00:00",
+      openTimeEnd: "",
       // morningTimes: [],
       // noonTimes: [],
       // afternoonTimes: [],
@@ -466,6 +466,9 @@ export default {
     },
     themeColor() {
       return window.color;
+    },
+    window() {
+      return window
     }
   },
   methods: {
@@ -568,8 +571,8 @@ export default {
     },
     // 计算可选择预约时间
     computedTime() {
-      let _satarTime = this.openTimeStart.split(":")[0] || "09";
-      let _endTime = this.openTimeEnd.split(":")[0] || "22";
+      let _satarTime = this.openTimeStart.split(":")[0];
+      let _endTime = Number(this.openTimeEnd.split(":")[0]-1);
       // let _morningTimes = [];
       // let _nightTime = [];
       // let _noonTimes = [];
@@ -602,7 +605,6 @@ export default {
         "06:00",
         "07:00"
       ];
-
       // 门店营业时间
       // for (let h = _satarTime; h <= _endTime; h++) {
       //   if (h < 10 && h > 0) {
@@ -611,10 +613,10 @@ export default {
       //     _allTime.push(h + ":00");
       //   }
       // }
-
+      let _nowDay = formatDate(new Date(), "yyyy-MM-dd")
       // 不可预约时间
       _allTime = _allTime.map(e => {
-        let _timestamp = new Date("2018-04-04 " + e).getTime();
+        let _timestamp = new Date(_nowDay+ " " + e).getTime();
         let _hour = e.split(":")[0];
         if (_hour < _satarTime && _hour > 0) {
           return {
@@ -622,7 +624,7 @@ export default {
             disable: true
           };
         }
-        if (_hour > _endTime) {
+        if (_hour > (Number(_endTime)-1)) {
           return {
             hour: e,
             disable: true
@@ -630,7 +632,7 @@ export default {
         }
         for (let i in this.todayPeriodTime) {
           if (
-            _timestamp >= this.todayPeriodTime[i].timeStart &&
+            _timestamp >= (Number(this.todayPeriodTime[i].timeStart)-(60*60*1000)) &&
             _timestamp <= this.todayPeriodTime[i].timeEnd
           ) {
             return {
@@ -859,6 +861,9 @@ export default {
     },
     // 获取教练的授课门店列表
     getStoreList() {
+      wx.showLoading({
+        title: "加载中..."
+      })
       let that = this;
       HttpRequest({
         url: window.api + "/mobile/coach/getAttendStoreByCus",
@@ -866,6 +871,7 @@ export default {
           coachId: that.coachId
         },
         success(res) {
+          wx.hideLoading()
           if (res.data.code == 200) {
             that.storeList = res.data.data;
             if (that.storeList.length == 1) {
@@ -1014,9 +1020,9 @@ export default {
             storeId: that.selectStoreId
           },
           success(res) {
-            if (res.data.data.openingHoursStart) {
-              that.openTimeStart = res.data.data.openingHoursStart;
-              that.openTimeEnd = res.data.data.openingHoursEnd;
+            if (res.data.code == 200) {
+              that.openTimeStart = res.data.data.openingHoursStart || "00";
+              that.openTimeEnd = res.data.data.openingHoursEnd || "24";
               that.computedTime();
               resolve();
               // that.businessTime =
@@ -1205,7 +1211,7 @@ page {
           flex: 0 0 40px;
           .day,
           .night {
-            height: 122px;
+            height: 243rpx;
             border-top: 1rpx solid #e5e5e5;
           }
           .night {

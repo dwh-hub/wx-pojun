@@ -43,7 +43,7 @@
                 :key="index"
                 @click.stop="selectCoach(item)"
               >
-                <img :src="window.api +item.headImgPath">
+                <img :src="window.api +(item.headImgPath||'/assets/img/morenm.png')">
                 <span>{{item.userName}}</span>
               </div>
             </div>
@@ -53,6 +53,7 @@
     </div>
     <div class="list">
       <team-class-item :info="item" v-for="(item, index)  in classList" :key="index"></team-class-item>
+      <none-result v-if="!classList.length"></none-result>
     </div>
     <div class="mask" v-show="maskShow" @click="clickMask"></div>
   </div>
@@ -67,7 +68,7 @@ import {
 } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem";
 import selectDate from "COMPS/selectDate";
-import { setTimeout } from "timers";
+import noneResult from "COMPS/noneResult";
 export default {
   data() {
     return {
@@ -102,7 +103,8 @@ export default {
   },
   components: {
     teamClassItem,
-    selectDate
+    selectDate,
+    noneResult
   },
   mounted() {
     setNavTab();
@@ -163,6 +165,7 @@ export default {
       if (item.storeName == "全部门店") {
         this.curCoach = "全部教练";
         this.curCoachId = "";
+        this.curSchedule = "全部课程";
       }
       this.getClassList();
       this.getCoachList();

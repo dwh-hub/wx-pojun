@@ -9,7 +9,7 @@
         <div class="team-class-name">{{info.anotherName || info.projectName || ''}}</div>
         <div class="team-class-coach">{{coachStr || ''}}</div>
         <div class="team-class-time">
-          <span>{{info.storeName || ''}}-{{info.venueName || ''}}</span>
+          <span>{{info.storeName || ''}}<span v-if="info.venueName">-</span>{{info.venueName || ''}}</span>
           {{startTime}}~{{endTime}}
         </div>
       </div>
@@ -32,7 +32,6 @@
 
 <script>
 import { formatDate, window } from "COMMON/js/common.js";
-import { setTimeout } from "timers";
 export default {
   name: "team-class-item",
   props: {

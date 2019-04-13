@@ -69,7 +69,8 @@ export default {
       coachList: [],
       businessTime: "",
       longitude: "", // 经度
-      latitude: "" // 纬度
+      latitude: "", // 纬度
+      loadCount: 0
     };
   },
   components: {
@@ -84,12 +85,25 @@ export default {
     setNavTab();
   },
   mounted() {
+    wx.showLoading({
+      title: "加载中..."
+    })
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     this.getStoreDetail();
     this.getStoreQuery();
     this.getTeamClassList();
     this.getCoachList();
+  },
+  onUnload() {
+    this.loadCount = 0
+  },
+  watch: {
+    loadCount() {
+      if(this.loadCount >= 2) {
+        wx.hideLoading()
+      }
+    }
   },
   computed: {
     window() {
@@ -141,6 +155,7 @@ export default {
             bannerList: _data.images.split(",")
           };
           that.storeInfo = _obj;
+          that.loadCount++
         }
       });
     },
@@ -153,10 +168,11 @@ export default {
           storeId: that.storeId
         },
         success(res) {
-          if (res.data.data.openTimeStart && res.data.data.openTimeStart) {
+          if (res.data.data.openingHoursStart && res.data.data.openingHoursEnd) {
             that.businessTime =
-              res.data.data.openTimeStart + "~" + res.data.data.openTimeEnd;
+              res.data.data.openingHoursStart + "~" + res.data.data.openingHoursEnd;
           }
+          that.loadCount++
         }
       });
     },
@@ -174,6 +190,7 @@ export default {
           if (res.data.code === 200) {
             that.teamClassList = res.data.data.slice(0, 1);
           }
+          that.loadCount++
         }
       });
     },
@@ -188,6 +205,7 @@ export default {
         },
         success(res) {
           that.coachList = res.data.data.slice(0, 1);
+          that.loadCount++
         }
       });
     }

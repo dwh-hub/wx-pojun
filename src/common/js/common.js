@@ -32,18 +32,21 @@ export {
 
 // 获取公司主题色
 export function getThemeColor() {
-  HttpRequest({
-    url: window.api + '/system/set/wxcompanyinfo',
-    data: {
-      companyId: wx.getStorageSync("companyId")
-    },
-    success(res) {
-      if (res.data.code == 200) {
-        window.color = JSON.parse(res.data.data.baseInfo).themeColor || '#2a82e4'
-      } else {
-        window.color = "#2a82e4"
+  return new Promise(function (resolve) {
+    HttpRequest({
+      url: window.api + '/system/set/wxcompanyinfo',
+      data: {
+        companyId: wx.getStorageSync("companyId")
+      },
+      success(res) {
+        if (res.data.code == 200) {
+          window.color = JSON.parse(res.data.data.baseInfo).themeColor || '#2a82e4'
+        } else {
+          window.color = "#2a82e4"
+        }
+        resolve()
       }
-    }
+    })
   })
 }
 

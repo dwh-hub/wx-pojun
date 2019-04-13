@@ -21,7 +21,12 @@
     </swiper>
     <div class="class-name">{{classDetail.anotherName || '课程名称'}}</div>
     <div class="coach-detail">
-      <div class="coach-detail-item" v-for="(item, index) in coachList" :key="index" @click="toNav(item.coachId)">
+      <div
+        class="coach-detail-item"
+        v-for="(item, index) in coachList"
+        :key="index"
+        @click="toNav(item.coachId)"
+      >
         <div class="cover">
           <img :scr="window.api + item.coachHeadImg">
         </div>
@@ -52,7 +57,10 @@
     </div>
     <div class="class-people">
       <div class="people-info">
-        <div class="num">已预约（{{classDetail.appointCount}}<span v-if="classDetail.maxPeople">/{{classDetail.maxPeople}}</span>）人</div>
+        <div class="num">
+          已预约（{{classDetail.appointCount}}
+          <span v-if="classDetail.maxPeople">/{{classDetail.maxPeople}}</span>）人
+        </div>
       </div>
     </div>
     <div class="ruler">
@@ -108,7 +116,8 @@ export default {
       latitude: "", // 纬度,
       companyId: "",
       // 团课时间是否过期
-      canAppoint: true
+      canAppoint: true,
+      loadCount: 0
     };
   },
   components: {
@@ -120,23 +129,38 @@ export default {
     this.id = option.classId;
     setNavTab();
   },
+  onUnload() {
+    this.loadCount = 0
+  },
   mounted() {
+    wx.showLoading({
+      title: '加载中...'
+    })
     this.companyId = wx.getStorageSync("companyId");
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     this.getClassDetail();
     this.getClassCoach();
   },
+  watch: {
+    loadCount() {
+      if(this.loadCount >= 2) {
+        wx.hideLoading()
+      }
+    }
+  },
   computed: {
     statrTime() {
       if (this.classDetail.timeStart) {
         return formatDate(new Date(this.classDetail.timeStart), "hh:mm");
       }
+      return "";
     },
     endTime() {
       if (this.classDetail.timeEnd) {
         return formatDate(new Date(this.classDetail.timeEnd), "hh:mm");
       }
+      return "";
     },
     classTime() {
       if (this.classDetail.timeStart) {
@@ -156,9 +180,11 @@ export default {
   },
   methods: {
     toNav(id) {
-      wx.navigateTo({
-        url: "../coachDetail/main?coachId="+id
-      });
+      if (id) {
+        wx.navigateTo({
+          url: "../coachDetail/main?coachId=" + id
+        });
+      }
     },
     // 预约团课
     appointClass() {
@@ -224,6 +250,7 @@ export default {
             that.classDetail = res.data.data;
             that.getAddress();
           }
+          that.loadCount++
         }
       });
     },
@@ -241,6 +268,7 @@ export default {
           if (res.data.code) {
             that.coachList = res.data.data;
           }
+          that.loadCount++
         }
       });
     },
@@ -261,6 +289,7 @@ export default {
             let _range = getRange(that.latitude, that.longitude, _lat, _lng);
             that.range = _range;
           }
+          that.loadCount++
         }
       });
     }

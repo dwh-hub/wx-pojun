@@ -35,7 +35,6 @@ import {
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
-import { setTimeout } from "timers";
 import store from "../../utils/store";
 
 export default {
@@ -67,12 +66,12 @@ export default {
         return "";
       }
       if (this.detail.coachName) {
-        return this.detail.coachName;
+        return this.detail.coachName.replace(/null/g, "");
       }
       if (this.detail.coachNameArrayStr) {
-        return this.detail.coachNameArrayStr;
+        return this.detail.coachNameArrayStr.replace(/null/g, "");
       }
-      return this.detail.coachNameArray.toString(" ");
+      return this.detail.coachNameArray.toString(" ").replace(/null/g, "");
     },
     themeColor() {
       return window.color;

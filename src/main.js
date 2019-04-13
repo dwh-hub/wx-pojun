@@ -20,17 +20,23 @@ if (!wx.getStorageSync("companyId")) {
   if(window.DEBUGGING) {
     wx.setStorage({
       key: "companyId",
-      data: 44
+      data: 44,
+      success() {
+        getThemeColor()
+      }
     });
   } else {
     wx.setStorage({
       key: "companyId",
-      data: 37
+      data: 37,
+      success() {
+        getThemeColor()
+      }
     });
   }
+} else {
+  getThemeColor()
 }
-
-getThemeColor()
 
 if (!wx.getStorageSync("Cookie")) {
   wx.request({

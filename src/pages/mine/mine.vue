@@ -286,7 +286,6 @@ export default {
       wx.showLoading({
         title: "登录中..."
       });
-      return console.log(wx.getStorageSync("sessionKey"))
       HttpRequest({
         url: window.api + "/mini/getphone",
         data: {
@@ -382,12 +381,14 @@ export default {
         wx.request({
           url: window.api + "/wxcustomer/findAllCustomer",
           data: {
-            phone: that.phone
+            phone: that.phone,
+            companyId: wx.getStorageSync("companyId")
           },
           success(res) {
             wx.hideLoading();
             if (res.data.code == 200) {
-              if (!res.data.data.length) {
+              let _data = res.data.data
+              if (!_data.length) {
                 return wx.showModal({
                   title: "提示",
                   content: "没有找到您的登记信息，请先登记信息",
@@ -400,26 +401,27 @@ export default {
                   }
                 });
               }
-              if (res.data.data.length == 1) {
-                that.userInfo = res.data.data[0];
-                store.commit("saveUserInfo", res.data.data[0]);
+
+              if (_data.length == 1) {
+                that.userInfo = _data[0];
+                store.commit("saveUserInfo", _data[0]);
                 wx.setStorage({
                   key: "userInfo",
-                  data: res.data.data[0]
+                  data: _data[0]
                 });
                 wx.setStorage({
                   key: "companyId",
-                  data: res.data.data[0].companyId
+                  data: _data[0].companyId
                 });
                 wx.setStorage({
                   key: "companyName",
-                  data: res.data.data[0].companyName
+                  data: _data[0].companyName
                 });
                 return resolve();
               }
               that.showBindBox = true;
-              that.companyList = res.data.data;
-              that.curCompany = res.data.data[0];
+              that.companyList = _data;
+              that.curCompany = _data[0];
               resolve();
             } else {
               wx.showModal({
@@ -567,6 +569,18 @@ page {
       border: 1px solid #cccccc;
       margin-top: 20px;
     }
+  }
+  .showTooltips {
+    background-color: #1aad19;
+    display: block;
+    width: 90%;
+    margin: auto;
+    text-align: center;
+    height: 45px;
+    line-height: 45px;
+    color: white;
+    border-radius: 5px;
+    margin-top: 15px;
   }
 }
 </style>

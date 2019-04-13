@@ -89,6 +89,7 @@ export default {
   },
   methods: {
     assess() {
+      console.log("assess")
       let url;
       let data = {};
       if (this.teamAttendId) {
@@ -219,6 +220,8 @@ page {
       border-radius: 5px;
     }
     .store-name {
+      font-size: 16px;
+      font-weight: bold;
       display: inline-block;
       margin-left: 12px;
       color: #333;

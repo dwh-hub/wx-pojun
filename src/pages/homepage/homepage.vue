@@ -87,7 +87,8 @@ import {
   window,
   HttpRequest,
   getRange,
-  getWXCompany
+  getWXCompany,
+  getThemeColor
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
@@ -119,7 +120,10 @@ export default {
     coachItem
   },
   mounted() {
-    setNavTab(wx.getStorageSync("companyName"));
+    getThemeColor().then(() => {
+      setNavTab(wx.getStorageSync("companyName"));
+      this.themeColor = window.color || "#2a82e4";
+    })
     this.companyId = wx.getStorageSync("companyId");
     let that = this;
     wx.getLocation({
@@ -132,17 +136,23 @@ export default {
         store.commit("saveLongitude", res.longitude);
         store.commit("saveLatitude", res.latitude);
         that.getNearbyStoreList();
+      },
+      fail(res) {
+        console.log(res)
       }
     });
-    this.themeColor = window.color;
     this.getBannerList();
     this.getRecommendCoach();
   },
   onShow() {
-    if (this.themeColor == "" || this.themeColor == "#fff") {
+    // this.themeColor == "" || this.themeColor == "#fff" || this.themeColor == "#2a82e4"
+    if (this.themeColor != window.color) {
       this.themeColor = window.color;
       console.log("companyName:"+wx.getStorageSync("companyName"))
       setNavTab(wx.getStorageSync("companyName"));
+    }
+    if(!this.nearbyStoreList.length) {
+      this.getNearbyStoreList();
     }
   },
   onLoad(options) {

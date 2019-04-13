@@ -29,9 +29,7 @@ export default {
   mounted() {
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
-    setTimeout(() => {
-this.getAllStore();
-    }, 2000)
+    this.getAllStore();
     
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;

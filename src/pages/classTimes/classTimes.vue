@@ -54,7 +54,7 @@ export default {
       HttpRequest({
         url: window.api + "/consumption/log/pages/customer",
         data: {
-          pageON: that.page,
+          pageNo: that.page,
           customerId: that.customerId,
           signInType: 2
         },

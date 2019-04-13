@@ -148,7 +148,6 @@ export default {
     // this.themeColor == "" || this.themeColor == "#fff" || this.themeColor == "#2a82e4"
     if (this.themeColor != window.color) {
       this.themeColor = window.color;
-      console.log("companyName:"+wx.getStorageSync("companyName"))
       setNavTab(wx.getStorageSync("companyName"));
     }
     if(!this.nearbyStoreList.length) {

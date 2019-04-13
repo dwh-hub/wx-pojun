@@ -191,6 +191,7 @@ export default {
               return;
             }
             that.cardInfoList = that.cardInfoList.concat(res.data.data.result);
+            that.page++
           } else {
             that.isNoneResult = true;
           }

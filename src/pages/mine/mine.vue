@@ -147,7 +147,7 @@ export default {
       // 积分
       myPoints: "",
       // 消费次数
-      FreeCount:"",
+      FreeCount: "",
       themeColor: ""
     };
   },
@@ -164,10 +164,13 @@ export default {
     //   });
     // } else {
     //   console.log("不存在，重新获取");
-    if(store.state.isLogin == false) {
+    if (store.state.isLogin == false) {
       wxLogin();
     }
-    // }
+    if (this.themeColor != window.color) {
+      this.themeColor = window.color;
+      setNavTab(wx.getStorageSync("companyName"));
+    }
   },
   mounted() {
     this.getTimes();
@@ -175,7 +178,7 @@ export default {
     this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);
     this.isLogin = store.state.isLogin;
-    this.themeColor = window.color
+    this.themeColor = window.color;
   },
   computed: {
     isLogin() {
@@ -387,7 +390,7 @@ export default {
           success(res) {
             wx.hideLoading();
             if (res.data.code == 200) {
-              let _data = res.data.data
+              let _data = res.data.data;
               if (!_data.length) {
                 return wx.showModal({
                   title: "提示",

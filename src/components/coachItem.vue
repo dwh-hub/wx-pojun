@@ -3,7 +3,8 @@
     <div @click="toDetail" v-if="info.userId">
       <div class="cover">
         <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
-        <img :src="imgUrl">
+        <!-- <img :src="imgUrl"> -->
+        <image :src="imgUrl" mode="aspectFit"></image>
       </div>
       <div class="coach-info">
         <div class="coach-name">{{info.userName || '教练名字'}}</div>
@@ -71,6 +72,10 @@ export default {
       return window.color;
     }
   },
+  mounted() {
+    console.log('mounted')
+    console.log(this.info)
+  },
   methods: {
     toDetail() {
       if (this.isToDetail) {
@@ -115,7 +120,7 @@ export default {
     // padding: 12px;
     padding-left: 12px;
     box-sizing: border-box;
-    > img {
+    > image {
       width: 80px;
       height: 80px;
       border-radius: 50%;
@@ -168,7 +173,7 @@ export default {
   }
   .coach-skeleton {
     .cover {
-      >img {
+      >image {
         background-color: #eee;
       }
     }

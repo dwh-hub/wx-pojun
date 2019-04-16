@@ -4,7 +4,8 @@ import {
   window,
   wxLogin,
   HttpRequest,
-  getThemeColor
+  getThemeColor,
+  getWXCompany
 } from "COMMON/js/common.js";
 import store from "./utils/store"
 
@@ -37,6 +38,8 @@ if (!wx.getStorageSync("companyId")) {
 } else {
   getThemeColor()
 }
+
+// getWXCompany()
 
 if (!wx.getStorageSync("Cookie")) {
   wx.request({

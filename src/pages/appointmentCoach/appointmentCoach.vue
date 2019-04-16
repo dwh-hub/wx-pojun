@@ -871,7 +871,6 @@ export default {
           coachId: that.coachId
         },
         success(res) {
-          wx.hideLoading()
           if (res.data.code == 200) {
             that.storeList = res.data.data;
             if (that.storeList.length == 1) {
@@ -880,6 +879,7 @@ export default {
               that.isStorePopup = true;
             }
           }
+          wx.hideLoading()
         }
       });
     },

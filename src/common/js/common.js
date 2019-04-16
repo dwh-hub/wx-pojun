@@ -1,5 +1,5 @@
 const window = {}
-window.DEBUGGING = false
+window.DEBUGGING = true
 window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
 window.color = "" // "#00c2a9"
 let Cookie = ""
@@ -108,23 +108,27 @@ export function setNavTab(title) {
  * @param {String} appid 微信公众号的appid
  */
 export function getWXCompany(appid) {
-  wx.request({
-    url: window.api + '/wxopen/getCompanyByAuthAppId',
-    data: {
-      authAppId: appid
-    },
-    success(res) {
-      wx.setStorageSync({
-        key: "companyId",
-        data: res.data.data.companyId
-      });
-      wx.setStorageSync({
-        key: "companyName",
-        data: res.data.data.companyName
-      });
-      getThemeColor()
-      // res.data.data.companyName
-    }
+  return new Promise(function (resolve) {
+    // wx.request({
+      // url: window.api + '/wxopen/getCompanyByAuthAppId',
+      // data: {
+      //   authAppId: appid
+      // },
+      // success(res) {
+        wx.setStorageSync({
+          key: "companyId",
+          data: 44, // res.data.data.companyId
+        });
+        wx.setStorageSync({
+          key: "companyName",
+          data: '前锋体育'// res.data.data.companyName
+        });
+        getThemeColor().then(() => {
+          resolve()
+        })
+        // res.data.data.companyName
+      // }
+    // })
   })
 }
 

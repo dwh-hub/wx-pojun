@@ -3,7 +3,8 @@
     <div v-if="info.teamScheduleId || info.coachAppointId" @click="toDetail" class="team-class-item-y">
       <div class="cover">
         <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
-        <img :src="window.api + info.masterImg">
+        <!-- <img :src="window.api + info.masterImg"> -->
+        <image :src="window.api + info.masterImg" mode="aspectFit"></image>
       </div>
       <div class="team-class-info">
         <div class="team-class-name">{{info.anotherName || info.projectName || ''}}</div>
@@ -140,7 +141,7 @@ export default {
     width: 90px;
     height: 90px;
     background-color: #eee;
-    > img {
+    > image {
       width: 100%;
       height: 100%;
     }

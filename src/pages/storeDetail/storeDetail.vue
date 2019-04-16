@@ -22,10 +22,10 @@
     <div class="address">
       <h4>地址</h4>
       <div class="store" :style="{'color': themeColor}">
-        {{storeInfo.name}}
+        {{storeInfo.name || '暂无'}}
         <span class="range" :style="{'color': themeColor}">{{storeInfo.range || ''}}</span>
       </div>
-      <div class="address-detail">{{storeInfo.address}}</div>
+      <div class="address-detail">{{storeInfo.address || '暂无地址信息'}}</div>
     </div>
     <div class="business-hours">
       <div class="business">
@@ -65,8 +65,8 @@ export default {
     return {
       storeId: -1,
       storeInfo: {},
-      teamClassList: [],
-      coachList: [],
+      teamClassList: [{}],
+      coachList: [{}],
       businessTime: "",
       longitude: "", // 经度
       latitude: "", // 纬度
@@ -189,8 +189,10 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             that.teamClassList = res.data.data.slice(0, 1);
+            that.loadCount++
+          } else {
+            that.teamClassList = []
           }
-          that.loadCount++
         }
       });
     },
@@ -204,8 +206,12 @@ export default {
           positionType: 1
         },
         success(res) {
-          that.coachList = res.data.data.slice(0, 1);
-          that.loadCount++
+          if(res.data.code == 200) {
+            that.coachList = res.data.data.slice(0, 1);
+            that.loadCount++
+          } else {
+            that.teamClassList = []
+          }
         }
       });
     }

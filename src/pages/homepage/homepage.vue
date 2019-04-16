@@ -60,7 +60,7 @@
           class="nearby-store"
           v-for="(item, index) in nearbyStoreList"
           :key="index"
-          @click="toNav(`../storeDetail/main?storeId=${item.storeId}`)"
+          @click="toStoreDetail(item.storeId)"
         >
           <!-- http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg -->
           <div class="cover">
@@ -75,8 +75,8 @@
     </div>
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
-      <team-class-item :info="recommendClass" v-if="recommendClass.anotherName"></team-class-item>
-      <coach-item :info="recommendCoach" v-if="recommendCoach.userName"></coach-item>
+      <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item>
+      <coach-item :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
     </div>
   </div>
 </template>
@@ -107,10 +107,10 @@ export default {
       longitude: "", // 经度
       latitude: "", // 维度
       bannerList: [],
-      recommendCoach: {},
-      recommendClass: {},
+      recommendCoach: [{}],
+      recommendClass: [{}],
       companyId: "",
-      nearbyStoreList: [],
+      nearbyStoreList: [{},{}],
       themeColor: ""
     };
   },
@@ -120,10 +120,10 @@ export default {
     coachItem
   },
   mounted() {
-    getThemeColor().then(() => {
-      setNavTab(wx.getStorageSync("companyName"));
-      this.themeColor = window.color || "#2a82e4";
-    })
+    // getThemeColor().then(() => {
+    //   setNavTab(wx.getStorageSync("companyName"));
+    //   this.themeColor = window.color || "#2a82e4";
+    // })
     this.companyId = wx.getStorageSync("companyId");
     let that = this;
     wx.getLocation({
@@ -156,7 +156,15 @@ export default {
   },
   onLoad(options) {
     if (options.appid) {
-      getWXCompany(options.appid);
+      getWXCompany(options.appid).then(() => {
+        setNavTab(wx.getStorageSync("companyName"));
+        this.themeColor = window.color || "#2a82e4";
+      });
+    } else {
+      getWXCompany('wx842adcf8a0ea1c9a').then(() => {
+        setNavTab(wx.getStorageSync("companyName"));
+        this.themeColor = window.color || "#2a82e4";
+      });
     }
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
@@ -168,11 +176,11 @@ export default {
       return window.color;
     }
   },
-  // onPullDownRefresh() {
-  //   setTimeout(() => {
-  //     wx.stopPullDownRefresh;
-  //   }, 2000);
-  // },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   methods: {
     toNav(url) {
       if (!url) {
@@ -192,6 +200,13 @@ export default {
       wx.navigateTo({
         url: url
       });
+    },
+    toStoreDetail(id) {
+      if(id) {
+        wx.navigateTo({
+          url: '../storeDetail/main?storeId='+id
+        });
+      }
     },
     // 获取轮播图
     getBannerList() {
@@ -222,8 +237,12 @@ export default {
             : ""
         },
         success(res) {
-          if (res.data.code == 200) {
-            that.recommendClass = res.data.data;
+          if (res.data.code == 200 && res.data.data) {
+            let _list = []
+            _list.push(res.data.data)
+            that.recommendClass = _list;
+          } else {
+            that.recommendClass = []
           }
         }
       });
@@ -236,13 +255,17 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data) {
             let _data = res.data.data;
-            that.recommendCoach = {
+            let _list = []
+            _list.push({
               userName: _data.coachName,
               userId: _data.coachId,
               individualResume: _data.individualResume,
               teamCountByCoach: _data.teamCountByCoach,
               privateCountByCoach: _data.privateCountByCoach
-            };
+            })
+            that.recommendCoach = _list;
+          } else {
+            that.recommendCoach = []
           }
         }
       });

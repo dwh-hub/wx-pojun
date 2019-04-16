@@ -147,7 +147,7 @@ export default {
       // 积分
       myPoints: "",
       // 消费次数
-      FreeCount: "",
+      FreeCount:"",
       themeColor: ""
     };
   },
@@ -164,13 +164,14 @@ export default {
     //   });
     // } else {
     //   console.log("不存在，重新获取");
-    if (store.state.isLogin == false) {
+    if(store.state.isLogin == false) {
       wxLogin();
     }
     if (this.themeColor != window.color) {
       this.themeColor = window.color;
       setNavTab(wx.getStorageSync("companyName"));
     }
+    // }
   },
   mounted() {
     this.getTimes();
@@ -178,7 +179,7 @@ export default {
     this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);
     this.isLogin = store.state.isLogin;
-    this.themeColor = window.color;
+    this.themeColor = window.color
   },
   computed: {
     isLogin() {
@@ -286,6 +287,9 @@ export default {
     // 获取微信加密数据
     getPhoneNumber(e) {
       let that = this;
+      if(!e.mp.detail.encryptedData) {
+        return
+      }
       wx.showLoading({
         title: "登录中..."
       });
@@ -315,6 +319,10 @@ export default {
       this.getUserInfo().then(() => {
         this.bindMethod();
       });
+    },
+    // 选择公司
+    selectCompany(item) {
+      this.curCompany = item;
     },
     // 绑定公司
     bind() {
@@ -385,12 +393,12 @@ export default {
           url: window.api + "/wxcustomer/findAllCustomer",
           data: {
             phone: that.phone,
-            companyId: wx.getStorageSync("companyId")
+            // companyId: wx.getStorageSync("companyId")
           },
           success(res) {
             wx.hideLoading();
             if (res.data.code == 200) {
-              let _data = res.data.data;
+              let _data = res.data.data
               if (!_data.length) {
                 return wx.showModal({
                   title: "提示",
@@ -425,7 +433,6 @@ export default {
               that.showBindBox = true;
               that.companyList = _data;
               that.curCompany = _data[0];
-              resolve();
             } else {
               wx.showModal({
                 title: "提示",

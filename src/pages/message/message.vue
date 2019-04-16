@@ -6,15 +6,57 @@
       <span class="read-none" :class="{ select: !isRead }" @click="showReadNone">已读</span>
     </div>-->
     <div class="header">
-      <van-tabs :active="navIndex" @change="onChange" :duration="0" :color="themeColor">
-        <van-tab title="未读"></van-tab>
-        <van-tab title="已读"></van-tab>
+      <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
+        <van-tab title="未读">
+          <div class="readContent">
+            <div
+              class="message-item"
+              v-for="(item, index) in messageNList"
+              :key="index"
+              @click="showDetail(item)"
+            >
+              <div class="img-wrapper">
+                <img src="https://www.pojun-tech.com/assets/img/messageDetailIcon.png">
+              </div>
+              <div class="message-info">
+                <div class="message-content">
+                  <div class="title">{{item.userMessageTemplateTitle}}</div>
+                  <div class="message-date">{{item.addTime}}</div>
+                </div>
+                <div class="message-text">{{item.userMessageParam}}</div>
+              </div>
+            </div>
+            <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
+          </div>
+        </van-tab>
+        <van-tab title="已读">
+          <div class="readContent">
+            <div
+              class="message-item"
+              v-for="(item, index) in messageYList"
+              :key="index"
+              @click="showDetail(item)"
+            >
+              <div class="img-wrapper">
+                <img src="https://www.pojun-tech.com/assets/img/messageDetailIcon.png">
+              </div>
+              <div class="message-info">
+                <div class="message-content">
+                  <div class="title">{{item.userMessageTemplateTitle}}</div>
+                  <div class="message-date">{{item.addTime}}</div>
+                </div>
+                <div class="message-text">{{item.userMessageParam}}</div>
+              </div>
+            </div>
+            <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
+          </div>
+        </van-tab>
       </van-tabs>
       <!-- <div class="search">
         <input type="text" placeholder="请输入名字/手机号回车搜索" placeholder-style="color: #ccc;">
       </div>-->
     </div>
-    <div class="readContent" v-show="navIndex == 0">
+    <!-- <div class="readContent" v-show="navIndex == 0">
       <div
         class="message-item"
         v-for="(item, index) in messageNList"
@@ -53,7 +95,7 @@
         </div>
       </div>
       <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
-    </div>
+    </div>-->
     <van-popup
       position="right"
       :show="showMessageBox"

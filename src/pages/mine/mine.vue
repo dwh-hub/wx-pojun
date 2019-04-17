@@ -73,6 +73,7 @@
         <span class="showTooltips" @click="bind">绑定</span>
       </div>
     </van-popup>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -86,6 +87,7 @@ import {
   getThemeColor
 } from "COMMON/js/common.js";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   data() {
@@ -151,6 +153,9 @@ export default {
       themeColor: ""
     };
   },
+  components: {
+    pageFooter
+  },
   onShow() {
     // if (wx.getStorageSync("sessionKey")) {
     //   wx.checkSession({
@@ -180,6 +185,11 @@ export default {
     store.commit("saveUserInfo", this.userInfo);
     this.isLogin = store.state.isLogin;
     this.themeColor = window.color
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   computed: {
     isLogin() {

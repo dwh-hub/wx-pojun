@@ -3,7 +3,7 @@
     <div class="nav-tab">
       <div class="nav-tab-left">
         <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
-          {{curStore}}
+          <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: window.color}">{{curStore}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showStoreList}">
             <div class="store-nav-list" :class="{slide: showStoreList}">
@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="signing" :class="{active: currentNav==2}" @click="selectNav(2)">
-          {{curCoachStatus}}
+          <span v-show="currentNav!=2">{{curCoachStatus}}</span><span v-show="currentNav==2" :style="{color: window.color}">{{curCoachStatus}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showSigning}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showSigning}">
@@ -45,6 +45,7 @@
     </div>
     <div class="mask" v-show="maskShow" @click="clickMask"></div>
     <none-result v-if="!curCoachList.length"></none-result>
+    <page-footer v-if="curCoachList.length"></page-footer>
   </div>
 </template>
 
@@ -53,6 +54,7 @@ import { setNavTab, window, HttpRequest, debounce } from "COMMON/js/common.js";
 import coachItem from "COMPS/coachItem.vue";
 import noneResult from "COMPS/noneResult";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
@@ -87,7 +89,8 @@ export default {
   },
   components: {
     coachItem,
-    noneResult
+    noneResult,
+    pageFooter
   },
   onLoad() {
     this.customerId = wx.getStorageSync("userInfo").id;
@@ -95,6 +98,11 @@ export default {
   },
   onUnload() {
     this.curCoachList = [{}, {}, {}, {}, {}];
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   mounted() {
     setNavTab();
@@ -131,6 +139,9 @@ export default {
       } else {
         return false;
       }
+    },
+    window() {
+      return window
     }
   },
   methods: {

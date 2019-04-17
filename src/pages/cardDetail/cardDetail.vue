@@ -41,12 +41,14 @@
         <span class="item-content">{{activateDate}}~{{doomsday}}</span>
       </div>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import card from "COMPS/card";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
@@ -58,7 +60,8 @@ export default {
     };
   },
   components: {
-    card
+    card,
+    pageFooter
   },
   onLoad(option) {
     this.cardId = option.id
@@ -66,6 +69,11 @@ export default {
   },
   mounted() {
     this.getCardDetail()
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   computed: {
     // 卡的激活时间

@@ -3,8 +3,8 @@
     <div class="header">
       <select-date @selectWeek="getClassList"></select-date>
       <div class="nav-tab">
-        <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
-          {{curStore}}
+        <div class="store" @click="selectNav(1)">
+          <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: window.color}">{{curStore}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showStoreNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showStoreNav}">
@@ -17,8 +17,8 @@
             </div>
           </div>
         </div>
-        <div class="class" :class="{active: currentNav==2}" @click="selectNav(2)">
-          {{curSchedule}}
+        <div class="class" @click="selectNav(2)">
+          <span v-show="currentNav!=2">{{curSchedule}}</span><span v-show="currentNav==2" :style="{color: window.color}">{{curSchedule}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showScheduleNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showScheduleNav}">
@@ -32,8 +32,8 @@
           </div>
         </div>
         <!-- <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div> -->
-        <div class="coach" :class="{active: currentNav==4}" @click="selectNav(4)">
-          {{curCoach}}
+        <div class="coach" @click="selectNav(4)">
+          <span v-show="currentNav!=4">{{curCoach}}</span><span v-show="currentNav==4" :style="{color: window.color}">{{curCoach}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showCoachNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showCoachNav}">
@@ -56,6 +56,7 @@
       <none-result v-if="!classList.length"></none-result>
     </div>
     <div class="mask" v-show="maskShow" @click="clickMask"></div>
+    <page-footer v-if="classList.length"></page-footer>
   </div>
 </template>
 
@@ -69,6 +70,7 @@ import {
 import teamClassItem from "COMPS/teamClassItem";
 import selectDate from "COMPS/selectDate";
 import noneResult from "COMPS/noneResult";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
@@ -83,7 +85,7 @@ export default {
       // nav课程列表
       scheduleNav: [],
       // 分页的团课
-      classList: [{},{},{},{}],
+      classList: [{},{},{},{},{}],
       // 存储所有的团课
       allClassList: [],
       // 当前选择的门店
@@ -104,7 +106,8 @@ export default {
   components: {
     teamClassItem,
     selectDate,
-    noneResult
+    noneResult,
+    pageFooter
   },
   mounted() {
     setNavTab();
@@ -140,6 +143,11 @@ export default {
         );
       }
     }
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   methods: {
     selectNav(index) {
@@ -216,7 +224,7 @@ export default {
     },
     // 获取团课列表
     getClassList(date) {
-      this.classList = [{}, {}, {}, {}];
+      this.classList = [{}, {}, {}, {},{}];
       if (date) {
         this.curDate = date;
       }

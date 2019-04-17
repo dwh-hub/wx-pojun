@@ -35,10 +35,11 @@
         <div class="box-item"><span class="text-left">报名费用</span><span class="text-right">{{activeDetail.entryFee*signNum}}</span></div>
         <div class="btn-wrapper">
           <span class="cancel" @click="showEntryBox = false">取消</span>
-          <span class="confirm" @click="confirmSignUp">确认</span>
+          <span class="confirm" @click="confirmSignUp" :style="{'background-color': window.color}">确认</span>
         </div>
       </div>
     </van-popup>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -46,6 +47,7 @@
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import wxParse from "mpvue-wxparse";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
@@ -74,6 +76,11 @@ export default {
     }
     this.getActiveDetail();
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
+  },
   computed: {
     isPhoneX() {
       return store.state.isIphoneX;
@@ -89,7 +96,8 @@ export default {
     // }
   },
   components: {
-    wxParse
+    wxParse,
+    pageFooter
   },
   methods: {
     decrease() {
@@ -310,9 +318,6 @@ export default {
       }
       .cancel {
         background-color: #fa8178;
-      }
-      .confirm {
-        background-color: @theme-color;
       }
     }
   }

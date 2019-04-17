@@ -1,6 +1,7 @@
 <template>
   <div class="all-store">
     <store-item :info="item" v-for="(item, index) in storeList" :key="index"></store-item>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -8,6 +9,7 @@
 import storeItem from "COMPS/storeItem.vue";
 import { setNavTab, window, getRange } from "COMMON/js/common.js";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   name: "all-store",
@@ -20,7 +22,8 @@ export default {
     };
   },
   components: {
-    storeItem
+    storeItem,
+    pageFooter
   },
   onLoad() {
     setNavTab();
@@ -35,6 +38,11 @@ export default {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }
     this.companyId = wx.getStorageSync("companyId");
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   methods: {
     getAllStore() {

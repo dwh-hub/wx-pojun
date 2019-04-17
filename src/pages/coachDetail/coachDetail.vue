@@ -38,6 +38,7 @@
       马上预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -45,6 +46,7 @@
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import store from "../../utils/store";
 import wxParse from "mpvue-wxparse";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   data() {
@@ -60,8 +62,14 @@ export default {
   mounted() {
     this.getCoachDetail();
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
+  },
   components: {
-    wxParse
+    wxParse,
+    pageFooter
   },
   computed: {
     isPhoneX() {

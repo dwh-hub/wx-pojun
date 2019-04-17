@@ -11,10 +11,7 @@
           :style="{'color': themeColor}"
         >共授课{{(coachInfo.privateCountByCoach+coachInfo.teamCountByCoach) || '0'}}节</div>
       </div>
-      <div class="tiems">
-        <!-- <div class="num">$1次$</div> -->
-        <!-- <div class="text">本次扣费</div> -->
-      </div>
+      <div class="tiems"></div>
     </div>
     <div class="cell-list-sm">
       <title-cell
@@ -151,100 +148,6 @@
           </div>
           <select-date @selectWeek="onDate"></select-date>
         </div>
-        <!-- <div class="specific-date">
-          <div class="morning">
-            <div class="date-header">
-              <h5>上午</h5>
-              <div class="mini-data" v-show="showMiniIndex == 1">
-                <div
-                  class="mini"
-                  v-for="(item,index) in miniDate"
-                  :key="index"
-                  @click="selectHour(item)"
-                  :class="{active: item == curTime}"
-                >{{item}}</div>
-              </div>
-            </div>
-            <div class="hours">
-              <div
-                class="hour"
-                v-for="(item, index) in morningTimes"
-                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
-                :key="index"
-                @click="selectHour(item,1)"
-              >{{item.hour}}</div>
-            </div>
-          </div>
-          <div class="noon">
-            <div class="date-header">
-              <h5>中午</h5>
-              <div class="mini-data" v-show="showMiniIndex == 2">
-                <div
-                  class="mini"
-                  v-for="(item,index) in miniDate"
-                  :key="index"
-                  @click="selectHour(item)"
-                  :class="{active: item == curTime}"
-                >{{item}}</div>
-              </div>
-            </div>
-            <div class="hours">
-              <div
-                class="hour"
-                v-for="(item, index) in noonTimes"
-                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
-                @click="selectHour(item,2)"
-                :key="index"
-              >{{item.hour}}</div>
-            </div>
-          </div>
-          <div class="afternoon">
-            <div class="date-header">
-              <h5>下午</h5>
-              <div class="mini-data" v-show="showMiniIndex == 3">
-                <div
-                  class="mini"
-                  v-for="(item,index) in miniDate"
-                  :key="index"
-                  @click="selectHour(item)"
-                  :class="{active: item == curTime}"
-                >{{item}}</div>
-              </div>
-            </div>
-            <div class="hours">
-              <div
-                class="hour"
-                v-for="(item, index) in afternoonTimes"
-                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
-                @click="selectHour(item,3)"
-                :key="index"
-              >{{item.hour}}</div>
-            </div>
-          </div>
-          <div class="afternoon">
-            <div class="date-header">
-              <h5>晚上</h5>
-              <div class="mini-data" v-show="showMiniIndex == 4">
-                <div
-                  class="mini"
-                  v-for="(item,index) in miniDate"
-                  :key="index"
-                  @click="selectHour(item)"
-                  :class="{active: item == curTime}"
-                >{{item}}</div>
-              </div>
-            </div>
-            <div class="hours">
-              <div
-                class="hour"
-                v-for="(item, index) in nightTime"
-                :class="{active: (item.hour == curTime || item.hour == curEndTime), disable: item.disable}"
-                @click="selectHour(item,4)"
-                :key="index"
-              >{{item.hour}}</div>
-            </div>
-          </div>
-        </div>-->
         <div class="specific-date">
           <div class="date-hours">
             <div class="time-icon">
@@ -256,28 +159,41 @@
               </div>
             </div>
             <div class="hour-group">
+              <!-- active: (curHourIndex == index),  -->
               <div
                 class="hour"
                 v-for="(item, index) in dayTime"
                 :key="index"
-                :class="{active: (curHourIndex == index), disable: item.disable}"
+                :class="{disable: item.disable}"
                 @click="selectHour(item, index)"
-              >{{item.hour}}</div>
+              >
+                <span
+                  v-if="curHourIndex == index"
+                  :style="{'background-color':themeColor,color:'#fff'}"
+                >{{item.hour}}</span>
+                <span v-else>{{item.hour}}</span>
+              </div>
             </div>
           </div>
           <div class="date-second">
-            <div 
-              class="second-item" 
-              v-for="(item, index) in allMiniTime" 
+            <div
+              class="second-item"
+              v-for="(item, index) in allMiniTime"
               :key="index"
-              :class="{active: curSecondIndex == index}"
-              @click="selectSecond(item,index)">{{item}}</div>
+              @click="selectSecond(item,index)"
+            >
+              <span
+                v-if="curSecondIndex == index"
+                :style="{'background-color':themeColor,color:'#fff'}"
+              >{{item}}</span>
+              <span v-else>{{item}}</span>
+            </div>
           </div>
         </div>
         <div class="date-group-footer">
           <div class="tips">
             <div class="already">
-              <span class="already-block"></span>
+              <span class="already-block" :style="{'background-color': themeColor}"></span>
               <span>已选择</span>
             </div>
             <div class="can">
@@ -334,6 +250,7 @@
       发起预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -347,6 +264,7 @@ import {
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   name: "appointment-coach",
@@ -437,7 +355,8 @@ export default {
   },
   components: {
     titleCell,
-    selectDate
+    selectDate,
+    pageFooter
   },
   onLoad(option) {
     // 进页面前先清空数据
@@ -445,6 +364,11 @@ export default {
     this.coachId = option.coachId;
     this.userInfo = wx.getStorageSync("userInfo");
     setNavTab();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   mounted() {
     this.getCoachDetail();
@@ -468,7 +392,7 @@ export default {
       return window.color;
     },
     window() {
-      return window
+      return window;
     }
   },
   methods: {
@@ -543,7 +467,7 @@ export default {
       this.isProjectPopup = true;
     },
     // 选择时间
-    selectHour(item,index) {
+    selectHour(item, index) {
       if (item.disable) {
         return;
       }
@@ -561,18 +485,18 @@ export default {
         this.curEndTime = _curEndtime;
       }
     },
-    selectSecond(item,index) {
-      if(this.curHourIndex == -1){
-        return
+    selectSecond(item, index) {
+      if (this.curHourIndex == -1) {
+        return;
       }
-      this.curTime = this.curTime.split(":")[0] + item
-      this.curEndTime = this.curEndTime.split(":")[0] + item
+      this.curTime = this.curTime.split(":")[0] + item;
+      this.curEndTime = this.curEndTime.split(":")[0] + item;
       this.curSecondIndex = index;
     },
     // 计算可选择预约时间
     computedTime() {
       let _satarTime = this.openTimeStart.split(":")[0];
-      let _endTime = Number(this.openTimeEnd.split(":")[0]-1);
+      let _endTime = Number(this.openTimeEnd.split(":")[0] - 1);
       // let _morningTimes = [];
       // let _nightTime = [];
       // let _noonTimes = [];
@@ -613,10 +537,10 @@ export default {
       //     _allTime.push(h + ":00");
       //   }
       // }
-      let _nowDay = formatDate(new Date(), "yyyy-MM-dd")
+      let _nowDay = formatDate(new Date(), "yyyy-MM-dd");
       // 不可预约时间
       _allTime = _allTime.map(e => {
-        let _timestamp = new Date(_nowDay+ " " + e).getTime();
+        let _timestamp = new Date(_nowDay + " " + e).getTime();
         let _hour = e.split(":")[0];
         if (_hour < _satarTime && _hour > 0) {
           return {
@@ -624,7 +548,7 @@ export default {
             disable: true
           };
         }
-        if (_hour > (Number(_endTime)-1)) {
+        if (_hour > Number(_endTime) - 1) {
           return {
             hour: e,
             disable: true
@@ -632,7 +556,8 @@ export default {
         }
         for (let i in this.todayPeriodTime) {
           if (
-            _timestamp >= (Number(this.todayPeriodTime[i].timeStart)-(60*60*1000)) &&
+            _timestamp >=
+              Number(this.todayPeriodTime[i].timeStart) - 60 * 60 * 1000 &&
             _timestamp <= this.todayPeriodTime[i].timeEnd
           ) {
             return {
@@ -863,7 +788,7 @@ export default {
     getStoreList() {
       wx.showLoading({
         title: "加载中..."
-      })
+      });
       let that = this;
       HttpRequest({
         url: window.api + "/mobile/coach/getAttendStoreByCus",
@@ -879,7 +804,7 @@ export default {
               that.isStorePopup = true;
             }
           }
-          wx.hideLoading()
+          wx.hideLoading();
         }
       });
     },
@@ -968,45 +893,6 @@ export default {
           } else {
             that.todayPeriodTime = [];
           }
-          /* 
-          let _todayPeriodTime = [];
-          res.data.data.forEach(e => {
-            console.log(e);
-            let _timeStart = formatDate(new Date(e.timeStart), "hh:mm");
-            let _endTime = formatDate(new Date(e.timeEnd), "hh:mm");
-            let _timeStartH = _timeStart.split(":")[0];
-            let _timeStartS = _timeStart.split(":")[1];
-            let _endTimeH = _endTime.split(":")[0];
-            let _endTimeS = _endTime.split(":")[1];
-            let second;
-            if (_endTimeS - _timeStartS < 16 && _endTimeS - _timeStartS > 0) {
-              second = "15";
-            } else if (
-              _endTimeS - _timeStartS < 31 &&
-              _endTimeS - _timeStartS > 15
-            ) {
-              second = "30";
-            } else if (
-              _endTimeS - _timeStartS < 46 &&
-              _endTimeS - _timeStartS > 30
-            ) {
-              second = "45";
-            } else {
-              second = "00";
-            }
-            _todayPeriodTime.push(`${_timeStartH}:${second}`);
-            _todayPeriodTime.push(`${Number(_timeStartH) + 1}:${second}`);
-            // for(let i=0;i<(_endTimeH - _timeStartH);i++) {
-            //   console.log(i)
-            // }
-          });
-          console.log(_todayPeriodTime);
-          that.todayPeriodTime = _todayPeriodTime;
-          // [{
-          //   timeStart: 1522814400000,
-          //   timeEnd:1522818000000
-          // }]
-          */
         }
       });
     },
@@ -1025,8 +911,6 @@ export default {
               that.openTimeEnd = res.data.data.openingHoursEnd || "24";
               that.computedTime();
               resolve();
-              // that.businessTime =
-              //   res.data.data.openTimeStart + "~" + res.data.data.openTimeEnd;
             }
           }
         });
@@ -1167,29 +1051,6 @@ page {
     }
   }
   .time-pop {
-    // .date-group {
-    //   position: fixed;
-    //   top: 0;
-    //   right: 0;
-    //   bottom: 0;
-    //   left: 0;
-    //   z-index: 9999;
-    //   background-color: #fff;
-    //   .date-group-header {
-    //     position: absolute;
-    //     top: 0;
-    //     left: 0;
-    //     width: 100%;
-    //     height: 140px;
-    //   }
-    //   .date-group-footer {
-    //     position: absolute;
-    //     bottom: 0;
-    //     left: 0;
-    //     width: 100%;
-    //     height: 120px;
-    //   }
-    // }
     .select-date {
       border-bottom: 1rpx solid #eee;
       border-top: 1rpx solid #eee;
@@ -1247,6 +1108,10 @@ page {
             border-bottom: 1rpx solid #e5e5e5;
             line-height: 40px;
             text-align: center;
+            > span {
+              display: inline-block;
+              width: 100%;
+            }
             &.active {
               background-color: #43cf7c;
               color: #fff;
@@ -1265,12 +1130,16 @@ page {
         .second-item {
           flex: 1;
           text-align: center;
-          line-height: 42px;
           font-size: 12px;
           color: #999;
-          &:nth-child(3n + 1) {
-            font-size: 14px;
-            color: #333;
+          > span {
+            display: inline-block;
+            line-height: 42px;
+            width: 100%;
+            &:nth-child(3n + 1) {
+              font-size: 14px;
+              color: #333;
+            }
           }
           &.active {
             background-color: #43cf7c;
@@ -1279,75 +1148,6 @@ page {
         }
       }
     }
-    // .specific-date {
-    //   position: absolute;
-    //   top: 140px;
-    //   bottom: 130px;
-    //   width: 100%;
-    //   overflow: auto;
-    //   padding: 0 15px;
-    //   box-sizing: border-box;
-    //   .morning,
-    //   .noon,
-    //   .afternoon {
-    //     .date-header {
-    //       display: flex;
-    //       margin-bottom: 15px;
-    //       align-items: center;
-    //       > h5 {
-    //         flex: 0 0 50px;
-    //         text-align: center;
-    //         line-height: 20px;
-    //         font-size: 15px;
-    //         // margin-bottom: 15px;
-    //       }
-    //       .mini-data {
-    //         flex: 1;
-    //         .mini {
-    //           display: inline-block;
-    //           width: 60px;
-    //           margin-top: 7px;
-    //           margin-right: 5px;
-    //           line-height: 36px;
-    //           text-align: center;
-    //           font-size: 13px;
-    //           border: 1rpx solid #eee;
-    //           &.active {
-    //             background-color: #43cf7c;
-    //             color: #fff;
-    //           }
-    //           &.disable {
-    //             background-color: #ccc !important;
-    //             color: #999 !important;
-    //           }
-    //         }
-    //       }
-    //     }
-    //     .hours {
-    //       display: flex;
-    //       flex-wrap: wrap;
-    //       width: 100%;
-    //       .hour {
-    //         flex: 0 0 24%;
-    //         box-sizing: border-box;
-    //         text-align: center;
-    //         margin-right: 1%;
-    //         margin-bottom: 10px;
-    //         line-height: 45px;
-    //         font-size: 16px;
-    //         border: 1rpx solid #eee;
-    //         &.active {
-    //           background-color: #43cf7c;
-    //           color: #fff;
-    //         }
-    //         &.disable {
-    //           background-color: #ccc !important;
-    //           color: #999 !important;
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
     .tips {
       padding: 0 15px;
       padding-top: 15px;
@@ -1367,9 +1167,9 @@ page {
         height: 20px;
         margin-right: 5px;
       }
-      .already-block {
-        background-color: #43cf7c;
-      }
+      // .already-block {
+      //   background-color: #43cf7c;
+      // }
       .can-block {
         border: 1rpx solid #eee;
       }

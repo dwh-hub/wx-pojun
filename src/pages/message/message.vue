@@ -8,7 +8,7 @@
     <div class="header">
       <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
         <van-tab title="未读">
-          <div class="readContent">
+          <!-- <div class="readContent">
             <div
               class="message-item"
               v-for="(item, index) in messageNList"
@@ -27,10 +27,11 @@
               </div>
             </div>
             <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
-          </div>
+            <page-footer v-if="messageNList.length"></page-footer>
+          </div> -->
         </van-tab>
         <van-tab title="已读">
-          <div class="readContent">
+          <!-- <div class="readContent">
             <div
               class="message-item"
               v-for="(item, index) in messageYList"
@@ -49,14 +50,15 @@
               </div>
             </div>
             <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
-          </div>
+            <page-footer v-if="messageYList.length"></page-footer>
+          </div> -->
         </van-tab>
       </van-tabs>
       <!-- <div class="search">
         <input type="text" placeholder="请输入名字/手机号回车搜索" placeholder-style="color: #ccc;">
       </div>-->
     </div>
-    <!-- <div class="readContent" v-show="navIndex == 0">
+    <div class="readContent" v-show="navIndex == 0">
       <div
         class="message-item"
         v-for="(item, index) in messageNList"
@@ -75,6 +77,7 @@
         </div>
       </div>
       <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
+      <page-footer v-if="messageNList.length"></page-footer>
     </div>
     <div class="readContent" v-show="navIndex == 1">
       <div
@@ -95,7 +98,8 @@
         </div>
       </div>
       <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
-    </div>-->
+      <page-footer v-if="messageYList.length"></page-footer>
+    </div>
     <van-popup
       position="right"
       :show="showMessageBox"
@@ -130,6 +134,7 @@ import {
 import store from "../../utils/store";
 import wxParse from "mpvue-wxparse";
 import noneResult from "COMPS/noneResult.vue";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
@@ -165,9 +170,15 @@ export default {
       this.getMessage(1, this.messageYPage);
     }
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
+  },
   components: {
     wxParse,
-    noneResult
+    noneResult,
+    pageFooter
   },
   computed: {
     themeColor() {

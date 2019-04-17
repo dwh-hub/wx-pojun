@@ -17,12 +17,14 @@
       <van-loading color="#999" custom-class="loading"/>
     </div>
     <none-result v-if="isNoneResult" text="暂无记录"></none-result>
+    <page-footer v-if="!isNoneResult"></page-footer>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import noneResult from "COMPS/noneResult.vue";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
@@ -37,10 +39,16 @@ export default {
     setNavTab();
   },
   components: {
-    noneResult
+    noneResult,
+    pageFooter
   },
   onReachBottom() {
     this.getClassRecord();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   mounted() {
     this.customerId = wx.getStorageSync("userInfo").id;

@@ -72,10 +72,6 @@ export default {
       return window.color;
     }
   },
-  mounted() {
-    console.log('mounted')
-    console.log(this.info)
-  },
   methods: {
     toDetail() {
       if (this.isToDetail) {

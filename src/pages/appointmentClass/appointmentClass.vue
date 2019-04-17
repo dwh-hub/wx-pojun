@@ -1,10 +1,12 @@
 <template>
   <div class="appointmentClass">
     <div class="nav-tab">
-      <div class="stay" :class="{active: currentNav==1}" @click="selectNav(1)">待上课</div>
-      <div class="assess" :class="{active: currentNav==2}" @click="selectNav(2)">待评价</div>
-      <div class="complete" :class="{active: currentNav==3}" @click="selectNav(3)">已评价</div>
-      <!-- <div class="other" :class="{active: currentNav==4}" @click="selectNav(4)">其他</div> -->
+      <div class="stay" @click="selectNav(1)" v-show="currentNav!=1">待上课</div> <!-- :class="{active: currentNav==1}" -->
+      <div class="stay" :style="{'color': themeColor}" @click="selectNav(1)" v-show="currentNav==1">待上课</div>
+      <div class="assess" @click="selectNav(2)" v-show="currentNav!=2">待评价</div> <!-- :class="{active: currentNav==2}" -->
+      <div class="assess" :style="{'color': themeColor}" @click="selectNav(2)" v-show="currentNav==2">待评价</div>
+      <div class="complete" @click="selectNav(3)" v-show="currentNav!=3">已评价</div>  <!-- :class="{active: currentNav==3}" -->
+      <div class="complete" :style="{'color': themeColor}" @click="selectNav(3)" v-show="currentNav==3">已评价</div>
     </div>
     <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
       <div class="stay-team-class">
@@ -68,6 +70,7 @@
       v-if="isBottomAppoint"
       @click="toggleSelect"
     >继续预约</div>
+    <page-footer v-if="teamClassList.length || coachList.length"></page-footer>
   </div>
 </template>
 
@@ -77,6 +80,7 @@ import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   data() {
@@ -104,13 +108,21 @@ export default {
   components: {
     noneResult,
     titleCell,
-    teamClassItem
+    teamClassItem,
+    pageFooter
   },
   // onLoad(option) {
   //   this._onLoad(option);
   // },
   onShow() {
     this._onLoad();
+  },
+  onPullDownRefresh() {
+    this.clearData();
+    this.selectNav(this.currentNav);
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   computed: {
     // btnText() {

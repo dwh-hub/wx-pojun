@@ -37,6 +37,7 @@
       立即评价
       <div class="block" v-if="isPhoneX"></div>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -44,6 +45,7 @@
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   data() {
@@ -73,8 +75,14 @@ export default {
     }
     setNavTab();
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
+  },
   components: {
-    teamClassItem
+    teamClassItem,
+    pageFooter
   },
   computed: {
     window() {

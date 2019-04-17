@@ -23,6 +23,7 @@
     <div class="loading" v-show="isLoading">
       <van-loading color="#999" custom-class="loading"/>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -30,10 +31,11 @@
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
-      list: [],
+      list: [{},{},{},{},{},{}],
       options: {},
       customerId: "",
       page: 1,
@@ -42,7 +44,8 @@ export default {
   },
   components: {
     teamClassItem,
-    coachItem
+    coachItem,
+    pageFooter
   },
   onLoad(options) {
     setNavTab();
@@ -50,9 +53,6 @@ export default {
     console.log(options);
     // type 1 团课 2 私教课
     this.options = options;
-    wx.showLoading({
-      title: "加载中..."
-    });
     // if (options.type == 1) {
     //   this.getOwnTeamClassList(options.status, options.waitEvaluate);
     // } else if (options.type == 2) {
@@ -61,7 +61,7 @@ export default {
     this.getList();
   },
   onUnload() {
-    this.list = [];
+    this.list = [{},{},{},{},{},{}];
     this.page = 1;
   },
   onReachBottom() {
@@ -75,6 +75,11 @@ export default {
       this.isLoading = false;
     }, 2000);
     this.getList();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   methods: {
     getList() {
@@ -132,13 +137,13 @@ export default {
         data: _data,
         success(res) {
           if (res.data.code === 200) {
+            if(that.page == 1) {that.list = []}
             if (!res.data.data.result.length) {
               return;
             }
             that.list = that.list.concat(res.data.data.result);
             that.page++;
           }
-          wx.hideLoading();
         }
       });
     },
@@ -171,6 +176,7 @@ export default {
         data: _data,
         success(res) {
           if (res.data.code === 200) {
+            if(that.page == 1) {that.list = []}
             if (!res.data.data.result.length) {
               return;
             }
@@ -191,7 +197,6 @@ export default {
             that.page++;
             that.list = that.list.concat(_data);
           }
-          wx.hideLoading();
         }
       });
     },
@@ -207,11 +212,11 @@ export default {
             pageSize: 10
           },
           success(res) {
+            if(that.page == 1) {that.list = []}
             if (res.data.code === 200) {
               that.list = res.data.data.result;
               resolve();
             }
-            wx.hideLoading();
           }
         });
       });
@@ -228,11 +233,11 @@ export default {
             pageSize: 10
           },
           success(res) {
+            if(that.page == 1) {that.list = []}
             if (res.data.code === 200) {
               that.list = res.data.data.result;
               resolve();
             }
-            wx.hideLoading();
           }
         });
       });

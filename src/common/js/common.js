@@ -1,15 +1,13 @@
 const window = {}
-window.DEBUGGING = true
+window.DEBUGGING = false
 window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
 window.color = "" // "#00c2a9"
-let Cookie = ""
 
 // 获取sessionKey 需调用wx.login获取sessionKey
 function initsessionKey() {
   let sessionKey = wx.getStorageSync("sessionKey");
 
   if (sessionKey) {
-    console.log("获取sessionKey1:" + sessionKey);
     this.sessionKey = sessionKey;
     return Promise.resolve(sessionKey);
   }
@@ -20,7 +18,6 @@ function initsessionKey() {
 function initCookie() {
   // if (SetCookie) {
   let _Cookie = wx.getStorageSync("Cookie");
-  Cookie = _Cookie
   return Promise.resolve(_Cookie);
   // }
   // return Promise.resolve();
@@ -50,6 +47,34 @@ export function getThemeColor() {
   })
 }
 
+// 获取公司id之后获取主题色
+export function getCompanyColor() {
+  // TODO: 目前沒有公司id就默认前锋
+  if (!wx.getStorageSync("companyId")) {
+    if (window.DEBUGGING) {
+      wx.setStorage({
+        key: "companyId",
+        data: 44,
+        success() {
+          return getThemeColor()
+        }
+      });
+    } else {
+      wx.setStorage({
+        key: "companyId",
+        data: 37,
+        success() {
+          return getThemeColor()
+        }
+      });
+    }
+  } else {
+    return getThemeColor()
+  }
+
+}
+
+// 微信登录
 export function wxLogin() {
   return new Promise(function (resolve) {
     wx.login({
@@ -61,7 +86,6 @@ export function wxLogin() {
               code: res.code
             },
             success(data) {
-              console.log(data)
               wx.setStorage({
                 key: "sessionKey",
                 data: data.data.data.sessionKey
@@ -109,26 +133,25 @@ export function setNavTab(title) {
  */
 export function getWXCompany(appid) {
   return new Promise(function (resolve) {
-    // wx.request({
-      // url: window.api + '/wxopen/getCompanyByAuthAppId',
-      // data: {
-      //   authAppId: appid
-      // },
-      // success(res) {
+    wx.request({
+      url: window.api + '/wxopen/getCompanyByAuthAppId',
+      data: {
+        authAppId: appid
+      },
+      success(res) {
         wx.setStorageSync({
           key: "companyId",
-          data: 44, // res.data.data.companyId
+          data: res.data.data.companyId, // 44
         });
         wx.setStorageSync({
           key: "companyName",
-          data: '前锋体育'// res.data.data.companyName
+          data: res.data.data.companyName // '前锋体育'
         });
         getThemeColor().then(() => {
           resolve()
         })
-        // res.data.data.companyName
-      // }
-    // })
+      }
+    })
   })
 }
 
@@ -166,20 +189,28 @@ export function checkPhoneFormat(phone, rejectPrompt = "手机号格式不正确
 }
 
 /**	
- * 获取cookie
+ * 获取 cookie JSESSIONID
  * @param {String} c_name cookie的名称
  */
-export function getCookie(c_name) {
-  if (document.cookie.length > 0) {
-    c_start = document.cookie.indexOf(c_name + "=")
-    if (c_start != -1) {
-      c_start = c_start + c_name.length + 1
-      c_end = document.cookie.indexOf(";", c_start)
-      if (c_end == -1) c_end = document.cookie.length
-      return unescape(document.cookie.substring(c_start, c_end))
-    }
-  }
-  return "";
+export function getCookie() {
+  return new Promise(function (resolve) {
+    wx.request({
+      url: window.api + '/loginPage',
+      success(res) {
+        if (res.header["Set-Cookie"] != wx.getStorageSync("Cookie")) {
+          wx.setStorage({
+            key: "Cookie",
+            data: res.header["Set-Cookie"],
+            success() {
+              resolve()
+            }
+          });
+        } else {
+          resolve()
+        }
+      }
+    })
+  })
 };
 
 // 对Date的扩展，将 Date 转化为指定格式的String
@@ -206,14 +237,11 @@ export function formatDate(date, fmt) {
 }
 
 
-/**
- *
+/** 节流
  * @param fn {Function}   实际要执行的函数
  * @param delay {Number}  延迟时间，单位是毫秒（ms）
- *
  * @return {Function}     返回一个“防反跳”了的函数
  */
-
 export function debounce(fn, delay) {
 
   // 定时器，用来 setTimeout

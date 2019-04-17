@@ -1,4 +1,5 @@
 <template>
+  <!-- 废弃的旧页面 -->
   <div class="appointmentCards">
     <div class="coach">
       <div class="cover">

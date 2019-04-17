@@ -1,19 +1,25 @@
 <template>
   <div class="select-date">
     <div class="date-month">
-      <div
-        class="month-item"
-        v-for="(item, index) in dayArray"
-        :key="index"
-        :class="{active: selectDateIndex == index}"
-      >{{item}}</div>
+      <!-- :class="{active: selectDateIndex == index}" -->
+      <div class="month-item" v-for="(item, index) in dayArray" :key="index">
+        <span v-show="selectDateIndex != index">{{item}}</span>
+        <span v-show="selectDateIndex == index" :style="{color:themeColor}">{{item}}</span>
+      </div>
     </div>
     <div class="date-week">
       <div class="week-item" v-for="(item, index) in weekArray" :key="index">
+        <!-- :class="{active: selectDateIndex == index}" -->
         <div
           class="item-round"
-          :class="{active: selectDateIndex == index}"
           @click="selectWeek(index)"
+          v-show="selectDateIndex != index"
+        >{{item}}</div>
+        <div
+          class="item-round"
+          @click="selectWeek(index)"
+          :style="{'background-color': themeColor,color:'#fff'}"
+          v-show="selectDateIndex == index"
         >{{item}}</div>
       </div>
     </div>
@@ -21,7 +27,7 @@
 </template>
 
 <script>
-import { formatDate } from "COMMON/js/common.js";
+import { formatDate, window } from "COMMON/js/common.js";
 export default {
   data() {
     return {
@@ -38,11 +44,11 @@ export default {
   mounted() {
     this.getDateArray();
   },
-  // computed: {
-  //   activeThemeColor() {
-
-  //   }
-  // },
+  computed: {
+    themeColor() {
+      return window.color;
+    }
+  },
   methods: {
     getDateArray() {
       let date = new Date();
@@ -67,24 +73,31 @@ export default {
       let _dateArray = [];
       let day = date.getDate();
       let weekIndex = date.getDay();
-      let timesStamp = date.getTime()
+      let timesStamp = date.getTime();
       this.curWeek = week[weekIndex];
       this.curDay = day;
 
       for (let i = 0; i < 7; i++) {
         _weekArray.push(week[weekIndex + i]);
-        _dayArray.push(new Date(timesStamp + 24*60*60*1000*i).getDate())
-        _dateArray.push(formatDate(new Date(timesStamp + 24*60*60*1000*i), 'yyyy-MM-dd'));
+        _dayArray.push(
+          new Date(timesStamp + 24 * 60 * 60 * 1000 * i).getDate()
+        );
+        _dateArray.push(
+          formatDate(
+            new Date(timesStamp + 24 * 60 * 60 * 1000 * i),
+            "yyyy-MM-dd"
+          )
+        );
       }
       this.weekArray = _weekArray;
       this.dayArray = _dayArray;
-      this.dateArray = _dateArray
-      console.log(_dateArray)
+      this.dateArray = _dateArray;
+      console.log(_dateArray);
     },
     selectWeek(index) {
       this.selectDateIndex = index;
-      formatDate(new Date(), 'yyyy-MM')
-      let date = this.dateArray[index]
+      formatDate(new Date(), "yyyy-MM");
+      let date = this.dateArray[index];
       this.$emit("selectWeek", date);
     }
   }

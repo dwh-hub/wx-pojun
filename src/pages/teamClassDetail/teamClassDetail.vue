@@ -30,7 +30,7 @@
         <div class="cover">
           <img :scr="window.api + item.coachHeadImg">
         </div>
-        <div class="name">{{item.coachName}}</div>
+        <div class="name">{{item.coachName || '教练名'}}</div>
       </div>
       <!-- <div class="coach-info">
         <div class="coach-name">$JsonG 宁宁$</div>
@@ -90,6 +90,7 @@
       不可预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -98,10 +99,12 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  getRange
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   name: "team-class-detail",
@@ -121,7 +124,8 @@ export default {
     };
   },
   components: {
-    titleCell
+    titleCell,
+    pageFooter
   },
   onLoad(option) {
     // 进页面前先清空数据
@@ -131,6 +135,11 @@ export default {
   },
   onUnload() {
     this.loadCount = 0
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   mounted() {
     wx.showLoading({

@@ -74,10 +74,11 @@
       </div>
     </div>
     <div class="recommend-wrapper">
-      <title-cell title="为你推荐" :titleSize="18"></title-cell>
+      <title-cell title="为你推荐" :titleSize="18" v-if="!recommendClass.length && !recommendCoach.length"></title-cell>
       <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item>
       <coach-item :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -88,13 +89,14 @@ import {
   HttpRequest,
   getRange,
   getWXCompany,
-  getThemeColor
+  getThemeColor,
+  getCompanyColor
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
+import pageFooter from "COMPS/pageFooter.vue"
 import store from "../../utils/store";
-
 export default {
   data() {
     return {
@@ -117,13 +119,14 @@ export default {
   components: {
     titleCell,
     teamClassItem,
-    coachItem
+    coachItem,
+    pageFooter
   },
   mounted() {
-    // getThemeColor().then(() => {
-    //   setNavTab(wx.getStorageSync("companyName"));
-    //   this.themeColor = window.color || "#2a82e4";
-    // })
+    getCompanyColor().then(() => {
+      setNavTab(wx.getStorageSync("companyName"));
+      this.themeColor = window.color || "#2a82e4";
+    })
     this.companyId = wx.getStorageSync("companyId");
     let that = this;
     wx.getLocation({
@@ -146,26 +149,26 @@ export default {
   },
   onShow() {
     // this.themeColor == "" || this.themeColor == "#fff" || this.themeColor == "#2a82e4"
-    if (this.themeColor != window.color) {
-      this.themeColor = window.color;
-      setNavTab(wx.getStorageSync("companyName"));
-    }
-    if(!this.nearbyStoreList.length) {
-      this.getNearbyStoreList();
-    }
+    // if (this.themeColor != window.color) {
+    //   this.themeColor = window.color;
+    //   setNavTab(wx.getStorageSync("companyName"));
+    // }
+    // if(!this.nearbyStoreList.length) {
+    //   this.getNearbyStoreList();
+    // }
   },
   onLoad(options) {
-    if (options.appid) {
-      getWXCompany(options.appid).then(() => {
-        setNavTab(wx.getStorageSync("companyName"));
-        this.themeColor = window.color || "#2a82e4";
-      });
-    } else {
-      getWXCompany('wx842adcf8a0ea1c9a').then(() => {
-        setNavTab(wx.getStorageSync("companyName"));
-        this.themeColor = window.color || "#2a82e4";
-      });
-    }
+    // if (options.appid) {
+    //   getWXCompany(options.appid).then(() => {
+    //     setNavTab(wx.getStorageSync("companyName"));
+    //     this.themeColor = window.color || "#2a82e4";
+    //   });
+    // } else {
+    //   getWXCompany('wx842adcf8a0ea1c9a').then(() => {
+    //     setNavTab(wx.getStorageSync("companyName"));
+    //     this.themeColor = window.color || "#2a82e4";
+    //   });
+    // }
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }
@@ -177,9 +180,16 @@ export default {
     }
   },
   onPullDownRefresh() {
+    this.recommendCoach = [{}]
+    this.recommendClass = [{}]
+    this.getRecommendCoach();
+    this.getRecommendClass()
+    if(!this.nearbyStoreList.length) {
+      this.getNearbyStoreList();
+    }
     setTimeout(() => {
       wx.stopPullDownRefresh();
-    }, 2000);
+    }, 1000);
   },
   methods: {
     toNav(url) {

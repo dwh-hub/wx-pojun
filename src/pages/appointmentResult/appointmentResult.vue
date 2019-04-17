@@ -22,6 +22,7 @@
       <div class="title">门店信息</div>
       <store-item :info="storeInfo"></store-item>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -36,6 +37,7 @@ import {
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   data() {
@@ -51,7 +53,8 @@ export default {
   },
   components: {
     titleCell,
-    storeItem
+    storeItem,
+    pageFooter
   },
   computed: {
     timeStart() {
@@ -91,6 +94,11 @@ export default {
       this.getCoachDetail();
     }
     setNavTab();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   methods: {
     assess() {

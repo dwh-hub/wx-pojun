@@ -44,6 +44,7 @@
       <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore('../coachList/main')"></title-cell>
       <coach-item :info="item" v-for="(item, index) in coachList" :key="index"></coach-item>
     </div>
+    <page-footer></page-footer>
   </div>
 </template>
 
@@ -59,6 +60,7 @@ import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
 import store from "../../utils/store";
+import pageFooter from "COMPS/pageFooter.vue"
 export default {
   name: "storeDetail",
   data() {
@@ -76,7 +78,8 @@ export default {
   components: {
     titleCell,
     teamClassItem,
-    coachItem
+    coachItem,
+    pageFooter
   },
   onLoad(option) {
     // 进页面前先清空数据
@@ -97,6 +100,11 @@ export default {
   },
   onUnload() {
     this.loadCount = 0
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   watch: {
     loadCount() {

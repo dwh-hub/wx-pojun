@@ -24,6 +24,7 @@
       <van-loading color="#999" custom-class="loading"/>
     </div>
     <none-result v-if="isNoneResult" text="暂无可用合同"></none-result>
+    <page-footer v-if="!isNoneResult"></page-footer>
   </div>
 </template>
 
@@ -32,6 +33,7 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import card from "COMPS/card";
 import store from "../../utils/store";
 import noneResult from "COMPS/noneResult.vue";
+import pageFooter from "COMPS/pageFooter.vue"
 
 export default {
   data() {
@@ -54,7 +56,8 @@ export default {
   },
   components: {
     card,
-    noneResult
+    noneResult,
+    pageFooter
   },
   onLoad(option) {
     this.showPopup = false;
@@ -67,6 +70,11 @@ export default {
     }
     this.teamScheduleId = "";
     setNavTab();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
   },
   mounted() {
     this.userInfo = wx.getStorageSync("userInfo");

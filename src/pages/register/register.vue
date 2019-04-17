@@ -97,6 +97,11 @@ export default {
     //   return "重新发送(" + this.CDTime + "s)";
     // }
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
+  },
   methods: {
     // 获取验证码
     // getVCode() {

@@ -4,10 +4,10 @@ import {
   window,
   wxLogin,
   HttpRequest,
-  getThemeColor,
-  getWXCompany
+  getCompanyColor
 } from "COMMON/js/common.js";
 import store from "./utils/store"
+import login from "COMMON/js/login.js"
 
 Vue.config.productionTip = false
 App.mpType = 'app'
@@ -16,30 +16,7 @@ const app = new Vue(App)
 app.$mount()
 Vue.prototype.globalData = getApp().globalData
 
-// TODO: 目前沒有公司id就默认前锋
-if (!wx.getStorageSync("companyId")) {
-  if(window.DEBUGGING) {
-    wx.setStorage({
-      key: "companyId",
-      data: 44,
-      success() {
-        getThemeColor()
-      }
-    });
-  } else {
-    wx.setStorage({
-      key: "companyId",
-      data: 37,
-      success() {
-        getThemeColor()
-      }
-    });
-  }
-} else {
-  getThemeColor()
-}
-
-// getWXCompany()
+getCompanyColor()
 
 if (!wx.getStorageSync("Cookie")) {
   wx.request({
@@ -80,7 +57,8 @@ function getMessage() {
           })
         }
       } else {
-        store.commit('changeLogin', false)
+        // store.commit('changeLogin', false)
+        login()
       }
     }
   })

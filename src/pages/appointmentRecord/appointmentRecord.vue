@@ -16,11 +16,13 @@
       <van-loading color="#999" custom-class="loading"/>
     </div>
     <none-result v-if="isNoneResult" text="暂无记录"></none-result>
+    <page-footer v-if="!isNoneResult"></page-footer>
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import pageFooter from "COMPS/pageFooter.vue"
 import noneResult from "COMPS/noneResult.vue";
 
 export default {
@@ -42,8 +44,14 @@ export default {
   onReachBottom() {
     this.getAppointRecordList();
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
+  },
   components: {
-    noneResult
+    noneResult,
+    pageFooter
   },
   methods: {
     getAppointRecordList() {

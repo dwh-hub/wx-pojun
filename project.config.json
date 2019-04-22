@@ -1,7 +1,7 @@
 {
 	"description": "项目配置文件。",
 	"setting": {
-		"urlCheck": false,
+		"urlCheck": true,
 		"es6": true,
 		"postcss": true,
 		"minified": false,
@@ -10,7 +10,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx30a8e0c9c1d59f09",
+	"appid": "wx3c0d1faf95b6e961",
 	"projectname": "wx-pojun",
 	"condition": {
 		"search": {

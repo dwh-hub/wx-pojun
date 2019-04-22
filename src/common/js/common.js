@@ -62,7 +62,7 @@ export function getCompanyColor() {
     } else {
       wx.setStorage({
         key: "companyId",
-        data: 37,
+        data: 51,
         success() {
           return getThemeColor()
         }
@@ -83,7 +83,8 @@ export function wxLogin() {
           wx.request({
             url: window.api + '/mini/getsession',
             data: {
-              code: res.code
+              code: res.code,
+              companyId: 51
             },
             success(data) {
               wx.setStorage({

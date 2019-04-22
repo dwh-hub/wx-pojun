@@ -12,7 +12,8 @@
     >
       <div v-for="(item,index) in bannerList" :key="index">
         <swiper-item>
-          <img :src="item" class="banner">
+          <!-- <img :src="item" class="banner"> -->
+          <image :src="item" mode="aspectFit" class="banner"></image>
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
@@ -182,6 +183,7 @@ export default {
   onPullDownRefresh() {
     this.recommendCoach = [{}]
     this.recommendClass = [{}]
+    this.getBannerList()
     this.getRecommendCoach();
     this.getRecommendClass()
     if(!this.nearbyStoreList.length) {

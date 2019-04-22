@@ -403,7 +403,7 @@ export default {
           url: window.api + "/wxcustomer/findAllCustomer",
           data: {
             phone: that.phone,
-            // companyId: wx.getStorageSync("companyId")
+            companyId: wx.getStorageSync("companyId")
           },
           success(res) {
             wx.hideLoading();

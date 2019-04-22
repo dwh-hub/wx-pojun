@@ -6,9 +6,9 @@
       <span class="read-none" :class="{ select: !isRead }" @click="showReadNone">已读</span>
     </div>-->
     <div class="header">
-      <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
+      <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
         <van-tab title="未读">
-          <!-- <div class="readContent">
+          <div class="readContent">
             <div
               class="message-item"
               v-for="(item, index) in messageNList"
@@ -28,10 +28,10 @@
             </div>
             <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
             <page-footer v-if="messageNList.length"></page-footer>
-          </div> -->
+          </div>
         </van-tab>
         <van-tab title="已读">
-          <!-- <div class="readContent">
+          <div class="readContent">
             <div
               class="message-item"
               v-for="(item, index) in messageYList"
@@ -51,14 +51,14 @@
             </div>
             <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
             <page-footer v-if="messageYList.length"></page-footer>
-          </div> -->
+          </div>
         </van-tab>
       </van-tabs>
       <!-- <div class="search">
         <input type="text" placeholder="请输入名字/手机号回车搜索" placeholder-style="color: #ccc;">
-      </div>-->
+      </div> -->
     </div>
-    <div class="readContent" v-show="navIndex == 0">
+    <!-- <div class="readContent" v-show="navIndex == 0">
       <div
         class="message-item"
         v-for="(item, index) in messageNList"
@@ -99,7 +99,7 @@
       </div>
       <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
       <page-footer v-if="messageYList.length"></page-footer>
-    </div>
+    </div> -->
     <van-popup
       position="right"
       :show="showMessageBox"
@@ -292,15 +292,15 @@ export default {
 @import url("~mpvue-wxparse/src/wxParse.css");
 
 #memberMessageTab {
-  padding-top: 44px;
-  .header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 44px;
-    width: 100%;
-    background-color: #fff;
-  }
+  // padding-top: 44px;
+  // .header {
+  //   position: fixed;
+  //   top: 0;
+  //   left: 0;
+  //   height: 44px;
+  //   width: 100%;
+  //   background-color: #fff;
+  // }
   // .search {
   //   padding: 10px;
   //   background-color: #fafafa;
@@ -378,6 +378,7 @@ export default {
     }
   }
 }
+
 </style>
 
 

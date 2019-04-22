@@ -1,8 +1,13 @@
 // cookie失效后根据公司id 自动登录
 import store from "../../utils/store.js"
-import { window } from "COMMON/js/common.js";
+import {
+  window
+} from "COMMON/js/common.js";
 
 function login() {
+  if (!wx.getStorageSync("phone") || !wx.getStorageSync("openId")) {
+    return store.commit("changeLogin", false);
+  }
   wx.request({
     url: window.api + "/wxcustomer/bindCard",
     data: {
@@ -19,6 +24,8 @@ function login() {
         store.commit("changeLogin", true);
       } else {
         store.commit("changeLogin", false);
+        wx.removeStorageSync("userInfo");
+        wx.removeStorageSync("phone");
       }
     }
   });

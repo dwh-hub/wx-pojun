@@ -11,7 +11,8 @@
     >
       <div v-for="(item,index) in classDetail.masterImg" :key="index">
         <swiper-item>
-          <img :src="window.api + item" class="banner">
+          <!-- <img :src="window.api + item" class="banner"> -->
+          <image :src="window.api + item" mode="aspectFit" class="banner"></image>
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"

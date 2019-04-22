@@ -11,7 +11,8 @@
     >
       <div v-for="(item,index) in storeInfo.bannerList" :key="index">
         <swiper-item>
-          <img :src="window.api + item" class="banner">
+          <!-- <img :src="window.api + item" class="banner"> -->
+          <image :src="window.api + item" mode="aspectFit" class="banner"></image>
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
@@ -23,9 +24,15 @@
       <h4>地址</h4>
       <div class="store" :style="{'color': themeColor}">
         {{storeInfo.name || '暂无'}}
-        <span class="range" :style="{'color': themeColor}">{{storeInfo.range || ''}}</span>
+        <span
+          class="range"
+          :style="{'color': themeColor}"
+        >{{storeInfo.range || ''}}</span>
       </div>
-      <div class="address-detail">{{storeInfo.address || '暂无地址信息'}}</div>
+      <div class="address-detail" @click="toMap()">
+        <span>{{storeInfo.address || '暂无地址信息'}}</span>
+        <img v-if="storeInfo.address" src="/static/images/address.png">
+      </div>
     </div>
     <div class="business-hours">
       <div class="business">
@@ -37,11 +44,23 @@
       </div>
     </div>
     <div class="team-class-part">
-      <title-cell title="团课" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore('../teamClassList/main')"></title-cell>
+      <title-cell
+        title="团课"
+        moreText="全部"
+        :moreSize="14"
+        :titleSize="16"
+        @tapMore="toAllStore('../teamClassList/main')"
+      ></title-cell>
       <team-class-item :info="item" v-for="(item, index)  in teamClassList" :key="index"></team-class-item>
     </div>
     <div class="coach-part">
-      <title-cell title="私教" moreText="全部" :moreSize="14" :titleSize="16" @tapMore="toAllStore('../coachList/main')"></title-cell>
+      <title-cell
+        title="私教"
+        moreText="全部"
+        :moreSize="14"
+        :titleSize="16"
+        @tapMore="toAllStore('../coachList/main')"
+      ></title-cell>
       <coach-item :info="item" v-for="(item, index) in coachList" :key="index"></coach-item>
     </div>
     <page-footer></page-footer>
@@ -60,7 +79,7 @@ import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
 import store from "../../utils/store";
-import pageFooter from "COMPS/pageFooter.vue"
+import pageFooter from "COMPS/pageFooter.vue";
 export default {
   name: "storeDetail",
   data() {
@@ -90,7 +109,7 @@ export default {
   mounted() {
     wx.showLoading({
       title: "加载中..."
-    })
+    });
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     this.getStoreDetail();
@@ -99,7 +118,7 @@ export default {
     this.getCoachList();
   },
   onUnload() {
-    this.loadCount = 0
+    this.loadCount = 0;
   },
   onPullDownRefresh() {
     setTimeout(() => {
@@ -108,8 +127,8 @@ export default {
   },
   watch: {
     loadCount() {
-      if(this.loadCount >= 2) {
-        wx.hideLoading()
+      if (this.loadCount >= 2) {
+        wx.hideLoading();
       }
     }
   },
@@ -126,6 +145,18 @@ export default {
       wx.navigateTo({
         url: url
       });
+    },
+    toMap() {
+      if (this.storeInfo.latitude) {
+        wx.openLocation({
+          latitude: parseFloat(this.storeInfo.latitude),
+          longitude: parseFloat(this.storeInfo.longitude),
+          scale: 18,
+          success(res) {
+            console.log(res);
+          }
+        });
+      }
     },
     call() {
       if (!this.storeInfo.phone) {
@@ -147,23 +178,29 @@ export default {
         success(res) {
           let _data = res.data.data;
           let _range;
+          let _lat = null;
+          let _lng = null;
           let _address = _data.parentName + _data.cityName + _data.address;
+          console.log(_data.storeName);
           _address = _address.replace(/null/g, "");
           _address = _address.replace(/[0]/gi, "");
           if (_data.mapPoint) {
-            let _lat = _data.mapPoint.split(",")[1];
-            let _lng = _data.mapPoint.split(",")[0];
+            _lat = _data.mapPoint.split(",")[1];
+            _lng = _data.mapPoint.split(",")[0];
             _range = getRange(that.latitude, that.longitude, _lat, _lng);
           }
           let _obj = {
             address: _address || "未设置详细地址",
             name: _data.storeName,
+            latitude: _lat,
+            longitude: _lng,
             range: _range,
             phone: _data.phone,
-            bannerList: _data.images.split(",")
+            bannerList: _data.images ? _data.images.split(",") : []
           };
           that.storeInfo = _obj;
-          that.loadCount++
+          console.log(that.storeInfo);
+          that.loadCount++;
         }
       });
     },
@@ -176,11 +213,18 @@ export default {
           storeId: that.storeId
         },
         success(res) {
-          if (res.data.data.openingHoursStart && res.data.data.openingHoursEnd) {
-            that.businessTime =
-              res.data.data.openingHoursStart + "~" + res.data.data.openingHoursEnd;
+          if (res.data.data) {
+            if (
+              res.data.data.openingHoursStart &&
+              res.data.data.openingHoursEnd
+            ) {
+              that.businessTime =
+                res.data.data.openingHoursStart +
+                "~" +
+                res.data.data.openingHoursEnd;
+            }
           }
-          that.loadCount++
+          that.loadCount++;
         }
       });
     },
@@ -197,9 +241,9 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             that.teamClassList = res.data.data.slice(0, 1);
-            that.loadCount++
+            that.loadCount++;
           } else {
-            that.teamClassList = []
+            that.teamClassList = [];
           }
         }
       });
@@ -214,11 +258,11 @@ export default {
           positionType: 1
         },
         success(res) {
-          if(res.data.code == 200) {
+          if (res.data.code == 200) {
             that.coachList = res.data.data.slice(0, 1);
-            that.loadCount++
+            that.loadCount++;
           } else {
-            that.teamClassList = []
+            that.teamClassList = [];
           }
         }
       });
@@ -256,6 +300,20 @@ export default {
     }
     .address-detail {
       color: #bababa;
+      > span {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      > img {
+        display: inline-block;
+        vertical-align: middle;
+        width: 15px;
+        height: 15px;
+        margin-left: 10px;
+        border-radius: 50%;
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
     }
   }
   .business-hours {

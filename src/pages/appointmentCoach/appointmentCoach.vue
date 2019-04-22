@@ -209,7 +209,7 @@
             class="confirm-date"
             :style="{'background-color': themeColor}"
             @click="selectDate"
-          >确定（{{confirmDate}}）</div>
+          >确定{{confirmDate}}</div>
         </div>
       </div>
     </van-popup>
@@ -384,7 +384,7 @@ export default {
     },
     confirmDate() {
       if (this.curEndTime) {
-        return this.curDate + " " + this.curTime + "~" + this.curEndTime;
+        return "（" + this.curDate + " " + this.curTime + "~" + this.curEndTime + "）";
       }
       return "";
     },

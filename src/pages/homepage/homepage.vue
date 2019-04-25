@@ -75,7 +75,7 @@
       </div>
     </div>
     <div class="recommend-wrapper">
-      <title-cell title="为你推荐" :titleSize="18" v-if="!recommendClass.length && !recommendCoach.length"></title-cell>
+      <title-cell title="为你推荐" :titleSize="18" v-if="recommendClass.length || recommendCoach.length"></title-cell>
       <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item>
       <coach-item :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
     </div>
@@ -114,7 +114,7 @@ export default {
       recommendClass: [{}],
       companyId: "",
       nearbyStoreList: [{},{}],
-      themeColor: ""
+      themeColor: "#2a82e4"
     };
   },
   components: {
@@ -124,29 +124,10 @@ export default {
     pageFooter
   },
   mounted() {
-    getCompanyColor().then(() => {
-      setNavTab(wx.getStorageSync("companyName"));
-      this.themeColor = window.color || "#2a82e4";
-    })
-    this.companyId = wx.getStorageSync("companyId");
-    let that = this;
-    wx.getLocation({
-      type: "wgs84",
-      success(res) {
-        console.log("经度:" + res.longitude);
-        console.log("维度:" + res.latitude);
-        that.latitude = res.latitude;
-        that.longitude = res.longitude;
-        store.commit("saveLongitude", res.longitude);
-        store.commit("saveLatitude", res.latitude);
-        that.getNearbyStoreList();
-      },
-      fail(res) {
-        console.log(res)
-      }
-    });
-    this.getBannerList();
-    this.getRecommendCoach();
+    // getCompanyColor().then(() => {
+    //     this.setTheme()
+    //     this._mounted()
+    // })
   },
   onShow() {
     // this.themeColor == "" || this.themeColor == "#fff" || this.themeColor == "#2a82e4"
@@ -159,21 +140,22 @@ export default {
     // }
   },
   onLoad(options) {
-    // if (options.appid) {
-    //   getWXCompany(options.appid).then(() => {
-    //     setNavTab(wx.getStorageSync("companyName"));
-    //     this.themeColor = window.color || "#2a82e4";
-    //   });
-    // } else {
-    //   getWXCompany('wx842adcf8a0ea1c9a').then(() => {
-    //     setNavTab(wx.getStorageSync("companyName"));
-    //     this.themeColor = window.color || "#2a82e4";
-    //   });
-    // }
-    // if (wx.getStorageSync("userInfo")) {
-    //   this.companyId = wx.getStorageSync("userInfo").companyId;
-    // }
-    // this.getWxoauth();
+    // 有appid走获取微信公众号信息，没有走默认的公司companyId设置
+    if (options.appid) {
+      getWXCompany(options.appid).then(() => {
+        this.setTheme()
+        this._mounted()
+      });
+    } else { // wx90e290f98e838e66
+      // getWXCompany('wx842adcf8a0ea1c9a').then(() => {
+      //   this.setTheme()
+      //   this._mounted()
+      // });
+      getCompanyColor().then(() => {
+        this.setTheme()
+        this._mounted()
+      })
+    }
   },
   computed: {
     windowColor() {
@@ -194,6 +176,32 @@ export default {
     }, 1000);
   },
   methods: {
+    _mounted() {
+      this.companyId = wx.getStorageSync("companyId");
+      console.log(this.companyId)
+      let that = this;
+      wx.getLocation({
+        type: "wgs84",
+        success(res) {
+          console.log("经度:" + res.longitude);
+          console.log("维度:" + res.latitude);
+          that.latitude = res.latitude;
+          that.longitude = res.longitude;
+          store.commit("saveLongitude", res.longitude);
+          store.commit("saveLatitude", res.latitude);
+          that.getNearbyStoreList();
+        },
+        fail(res) {
+          console.log(res)
+        }
+      });
+      this.getBannerList();
+      this.getRecommendCoach();
+    },
+    setTheme() {
+      setNavTab(wx.getStorageSync("companyName"));
+      this.themeColor = window.color || "#2a82e4";
+    },
     toNav(url) {
       if (!url) {
         return wx.showToast({
@@ -335,64 +343,11 @@ export default {
     },
     compare(property) {
       return function(a, b) {
-        var value1 = a[property];
-        var value2 = b[property];
-        return value1 - value2;
+        var value1 = a[property] || 0;
+        var value2 = b[property] || 0;
+        return parseInt(value1) - parseInt(value2);
       };
     }
-    // 获取微信公众号信息
-    // getWxoauth() {
-    //   let that = this;
-    //   HttpRequest({
-    //     url: window.api + "/wxopen/wxoauth/wxcustomer",
-    //     data: {
-    //       appid: "wx842adcf8a0ea1c9a"
-    //     },
-    //     success(res) {
-    //       if (res.data.code) {
-    //         HttpRequest({
-    //           url: window.api + "/wxopen/wxoauth/wxlogin",
-    //           data: {
-    //             appid: "wx842adcf8a0ea1c9a"
-    //           },
-    //           success(res) {
-    //             console.log(res);
-    //             // wx.setStorage({
-    //             //   key: "companyId",
-    //             //   data: res.data.data.companyId
-    //             // });
-    //           }
-    //         });
-    //       }
-    //     }
-    //   });
-    // }
-    // touchStart(e) {
-    //   // console.log(e)
-    //   this.touch.x = e.clientX;
-    //   this.touch.y = e.clientY;
-    // },
-    // touchEnd(e) {
-    //   // console.log(e)
-    //   let x = e.mp.changedTouches[0].clientX;
-    //   let y = e.mp.changedTouches[0].clientY;
-    //   this.getTouchData(x, y, this.touch.x, this.touch.y);
-    // },
-    // getTouchData(endX, endY, startX, startY) {
-    //   let turn = "";
-    //   if (endX - startX > 50 && Math.abs(endY - startY) < 50) {
-    //     //右滑
-    //     turn = "right";
-    //   } else if (endX - startX < -50 && Math.abs(endY - startY) < 50) {
-    //     //左滑
-    //     turn = "left";
-    //   }
-    //   console.log("turn:" + turn);
-    //   if (turn == "right") {
-    //     console.log("右滑");
-    //   }
-    //   // return turn;
-    // }
   }
 };
 </script>
@@ -401,12 +356,12 @@ export default {
 @import "~COMMON/less/reset.less";
 @import "~COMMON/less/common.less";
 page {
-  background-color: #f6f6f6;
+  background-color: #fff;
   height: 100%;
 }
 .homepage {
   padding-bottom: 20px;
-  background-color: #f6f6f6;
+  background-color: #fff;
   .swiper {
     height: 180px;
   }

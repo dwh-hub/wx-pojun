@@ -1,7 +1,7 @@
 {
 	"description": "项目配置文件。",
 	"setting": {
-		"urlCheck": true,
+		"urlCheck": false,
 		"es6": true,
 		"postcss": true,
 		"minified": false,
@@ -10,7 +10,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx3c0d1faf95b6e961",
+	"appid": "wx30a8e0c9c1d59f09",
 	"projectname": "wx-pojun",
 	"condition": {
 		"search": {
@@ -30,13 +30,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 6,
+			"current": 0,
 			"list": [
 				{
-					"id": -1,
+					"id": 0,
 					"name": "主页",
 					"pathName": "pages/homepage/main",
-					"query": "",
+					"query": "appid=wx842adcf8a0ea1c9a",
 					"scene": null
 				},
 				{
@@ -78,6 +78,7 @@
 					"id": -1,
 					"name": "demo",
 					"pathName": "pages/authorizeLogin/main",
+					"query": "",
 					"scene": null
 				}
 			]

@@ -300,18 +300,18 @@ export default {
       // nightTime: [],
       dayTime: [],
       allMiniTime: [
-        ":00",
-        ":05",
-        ":10",
-        ":15",
-        ":20",
-        ":25",
-        ":30",
-        ":35",
-        ":40",
-        ":45",
-        ":50",
-        ":55"
+        "00",
+        "05",
+        "10",
+        "15",
+        "20",
+        "25",
+        "30",
+        "35",
+        "40",
+        "45",
+        "50",
+        "55"
       ],
       // 当前选择的日期
       curDate: "",
@@ -478,7 +478,7 @@ export default {
       this.curSecondIndex = 0;
       let hour = _item.slice(0, 2);
       let _curEndtime =
-        Number(_item.split(":")[0]) + 1 + ":" + _item.split(":")[1];
+      Number(_item.split(":")[0]) + 1 + ":" + _item.split(":")[1];
       if (Number(_curEndtime.split(":")[0]) < 10) {
         this.curEndTime = "0" + String(_curEndtime);
       } else {
@@ -489,8 +489,8 @@ export default {
       if (this.curHourIndex == -1) {
         return;
       }
-      this.curTime = this.curTime.split(":")[0] + item;
-      this.curEndTime = this.curEndTime.split(":")[0] + item;
+      this.curTime = this.curTime.split(":")[0] + ":" + item;
+      this.curEndTime = this.curEndTime.split(":")[0] + ":"+ item;
       this.curSecondIndex = index;
     },
     // 计算可选择预约时间
@@ -504,6 +504,14 @@ export default {
 
       // let _allTime = [];
       let _allTime = [
+        "00:00",
+        "01:00",
+        "02:00",
+        "03:00",
+        "04:00",
+        "05:00",
+        "06:00",
+        "07:00",
         "08:00",
         "09:00",
         "10:00",
@@ -519,15 +527,7 @@ export default {
         "20:00",
         "21:00",
         "22:00",
-        "23:00",
-        "24:00",
-        "01:00",
-        "02:00",
-        "03:00",
-        "04:00",
-        "05:00",
-        "06:00",
-        "07:00"
+        "23:00"
       ];
       // 门店营业时间
       // for (let h = _satarTime; h <= _endTime; h++) {
@@ -542,18 +542,24 @@ export default {
       _allTime = _allTime.map(e => {
         let _timestamp = new Date(_nowDay + " " + e).getTime();
         let _hour = e.split(":")[0];
-        if (_hour < _satarTime && _hour > 0) {
+        if(_hour == "00") {
           return {
             hour: e,
             disable: true
           };
         }
-        if (_hour > Number(_endTime) - 1) {
+        if ((_hour < _satarTime && _hour > 0) || (_hour > Number(_endTime) - 1)) {
           return {
             hour: e,
             disable: true
           };
         }
+        // if (_hour > Number(_endTime) - 1) {
+        //   return {
+        //     hour: e,
+        //     disable: true
+        //   };
+        // }
         for (let i in this.todayPeriodTime) {
           if (
             _timestamp >=

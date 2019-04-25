@@ -1,7 +1,7 @@
 const window = {}
 window.DEBUGGING = false
 window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
-window.color = "" // "#00c2a9"
+window.color = "#2a82e4" // "#00c2a9"
 
 // 获取sessionKey 需调用wx.login获取sessionKey
 function initsessionKey() {
@@ -62,7 +62,7 @@ export function getCompanyColor() {
     } else {
       wx.setStorage({
         key: "companyId",
-        data: 51,
+        data: 37,
         success() {
           return getThemeColor()
         }
@@ -84,7 +84,7 @@ export function wxLogin() {
             url: window.api + '/mini/getsession',
             data: {
               code: res.code,
-              companyId: 51
+              companyId: wx.getStorageSync("companyId")
             },
             success(data) {
               wx.setStorage({
@@ -140,17 +140,13 @@ export function getWXCompany(appid) {
         authAppId: appid
       },
       success(res) {
-        wx.setStorageSync({
-          key: "companyId",
-          data: res.data.data.companyId, // 44
-        });
-        wx.setStorageSync({
-          key: "companyName",
-          data: res.data.data.companyName // '前锋体育'
-        });
-        getThemeColor().then(() => {
-          resolve()
-        })
+        if (res.data.data) {
+          wx.setStorageSync("companyId", res.data.data.companyId);
+          wx.setStorageSync("companyName",res.data.data.companyName)
+          getThemeColor().then(() => {
+            resolve()
+          })
+        }
       }
     })
   })

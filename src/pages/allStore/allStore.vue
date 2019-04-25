@@ -73,6 +73,9 @@ export default {
                 storeId: e.storeId
               };
             });
+            console.log(_storeList)
+            _storeList.sort(that.compare("range"));
+            console.log(_storeList)
             that.storeList = _storeList;
           } else {
             that.storeList = []
@@ -80,6 +83,13 @@ export default {
           // wx.hideLoading();
         }
       });
+    },
+    compare(property) {
+      return function(a, b) {
+        var value1 = a[property] || 0;
+        var value2 = b[property] || 0;
+        return parseInt(value1) - parseInt(value2);
+      };
     }
   }
 };

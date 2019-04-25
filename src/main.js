@@ -16,7 +16,7 @@ const app = new Vue(App)
 app.$mount()
 Vue.prototype.globalData = getApp().globalData
 
-getCompanyColor()
+// getCompanyColor()
 
 if (!wx.getStorageSync("Cookie")) {
   wx.request({

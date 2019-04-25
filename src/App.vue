@@ -1,5 +1,4 @@
 <script>
-import { getThemeColor } from "COMMON/js/common.js";
 export default {
   onLaunch() {
     const updateManager = wx.getUpdateManager();
@@ -22,11 +21,6 @@ export default {
     updateManager.onUpdateFailed(function() {
       // 新版本下载失败
     });
-  },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
   },
   created() {
     // 调用API从本地缓存中获取数据

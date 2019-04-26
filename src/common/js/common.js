@@ -36,6 +36,7 @@ export function getThemeColor() {
         companyId: wx.getStorageSync("companyId")
       },
       success(res) {
+        console.log("---------getThemeColor-----------")
         if (res.data.code == 200) {
           window.color = JSON.parse(res.data.data.baseInfo).themeColor || '#2a82e4'
         } else {
@@ -52,21 +53,11 @@ export function getCompanyColor() {
   // TODO: 目前沒有公司id就默认前锋
   if (!wx.getStorageSync("companyId")) {
     if (window.DEBUGGING) {
-      wx.setStorage({
-        key: "companyId",
-        data: 44,
-        success() {
-          return getThemeColor()
-        }
-      });
+      wx.setStorageSync('companyId', '44')
+      return getThemeColor()
     } else {
-      wx.setStorage({
-        key: "companyId",
-        data: 37,
-        success() {
-          return getThemeColor()
-        }
-      });
+      wx.setStorageSync('companyId', '37')
+      return getThemeColor()
     }
   } else {
     return getThemeColor()

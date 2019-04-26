@@ -55,6 +55,7 @@
     <van-action-sheet
       :show="showSelect"
       :actions="actions"
+      :safe-area-inset-bottom="false"
       @close="closeSelect"
       @select="selectCur"
     ></van-action-sheet>
@@ -148,9 +149,11 @@ export default {
     _onLoad() {
       // 进页面前先清空数据
       this.clearData();
-      this.customerId = wx.getStorageSync("userInfo").id;
-      setNavTab();
-      this.selectNav(this.currentNav);
+      setTimeout(() =>{
+        this.customerId = wx.getStorageSync("userInfo").id;
+        setNavTab();
+        this.selectNav(this.currentNav);
+      },1000)
     },
     clearData() {
       this.showSelect = false;
@@ -165,7 +168,7 @@ export default {
     },
     selectNav(index) {
       this.clearData()
-      // setTimeout(() => {
+      setTimeout(() => {
       this.currentNav = index;
       if (!store.state.isLogin) {
         this.teamClassList = []
@@ -221,7 +224,7 @@ export default {
           // this.teamClassList = this.teamClass_3;
         // }
       }
-      // }, 1000)
+      }, 1000)
     },
     toggleSelect() {
       this.showSelect = true;

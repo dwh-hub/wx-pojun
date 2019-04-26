@@ -86,9 +86,9 @@ export default {
     },
     compare(property) {
       return function(a, b) {
-        var value1 = a[property] || 0;
-        var value2 = b[property] || 0;
-        return parseInt(value1) - parseInt(value2);
+        var value1 = a[property] || 99999999;
+        var value2 = b[property] || 99999999;
+        return parseFloat(value1) - parseFloat(value2);
       };
     }
   }

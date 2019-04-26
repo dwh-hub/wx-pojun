@@ -4,7 +4,7 @@
       <div class="cover">
         <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
         <!-- <img :src="imgUrl"> -->
-        <image :src="imgUrl" mode="aspectFit"></image>
+        <image :src="imgUrl" mode="aspectFill"></image>
       </div>
       <div class="coach-info">
         <div class="coach-name">{{info.userName || '教练名字'}}</div>
@@ -21,9 +21,18 @@
       <div
         class="appoint"
         :style="{'background-color': themeColor}"
-        v-if="hasBtn"
+        v-if="hasBtn && isLogin"
         @click.stop="toAppoint"
       >预约</div>
+      <button
+        v-else
+        class="appoint clearBtn"
+        :style="{'background-color': themeColor}"
+        type="default"
+        @click.stop
+        open-type="getPhoneNumber"
+        @getphonenumber="_getPhoneNumbe"
+      >预约</button>
     </div>
     <div class="coach-skeleton" v-else>
       <div class="cover"><img></div>
@@ -38,6 +47,7 @@
 
 <script>
 import store from "../utils/store";
+import {getPhoneNumber} from "COMMON/js/api.js";
 import { window } from "COMMON/js/common";
 export default {
   name: "coach-item",
@@ -62,6 +72,9 @@ export default {
     }
   },
   computed: {
+    isLogin() {
+      return store.state.isLogin
+    },
     imgUrl() {
       if (this.info.headImgPath) {
         return window.api + this.info.headImgPath;
@@ -73,6 +86,9 @@ export default {
     }
   },
   methods: {
+    _getPhoneNumbe(e) {
+      getPhoneNumber(e)
+    },
     toDetail() {
       if (this.isToDetail) {
         return wx.navigateTo({
@@ -161,6 +177,7 @@ export default {
     line-height: 26px;
     height: 26px;
     width: 50px;
+    font-size: 14px;
     margin: auto;
     text-align: center;
     vertical-align: middle;

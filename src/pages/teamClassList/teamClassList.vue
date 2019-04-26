@@ -78,7 +78,7 @@ export default {
       showStoreNav: false,
       showCoachNav: false,
       showScheduleNav: false,
-      // nav团课列表
+      // nav门店列表
       storeNav: [],
       // nav教练列表
       coachNav: [],
@@ -155,6 +155,20 @@ export default {
       if ((index == 4 || index == 2) && this.curStoreId == "") {
         return wx.showToast({
           title: "请先选择门店",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if(index == 2 && !this.scheduleNav.length) {
+        return wx.showToast({
+          title: "暂无课程类别",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if(index == 4 && !this.coachNav.length) {
+        return wx.showToast({
+          title: "暂无私教",
           icon: "none",
           duration: 1000
         });
@@ -273,9 +287,10 @@ export default {
           success(res) {
             resolve();
             if (!res.data.data.length) {
-              return (that.coachNav = that.coachNav.concat({
-                userName: "无"
-              }));
+              // return (that.coachNav = that.coachNav.concat({
+              //   userName: "无"
+              // }));
+              return that.coachNav = []
             }
             let _list = res.data.data;
             _list.unshift({

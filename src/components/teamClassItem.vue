@@ -4,7 +4,7 @@
       <div class="cover">
         <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
         <!-- <img :src="window.api + info.masterImg"> -->
-        <image :src="window.api + info.masterImg" mode="aspectFit"></image>
+        <image :src="window.api + info.masterImg" mode="aspectFill"></image>
       </div>
       <div class="team-class-info">
         <div class="team-class-name">{{info.anotherName || info.projectName || ''}}</div>

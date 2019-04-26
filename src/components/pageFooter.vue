@@ -1,8 +1,9 @@
 <template>
-  <div class="page-footer">
+  <!-- <div class="page-footer">
     <p>欢迎您！<span :style="{color:window.color}">{{userName}}</span></p>
     <span class="footer-text"><span class="company" :style="{color:window.color}">利刃系统</span>由<span class="company">破军科技</span>提供技术支持</span>
-  </div>
+  </div> -->
+  <div></div>
 </template>
 
 <script>

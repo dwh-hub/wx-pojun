@@ -12,7 +12,7 @@
       <div v-for="(item,index) in classDetail.masterImg" :key="index">
         <swiper-item>
           <!-- <img :src="window.api + item" class="banner"> -->
-          <image :src="window.api + item" mode="aspectFit" class="banner"></image>
+          <image :src="window.api + item" mode="aspectFill" class="banner"></image>
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
@@ -45,7 +45,11 @@
           <span class="name">{{classDetail.storeName}}</span>
           <span class="range">{{range}}</span>
         </div>
-        <div class="address">{{address || '暂无详细地址'}}</div>
+        <div class="address-detail" @click="toMap()">
+          <span>{{address || '暂无详细地址'}}</span>
+          <img v-if="address" src="/static/images/address.png">
+        </div>
+        <div class="address"></div>
       </div>
       <!-- <div class="class-type">$合同结算$</div> -->
     </div>
@@ -82,12 +86,20 @@
       class="bottom-btn appointment"
       @click="appointClass"
       :style="{'background-color': window.color}"
-      v-if="canAppoint"
+      v-if="canAppoint && isLogin"
     >
       马上预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
-    <div class="bottom-btn appointmentNone" v-else>
+    <button
+      v-else
+      class="bottom-btn appointment clearBtn"
+      :style="{'background-color': window.color,color:'#fff'}"
+      type="default"
+      open-type="getPhoneNumber"
+      @getphonenumber="_getPhoneNumbe"
+    >马上预约</button>
+    <div class="bottom-btn appointmentNone" v-if="!canAppoint">
       不可预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
@@ -106,6 +118,7 @@ import {
 import titleCell from "COMPS/titleCell.vue";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
+import {getPhoneNumber} from "COMMON/js/api.js"
 
 export default {
   name: "team-class-detail",
@@ -121,7 +134,9 @@ export default {
       companyId: "",
       // 团课时间是否过期
       canAppoint: true,
-      loadCount: 0
+      loadCount: 0,
+      storeLat: '',
+      storeLong: ''
     };
   },
   components: {
@@ -181,6 +196,9 @@ export default {
       }
       return "";
     },
+    isLogin() {
+      return store.state.isLogin
+    },
     isPhoneX() {
       return store.state.isIphoneX;
     },
@@ -189,6 +207,22 @@ export default {
     }
   },
   methods: {
+    toMap() {
+      if (this.storeLat) {
+        wx.openLocation({
+          latitude: parseFloat(this.storeLat),
+          longitude: parseFloat(this.storeLong),
+          scale: 18,
+          success(res) {
+            console.log(res);
+          }
+        });
+      }
+    },
+    _getPhoneNumbe(e) {
+      let url = "../teamClassDetail/main?classId=" + this.id
+      getPhoneNumber(e,url)
+    },
     toNav(id) {
       if (id) {
         wx.navigateTo({
@@ -216,15 +250,6 @@ export default {
           duration: 2000
         });
       }
-      // wx.showModal({
-      //   title: "提示",
-      //   content: "确认预约该团课？",
-      //   success(res) {
-      //     if (res.confirm) {
-      // HttpRequest({
-      //   url: window.api + "/teamClass/teamAppoint/add",
-      //   data: {}
-      // });
       wx.navigateTo({
         url:
           "../memberCard/main?classId=" +
@@ -234,12 +259,6 @@ export default {
           "&venueId=" +
           that.classDetail.venueId
       });
-      // wx.navigateTo({
-      //   url: "../appointmentResult/main?classId=" + that.id
-      // });
-      // }
-      // }
-      // });
     },
     // 获取团课详情
     getClassDetail() {
@@ -298,6 +317,8 @@ export default {
             let _lng = _data.mapPoint.split(",")[0];
             let _range = getRange(that.latitude, that.longitude, _lat, _lng);
             that.range = _range;
+            that.storeLat = _lat
+            that.storeLong = _lng
           }
           that.loadCount++
         }
@@ -375,7 +396,7 @@ export default {
     border-bottom: 1rpx solid #eee;
     .address-group {
       .store {
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         .name {
           font-size: 16px;
           margin-right: 10px;
@@ -384,10 +405,23 @@ export default {
           font-size: 12px;
         }
       }
-      .address {
-        margin-bottom: 10px;
-        color: #bababa;
+    .address-detail {
+      color: #bababa;
+      > span {
+        display: inline-block;
+        vertical-align: middle;
       }
+      > img {
+        display: inline-block;
+        vertical-align: middle;
+        width: 15px;
+        height: 15px;
+        margin-left: 10px;
+        border-radius: 50%;
+        background-size: cover;
+        background-repeat: no-repeat;
+      }
+    }
     }
     .class-type {
       color: #bababa;

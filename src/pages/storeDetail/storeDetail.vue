@@ -12,7 +12,7 @@
       <div v-for="(item,index) in storeInfo.bannerList" :key="index">
         <swiper-item>
           <!-- <img :src="window.api + item" class="banner"> -->
-          <image :src="window.api + item" mode="aspectFit" class="banner"></image>
+          <image :src="window.api + item" mode="aspectFill" class="banner" @click="previewImage(window.api+item)"></image>
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
@@ -21,7 +21,7 @@
       </div>
     </swiper>
     <div class="address">
-      <h4>地址</h4>
+      <!-- <h4>地址</h4> -->
       <div class="store" :style="{'color': themeColor}">
         {{storeInfo.name || '暂无'}}
         <span
@@ -266,6 +266,12 @@ export default {
           }
         }
       });
+    },
+    previewImage(item) {
+      wx.previewImage({
+        current: item,
+        urls: this.storeInfo.bannerList
+      })
     }
   }
 };

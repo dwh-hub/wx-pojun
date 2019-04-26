@@ -13,7 +13,7 @@
       <div v-for="(item,index) in bannerList" :key="index">
         <swiper-item>
           <!-- <img :src="item" class="banner"> -->
-          <image :src="item" mode="aspectFit" class="banner"></image>
+          <image :src="item" mode="aspectFill" class="banner" @click="previewImage(item)"></image>
           <!-- <img
             class="banner"
             src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
@@ -75,8 +75,35 @@
       </div>
     </div>
     <div class="recommend-wrapper">
-      <title-cell title="为你推荐" :titleSize="18" v-if="recommendClass.length || recommendCoach.length"></title-cell>
-      <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item>
+      <title-cell title="为你推荐" :titleSize="18"></title-cell>
+      <!-- <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item> -->
+        <div class="class-item">
+          <div v-if="recommendClass.teamScheduleId" @click="toDetail">
+            <div class="class-cover">
+              <image :src="window.api + recommendClass.masterImg" mode="aspectFill"></image>
+            </div>
+            <div class="class-info">
+              <div class="class-top">
+                <span class="class-name">{{recommendClass.anotherName}}</span>
+                <span class="class-time">{{recommendClass.timeStart+"~"+recommendClass.timeEnd}}</span>
+              </div>
+              <div class="class-bottom">
+                <span class="class-coach">{{recommendClass.coachNameArrayStr}}</span>
+                <span class="class-venue">{{recommendClass.storeName || ''}}<span v-if="recommendClass.venueName">-</span>{{recommendClass.venueName || ''}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="class-skeleton" v-else>
+            <div class="class-cover">
+            </div>
+            <div class="class-info">
+              <div class="class-top">
+                <span class="class-name"></span>
+              </div>
+              <div class="class-bottom"></div>
+            </div>
+          </div>
+        </div>
       <coach-item :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
     </div>
     <page-footer></page-footer>
@@ -89,6 +116,7 @@ import {
   window,
   HttpRequest,
   getRange,
+  formatDate,
   getWXCompany,
   getThemeColor,
   getCompanyColor
@@ -111,7 +139,7 @@ export default {
       latitude: "", // 维度
       bannerList: [],
       recommendCoach: [{}],
-      recommendClass: [{}],
+      recommendClass: {},
       companyId: "",
       nearbyStoreList: [{},{}],
       themeColor: "#2a82e4"
@@ -158,13 +186,16 @@ export default {
     }
   },
   computed: {
+    window() {
+      return window
+    },
     windowColor() {
       return window.color;
     }
   },
   onPullDownRefresh() {
     this.recommendCoach = [{}]
-    this.recommendClass = [{}]
+    this.recommendClass = {}
     this.getBannerList()
     this.getRecommendCoach();
     this.getRecommendClass()
@@ -176,6 +207,9 @@ export default {
     }, 1000);
   },
   methods: {
+    _getPhoneNumbe(e) {
+      getPhoneNumber(e)
+    },
     _mounted() {
       this.companyId = wx.getStorageSync("companyId");
       console.log(this.companyId)
@@ -258,12 +292,17 @@ export default {
         },
         success(res) {
           if (res.data.code == 200 && res.data.data) {
-            let _list = []
-            _list.push(res.data.data)
-            that.recommendClass = _list;
+            let _data = res.data.data
+            // let _list = []
+            // _list.push(res.data.data)
+            _data.coachNameArrayStr = _data.coachNameArrayStr.replace(/null/g,'');
+            _data.timeStart = formatDate(new Date(_data.timeStart), "hh:mm")
+            _data.timeEnd = formatDate(new Date(_data.timeEnd), "hh:mm")
+            that.recommendClass = res.data.data;
           } else {
-            that.recommendClass = []
+            that.recommendClass = {}
           }
+          console.log(that.recommendClass)
         }
       });
     },
@@ -345,8 +384,19 @@ export default {
       return function(a, b) {
         var value1 = a[property] || 0;
         var value2 = b[property] || 0;
-        return parseInt(value1) - parseInt(value2);
+        return parseFloat(value1) - parseFloat(value2);
       };
+    },
+    previewImage(item) {
+      wx.previewImage({
+        current: item,
+        urls: this.bannerList
+      })
+    },
+    toDetail() {
+      wx.navigateTo({
+        url: "../teamClassDetail/main?classId=" + this.recommendClass.teamScheduleId
+      });
     }
   }
 };
@@ -440,6 +490,59 @@ page {
     }
     .team-class-item {
       margin-bottom: 20px;
+    }
+    .class-item {
+      background-color: #fff;
+      border-radius: 2px;
+      box-shadow: 0px 2px 10px #ccc;
+      .class-cover {
+        width: 100%;
+        height: 140px;
+        > image {
+          width: 100%;
+          height: 100%;
+          background-color: #ccc;
+        }
+      }
+      .class-info {
+        padding: 14px 10px 14px 20px;
+        .class-top {
+          margin-bottom: 8px;
+          .class-name {
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+          }
+          .class-time {
+            float: right;
+            font-size: 14px;
+            color: #bababa;
+          }
+        }
+        .class-bottom {
+          .class-coach {
+            font-size: 14px;
+            color: #bababa;
+          }
+          .class-venue {
+            float: right;
+            font-size: 14px;
+          }
+        }
+      }
+      .class-skeleton {
+        .class-cover,.class-top,.class-bottom {
+          background-color: #eee;
+        }
+        .class-top {
+          height: 18px;
+          width: 200px;
+        }
+        .class-bottom {
+          height: 14px;
+          width: 100px;
+        }
+      }
     }
   }
 }

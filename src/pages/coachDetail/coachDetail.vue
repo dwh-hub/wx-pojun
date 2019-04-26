@@ -31,6 +31,7 @@
       </div>
     </div>
     <div
+      v-if="isLogin"
       class="bottom-btn appointment-btn"
       @click="toAppoint"
       :style="{'background-color': window.color}"
@@ -38,6 +39,14 @@
       马上预约
       <div class="block" v-if="isPhoneX"></div>
     </div>
+    <button
+      v-else
+      class="bottom-btn appointment-btn clearBtn"
+      :style="{'background-color': window.color,color:'#fff'}"
+      type="default"
+      open-type="getPhoneNumber"
+      @getphonenumber="_getPhoneNumbe"
+    >马上预约</button>
     <page-footer></page-footer>
   </div>
 </template>
@@ -47,6 +56,7 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import store from "../../utils/store";
 import wxParse from "mpvue-wxparse";
 import pageFooter from "COMPS/pageFooter.vue"
+import {getPhoneNumber} from "COMMON/js/api.js";
 
 export default {
   data() {
@@ -80,6 +90,10 @@ export default {
     }
   },
   methods: {
+    _getPhoneNumbe(e) {
+      let url = "../coachDetail/main?coachId=" + this.coachId
+      getPhoneNumber(e,url)
+    },
     toAppoint() {
       if (!store.state.isLogin) {
         return wx.showToast({
@@ -101,6 +115,9 @@ export default {
           console.log(that.coachInfo)
         }
       });
+    },
+    isLogin() {
+      return store.state.isLogin
     }
   }
 };

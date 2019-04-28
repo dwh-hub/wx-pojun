@@ -1,8 +1,8 @@
 {
   "pages": [
+    "pages/authorizeLogin/main",
     "pages/homepage/main",
     "pages/register/main",
-    "pages/authorizeLogin/main",
     "pages/mine/main",
     "pages/login/main",
     "pages/appointmentClass/main",
@@ -22,12 +22,15 @@
     "pages/coachDetail/main",
     "pages/appointmentResult/main",
     "pages/storeDetail/main",
-    "pages/appointmentCards/main",
     "pages/cardDetail/main",
-    "pages/checkInRecord/main",
-    "pages/faceSetUp/main",
-    "pages/myPoints/main"
+    "pages/checkInRecord/main"
   ],
+  "subPackages": [{
+    "root": "pages/businessPage/",
+    "pages": [
+      "index/main"
+    ]
+  }],
   "permission": {
     "scope.userLocation": {
       "desc": "你的位置信息将用于小程序位置接口的效果展示"

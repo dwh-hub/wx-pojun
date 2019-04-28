@@ -60,7 +60,7 @@
       @close="showSelect = false;"
       @select="selectCur"
     ></van-action-sheet>
-    <button type="primary" @click="register">确认登记</button>
+    <button type="primary" @click="register">确认注册</button>
   </div>
 </template>
 

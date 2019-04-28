@@ -40,7 +40,7 @@
         <div class="text">私教</div>
       </div>
       <div class="tab-item" @click="toNav('../memberCard/main')">
-        <img src="/static/images/icon-member.png" :style="{'background-color': themeColor}">
+        <img class="" src="/static/images/icon-member.png" :style="{'background-color': themeColor}">
         <div class="text">会员卡</div>
       </div>
       <div class="tab-item" @click="toNav()">
@@ -77,8 +77,8 @@
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
       <!-- <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item> -->
-        <div class="class-item">
-          <div v-if="recommendClass.teamScheduleId" @click="toDetail">
+        <div class="class-item" v-if="recommendClass.teamScheduleId">
+          <div v-if="!recommendClass.loading" @click="toDetail">
             <div class="class-cover">
               <image :src="window.api + recommendClass.masterImg" mode="aspectFill"></image>
             </div>
@@ -126,6 +126,7 @@ import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
 import pageFooter from "COMPS/pageFooter.vue"
 import store from "../../utils/store";
+import {getPhoneNumber} from "COMMON/js/api.js";
 export default {
   data() {
     return {
@@ -139,7 +140,9 @@ export default {
       latitude: "", // 维度
       bannerList: [],
       recommendCoach: [{}],
-      recommendClass: {},
+      recommendClass: {
+        loading: true
+      },
       companyId: "",
       nearbyStoreList: [{},{}],
       themeColor: "#2a82e4"
@@ -158,34 +161,43 @@ export default {
     // })
   },
   onShow() {
-    // this.themeColor == "" || this.themeColor == "#fff" || this.themeColor == "#2a82e4"
     // if (this.themeColor != window.color) {
-    //   this.themeColor = window.color;
-    //   setNavTab(wx.getStorageSync("companyName"));
+    //     this.setTheme()
     // }
-    // if(!this.nearbyStoreList.length) {
-    //   this.getNearbyStoreList();
-    // }
-  },
-  onLoad(options) {
-    // 有appid走获取微信公众号信息，没有走默认的公司companyId设置
-    if (options.appid) {
-      getWXCompany(options.appid).then(() => {
-        this.setTheme()
-        this._mounted()
-      });
-    } else { // wx90e290f98e838e66
-      // getWXCompany('wx842adcf8a0ea1c9a').then(() => {
-      //   this.setTheme()
-      //   this._mounted()
-      // });
-      getCompanyColor().then(() => {
-        this.setTheme()
-        this._mounted()
-      })
+    if(!this.nearbyStoreList.length) {
+      this.getNearbyStoreList();
     }
   },
+  onLoad(options) {
+      this.setTheme()
+      this._mounted()
+    // if (options.appid) {
+    //   getWXCompany(options.appid).then(() => {
+    //     this.setTheme()
+    //     this._mounted()
+    //   });
+    // } else if(options.scene) {
+    //   // 有scene参数时
+    //   var scene = decodeURIComponent(options.scene) // 公司id,门店id
+    //   var companyId = scene.split(",")[0]
+    //   var storeId = scene.split(",")[1]
+    //    wx.setStorageSync('companyId', companyId)
+    //    wx.setStorageSync('storeId', storeId)
+    // } else { // wx90e290f98e838e66
+    //   // getWXCompany('wx842adcf8a0ea1c9a').then(() => {
+    //   //   this.setTheme()
+    //   //   this._mounted()
+    //   // });
+    //   getCompanyColor().then(() => {
+    //     this.setTheme()
+    //     this._mounted()
+    //   })
+    // }
+  },
   computed: {
+    isLogin() {
+      return store.state.isLogin
+    },
     window() {
       return window
     },
@@ -195,7 +207,9 @@ export default {
   },
   onPullDownRefresh() {
     this.recommendCoach = [{}]
-    this.recommendClass = {}
+    this.recommendClass = {
+        loading: true
+        }
     this.getBannerList()
     this.getRecommendCoach();
     this.getRecommendClass()
@@ -207,7 +221,7 @@ export default {
     }, 1000);
   },
   methods: {
-    _getPhoneNumbe(e) {
+    _getPhoneNumber(e) {
       getPhoneNumber(e)
     },
     _mounted() {
@@ -233,6 +247,7 @@ export default {
       this.getRecommendCoach();
     },
     setTheme() {
+      console.log("--------homepage-------")
       setNavTab(wx.getStorageSync("companyName"));
       this.themeColor = window.color || "#2a82e4";
     },
@@ -300,9 +315,8 @@ export default {
             _data.timeEnd = formatDate(new Date(_data.timeEnd), "hh:mm")
             that.recommendClass = res.data.data;
           } else {
-            that.recommendClass = {}
+            that.recommendClass = {loading: false}
           }
-          console.log(that.recommendClass)
         }
       });
     },

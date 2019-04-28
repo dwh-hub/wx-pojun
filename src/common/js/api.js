@@ -5,7 +5,12 @@ import {
 } from "COMMON/js/common.js";
 import store from "../../utils/store.js"
 
-export function getPhoneNumber(e,url) {
+/**
+ * 
+ * @param {*} e 微信返回的加密数据
+ * @param {*} url 登录成功后要跳转的地址
+ */
+export function getPhoneNumber(e, url) {
   if (!e.mp.detail.encryptedData) {
     return
   }
@@ -24,7 +29,7 @@ export function getPhoneNumber(e,url) {
         wx.setStorage({
           key: "phone",
           data: res.data.data,
-          success: function() {
+          success: function () {
             login(url);
           }
         });
@@ -56,7 +61,7 @@ function getUserInfo() {
           if (!_data.length) {
             return wx.showModal({
               title: "提示",
-              content: "没有找到您的登记信息，请先登记信息",
+              content: "您目前不是该店会员，是否前往注册会员？",
               success(res) {
                 if (res.confirm) {
                   wx.navigateTo({
@@ -101,41 +106,114 @@ function getUserInfo() {
 
 // 绑定方法
 function bindMethod(url) {
-    wx.request({
-      url: window.api + "/wxcustomer/bindCard",
-      data: {
-        phone: wx.getStorageSync("phone"),
-        companyId: wx.getStorageSync("companyId"),
-        miniOpenId: wx.getStorageSync("openId")
-      },
-      success(res) {
-        wx.setStorage({
-          key: "Cookie",
-          data: res.header["Set-Cookie"]
+  wx.request({
+    url: window.api + "/wxcustomer/bindCard",
+    data: {
+      phone: wx.getStorageSync("phone"),
+      companyId: wx.getStorageSync("companyId"),
+      miniOpenId: wx.getStorageSync("openId")
+    },
+    success(res) {
+      wx.setStorage({
+        key: "Cookie",
+        data: res.header["Set-Cookie"]
+      });
+      if (res.data.code === 200) {
+        wx.showToast({
+          title: "登录成功",
+          icon: "success",
+          duration: 1000
         });
-        if (res.data.code === 200) {
-          wx.showToast({
-            title: "登录成功",
-            icon: "success",
-            duration: 1000
-          });
-          store.commit("changeLogin", true);
-          getThemeColor();
+        getMessage()
+        store.commit("changeLogin", true);
+        getThemeColor();
+        let _url = url ? url : './main'
+        if (_url == "tabbar") {
           setTimeout(() => {
             wx.reLaunch({
-              url: url?url:'./main'
+              url: '../mine/main'
             });
           }, 1000);
         } else {
-          return wx.showModal({
-            title: "提示",
-            content: res.data.message,
-            showCancel: false
-          });
+          setTimeout(() => {
+            wx.redirectTo({
+              url: _url
+            });
+          }, 1000);
         }
+      } else {
+        return wx.showModal({
+          title: "提示",
+          content: res.data.message,
+          showCancel: false
+        });
       }
-    });
-  }
-  export default {
-    getPhoneNumber
-  }
+    }
+  });
+}
+
+// 注册
+function register() {
+  HttpRequest({
+    url: window.api + "/wxcustomer/addCustomer",
+    data: {
+      companyId: wx.getStorageSync("companyId"),
+      phone: wx.getStorageSync("phone"),
+      name: "",
+      storeId: wx.getStorageSync("storeId"),
+      sex: 0
+    },
+    success(res) {
+      if (res.data.code === 200) {
+        wx.showToast({
+          title: res.data.message,
+          icon: "success",
+          duration: 1000
+        });
+        setTimeout(() => {
+          wx.navigateBack({
+            delta: 1
+          });
+        }, 500);
+      } else {
+        wx.showModal({
+          title: "提示",
+          content: res.data.message,
+          showCancel: false
+        });
+      }
+    }
+  });
+}
+
+export function getMessage() {
+  HttpRequest({
+    url: window.api + '/home/wechat/message/customer/pages',
+    data: {
+      status: 0,
+      pageNo: 1
+    },
+    success(res) {
+      if (res.data.code == 200) {
+        store.commit('changeLogin', true)
+        if (res.data.data.recCount > 99) {
+          return wx.setTabBarBadge({
+            index: 3,
+            text: '99+'
+          })
+        }
+        if (res.data.data.recCount <= 99 && res.data.data.recCount > 0) {
+          return wx.setTabBarBadge({
+            index: 3,
+            text: String(res.data.data.recCount)
+          })
+        }
+      } else {
+      }
+    }
+  })
+}
+export default {
+  getPhoneNumber,
+  getMessage
+}

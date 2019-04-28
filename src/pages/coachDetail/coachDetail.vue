@@ -45,7 +45,7 @@
       :style="{'background-color': window.color,color:'#fff'}"
       type="default"
       open-type="getPhoneNumber"
-      @getphonenumber="_getPhoneNumbe"
+      @getphonenumber="_getPhoneNumber"
     >马上预约</button>
     <page-footer></page-footer>
   </div>
@@ -90,7 +90,7 @@ export default {
     }
   },
   methods: {
-    _getPhoneNumbe(e) {
+    _getPhoneNumber(e) {
       let url = "../coachDetail/main?coachId=" + this.coachId
       getPhoneNumber(e,url)
     },

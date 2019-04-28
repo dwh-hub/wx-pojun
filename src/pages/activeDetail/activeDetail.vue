@@ -19,7 +19,15 @@
           <span class="numbers">{{signNum}}</span>
           <span class="increase" @click="signNum++">+</span>
         </div>
-        <span class="sign" :style="{'background-color': window.color}" @click="showPopup()">报名</span>
+        <span class="sign" v-if="isLogin" :style="{'background-color': window.color}" @click="showPopup()">报名</span>
+        <button
+          v-else
+          class="sign clearBtn"
+          :style="{'background-color': window.color}"
+          type="default"
+          open-type="getPhoneNumber"
+          @getphonenumber="_getPhoneNumbe"
+        >报名</button>
       </div>
       <div class="block" v-if="isPhoneX"></div>
     </div>
@@ -48,6 +56,7 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import wxParse from "mpvue-wxparse";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
+import {getPhoneNumber} from "COMMON/js/api.js";
 export default {
   data() {
     return {
@@ -82,6 +91,9 @@ export default {
     }, 1000);
   },
   computed: {
+    isLogin() {
+      return store.state.isLogin
+    },
     isPhoneX() {
       return store.state.isIphoneX;
     },
@@ -100,6 +112,10 @@ export default {
     pageFooter
   },
   methods: {
+    _getPhoneNumbe(e) {
+      let url = "../activeDetail/main?markId=" + this.markId
+      getPhoneNumber(e,url)
+    },
     decrease() {
       if (this.signNum == 1) {
         return;
@@ -293,6 +309,7 @@ export default {
       float: right;
       display: block;
       width: 90px;
+      line-height: 50px;
       text-align: center;
       color: #fff;
     }

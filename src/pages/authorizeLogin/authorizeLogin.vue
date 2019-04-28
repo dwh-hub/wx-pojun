@@ -1,10 +1,17 @@
 <template>
   <div class="authorize-login">
-    <image src="https://www.pojun-tech.com/images/company_log/37/1.5344641783646104E12.png"></image>
-    <div class="tip">请完成微信授权以继续使用</div>
-    <button class="authorize" type="primary" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button>
-
-    <van-popup
+    <!-- <image src="https://pojun-tech.cn/images/company_log/30/1.55367751951427E12.png" mode="aspectFit"></image> -->
+    <div class="authorize-bottom">
+      <div class="tip">请完成微信授权以继续使用</div>
+      <button
+        class="authorize"
+        type="primary"
+        open-type="getPhoneNumber"
+        @getphonenumber="_getPhoneNumber"
+      >微信授权登录</button>
+      <div class="toHome" @click="toHome">暂不登录</div>
+    </div>
+    <!-- <van-popup
       :show="showBindBox"
       @close="showBindBox = false"
       :duration="200"
@@ -22,18 +29,21 @@
         </div>
         <span class="showTooltips" @click="bind">绑定</span>
       </div>
-    </van-popup>
+    </van-popup>-->
   </div>
 </template>
 
 <script>
 import {
   setNavTab,
-  checkPhoneFormat,
   window,
-  HttpRequest
+  wxLogin,
+  HttpRequest,
+  getWXCompany,
+  getCompanyColor
 } from "COMMON/js/common.js";
 import store from "../../utils/store";
+import { getPhoneNumber,getMessage } from "COMMON/js/api.js";
 export default {
   data() {
     return {
@@ -45,61 +55,52 @@ export default {
       curCompany: {}
     };
   },
-  onLoad() {
-    setNavTab();
+  onLoad(options) {
+    wxLogin();
+    // 获取公司id --> 获取公司主题色
+    if (options.appid) {
+      // 通过微信公众号appId获取公司信息(companyId, companyName)
+      getWXCompany(options.appid).then(() => {
+        this.login()
+      })
+    } else if(options.scene) {
+      // 扫码进入时携带scene参数时(参数：公司id,门店id)
+      var scene = decodeURIComponent(options.scene)
+      var companyId = scene.split(",")[0]
+      var storeId = scene.split(",")[1]
+       wx.setStorageSync('companyId', companyId)
+       wx.setStorageSync('storeId', storeId)
+       this.login()
+    } else {
+      // 直接进入小程序时，设置默认公司id
+      getCompanyColor().then(() => {
+        this.login()
+      })
+    }
   },
   methods: {
-    // 获取微信加密数据
-    getPhoneNumber(e) {
-      let that = this;
-      HttpRequest({
-        url: window.api + "/mini/getphone",
-        data: {
-          sessionKey: wx.getStorageSync("sessionKey"),
-          encryptedData: e.mp.detail.encryptedData,
-          iv: e.mp.detail.iv
-        },
-        success(res) {
-          that.phone = res.data.data;
-          wx.setStorage({
-            key: "phone",
-            data: res.data.data
-          });
-          that.login();
-        }
+    toHome() {
+      wx.switchTab({
+        url: "../homepage/main"
       });
     },
-    // 登录
+    _getPhoneNumber(e) {
+      getPhoneNumber(e, "tabbar");
+    },
     login() {
-      this.getUserInfo().then(() => {
-        this.bindMethod();
+      let that = this
+      if (!wx.getStorageSync("phone") || !wx.getStorageSync("openId")) {
+        return store.commit("changeLogin", false);
+      }
+      wx.showLoading({
+        title: "加载中..."
       });
-    },
-    // 绑定公司
-    bind() {
-      this.showBindBox = false;
-      this.userInfo = this.curCompany;
-      store.commit("saveUserInfo", this.curCompany);
-      wx.setStorage({
-        key: "userInfo",
-        data: this.curCompany
-      });
-      wx.setStorage({
-        key: "companyId",
-        data: this.curCompany.companyId
-      });
-      this.bindMethod();
-    },
-    // 绑定方法
-    bindMethod() {
-      let that = this;
       wx.request({
         url: window.api + "/wxcustomer/bindCard",
         data: {
-          phone: that.phone,
-          companyId: that.userInfo.companyId,
+          phone: wx.getStorageSync("phone"),
+          companyId: wx.getStorageSync("userInfo").companyId,
           miniOpenId: wx.getStorageSync("openId")
-          // smsSendLogId: that.smsSendLogId
         },
         success(res) {
           wx.setStorage({
@@ -107,75 +108,19 @@ export default {
             data: res.header["Set-Cookie"]
           });
           if (res.data.code === 200) {
-            wx.showToast({
-              title: "登录成功",
-              icon: "success",
-              duration: 1000
-            });
             store.commit("changeLogin", true);
-            setTimeout(() => {
-              wx.reLaunch({
-                url: "../mine/main"
-              });
-            }, 1000);
+            getMessage()
+            wx.hideLoading();
+            wx.reLaunch({
+              url: '../homepage/main'
+            });
+          } else {
+            store.commit("changeLogin", false);
+            wx.hideLoading();
+            wx.removeStorageSync("userInfo");
+            wx.removeStorageSync("phone");
           }
         }
-      });
-    },
-    // 获取用户信息
-    getUserInfo() {
-      wx.showLoading({
-        title: "正在登录..."
-      });
-      let that = this;
-      return new Promise(function(resolve) {
-        wx.request({
-          url: window.api + "/wxcustomer/findAllCustomer",
-          data: {
-            phone: that.phone
-          },
-          success(res) {
-            wx.hideLoading();
-            if (res.data.code == 200) {
-              if (!res.data.data.length) {
-                return wx.showModal({
-                  title: "提示",
-                  content: "没有找到您的登记信息，请先登记信息",
-                  success(res) {
-                    if (res.confirm) {
-                      wx.navigateTo({
-                        url: "../register/main"
-                      })
-                    }
-                  }
-                });
-              }
-              if (res.data.data.length == 1) {
-                that.userInfo = res.data.data[0];
-                store.commit("saveUserInfo", res.data.data[0]);
-                wx.setStorage({
-                  key: "userInfo",
-                  data: res.data.data[0]
-                });
-                wx.setStorage({
-                  key: "companyId",
-                  data: res.data.data[0].companyId
-                });
-                return resolve();
-              }
-              that.showBindBox = true;
-              that.companyList = res.data.data;
-              that.curCompany = res.data.data[0];
-              resolve();
-            } else {
-              wx.showModal({
-                title: "提示",
-                content: res.data.message,
-                showCancel: false
-              });
-            }
-          }
-        });
       });
     }
   }
@@ -186,19 +131,30 @@ export default {
 @import "~COMMON/less/reset.less";
 
 .authorize-login {
-  padding: 15px;
   // padding-top: 200px;
-  >image {
+  > image {
     width: 100%;
   }
-  .tip {
+  .authorize-bottom {
+    position: fixed;
+    bottom: 120px;
+    left: 0;
+    padding: 15px;
     text-align: center;
-    line-height: 36px;
-  }
-  .authorize {
-    font-size: 16px;
-    height: 36px;
-    line-height: 36px;
+    box-sizing: border-box;
+    width: 100%;
+    .tip {
+      text-align: center;
+      line-height: 36px;
+    }
+    .toHome {
+      margin-top: 10px;
+    }
+    .authorize {
+      font-size: 16px;
+      height: 36px;
+      line-height: 36px;
+    }
   }
   .companyList {
     padding: 15px;

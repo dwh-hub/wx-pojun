@@ -121,6 +121,13 @@ export default {
           navigatorUrl: "../checkInRecord/main",
           hit: "",
           text: "次"
+        },
+        {
+          imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
+          navName: "我是工作人员",
+          navigatorUrl: "../businessPage/index/main",
+          hit: "",
+          text: ""
         }
         // {
         //   imgUrl: "https://www.pojun-tech.cn/assets/img/integral.png",
@@ -158,9 +165,9 @@ export default {
     pageFooter
   },
   onShow() {
-    if(store.state.isLogin == false) {
-      wxLogin();
-    }
+    // if(store.state.isLogin == false) {
+    //   wxLogin();
+    // }
     if (this.themeColor != window.color) {
       this.themeColor = window.color;
       setNavTab(wx.getStorageSync("companyName"));
@@ -196,7 +203,7 @@ export default {
   },
   methods: {
     _getPhoneNumbe(e) {
-      getPhoneNumber(e)
+      getPhoneNumber(e,"tabbar")
     },
     navTo(url) {
       if (!store.state.isLogin) {

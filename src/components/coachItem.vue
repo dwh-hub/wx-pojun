@@ -31,7 +31,7 @@
         type="default"
         @click.stop
         open-type="getPhoneNumber"
-        @getphonenumber="_getPhoneNumbe"
+        @getphonenumber="_getPhoneNumber"
       >预约</button>
     </div>
     <div class="coach-skeleton" v-else>
@@ -79,14 +79,14 @@ export default {
       if (this.info.headImgPath) {
         return window.api + this.info.headImgPath;
       }
-      return "http://pojun-tech.cn/assets/img/morenm.png";
+      return "http://pojun-tech.cn/assets/img/morenTo.png";
     },
     themeColor() {
       return window.color;
     }
   },
   methods: {
-    _getPhoneNumbe(e) {
+    _getPhoneNumber(e) {
       getPhoneNumber(e)
     },
     toDetail() {

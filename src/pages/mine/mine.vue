@@ -15,7 +15,7 @@
           class="authorize"
           type="default"
           open-type="getPhoneNumber"
-          @getphonenumber="_getPhoneNumbe"
+          @getphonenumber="_getPhoneNumber"
         >点击登录</button>
       </div>
       <div class="mineDetail" v-else>
@@ -125,7 +125,7 @@ export default {
         {
           imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
           navName: "我是工作人员",
-          navigatorUrl: "../businessPage/index/main",
+          navigatorUrl: "../pageBusiness/index/main",
           hit: "",
           text: ""
         }
@@ -165,9 +165,9 @@ export default {
     pageFooter
   },
   onShow() {
-    // if(store.state.isLogin == false) {
-    //   wxLogin();
-    // }
+    if(store.state.isLogin == false) {
+      wxLogin();
+    }
     if (this.themeColor != window.color) {
       this.themeColor = window.color;
       setNavTab(wx.getStorageSync("companyName"));
@@ -202,8 +202,8 @@ export default {
     }
   },
   methods: {
-    _getPhoneNumbe(e) {
-      getPhoneNumber(e,"tabbar")
+    _getPhoneNumber(e) {
+      getPhoneNumber(e,"../mine/main",true)
     },
     navTo(url) {
       if (!store.state.isLogin) {
@@ -242,7 +242,7 @@ export default {
                     duration: 1000
                   });
                   wx.reLaunch({
-                    url: "../mine/main"
+                    url: "../authorizeLogin/main"
                   });
                 } else {
                   wx.showModal({

@@ -130,12 +130,7 @@ import {getPhoneNumber} from "COMMON/js/api.js";
 export default {
   data() {
     return {
-      // bannerArr: ["https://www.pojun-tech.com/assets/img/morenImg.jpg"],
       storeList: [],
-      // touch: {
-      //   x: "",
-      //   y: ""
-      // }
       longitude: "", // 经度
       latitude: "", // 维度
       bannerList: [],
@@ -161,14 +156,42 @@ export default {
     // })
   },
   onShow() {
-    // if (this.themeColor != window.color) {
-    //     this.setTheme()
-    // }
+    let that = this;
+    wx.getLocation({
+      type: "wgs84",
+      success(res) {
+        console.log("经度:" + res.longitude);
+        console.log("维度:" + res.latitude);
+        that.latitude = res.latitude;
+        that.longitude = res.longitude;
+        store.commit("saveLongitude", res.longitude);
+        store.commit("saveLatitude", res.latitude);
+        that.getNearbyStoreList();
+      },
+      fail(res) {
+        that.getNearbyStoreList();
+      }
+    });
     if(!this.nearbyStoreList.length) {
       this.getNearbyStoreList();
     }
+    wx.getSetting({
+      success(res) {
+        if (!res.authSetting['scope.userLocation']) {
+          wx.showModal({
+            title: "授权",
+            content: "部分功能需要地理位置，是否授权？",
+            success(res) {
+              if (res.confirm) {
+                wx.openSetting()
+              }
+            }
+          });
+        }
+      }
+    })
   },
-  onLoad(options) {
+  onLoad() {
       this.setTheme()
       this._mounted()
     // if (options.appid) {
@@ -228,26 +251,10 @@ export default {
       this.companyId = wx.getStorageSync("companyId");
       console.log(this.companyId)
       let that = this;
-      wx.getLocation({
-        type: "wgs84",
-        success(res) {
-          console.log("经度:" + res.longitude);
-          console.log("维度:" + res.latitude);
-          that.latitude = res.latitude;
-          that.longitude = res.longitude;
-          store.commit("saveLongitude", res.longitude);
-          store.commit("saveLatitude", res.latitude);
-          that.getNearbyStoreList();
-        },
-        fail(res) {
-          console.log(res)
-        }
-      });
       this.getBannerList();
       this.getRecommendCoach();
     },
     setTheme() {
-      console.log("--------homepage-------")
       setNavTab(wx.getStorageSync("companyName"));
       this.themeColor = window.color || "#2a82e4";
     },
@@ -349,7 +356,7 @@ export default {
       wx.request({
         url: window.api + "/store/all-store-name-list-nolimit",
         data: {
-          companyId: that.companyId || ""
+          companyId: that.companyId
         },
         success(res) {
           if (res.data.code === 200) {
@@ -376,8 +383,8 @@ export default {
             _storeList.sort(that.compare("range"));
             that.nearbyStoreList = _storeList.slice(0, 2);
             if (!_storeList.length) {
-              that.nearbyStoreList = _list.slice(0, 2);
-              that.nearbyStoreList = that.nearbyStoreList.map(e => {
+              _list = _list.slice(0, 2);
+              that.nearbyStoreList = _list.map(e => {
                 return {
                   cover: e.images ? window.api + e.images.split(",")[0] : "",
                   address: e.address,

@@ -82,6 +82,9 @@ export default {
     pageFooter
   },
   computed: {
+    isLogin() {
+      return store.state.isLogin
+    },
     isPhoneX() {
       return store.state.isIphoneX;
     },
@@ -115,9 +118,6 @@ export default {
           console.log(that.coachInfo)
         }
       });
-    },
-    isLogin() {
-      return store.state.isLogin
     }
   }
 };

@@ -43,7 +43,7 @@
       <div class="address-group">
         <div class="store">
           <span class="name">{{classDetail.storeName}}</span>
-          <span class="range">{{range}}</span>
+          <span class="range" :style="{'color': window.color}">{{range}}</span>
         </div>
         <div class="address-detail" @click="toMap()">
           <span>{{address || '暂无详细地址'}}</span>
@@ -97,7 +97,7 @@
       :style="{'background-color': window.color,color:'#fff'}"
       type="default"
       open-type="getPhoneNumber"
-      @getphonenumber="_getPhoneNumbe"
+      @getphonenumber="_getPhoneNumber"
     >马上预约</button>
     <div class="bottom-btn appointmentNone" v-if="!canAppoint">
       不可预约
@@ -219,7 +219,7 @@ export default {
         });
       }
     },
-    _getPhoneNumbe(e) {
+    _getPhoneNumber(e) {
       let url = "../teamClassDetail/main?classId=" + this.id
       getPhoneNumber(e,url)
     },

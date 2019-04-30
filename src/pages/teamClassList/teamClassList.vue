@@ -43,7 +43,7 @@
                 :key="index"
                 @click.stop="selectCoach(item)"
               >
-                <img :src="window.api +(item.headImgPath||'/assets/img/morenm.png')">
+                <img :src="window.api +(item.headImgPath||'/assets/img/morenTo.png')">
                 <span>{{item.userName}}</span>
               </div>
             </div>

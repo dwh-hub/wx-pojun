@@ -1,13 +1,13 @@
 import Vue from 'vue'
 import App from './App'
 import {
-  window,
-  wxLogin,
-  HttpRequest,
-  getCompanyColor
+  window
+  // wxLogin,
+  // HttpRequest,
+  // getCompanyColor
 } from "COMMON/js/common.js";
 import store from "./utils/store"
-import login from "COMMON/js/login.js"
+// import login from "COMMON/js/login.js"
 
 Vue.config.productionTip = false
 App.mpType = 'app'

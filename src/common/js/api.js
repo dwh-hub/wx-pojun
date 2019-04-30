@@ -10,7 +10,7 @@ import store from "../../utils/store.js"
  * @param {*} e 微信返回的加密数据
  * @param {*} url 登录成功后要跳转的地址
  */
-export function getPhoneNumber(e, url) {
+export function getPhoneNumber(e, url,isTab) {
   if (!e.mp.detail.encryptedData) {
     return
   }
@@ -30,7 +30,7 @@ export function getPhoneNumber(e, url) {
           key: "phone",
           data: res.data.data,
           success: function () {
-            login(url);
+            login(url,isTab);
           }
         });
       } else {
@@ -40,9 +40,9 @@ export function getPhoneNumber(e, url) {
   });
 }
 // 登录
-function login(url) {
+function login(url,isTab) {
   getUserInfo().then(() => {
-    bindMethod(url);
+    bindMethod(url,isTab);
   });
 }
 // 获取用户信息
@@ -59,6 +59,9 @@ function getUserInfo() {
         if (res.data.code == 200) {
           let _data = res.data.data
           if (!_data.length) {
+            if(wx.getStorageSync("storeId")) {
+              return register()
+            }
             return wx.showModal({
               title: "提示",
               content: "您目前不是该店会员，是否前往注册会员？",
@@ -105,7 +108,10 @@ function getUserInfo() {
 }
 
 // 绑定方法
-function bindMethod(url) {
+function bindMethod(url,isTab) {
+  wx.showLoading({
+    title: "登录中..."
+  });
   wx.request({
     url: window.api + "/wxcustomer/bindCard",
     data: {
@@ -119,19 +125,21 @@ function bindMethod(url) {
         data: res.header["Set-Cookie"]
       });
       if (res.data.code === 200) {
+        wx.hideLoading();
         wx.showToast({
           title: "登录成功",
           icon: "success",
           duration: 1000
         });
+        wx.removeStorageSync("storeId");
         getMessage()
         store.commit("changeLogin", true);
         getThemeColor();
         let _url = url ? url : './main'
-        if (_url == "tabbar") {
+        if (isTab) {
           setTimeout(() => {
             wx.reLaunch({
-              url: '../mine/main'
+              url: _url
             });
           }, 1000);
         } else {
@@ -159,22 +167,13 @@ function register() {
     data: {
       companyId: wx.getStorageSync("companyId"),
       phone: wx.getStorageSync("phone"),
-      name: "",
+      name: wx.getStorageSync("phone"),
       storeId: wx.getStorageSync("storeId"),
       sex: 0
     },
     success(res) {
       if (res.data.code === 200) {
-        wx.showToast({
-          title: res.data.message,
-          icon: "success",
-          duration: 1000
-        });
-        setTimeout(() => {
-          wx.navigateBack({
-            delta: 1
-          });
-        }, 500);
+        bindMethod()
       } else {
         wx.showModal({
           title: "提示",

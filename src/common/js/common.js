@@ -36,7 +36,6 @@ export function getThemeColor() {
         companyId: wx.getStorageSync("companyId")
       },
       success(res) {
-        console.log("---------getThemeColor-----------")
         if (res.data.code == 200) {
           window.color = JSON.parse(res.data.data.baseInfo).themeColor || '#2a82e4'
         } else {
@@ -72,7 +71,7 @@ export function wxLogin() {
       success(res) {
         if (res.code) {
           wx.request({
-            url: window.api + '/mini/getsession',
+            url: window.api + '/mini/getsession', // ByAuth
             data: {
               code: res.code,
               companyId: wx.getStorageSync("companyId")

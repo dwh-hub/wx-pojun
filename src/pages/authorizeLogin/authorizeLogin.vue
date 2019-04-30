@@ -1,8 +1,15 @@
 <template>
   <div class="authorize-login">
-    <!-- <image src="https://pojun-tech.cn/images/company_log/30/1.55367751951427E12.png" mode="aspectFit"></image> -->
-    <div class="authorize-bottom">
+    <image src="https://pojun-tech.cn/assets/img/coordinates.png" mode="aspectFit"></image>
+    <div class="authorize-bottom" v-if="isShow">
       <div class="tip">请完成微信授权以继续使用</div>
+      <!-- <button 
+        class="authorize"
+        type="primary"
+        open-type="getUserInfo" 
+        @getuserinfo="getUserInfo">
+        获取用户信息
+      </button> -->
       <button
         class="authorize"
         type="primary"
@@ -29,7 +36,7 @@
         </div>
         <span class="showTooltips" @click="bind">绑定</span>
       </div>
-    </van-popup>-->
+    </van-popup> -->
   </div>
 </template>
 
@@ -40,7 +47,8 @@ import {
   wxLogin,
   HttpRequest,
   getWXCompany,
-  getCompanyColor
+  getCompanyColor,
+  getThemeColor
 } from "COMMON/js/common.js";
 import store from "../../utils/store";
 import { getPhoneNumber,getMessage } from "COMMON/js/api.js";
@@ -52,11 +60,17 @@ export default {
       showBindBox: false,
       companyList: [],
       // 选择的公司
-      curCompany: {}
+      curCompany: {},
+      isShow: true
     };
   },
   onLoad(options) {
     wxLogin();
+    wx.getLocation({
+      type: "wgs84",
+      success(res) {
+      }
+    });
     // 获取公司id --> 获取公司主题色
     if (options.appid) {
       // 通过微信公众号appId获取公司信息(companyId, companyName)
@@ -66,10 +80,11 @@ export default {
     } else if(options.scene) {
       // 扫码进入时携带scene参数时(参数：公司id,门店id)
       var scene = decodeURIComponent(options.scene)
-      var companyId = scene.split(",")[0]
-      var storeId = scene.split(",")[1]
+      var companyId = scene.split("-")[0]
+      var storeId = scene.split("-")[1]
        wx.setStorageSync('companyId', companyId)
        wx.setStorageSync('storeId', storeId)
+       getThemeColor()
        this.login()
     } else {
       // 直接进入小程序时，设置默认公司id
@@ -85,13 +100,21 @@ export default {
       });
     },
     _getPhoneNumber(e) {
-      getPhoneNumber(e, "tabbar");
+      getPhoneNumber(e,"../homepage/main",true);
+    },
+    getUserInfo(e) {
+      console.log(e)
+      if(e.mp.detail.indexOf("fail") == -1) {
+        console.log(e.mp.detail)
+      }
     },
     login() {
       let that = this
       if (!wx.getStorageSync("phone") || !wx.getStorageSync("openId")) {
+        this.isShow = true
         return store.commit("changeLogin", false);
       }
+      this.isShow = false
       wx.showLoading({
         title: "加载中..."
       });
@@ -115,6 +138,7 @@ export default {
               url: '../homepage/main'
             });
           } else {
+            that.isShow = true
             store.commit("changeLogin", false);
             wx.hideLoading();
             wx.removeStorageSync("userInfo");
@@ -131,15 +155,17 @@ export default {
 @import "~COMMON/less/reset.less";
 
 .authorize-login {
-  // padding-top: 200px;
+  padding: 15px;
+  padding-top: 50px;
   > image {
     width: 100%;
   }
   .authorize-bottom {
-    position: fixed;
-    bottom: 120px;
-    left: 0;
-    padding: 15px;
+    // position: fixed;
+    // bottom: 120px;
+    // left: 0;
+    // padding: 15px;
+    // margin-top: 20px;
     text-align: center;
     box-sizing: border-box;
     width: 100%;
@@ -147,13 +173,11 @@ export default {
       text-align: center;
       line-height: 36px;
     }
-    .toHome {
-      margin-top: 10px;
-    }
     .authorize {
       font-size: 16px;
       height: 36px;
       line-height: 36px;
+      margin-bottom: 10px;
     }
   }
   .companyList {

@@ -26,7 +26,7 @@
           :style="{'background-color': window.color}"
           type="default"
           open-type="getPhoneNumber"
-          @getphonenumber="_getPhoneNumbe"
+          @getphonenumber="_getPhoneNumber"
         >报名</button>
       </div>
       <div class="block" v-if="isPhoneX"></div>
@@ -112,7 +112,7 @@ export default {
     pageFooter
   },
   methods: {
-    _getPhoneNumbe(e) {
+    _getPhoneNumber(e) {
       let url = "../activeDetail/main?markId=" + this.markId
       getPhoneNumber(e,url)
     },

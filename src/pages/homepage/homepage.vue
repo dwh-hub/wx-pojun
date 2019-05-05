@@ -65,7 +65,8 @@
         >
           <!-- http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg -->
           <div class="cover">
-            <img :src="item.cover">
+            <image :src="item.cover" mode="aspectFill"></image>
+            <!-- <img :src="item.cover"> -->
           </div>
           <div class="nearby-bottom">
             <span class="name">{{item.storeName}}</span>
@@ -77,15 +78,15 @@
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
       <!-- <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item> -->
-        <div class="class-item" v-if="recommendClass.teamScheduleId">
-          <div v-if="!recommendClass.loading" @click="toDetail">
+        <div class="class-item">
+          <div v-if="!recommendClass.loading && recommendClass.teamScheduleId" @click="toDetail">
             <div class="class-cover">
               <image :src="window.api + recommendClass.masterImg" mode="aspectFill"></image>
             </div>
             <div class="class-info">
               <div class="class-top">
                 <span class="class-name">{{recommendClass.anotherName}}</span>
-                <span class="class-time">{{recommendClass.timeStart+"~"+recommendClass.timeEnd}}</span>
+                <span class="class-time" v-if="recommendClass.timeStart">{{(recommendClass.timeStart || '')+"~"+(recommendClass.timeEnd || '')}}</span>
               </div>
               <div class="class-bottom">
                 <span class="class-coach">{{recommendClass.coachNameArrayStr}}</span>
@@ -93,7 +94,7 @@
               </div>
             </div>
           </div>
-          <div class="class-skeleton" v-else>
+          <div class="class-skeleton" v-if="recommendClass.loading">
             <div class="class-cover">
             </div>
             <div class="class-info">
@@ -192,8 +193,9 @@ export default {
     })
   },
   onLoad() {
-      this.setTheme()
-      this._mounted()
+    this.setTheme()
+    this._mounted()
+    
     // if (options.appid) {
     //   getWXCompany(options.appid).then(() => {
     //     this.setTheme()
@@ -231,8 +233,8 @@ export default {
   onPullDownRefresh() {
     this.recommendCoach = [{}]
     this.recommendClass = {
-        loading: true
-        }
+      loading: true
+    }
     this.getBannerList()
     this.getRecommendCoach();
     this.getRecommendClass()
@@ -321,8 +323,10 @@ export default {
             _data.timeStart = formatDate(new Date(_data.timeStart), "hh:mm")
             _data.timeEnd = formatDate(new Date(_data.timeEnd), "hh:mm")
             that.recommendClass = res.data.data;
+            console.log(that.recommendClass)
           } else {
             that.recommendClass = {loading: false}
+            console.log(that.recommendClass)
           }
         }
       });
@@ -478,7 +482,7 @@ page {
         width: 96%;
         .cover {
           width: 100%;
-          > img {
+          > image {
             width: 100%;
             height: 90px;
             background-color: #eee;
@@ -509,13 +513,11 @@ page {
     .title {
       font-weight: bold;
     }
-    .team-class-item {
-      margin-bottom: 20px;
-    }
     .class-item {
       background-color: #fff;
       border-radius: 2px;
       box-shadow: 0px 2px 10px #ccc;
+      margin-bottom: 15px;
       .class-cover {
         width: 100%;
         height: 140px;

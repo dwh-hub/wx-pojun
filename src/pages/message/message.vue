@@ -360,6 +360,7 @@ export default {
     border: 1rpx solid #eee;
     margin: 15px;
     text-align: center;
+    border-radius: 4px;
     &:active {
       background-color: #e6e6e6;
     }

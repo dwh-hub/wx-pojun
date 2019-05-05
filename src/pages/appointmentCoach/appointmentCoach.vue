@@ -178,15 +178,16 @@
           <div class="date-second">
             <div
               class="second-item"
-              v-for="(item, index) in allMiniTime"
+              v-for="(item, index) in curTimeObj.arr"
               :key="index"
+              :class="{disable: item.disable}"
               @click="selectSecond(item,index)"
             >
               <span
                 v-if="curSecondIndex == index"
                 :style="{'background-color':themeColor,color:'#fff'}"
-              >{{item}}</span>
-              <span v-else>{{item}}</span>
+              >{{item.second}}</span>
+              <span v-else>{{item.second}}</span>
             </div>
           </div>
         </div>
@@ -264,7 +265,7 @@ import {
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 import store from "../../utils/store";
-import pageFooter from "COMPS/pageFooter.vue"
+import pageFooter from "COMPS/pageFooter.vue";
 
 export default {
   name: "appointment-coach",
@@ -294,10 +295,6 @@ export default {
       openTimeStart: "",
       // 关店时间
       openTimeEnd: "",
-      // morningTimes: [],
-      // noonTimes: [],
-      // afternoonTimes: [],
-      // nightTime: [],
       dayTime: [],
       allMiniTime: [
         "00",
@@ -317,6 +314,7 @@ export default {
       curDate: "",
       // 点击选择的时间
       curTime: "",
+      curTimeObj: {},
       // 点击选择的时间的结束时间
       curEndTime: "",
       curHourIndex: -1,
@@ -345,10 +343,6 @@ export default {
       projectId: "",
       // 教练信息
       coachInfo: {},
-      // 小时间段
-      // miniDate: [],
-      // 小时间段显示位置 1 上午 2 中午 3 下午 4 晚上
-      // showMiniIndex: 0,
       // 不能预约的时间
       todayPeriodTime: []
     };
@@ -371,9 +365,9 @@ export default {
     }, 1000);
   },
   mounted() {
+    this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.getCoachDetail();
     // this.computedTime();
-    this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     this.getCardList();
     this.getStoreList();
     this.getPeriodTime();
@@ -384,7 +378,15 @@ export default {
     },
     confirmDate() {
       if (this.curEndTime) {
-        return "（" + this.curDate + " " + this.curTime + "~" + this.curEndTime + "）";
+        return (
+          "（" +
+          this.curDate +
+          " " +
+          this.curTime +
+          "~" +
+          this.curEndTime +
+          "）"
+        );
       }
       return "";
     },
@@ -471,6 +473,7 @@ export default {
       if (item.disable) {
         return;
       }
+      this.curTimeObj = item;
       let _item;
       _item = item.hour;
       this.curTime = _item;
@@ -478,7 +481,7 @@ export default {
       this.curSecondIndex = 0;
       let hour = _item.slice(0, 2);
       let _curEndtime =
-      Number(_item.split(":")[0]) + 1 + ":" + _item.split(":")[1];
+        Number(_item.split(":")[0]) + 1 + ":" + _item.split(":")[1];
       if (Number(_curEndtime.split(":")[0]) < 10) {
         this.curEndTime = "0" + String(_curEndtime);
       } else {
@@ -486,24 +489,40 @@ export default {
       }
     },
     selectSecond(item, index) {
+      if (item.disable) {
+        return;
+      }
       if (this.curHourIndex == -1) {
         return;
       }
-      this.curTime = this.curTime.split(":")[0] + ":" + item;
-      this.curEndTime = this.curEndTime.split(":")[0] + ":"+ item;
+      this.curTime = this.curTime.split(":")[0] + ":" + item.second;
+      this.curEndTime = this.curEndTime.split(":")[0] + ":" + item.second;
       this.curSecondIndex = index;
+    },
+    // 判断当前时间节点是否被占用的函数
+    isUsed(start, end) {
+      for (let i in this.todayPeriodTime) {
+        let element = this.todayPeriodTime[i];
+
+        if (
+          // 开始时间在预约时间内
+          (element.timeStart - 60 * 60 * 1000 < start &&
+            start < element.timeEnd) ||
+          (element.timeStart < end && end < element.timeEnd)
+        ) {
+          return true;
+        }
+      }
+
+      return false;
     },
     // 计算可选择预约时间
     computedTime() {
-      let _satarTime = this.openTimeStart.split(":")[0];
-      let _endTime = Number(this.openTimeEnd.split(":")[0] - 1);
-      // let _morningTimes = [];
-      // let _nightTime = [];
-      // let _noonTimes = [];
-      // let _afternoonTimes = [];
+      const HOUR = 60 * 60 * 1000;
+      const DAY = 24 * HOUR;
 
-      // let _allTime = [];
-      let _allTime = [
+      let target = [];
+      let hourTime = [
         "00:00",
         "01:00",
         "02:00",
@@ -529,95 +548,63 @@ export default {
         "22:00",
         "23:00"
       ];
-      // 门店营业时间
-      // for (let h = _satarTime; h <= _endTime; h++) {
-      //   if (h < 10 && h > 0) {
-      //     _allTime.push("0" + h + ":00");
-      //   } else {
-      //     _allTime.push(h + ":00");
-      //   }
-      // }
-      let _nowDay = formatDate(new Date(), "yyyy-MM-dd");
-      // 不可预约时间
-      _allTime = _allTime.map(e => {
-        let _timestamp = new Date(_nowDay + " " + e).getTime();
-        let _hour = e.split(":")[0];
-        if(_hour == "00") {
-          return {
-            hour: e,
-            disable: true
-          };
+      let _openStart = this.openTimeStart || "00:00";
+      let _openEnd = this.openTimeEnd || "23:59";
+      let _nowDay = this.curDate;
+      // 关店时间 合到被占用时间
+      let closeTimeArr = [
+        {
+          timeStart: new Date(_nowDay + " " + "00:00").getTime(),
+          timeEnd: new Date(_nowDay + " " + _openStart).getTime()
+        },
+        {
+          timeStart: new Date(_nowDay + " " + _openEnd).getTime(),
+          timeEnd: new Date(_nowDay + " " + "24:00").getTime()
         }
-        if ((_hour < _satarTime && _hour > 0) || (_hour > Number(_endTime) - 1)) {
-          return {
-            hour: e,
-            disable: true
-          };
+      ];
+      this.todayPeriodTime = this.todayPeriodTime.concat(closeTimeArr);
+      // 获取当日的时间（0点）
+      let baseDay = new Date(_nowDay +" "+ "00:00").getTime()
+      // let baseDay = parseInt(this.todayPeriodTime[0].timeStart / DAY) * DAY - 8 * HOUR;
+      // 填充第一层
+      for (let i in hourTime) {
+        target.push({
+          hour: hourTime[i],
+          disable: false,
+          start: baseDay + parseInt(i) * HOUR,
+          end: baseDay + (parseInt(i) + 1) * HOUR,
+          arr: []
+        });
+      }
+
+      // 5分钟间隔
+      const TIME_SPLIT = 5 * 60 * 1000;
+      // 填充第二层
+      for (let i in target) {
+        for (let j = 0; j < 12; ++j) {
+          target[i].arr.push({
+            second: String(j * 5).length == 2 ? j * 5 : "0" + j * 5,
+            disable: false,
+            start: target[i].start + j * TIME_SPLIT,
+            end: target[i].start + (j + 1) * TIME_SPLIT
+          });
         }
-        // if (_hour > Number(_endTime) - 1) {
-        //   return {
-        //     hour: e,
-        //     disable: true
-        //   };
-        // }
-        for (let i in this.todayPeriodTime) {
-          if (
-            _timestamp >=
-              Number(this.todayPeriodTime[i].timeStart) - 60 * 60 * 1000 &&
-            _timestamp <= this.todayPeriodTime[i].timeEnd
-          ) {
-            return {
-              hour: e,
-              disable: true
-            };
+      }
+
+      // 比对当前格子是否被占用
+      for (let i in target) {
+        let hourEle = target[i];
+        if (this.isUsed(hourEle.start, hourEle.end)) {
+          hourEle.disable = true;
+        }
+        for (let j = 0; j < 12; ++j) {
+          let element = target[i].arr[j];
+          if (this.isUsed(element.start, element.end)) {
+            element.disable = true;
           }
         }
-        return {
-          hour: e,
-          disable: false
-        };
-      });
-      this.dayTime = _allTime;
-      // 时间分段
-      // _allTime.forEach(e => {
-      //   let _hour = Number(e.hour.split(":")[0]);
-      //   if (_hour < 12 && _hour >= 0) {
-      //     _morningTimes.push(e);
-      //   } else if (_hour >= 12 && _hour <= 14) {
-      //     _noonTimes.push(e);
-      //   } else if (_hour > 14 && _hour <= 18) {
-      //     _afternoonTimes.push(e);
-      //   } else {
-      //     _nightTime.push(e);
-      //   }
-      // });
-      // this.morningTimes = _morningTimes;
-      // this.noonTimes = _noonTimes;
-      // this.afternoonTimes = _afternoonTimes;
-      // this.nightTime = _nightTime;
-
-      // // 上午时间段
-      // for (let i = 0; i < 12 - Number(_satarTime); i++) {
-      //   let _time = Number(_satarTime) + i + ":00";
-      //   if (Number(_satarTime) + i < 10) {
-      //     _time = "0" + String(_time);
-      //   }
-      //   _morningTimes.push(_time);
-      // }
-      // this.morningTimes = _morningTimes;
-      // // 中午时间段
-      // if (Number(_satarTime) < 12 || Number(_endTime) > 14) {
-      //   this.noonTimes = ["12:00", "13:00", "14:00"];
-      // }
-      // // 下午时间段
-      // if (Number(_satarTime) < 15 || Number(_endTime) > 18) {
-      //   this.afternoonTimes = ["15:00", "16:00", "17:00", "18:00"];
-      // }
-      // // 晚上时间段
-      // for (let j = 0; j < Number(_endTime) - 19; j++) {
-      //   _nightTime.push(19 + j + ":00");
-      // }
-      // this.nightTime = _nightTime;
+      }
+      this.dayTime = target;
     },
     // 选择门店
     selectStore(item) {
@@ -652,8 +639,16 @@ export default {
     },
     // 确认选择时间
     selectDate() {
+      if(this.confirmDate == "") {
+        return wx.showToast({
+          title: "请选择时间",
+          icon: "none",
+          duration: 1000
+        });
+      }
       this.isTimePopup = false;
-      this.timeCellText = this.confirmDate;
+      console.log(this.confirmDate)
+      this.timeCellText = this.confirmDate.replace(/（/g,'').replace(/）/g,'')
       if (!this.cardClassId) {
         // this.isCardPopup = true;
         this.showCardPopop();
@@ -678,20 +673,6 @@ export default {
     // 确认预约
     appointCoach() {
       let that = this;
-      // return console.log({
-      //   storeId: that.selectStoreId,
-      //   venueId: that.venueId,
-      //   coachId: that.coachId,
-      //   calendar: that.curDate,
-      //   timeStart: that.curDate + that.curTime,
-      //   timeEnd: that.curDate + that.curEndTime,
-      //   cardId: that.cardClassId,
-      //   name: that.userInfo.name,
-      //   customerId: that.userInfo.id,
-      //   phone: that.userInfo.phone,
-      //   projectId: that.projectId,
-      //   status: 0
-      // });
       if (this.storeCellText == "请选择" || this.storeCellText == "") {
         return wx.showToast({
           title: "请选择授课门店",
@@ -769,9 +750,6 @@ export default {
           }
         }
       });
-      // wx.navigateTo({
-      //   url: "../appointmentResult/main"
-      // });
     },
     // 组件select-date返回的日期
     onDate(date) {
@@ -894,6 +872,14 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            /*let _time = []
+            _time = res.data.data.map(function(e) {
+              return {
+                startTime: formatDate(new Date(e.timeStart), "yyyy-MM-dd hh:mm"),
+                endTime: formatDate(new Date(e.timeEnd), "yyyy-MM-dd hh:mm")
+              }
+            })
+            console.log(_time)*/
             that.todayPeriodTime = res.data.data;
             that.computedTime();
           } else {
@@ -1150,6 +1136,10 @@ page {
           &.active {
             background-color: #43cf7c;
             color: #fff;
+          }
+          &.disable {
+            background-color: #ccc !important;
+            color: #999 !important;
           }
         }
       }

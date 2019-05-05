@@ -19,7 +19,8 @@
       <van-rate :value="coachRateVaule" :size="36" @change="onCoachRate"/>
     </div>
     <div class="store">
-      <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg" alt>
+      <!-- <img src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg" alt> -->
+      <img :src="detail.image" alt="">
       <span class="store-name">{{detail.storeName}}</span>
     </div>
     <div class="store-assess">
@@ -59,6 +60,12 @@ export default {
       coachAppointId: null,
       detail: {}
     };
+  },
+  onShow() {
+    this.coachRateVaule = 5
+    this.storeRateVaule = 5
+    this.teamClasVaule = 5
+    this.remarks = ""
   },
   onLoad(options) {
     this.detail = JSON.parse(options.detail);
@@ -104,7 +111,7 @@ export default {
         url = "/teamClass/finish/evalute/save";
         data = {
           teamAttendId: this.teamAttendId,
-          scheduleStarLevel: this.teamClasVaule,
+          scheduleStarLevel: this.coachRateVaule,
           storeStarLevel: this.storeRateVaule,
           remarks: this.remarks
         };
@@ -113,7 +120,7 @@ export default {
         url = "/wxcustomer/class/evaluate/save";
         data = {
           coachAppointId: this.coachAppointId,
-          coachStarLevel: this.teamClasVaule,
+          coachStarLevel: this.coachRateVaule,
           storeStarLevel: this.storeRateVaule,
           remarks: this.remarks
         };

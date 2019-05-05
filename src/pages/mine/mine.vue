@@ -122,13 +122,13 @@ export default {
           hit: "",
           text: "次"
         },
-        {
-          imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
-          navName: "我是工作人员",
-          navigatorUrl: "../pageBusiness/index/main",
-          hit: "",
-          text: ""
-        }
+        // {
+        //   imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
+        //   navName: "我是工作人员",
+        //   navigatorUrl: "../pageBusiness/index/main",
+        //   hit: "",
+        //   text: ""
+        // }
         // {
         //   imgUrl: "https://www.pojun-tech.cn/assets/img/integral.png",
         //   navName: "我的积分",

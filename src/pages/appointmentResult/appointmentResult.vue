@@ -8,7 +8,7 @@
       </p>
       <div class="btn-group">
         <span class="cancel" @click="cancel" v-if="detail.status == 1">取消预约</span>
-        <span class="assess" :style="{'background-color': themeColor}" @click="assess" v-if="!detail.evaluateId && detail.status == 3">评价</span>
+        <span class="assess" :style="{'background-color': themeColor}" @click="assess" v-if="(!detail.evaluateId || !detail.teamClassEvaluteId) && detail.status == 3">评价</span>
         <span class="again" :style="{'background-color': themeColor}" @click="again">再约一节</span>
       </div>
     </div>
@@ -102,6 +102,7 @@ export default {
   },
   methods: {
     assess() {
+      this.detail['image'] = this.storeInfo.cover
       let detailStr = JSON.stringify(this.detail);
       if (this.teamAttendId) {
         wx.navigateTo({

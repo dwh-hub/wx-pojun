@@ -120,14 +120,14 @@ export default {
         _data = {
           customerId: that.customerId,
           statusType: status,
-          page: that.page,
+          pageNo: that.page,
           pageSize: 10
         };
       } else {
         _data = {
           customerId: that.customerId,
           status: status,
-          page: that.page,
+          pageNo: that.page,
           pageSize: 10,
           waitEvaluate: waitEvaluate || ""
         };
@@ -159,14 +159,14 @@ export default {
         _data = {
           customerId: that.customerId,
           statusType: status,
-          page: that.page,
+          pageNo: that.page,
           pageSize: 10
         };
       } else {
         _data = {
           customerId: that.customerId,
           status: status,
-          page: that.page,
+          pageNo: that.page,
           pageSize: 10,
           waitEvaluate: waitEvaluate || ""
         };
@@ -208,7 +208,7 @@ export default {
           url: window.api + "/mobile/coach/waitEvaluatePages",
           data: {
             customerId: that.customerId,
-            page: that.page,
+            pageNo: that.page,
             pageSize: 10
           },
           success(res) {
@@ -229,7 +229,7 @@ export default {
           url: window.api + "/teamClass/waitEvaluatePages",
           data: {
             customerId: that.customerId,
-            page: that.page,
+            pageNo: that.page,
             pageSize: 10
           },
           success(res) {

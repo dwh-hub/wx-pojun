@@ -35,6 +35,11 @@ export function getPhoneNumber(e, url,isTab) {
         });
       } else {
         wx.hideLoading();
+        wx.showModal({
+          title: "提示",
+          content: res.data.message,
+          showCancel: false
+        });
       }
     }
   });

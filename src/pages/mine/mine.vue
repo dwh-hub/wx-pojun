@@ -165,6 +165,7 @@ export default {
     pageFooter
   },
   onShow() {
+    this.getTimes();
     if(store.state.isLogin == false) {
       wxLogin();
     }
@@ -174,7 +175,6 @@ export default {
     }
   },
   mounted() {
-    this.getTimes();
     setNavTab();
     this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);

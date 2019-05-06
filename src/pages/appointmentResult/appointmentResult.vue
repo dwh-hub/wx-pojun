@@ -185,7 +185,7 @@ export default {
       let that = this;
       wx.showModal({
         title: "提示",
-        content: "确认取消预约该团课？",
+        content: "确认取消预约该课程？",
         success(res) {
           if (res.confirm) {
             if (that.teamAttendId) {
@@ -237,19 +237,37 @@ export default {
           coachAppointId: that.coachAppointId
         },
         success(res) {
-          wx.showModal({
-            title: "提示",
-            content: res.data.data,
-            showCancel: false
-          });
-          if (res.data.data.indexOf("成功") > -1) {
-            // 成功
+          if (res.data.code === 200) {
+            wx.showToast({
+              title: "取消预约成功",
+              icon: "success",
+              duration: 1000
+            });
             setTimeout(() => {
               wx.navigateBack({
                 delta: 1
               });
             }, 1000);
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
           }
+          // wx.showModal({
+          //   title: "提示",
+          //   content: res.data.data,
+          //   showCancel: false
+          // });
+          // if (res.data.data.indexOf("成功") > -1) {
+          //   // 成功
+          //   setTimeout(() => {
+          //     wx.navigateBack({
+          //       delta: 1
+          //     });
+          //   }, 1000);
+          // }
         }
       });
     },

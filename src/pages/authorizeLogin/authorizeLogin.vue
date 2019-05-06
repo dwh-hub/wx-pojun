@@ -82,16 +82,26 @@ export default {
       var scene = decodeURIComponent(options.scene)
       var companyId = scene.split("-")[0]
       var storeId = scene.split("-")[1]
-       wx.setStorageSync('companyId', companyId)
-       wx.setStorageSync('storeId', storeId)
-       getThemeColor()
-       this.login()
+      wx.setStorageSync('companyId', companyId)
+      wx.setStorageSync('storeId', storeId)
+      getThemeColor()
+      this.login()
     } else {
       // 直接进入小程序时，设置默认公司id
       getCompanyColor().then(() => {
         this.login()
       })
     }
+  },
+  onPullDownRefresh() {
+    if (store.state.isLogin) {
+      wx.switchTab({
+        url: "../homepage/main"
+      });
+    } else {
+      this.isShow = true
+    }
+    wx.stopPullDownRefresh();
   },
   methods: {
     toHome() {

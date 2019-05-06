@@ -409,7 +409,7 @@ export default {
           },
           success(res) {
             if (res.data.code === 200) {
-              that.coachList_2 = res.data.data.result;
+              that.coachList_2 = res.data.data.result.slice(0,2);
               resolve();
             }
             // wx.hideLoading();
@@ -433,7 +433,7 @@ export default {
           },
           success(res) {
             if (res.data.code === 200) {
-              that.teamClass_2 = res.data.data.result;
+              that.teamClass_2 = res.data.data.result.slice(0,2);
               resolve();
             }
             // wx.hideLoading();

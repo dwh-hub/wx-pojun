@@ -1,5 +1,5 @@
 const window = {}
-window.DEBUGGING = false
+window.DEBUGGING = true
 window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
 

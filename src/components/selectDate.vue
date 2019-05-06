@@ -42,7 +42,7 @@ export default {
     };
   },
   mounted() {
-    this.getDateArray();
+    this.getDateArray(new Date());
   },
   computed: {
     themeColor() {
@@ -50,8 +50,8 @@ export default {
     }
   },
   methods: {
-    getDateArray() {
-      let date = new Date();
+    getDateArray(weekDate) {
+      let date = weekDate
       let week = [
         "周日",
         "周一",

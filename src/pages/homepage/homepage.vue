@@ -257,7 +257,12 @@ export default {
       this.getRecommendCoach();
     },
     setTheme() {
-      setNavTab(wx.getStorageSync("companyName"));
+      const extConfig = wx.getExtConfigSync ? wx.getExtConfigSync() : {}
+      if (extConfig.name) {
+        setNavTab(wx.getStorageSync(extConfig.name));
+      } else {
+        setNavTab(wx.getStorageSync("companyName"));
+      }
       this.themeColor = window.color || "#2a82e4";
     },
     toNav(url) {

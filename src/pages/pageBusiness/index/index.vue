@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <!-- <camera
+    <camera
       device-position="front"
       flash="off"
       binderror="error"
@@ -17,7 +17,7 @@
     </div>
     <div class="preview-tips">预览</div>
     <image mode="widthFix" :src="src"></image>
-    <video v-if="videoSrc" class="video" :src="videoSrc"></video> -->
+    <video v-if="videoSrc" class="video" :src="videoSrc"></video>
   </div>
 </template>
 
@@ -33,35 +33,46 @@ export default {
   },
   mounted() {
     setNavTab();
-      // this.ctx = wx.createCameraContext();
+    this.ctx = wx.createCameraContext();
   },
   methods: {
-    // takePhoto() {
-    //   this.ctx.takePhoto({
-    //     quality: "high",
-    //     success: res => {
-    //       this.src =  res.tempImagePath
-    //     }
-    //   });
-    // },
-    // startRecord() {
-    //   this.ctx.startRecord({
-    //     success: (res) => {
-    //       console.log('startRecord')
-    //     }
-    //   })
-    // },
-    // stopRecord() {
-    //   this.ctx.stopRecord({
-    //     success: (res) => {
-    //       this.src = res.tempThumbPath
-    //       this.videoSrc = res.tempVideoPath
-    //     }
-    //   })
-    // },
-    // error(e) {
-    //   console.log(e.detail);
-    // }
+    takePhoto() {
+      this.ctx.takePhoto({
+        quality: "high",
+        success: res => {
+          this.src =  res.tempImagePath
+          // wx.downloadFile({
+            // url: res.tempImagePath,
+            // success(res_2) {
+              // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
+              // res_2.tempFilePath
+              // console.log(res_2.tempFilePath)
+              let base64 = wx.getFileSystemManager().readFileSync(res.tempFilePath, 'base64') 
+              // console.log(base64)
+            // }
+          // })
+        }
+      });
+    },
+    startRecord() {
+      this.ctx.startRecord({
+        success: (res) => {
+          console.log('startRecord')
+        }
+      })
+    },
+    stopRecord() {
+      this.ctx.stopRecord({
+        success: (res) => {
+          this.src = res.tempThumbPath
+          this.videoSrc = res.tempVideoPath
+          console.log(res)
+        }
+      })
+    },
+    error(e) {
+      console.log(e.detail);
+    }
   }
 };
 </script>

@@ -1055,19 +1055,20 @@ page {
       width: 100%;
       // overflow: auto;
       // padding: 0 15px;
-      box-sizing: border-box;
       .date-hours {
         display: flex;
         align-items: center;
-        height: 246px;
+        height: 486rpx;
         .time-icon {
           flex: 0 0 40px;
-          .day,
-          .night {
-            height: 243rpx;
+          height: 486rpx;
+          .day {
+            height: 242rpx;
             border-top: 1rpx solid #e5e5e5;
           }
           .night {
+            height: 242rpx;
+            border-top: 1rpx solid #e5e5e5;
             border-bottom: 1rpx solid #e5e5e5;
           }
           .sun,
@@ -1147,7 +1148,6 @@ page {
     .tips {
       padding: 0 15px;
       padding-top: 15px;
-      border-top: 1rpx solid #eee;
       > div {
         display: inline-block;
         margin-right: 15px;

@@ -153,7 +153,7 @@ export default {
         this.customerId = wx.getStorageSync("userInfo").id;
         setNavTab();
         this.selectNav(this.currentNav);
-      },1000)
+      },500)
     },
     clearData() {
       this.showSelect = false;
@@ -177,54 +177,30 @@ export default {
       }
       if (index == 1) {
         // 待上课
-        // if (!this.coachList_1.length) {
           this.getOwnCoachClassList(2).then(() => {
             this.coachList = this.coachList_1;
           });
-        // } else {
-          // this.coachList = this.coachList_1;
-        // }
-        // if (!this.teamClass_1.length) {
           this.getOwnTeamClassList(1).then(() => {
             this.teamClassList = this.teamClass_1;
           });
-        // } else {
-          // this.teamClassList = this.teamClass_1;
-        // }
       } else if (index == 2) {
         // 待评价
-        // if (!this.coachList_2.length) {
           this.getOwnCoachClassList(3, 1).then(() => {
             this.coachList = this.coachList_2;
           });
-        // } else {
-          // this.coachList = this.coachList_2;
-        // }
-        // if (!this.teamClass_2.length) {
           this.getOwnTeamClassList(3, 1).then(() => {
             this.teamClassList = this.teamClass_2;
           });
-        // } else {
-          // this.teamClassList = this.teamClass_2;
-        // }
       } else if (index == 3) {
         // 3 已完成
-        // if (!this.coachList_3.length) {
           this.getOwnCoachClassList(3).then(() => {
             this.coachList = this.coachList_3;
           });
-        // } else {
-          // this.coachList = this.coachList_3;
-        // }
-        // if (!this.teamClass_3.length) {
           this.getOwnTeamClassList(3).then(() => {
             this.teamClassList = this.teamClass_3;
           });
-        // } else {
-          // this.teamClassList = this.teamClass_3;
-        // }
       }
-      }, 1000)
+      }, 500)
     },
     toggleSelect() {
       this.showSelect = true;

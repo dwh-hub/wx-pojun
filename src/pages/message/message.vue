@@ -273,10 +273,9 @@ export default {
                 text: String(res.data.data.recCount)
               });
             } else {
-              return wx.setTabBarBadge({
-                index: 3,
-                text: null
-              });
+              return wx.hideTabBarRedDot({
+                index: 3
+              })
             }
           }
         }

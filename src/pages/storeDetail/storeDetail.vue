@@ -234,9 +234,10 @@ export default {
       HttpRequest({
         url: window.api + "/teamClass/teamSchedule/weekView",
         data: {
+          companyId: wx.getStorageSync("companyId"),
           storeId: that.storeId,
           calendarStart: formatDate(new Date(), "yyyy-MM-dd"),
-          calendarEnd: ""
+          calendarEnd: "2021-01-01"
         },
         success(res) {
           if (res.data.code === 200) {
@@ -254,6 +255,7 @@ export default {
       HttpRequest({
         url: window.api + "/customer/register/userofrole",
         data: {
+          companyId: wx.getStorageSync("companyId"),
           storeId: that.storeId,
           positionType: 1
         },

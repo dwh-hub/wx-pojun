@@ -564,7 +564,7 @@ export default {
       ];
       this.todayPeriodTime = this.todayPeriodTime.concat(closeTimeArr);
       // 获取当日的时间（0点）
-      let baseDay = new Date(_nowDay +" "+ "00:00").getTime()
+      let baseDay = new Date(_nowDay + " " + "00:00").getTime();
       // let baseDay = parseInt(this.todayPeriodTime[0].timeStart / DAY) * DAY - 8 * HOUR;
       // 填充第一层
       for (let i in hourTime) {
@@ -639,7 +639,7 @@ export default {
     },
     // 确认选择时间
     selectDate() {
-      if(this.confirmDate == "") {
+      if (this.confirmDate == "") {
         return wx.showToast({
           title: "请选择时间",
           icon: "none",
@@ -647,8 +647,10 @@ export default {
         });
       }
       this.isTimePopup = false;
-      console.log(this.confirmDate)
-      this.timeCellText = this.confirmDate.replace(/（/g,'').replace(/）/g,'')
+      console.log(this.confirmDate);
+      this.timeCellText = this.confirmDate
+        .replace(/（/g, "")
+        .replace(/）/g, "");
       if (!this.cardClassId) {
         // this.isCardPopup = true;
         this.showCardPopop();
@@ -1058,18 +1060,18 @@ page {
       .date-hours {
         display: flex;
         align-items: center;
-        height: 486rpx;
+        max-height: 486rpx;
+        overflow: hidden;
+        border-top: 1rpx solid #eee;
         .time-icon {
           flex: 0 0 40px;
           height: 486rpx;
           .day {
             height: 242rpx;
-            border-top: 1rpx solid #e5e5e5;
           }
           .night {
             height: 242rpx;
             border-top: 1rpx solid #e5e5e5;
-            border-bottom: 1rpx solid #e5e5e5;
           }
           .sun,
           .moon {
@@ -1095,7 +1097,6 @@ page {
           // grid-template-columns: 16.6% 16.6% 16.6% 16.6% 16.6% 16.6%;
           grid-template-columns: 25% 25% 25% 25%;
           grid-template-rows: auto;
-          border-top: 1rpx solid #e5e5e5;
           .hour {
             border-left: 1rpx solid #e5e5e5;
             border-bottom: 1rpx solid #e5e5e5;
@@ -1120,6 +1121,8 @@ page {
       .date-second {
         display: flex;
         width: 100%;
+        border-top: 1rpx solid #eee;
+        border-bottom: 1rpx solid #eee;
         .second-item {
           flex: 1;
           text-align: center;

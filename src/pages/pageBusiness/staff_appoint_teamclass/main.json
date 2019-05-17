@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "团课预约",
+    "usingComponents": {
+      "van-search": "../../../../static/vant/search/index",
+      "van-popup": "../../../../static/vant/popup/index"
+    }
+  }

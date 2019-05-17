@@ -27,7 +27,8 @@
             </div>
           </div>
         </div>
-        <div class="search" :class="{active: currentNav==3}" @click="selectNav(3)">搜索</div>
+        <div class="search" v-show="currentNav!=3" @click="selectNav(3)">搜索</div>
+        <div class="search" v-show="currentNav==3" :style="{color: window.color}" @click="selectNav(3)">搜索</div>
       </div>
       <div class="search-wrapper" :class="{'show-search':showSearch}">
         <van-search

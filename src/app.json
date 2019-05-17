@@ -28,7 +28,12 @@
   "subPackages": [{
     "root": "pages/pageBusiness/",
     "pages": [
-      "index/main"
+      "workbench/main",
+      "index/main",
+      "staff_appoint_teamclass/main",
+      "allServices/main",
+      "member/main",
+      "appoint_coach/main"
     ]
   }],
   "permission": {

@@ -2,13 +2,9 @@
   "extEnable": true,
   "extAppid": "wx8a6408ab22fdeea4",
   "directCommit": false,
-  "ext": {
-    "name": "前锋体育",
-    "companyId": 37
-  },
   "extPages": {
     "pages/homepage/main": {
-      "navigationBarTitleText": "前锋体育"
+      "navigationBarTitleText": "利刃系统"
     }
   },
   "networkTimeout": {

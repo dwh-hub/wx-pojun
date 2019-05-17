@@ -4,7 +4,8 @@
       <div class="cover">
         <!-- <img src="http://pojun-tech.cn/images/team/37/1.5510765515557332E12.jpeg"> -->
         <!-- <img :src="imgUrl"> -->
-        <image :src="imgUrl" mode="aspectFill"></image>
+        <!-- <image :src="imgUrl" mode="aspectFill"></image> -->
+        <div class="avatar" :style="{'background-image':'url('+imgUrl+')'}"></div>
       </div>
       <div class="coach-info">
         <div class="coach-name">{{info.userName || '教练名字'}}</div>
@@ -35,7 +36,7 @@
       >预约</button>
     </div>
     <div class="coach-skeleton" v-else>
-      <div class="cover"><img></div>
+      <div class="cover"><div class="avatar"></div></div>
       <div class="skeleton-wrapper">
         <div class="skeleton-name"></div>
         <div class="skeleton-desc"></div>
@@ -128,15 +129,20 @@ export default {
   .cover {
     flex: 0 0 90px;
     width: 90px;
-    // height: 90px;
+    height: 90px;
     // padding: 12px;
     padding-left: 12px;
-    box-sizing: border-box;
-    > image {
-      width: 80px;
-      height: 80px;
+    // box-sizing: border-box;
+    .avatar {
+      // width: 80px;
+      // height: 80px;
+      width: 100%;
+      height: 100%;
       border-radius: 50%;
       background-color: #eee;
+      background-size: 100% auto;
+      background-repeat: no-repeat;
+      background-position: 50% 50%;
     }
   }
   .coach-info {
@@ -147,6 +153,7 @@ export default {
     padding-left: 12px;
     > div {
       flex: 1;
+      line-height: 28px;
       // line-height: 30px;
       .Mult-line(1);
     }
@@ -186,8 +193,8 @@ export default {
   }
   .coach-skeleton {
     .cover {
-      >image {
-        background-color: #eee;
+      .avatar {
+        // background-color: #eee;
       }
     }
     .skeleton-wrapper {

@@ -66,6 +66,7 @@ export default {
     };
   },
   onLoad(option) {
+    this.coachInfo = {}
     this.coachId = option.coachId;
     setNavTab();
   },

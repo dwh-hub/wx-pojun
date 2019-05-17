@@ -1,105 +1,139 @@
 <template>
   <div class="index">
-    <camera
-      device-position="front"
-      flash="off"
-      binderror="error"
-      style="width: 100%; height: 300px;"
-    ></camera>
-    <div class="btn-area">
-      <button type="primary" @click="takePhoto">拍照</button>
+    <div class="header-search">
+      <div class="store">门店</div>
+      <div class="search-wrapper">
+        <van-search
+          :value="searchText"
+          background="#fff"
+          @change="search"
+          placeholder="请输入搜索内容"
+        ></van-search>
+      </div>
     </div>
-    <div class="btn-area">
-      <button type="primary" @click="startRecord">开始录像</button>
+    <header-data></header-data>
+    <div class="taamclass list">
+      <div class="list-header">
+        <span class="title">私教预约</span>
+        <span class="info">今日约课13节私教</span>
+        <span class="btn" @click="toNav('../staff_appoint_teamclass/main')">约课</span>
+      </div>
+      <staff-coach-item></staff-coach-item>
+      <div class="see-more">查看更多</div>
     </div>
-    <div class="btn-area">
-      <button type="primary" @click="stopRecord">结束录像</button>
+
+    <div class="coachclass list">
+      <div class="list-header">
+        <span class="title">私教预约</span>
+        <span class="info">今日约课13节私教</span>
+        <span class="btn">约课</span>
+      </div>
+      <staff-coach-item></staff-coach-item>
+      <div class="see-more">查看更多</div>
     </div>
-    <div class="preview-tips">预览</div>
-    <image mode="widthFix" :src="src"></image>
-    <video v-if="videoSrc" class="video" :src="videoSrc"></video>
+
+    <van-tabbar :active="activeIndex" @change="changeTabbar">
+      <van-tabbar-item icon="home-o">首页</van-tabbar-item>
+      <van-tabbar-item icon="manager-o" dot>会员</van-tabbar-item>
+      <van-tabbar-item icon="desktop-o" info="5">工作台</van-tabbar-item>
+      <van-tabbar-item icon="setting-o" info="20">我的</van-tabbar-item>
+    </van-tabbar>
   </div>
 </template>
 
 <script>
 import { setNavTab, window } from "COMMON/js/common.js";
+import staffCoachItem from "../components/staff-coach-item.vue";
+import headerData from "../components/header-data.vue";
 export default {
   data() {
     return {
-      src: '',
-      videoSrc: '',
-      ctx: null
+      activeIndex: 0,
+      searchText: "",
+      teamclassList: [],
+      teamcoachList: []
     };
   },
   mounted() {
     setNavTab();
-    this.ctx = wx.createCameraContext();
+  },
+  components: {
+    staffCoachItem,
+    headerData
   },
   methods: {
-    takePhoto() {
-      this.ctx.takePhoto({
-        quality: "high",
-        success: res => {
-          this.src =  res.tempImagePath
-          // wx.downloadFile({
-            // url: res.tempImagePath,
-            // success(res_2) {
-              // 只要服务器有响应数据，就会把响应内容写入文件并进入 success 回调，业务需要自行判断是否下载到了想要的内容
-              // res_2.tempFilePath
-              // console.log(res_2.tempFilePath)
-              let base64 = wx.getFileSystemManager().readFileSync(res.tempFilePath, 'base64') 
-              // console.log(base64)
-            // }
-          // })
-        }
+    search(e) {
+      console.log(e);
+    },
+    changeTabbar(e) {
+      this.activeIndex = e.mp.detail;
+      if (e.mp.detail == 1) {
+        wx.navigateTo({
+          url: "../member/main"
+        });
+      }
+      if (e.mp.detail == 2) {
+        wx.redirectTo({
+          url: "../workbench/main"
+        });
+      }
+    },
+    toNav(url) {
+      wx.navigateTo({
+        url: url
       });
-    },
-    startRecord() {
-      this.ctx.startRecord({
-        success: (res) => {
-          console.log('startRecord')
-        }
-      })
-    },
-    stopRecord() {
-      this.ctx.stopRecord({
-        success: (res) => {
-          this.src = res.tempThumbPath
-          this.videoSrc = res.tempVideoPath
-          console.log(res)
-        }
-      })
-    },
-    error(e) {
-      console.log(e.detail);
     }
   }
 };
 </script>
 
 <style lang="less">
+@import "../common/less/staff_common.less";
 page {
-  background-color: #F8F8F8;
   height: 100%;
-  font-size: 32rpx;
-  line-height: 1.6;
+  background-color: #f6f6f6;
 }
-
-.btn-area {
-  margin-top: 60rpx;
-  box-sizing: border-box;
-  width: 100%;
-  padding: 0 30rpx;
-}
-
-.preview-tips {
-  margin: 20rpx 0;  
-  text-align: center;
-}
-
-.video {
-  margin: 50px auto;
-  width: 100%;
-  height: 300px;
+.index {
+  .list {
+    background-color: #fff;
+    .list-header {
+      height: 44px;
+      width: 100%;
+      margin-top: 5px;
+      padding-left: 10px;
+      padding-right: 15px;
+      text-align: center;
+      box-sizing: border-box;
+      .title {
+        float: left;
+        font-size: 16px;
+        line-height: 44px;
+      }
+      .info {
+        font-size: 14px;
+        color: #505050;
+        line-height: 44px;
+      }
+      .btn {
+        float: right;
+        font-size: 12px;
+        line-height: 24px;
+        margin-top: 10px;
+        padding: 0 15px;
+        color: #fff;
+        background-color: #2a82e4;
+        border-radius: 16px;
+      }
+    }
+    .staff-coach-item {
+      border-top: 1px solid #e5e5e5;
+    }
+    .see-more {
+      border-top: 1px solid #e5e5e5;
+      line-height: 36px;
+      text-align: center;
+      color: #2a82e4;
+    }
+  }
 }
 </style>

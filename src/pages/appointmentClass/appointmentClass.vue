@@ -90,8 +90,8 @@ export default {
       currentNav: 1,
       showSelect: false,
       // 当前显示的团课，私教列表
-      teamClassList: [],
-      coachList: [],
+      teamClassList: [{},{}],
+      coachList: [{},{}],
       // 储存数据 私教 1 待上课 2 待评价 3 已完成
       coachList_3: [],
       coachList_2: [],
@@ -119,7 +119,6 @@ export default {
     this._onLoad();
   },
   onPullDownRefresh() {
-    this.clearData();
     this.selectNav(this.currentNav);
     setTimeout(() => {
       wx.stopPullDownRefresh();
@@ -148,12 +147,12 @@ export default {
   methods: {
     _onLoad() {
       // 进页面前先清空数据
-      this.clearData();
-      setTimeout(() =>{
+      // this.clearData();
+      // setTimeout(() =>{
         this.customerId = wx.getStorageSync("userInfo").id;
         setNavTab();
-        this.selectNav(this.currentNav);
-      },500)
+        this.selectNav(this.currentNav,false);
+      // },500)
     },
     clearData() {
       this.showSelect = false;
@@ -166,15 +165,17 @@ export default {
       this.teamClass_3 = [{},{}];
       this.teamClass_2 = [{},{}];
     },
-    selectNav(index) {
-      this.clearData()
-      setTimeout(() => {
+    selectNav(index,isClear = true) {
       this.currentNav = index;
       if (!store.state.isLogin) {
         this.teamClassList = []
         this.coachList = []
         return;
       }
+      if(isClear) {
+        this.clearData()
+      }
+      setTimeout(() => {
       if (index == 1) {
         // 待上课
           this.getOwnCoachClassList(2).then(() => {

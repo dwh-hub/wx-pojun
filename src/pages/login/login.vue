@@ -20,7 +20,7 @@
       <input class type="text" v-model="vCode" placeholder="请输入验证码">
     </div>
     <span class="showTooltips" @click="login">登录</span>
-
+    <div class="toHome" @click="toHome">暂不登录</div>
     <van-popup
       :show="showBindBox"
       @close="showBindBox = false"
@@ -68,6 +68,11 @@ export default {
     setNavTab();
   },
   methods: {
+    toHome() {
+      wx.switchTab({
+        url: "../homepage/main"
+      });
+    },
     // 获取验证码
     getVCode() {
       let that = this;

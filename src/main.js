@@ -4,7 +4,6 @@ import {
   window
   // wxLogin,
   // HttpRequest,
-  // getCompanyColor
 } from "COMMON/js/common.js";
 import store from "./utils/store"
 // import login from "COMMON/js/login.js"
@@ -16,8 +15,6 @@ const app = new Vue(App)
 app.$mount()
 Vue.prototype.globalData = getApp().globalData
 
-// getCompanyColor()
-
 if (!wx.getStorageSync("Cookie")) {
   wx.request({
     url: window.api + '/loginPage',
@@ -26,11 +23,8 @@ if (!wx.getStorageSync("Cookie")) {
         key: "Cookie",
         data: res.header["Set-Cookie"]
       });
-      // getMessage()
     }
   })
-} else {
-  // getMessage()
 }
 
 // function getMessage() {
@@ -94,4 +88,3 @@ function isIphoneX() {
 //   console.log("不存在，重新获取");
 //   wxLogin()
 // }
-

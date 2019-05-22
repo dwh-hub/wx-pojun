@@ -4,7 +4,7 @@
       <select-date @selectWeek="getClassList"></select-date>
       <div class="nav-tab">
         <div class="store" @click="selectNav(1)">
-          <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: window.color}">{{curStore}}</span>
+          <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: themeColor}">{{curStore}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showStoreNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showStoreNav}">
@@ -18,7 +18,7 @@
           </div>
         </div>
         <div class="class" @click="selectNav(2)">
-          <span v-show="currentNav!=2">{{curSchedule}}</span><span v-show="currentNav==2" :style="{color: window.color}">{{curSchedule}}</span>
+          <span v-show="currentNav!=2">{{curSchedule}}</span><span v-show="currentNav==2" :style="{color: themeColor}">{{curSchedule}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showScheduleNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showScheduleNav}">
@@ -33,7 +33,7 @@
         </div>
         <!-- <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div> -->
         <div class="coach" @click="selectNav(4)">
-          <span v-show="currentNav!=4">{{curCoach}}</span><span v-show="currentNav==4" :style="{color: window.color}">{{curCoach}}</span>
+          <span v-show="currentNav!=4">{{curCoach}}</span><span v-show="currentNav==4" :style="{color: themeColor}">{{curCoach}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showCoachNav}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showCoachNav}">
@@ -71,6 +71,7 @@ import teamClassItem from "COMPS/teamClassItem";
 import selectDate from "COMPS/selectDate";
 import noneResult from "COMPS/noneResult";
 import pageFooter from "COMPS/pageFooter.vue"
+import colorMixin from "COMPS/colorMixin.vue"
 export default {
   data() {
     return {
@@ -103,6 +104,7 @@ export default {
       companyId: ""
     };
   },
+  mixins:[colorMixin],
   components: {
     teamClassItem,
     selectDate,

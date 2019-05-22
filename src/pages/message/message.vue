@@ -135,6 +135,7 @@ import store from "../../utils/store";
 import wxParse from "mpvue-wxparse";
 import noneResult from "COMPS/noneResult.vue";
 import pageFooter from "COMPS/pageFooter.vue"
+import colorMixin from "COMPS/colorMixin.vue"
 export default {
   data() {
     return {
@@ -152,8 +153,14 @@ export default {
       arrId: []
     };
   },
+  mixins:[colorMixin],
   mounted() {
     setNavTab();
+  },
+  onLoad(option) {
+    if (options.nav) {
+      this.navIndex = options.nav;
+    }
   },
   onShow() {
     if (!store.state.isLogin) {
@@ -181,9 +188,6 @@ export default {
     pageFooter
   },
   computed: {
-    themeColor() {
-      return window.color;
-    }
   },
   methods: {
     onChange(e) {

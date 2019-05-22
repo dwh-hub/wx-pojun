@@ -24,7 +24,7 @@
       <!-- <i class="screening-icon"></i> -->
       <img class="screening-icon" src="/static/images/staff/screening.png">
     </div>
-    <div class="mask" v-show="maskShow" @click="clickMask"></div>
+    <div class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
   </div>
 </template>
 

@@ -1,10 +1,12 @@
 const window = {}
-window.DEBUGGING = false
+window.DEBUGGING = true
 window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
-
 // 获取 ext.json 配置信息
-const extConfig = wx.getExtConfigSync ? wx.getExtConfigSync() : {}
+const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
+if (extConfig.companyId) {
+  wx.setStorageSync('companyId', extConfig.companyId)
+}
 
 // 获取sessionKey 需调用wx.login获取sessionKey
 function initsessionKey() {
@@ -44,7 +46,7 @@ export function getThemeColor() {
         } else {
           window.color = "#2a82e4"
         }
-        resolve()
+        resolve(window.color)
       }
     })
   })
@@ -52,16 +54,15 @@ export function getThemeColor() {
 
 // 获取公司id之后获取主题色
 export function getCompanyColor() {
-  // TODO: 目前沒有公司id就默认前锋
   if (!wx.getStorageSync("companyId")) {
     if (window.DEBUGGING) {
       wx.setStorageSync('companyId', '44')
       return getThemeColor()
     } else {
-      if(extConfig.companyId) {
+      if (extConfig.companyId) {
         wx.setStorageSync('companyId', extConfig.companyId)
       } else {
-        wx.setStorageSync('companyId', '37')
+        wx.setStorageSync('companyId', '52')
       }
       return getThemeColor()
     }
@@ -112,17 +113,33 @@ export function setNavTab(title) {
       title: title
     });
   }
-  wx.setNavigationBarColor({
-    frontColor: "#ffffff",
-    backgroundColor: window.color || "#2a82e4",
-    animation: {
-      duration: 200,
-      timingFunc: "easeIn"
-    }
-  });
-  wx.setTabBarStyle({
-    backgroundColor: window.color || "#2a82e4"
-  })
+  if (!window.color || window.color == "#2a82e4") {
+    getThemeColor().then(() => {
+      wx.setNavigationBarColor({
+        frontColor: "#ffffff",
+        backgroundColor: window.color || "#2a82e4",
+        animation: {
+          duration: 0,
+          timingFunc: "easeIn"
+        }
+      });
+      wx.setTabBarStyle({
+        backgroundColor: window.color || "#2a82e4"
+      })
+    })
+  } else {
+    wx.setNavigationBarColor({
+      frontColor: "#ffffff",
+      backgroundColor: window.color,
+      animation: {
+        duration: 0,
+        timingFunc: "easeIn"
+      }
+    });
+    wx.setTabBarStyle({
+      backgroundColor: window.color
+    })
+  }
 }
 
 /**
@@ -139,7 +156,7 @@ export function getWXCompany(appid) {
       success(res) {
         if (res.data.data) {
           wx.setStorageSync("companyId", res.data.data.companyId);
-          wx.setStorageSync("companyName",res.data.data.companyName)
+          wx.setStorageSync("companyName", res.data.data.companyName)
           getThemeColor().then(() => {
             resolve()
           })

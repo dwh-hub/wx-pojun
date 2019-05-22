@@ -12,27 +12,36 @@
     </div>
     <header-data></header-data>
     <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
-    <staff-coach-item></staff-coach-item>
-
+    <div class="item-wrapper" v-for="(item, index) in teamclassList" :key="index">
+      <div class="item-left" @click="selectClass(item,index)" v-show="isOperate">
+        <div class="icon-wrapper" :class="{border: !item.isSelect}">
+          <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
+        </div>
+      </div>
+      <staff-coach-item @clickItem="navTo('../schedule_class/main')"></staff-coach-item>
+    </div>
     <van-popup
       :show="isShowFilter"
       @close="isShowFilter = false"
       position="right"
       custom-style="width:80%;height:100%"
     ></van-popup>
-    <suspension-window :operateList="operateList" @operate="operate"></suspension-window>
-    <!-- <div class="suspension">
-      <div class="operate-wrapper" v-show="showOperate" @click.stop="operate">
-        <div class="operate-item">
-          <span>批量取消课程</span><image mode="aspectFit" src="/static/images/staff/close.svg"></image>
+    <suspension-window v-if="!isOperate" :operateList="operateList" @operate="operate"></suspension-window>
+    <div class="operate-bottom" v-if="isOperate">
+      <div class="left" @click="selectAll">
+        <div class="icon-wrapper" :class="{border: !isAllSelect}">
+          <img src="/static/images/staff/select-icon.png" alt v-show="isAllSelect">
         </div>
-        <div class="operate-item">
-          <span>排课</span><image mode="aspectFit" src="/static/images/staff/calendar.svg"></image>
-        </div>
+        <span class="left-text">全选</span>
       </div>
-      <image @click="toggleOperate" mode="aspectFit" src="/static/images/staff/suspension.svg"></image>
+      <div class="middle">已选{{selectNum}}节</div>
+      <div class="right">
+        <div class="btn" @click="isOperate = false">取消操作</div>
+        <div class="btn" @click="batchCancel">批量取消课程</div>
+      </div>
     </div>
-    <div class="mask-all" v-show="showOperate" @click="showOperate = false"></div> -->
+    <van-dialog id="van-dialog"/>
+    <van-toast id="van-toast"/>
   </div>
 </template>
 
@@ -42,6 +51,8 @@ import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import suspensionWindow from "../components/suspension-window.vue";
+import Dialog from "../../../../static/vant/dialog/dialog";
+import Toast from "../../../../static/vant/toast/toast";
 
 export default {
   data() {
@@ -92,15 +103,28 @@ export default {
           ]
         }
       ],
-      operateList: [{
-        text: '批量取消课程',
-        iconUrl: '/static/images/staff/close.svg'
-      },{
-        text: '排课',
-        iconUrl: '/static/images/staff/calendar.svg'
-      }]
+      operateList: [
+        {
+          text: "批量取消课程",
+          iconUrl: "/static/images/staff/close.svg"
+        },
+        {
+          text: "排课",
+          iconUrl: "/static/images/staff/calendar.svg"
+        }
+      ],
+      teamclassList: [
+        {
+          isSelect: false
+        }
+      ],
+      isAllSelect: false,
+      isOperate: false
       // showOperate: false
     };
+  },
+  onShow() {
+    this.isOperate = false
   },
   mounted() {
     setNavTab();
@@ -113,10 +137,35 @@ export default {
   },
   computed: {
     window() {
-      return window
+      return window;
+    },
+    selectNum() {
+      let _num = 0;
+      this.teamclassList.forEach(e => {
+        if (e.isSelect) {
+          _num++;
+        }
+      });
+      return _num;
     }
   },
   methods: {
+    navTo(url) {
+      wx.navigateTo({
+        url: url
+      });
+    },
+    selectClass(item, index) {
+      if (!this.isOperate) {
+        return;
+      }
+      this.teamclassList[index].isSelect = !item.isSelect;
+      if (this.teamclassList.filter(e => true !== e.isSelect).length > 0) {
+        this.isAllSelect = false;
+      } else {
+        this.isAllSelect = true;
+      }
+    },
     showFilter() {
       this.isShowFilter = true;
     },
@@ -124,14 +173,44 @@ export default {
       console.log(e);
     },
     operate(param) {
-      console.log(param)
+      console.log(param);
+      if (param == "批量取消课程") {
+        this.isOperate = true;
+      }
+    },
+    selectAll() {
+      let that = this;
+      this.teamclassList = this.teamclassList.map(e => {
+        if (that.isAllSelect) {
+          e.isSelect = false;
+          that.isAllSelect = false;
+        } else {
+          e.isSelect = true;
+          that.isAllSelect = true;
+        }
+        return e;
+      });
+    },
+    batchCancel() {
+      if (!this.selectNum) {
+        return Toast("未选择课程");
+      }
+      Dialog.confirm({
+        title: `确认取消课程${this.selectNum}节`,
+        message: "确认取消所选的课程吗？",
+        asyncClose: true
+      })
+        .then(() => {
+          setTimeout(() => {
+            Dialog.close();
+            this.isOperate = false;
+            Toast("取消成功");
+          }, 1000);
+        })
+        .catch(() => {
+          Dialog.close();
+        });
     }
-    // toggleOperate() {
-    //   this.showOperate = !this.showOperate
-    // },
-    // operate() {
-
-    // }
   }
 };
 </script>
@@ -148,7 +227,66 @@ page {
     margin-top: 5px;
     margin-bottom: 1px;
   }
-
+  .item-wrapper {
+    display: flex;
+    background-color: #fff;
+    .item-left {
+      // flex: 0 0 30px;
+      padding-left: 10px;
+      box-sizing: border-box;
+      .icon-wrapper {
+        margin-top: 27px;
+      }
+    }
+  }
+  .operate-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    line-height: 40px;
+    height: 40px;
+    color: #2a82e4;
+    background-color: #fff;
+    border-top: 1rpx solid #eee;
+    display: flex;
+    justify-content: space-between;
+    .left {
+      .icon-wrapper {
+        display: inline-block;
+        margin: 0 15px;
+        &.border {
+          vertical-align: middle;
+        }
+      }
+      .left-text {
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
+    .right {
+      // float: right;
+      .btn {
+        display: inline-block;
+        padding: 0 15px;
+        border-left: 1rpx solid #fff;
+        color: #fff;
+        background-color: #2a82e4;
+      }
+    }
+  }
+  .icon-wrapper {
+    width: 20px;
+    height: 20px;
+    &.border {
+      border: 1rpx solid #eee;
+      border-radius: 50%;
+    }
+    > img {
+      width: 100%;
+      height: 100%;
+    }
+  }
   // .suspension {
   //   position: fixed;
   //   right: 20px;
@@ -157,7 +295,7 @@ page {
   //   >image {
   //     float: right;
   //    width: 45px;
-  //    height: 45px; 
+  //    height: 45px;
   //   }
   //   .operate-wrapper {
   //     text-align: right;
@@ -174,7 +312,7 @@ page {
   //         display: inline-block;
   //         vertical-align: middle;
   //         width: 30px;
-  //         height: 30px; 
+  //         height: 30px;
   //       }
   //     }
   //   }

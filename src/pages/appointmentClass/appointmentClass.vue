@@ -1,12 +1,30 @@
 <template>
   <div class="appointmentClass">
     <div class="nav-tab">
-      <div class="stay" @click="selectNav(1)" v-show="currentNav!=1">待上课</div> <!-- :class="{active: currentNav==1}" -->
-      <div class="stay" :style="{'color': themeColor}" @click="selectNav(1)" v-show="currentNav==1">待上课</div>
-      <div class="assess" @click="selectNav(2)" v-show="currentNav!=2">待评价</div> <!-- :class="{active: currentNav==2}" -->
-      <div class="assess" :style="{'color': themeColor}" @click="selectNav(2)" v-show="currentNav==2">待评价</div>
-      <div class="complete" @click="selectNav(3)" v-show="currentNav!=3">已评价</div>  <!-- :class="{active: currentNav==3}" -->
-      <div class="complete" :style="{'color': themeColor}" @click="selectNav(3)" v-show="currentNav==3">已评价</div>
+      <div class="stay" @click="selectNav(1)" v-show="currentNav!=1">待上课</div>
+      <!-- :class="{active: currentNav==1}" -->
+      <div
+        class="stay"
+        :style="{'color': themeColor}"
+        @click="selectNav(1)"
+        v-show="currentNav==1"
+      >待上课</div>
+      <div class="assess" @click="selectNav(2)" v-show="currentNav!=2">待评价</div>
+      <!-- :class="{active: currentNav==2}" -->
+      <div
+        class="assess"
+        :style="{'color': themeColor}"
+        @click="selectNav(2)"
+        v-show="currentNav==2"
+      >待评价</div>
+      <div class="complete" @click="selectNav(3)" v-show="currentNav!=3">已评价</div>
+      <!-- :class="{active: currentNav==3}" -->
+      <div
+        class="complete"
+        :style="{'color': themeColor}"
+        @click="selectNav(3)"
+        v-show="currentNav==3"
+      >已评价</div>
     </div>
     <div class="stay-list" v-if="!(!teamClassList.length && !coachList.length)">
       <div class="stay-team-class">
@@ -81,7 +99,8 @@ import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
-import pageFooter from "COMPS/pageFooter.vue"
+import pageFooter from "COMPS/pageFooter.vue";
+import colorMixin from "COMPS/colorMixin.vue";
 
 export default {
   data() {
@@ -90,8 +109,8 @@ export default {
       currentNav: 1,
       showSelect: false,
       // 当前显示的团课，私教列表
-      teamClassList: [{},{}],
-      coachList: [{},{}],
+      teamClassList: [{}, {}],
+      coachList: [{}, {}],
       // 储存数据 私教 1 待上课 2 待评价 3 已完成
       coachList_3: [],
       coachList_2: [],
@@ -106,15 +125,18 @@ export default {
       actions: [{ name: "团课" }, { name: "私教" }]
     };
   },
+  mixins: [colorMixin],
   components: {
     noneResult,
     titleCell,
     teamClassItem,
     pageFooter
   },
-  // onLoad(option) {
-  //   this._onLoad(option);
-  // },
+  onLoad(option) {
+    if (options.nav) {
+      this.currentNav = options.nav;
+    }
+  },
   onShow() {
     this._onLoad();
   },
@@ -132,76 +154,76 @@ export default {
     //   return "";
     // },
     isBottomAppoint() {
-      if(this.teamClassList.length || this.coachList.length) {
-        if(this.teamClassList[0] || this.coachList[0]) {
-          return true
+      if (this.teamClassList.length || this.coachList.length) {
+        if (this.teamClassList[0] || this.coachList[0]) {
+          return true;
         }
-        return false
+        return false;
       }
-      return false
-    },
-    themeColor() {
-      return window.color;
+      return false;
     }
+    // themeColor() {
+    //   return window.color;
+    // }
   },
   methods: {
     _onLoad() {
       // 进页面前先清空数据
       // this.clearData();
       // setTimeout(() =>{
-        this.customerId = wx.getStorageSync("userInfo").id;
-        setNavTab();
-        this.selectNav(this.currentNav,false);
+      this.customerId = wx.getStorageSync("userInfo").id;
+      setNavTab();
+      this.selectNav(this.currentNav, false);
       // },500)
     },
     clearData() {
       this.showSelect = false;
-      this.teamClassList = [{},{}];
-      this.coachList = [{},{}];
-      this.coachList_3 = [{},{}];
-      this.coachList_2 = [{},{}];
-      this.coachList_1 = [{},{}];
-      this.teamClass_1 = [{},{}];
-      this.teamClass_3 = [{},{}];
-      this.teamClass_2 = [{},{}];
+      this.teamClassList = [{}, {}];
+      this.coachList = [{}, {}];
+      this.coachList_3 = [{}, {}];
+      this.coachList_2 = [{}, {}];
+      this.coachList_1 = [{}, {}];
+      this.teamClass_1 = [{}, {}];
+      this.teamClass_3 = [{}, {}];
+      this.teamClass_2 = [{}, {}];
     },
-    selectNav(index,isClear = true) {
+    selectNav(index, isClear = true) {
       this.currentNav = index;
       if (!store.state.isLogin) {
-        this.teamClassList = []
-        this.coachList = []
+        this.teamClassList = [];
+        this.coachList = [];
         return;
       }
-      if(isClear) {
-        this.clearData()
+      if (isClear) {
+        this.clearData();
       }
       setTimeout(() => {
-      if (index == 1) {
-        // 待上课
+        if (index == 1) {
+          // 待上课
           this.getOwnCoachClassList(2).then(() => {
             this.coachList = this.coachList_1;
           });
           this.getOwnTeamClassList(1).then(() => {
             this.teamClassList = this.teamClass_1;
           });
-      } else if (index == 2) {
-        // 待评价
+        } else if (index == 2) {
+          // 待评价
           this.getOwnCoachClassList(3, 1).then(() => {
             this.coachList = this.coachList_2;
           });
           this.getOwnTeamClassList(3, 1).then(() => {
             this.teamClassList = this.teamClass_2;
           });
-      } else if (index == 3) {
-        // 3 已完成
+        } else if (index == 3) {
+          // 3 已完成
           this.getOwnCoachClassList(3).then(() => {
             this.coachList = this.coachList_3;
           });
           this.getOwnTeamClassList(3).then(() => {
             this.teamClassList = this.teamClass_3;
           });
-      }
-      }, 500)
+        }
+      }, 500);
     },
     toggleSelect() {
       this.showSelect = true;
@@ -386,7 +408,7 @@ export default {
           },
           success(res) {
             if (res.data.code === 200) {
-              that.coachList_2 = res.data.data.result.slice(0,2);
+              that.coachList_2 = res.data.data.result.slice(0, 2);
               resolve();
             }
             // wx.hideLoading();
@@ -410,7 +432,7 @@ export default {
           },
           success(res) {
             if (res.data.code === 200) {
-              that.teamClass_2 = res.data.data.result.slice(0,2);
+              that.teamClass_2 = res.data.data.result.slice(0, 2);
               resolve();
             }
             // wx.hideLoading();

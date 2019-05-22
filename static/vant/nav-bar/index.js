@@ -18,10 +18,10 @@ VantComponent({
     },
     methods: {
         onClickLeft() {
-            this.$emit('click-left');
+            this.$emit('clickLeft');
         },
         onClickRight() {
-            this.$emit('click-right');
+            this.$emit('clickRight');
         }
     }
 });

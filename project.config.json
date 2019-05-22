@@ -32,13 +32,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 4,
+			"current": 0,
 			"list": [
 				{
 					"id": 0,
 					"name": "主页",
 					"pathName": "pages/homepage/main",
-					"query": "appid=wx842adcf8a0ea1c9a",
+					"query": "scene=52-94",
 					"scene": null
 				},
 				{
@@ -50,22 +50,22 @@
 				},
 				{
 					"id": 2,
-					"name": "注册",
-					"pathName": "pages/register/main",
+					"name": "约课",
+					"pathName": "pages/appointmentClass/main",
 					"query": "",
 					"scene": null
 				},
 				{
 					"id": 3,
 					"name": "商户端",
-					"pathName": "pages/pageBusiness/member/main",
+					"pathName": "pages/pageBusiness/customer_detail/main",
 					"query": "",
 					"scene": null
 				},
 				{
 					"id": 4,
 					"name": "商户端index",
-					"pathName": "pages/pageBusiness/index/main",
+					"pathName": "pages/pageBusiness/workbench/main",
 					"query": "",
 					"scene": null
 				},

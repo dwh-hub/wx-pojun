@@ -5,12 +5,15 @@ import {
 } from "COMMON/js/common.js";
 import store from "../../utils/store.js"
 
+
+let storeId
+
 /**
  * 
  * @param {*} e 微信返回的加密数据
  * @param {*} url 登录成功后要跳转的地址
  */
-export function getPhoneNumber(e, url,isTab) {
+export function getPhoneNumber(e, url, isTab) {
   if (!e.mp.detail.encryptedData) {
     return
   }
@@ -30,7 +33,7 @@ export function getPhoneNumber(e, url,isTab) {
           key: "phone",
           data: res.data.data,
           success: function () {
-            login(url,isTab);
+            login(url, isTab);
           }
         });
       } else {
@@ -45,11 +48,33 @@ export function getPhoneNumber(e, url,isTab) {
   });
 }
 // 登录
-function login(url,isTab) {
+function login(url, isTab) {
   getUserInfo().then(() => {
-    bindMethod(url,isTab);
+    bindMethod(url, isTab);
   });
 }
+
+
+function getAllStore() {
+  wx.request({
+    url: window.api + "/store/all-store-name-list-nolimit",
+    data: {
+      companyId: wx.getStorageSync("companyId")
+    },
+    success(res) {
+      if (res.data.code === 200) {
+        storeId = res.data.data[0].storeId
+      }
+    }
+  });
+}
+getAllStore()
+
+// 随机4位数
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min)) + min;
+}
+
 // 获取用户信息
 function getUserInfo() {
   return new Promise(function (resolve) {
@@ -64,7 +89,7 @@ function getUserInfo() {
         if (res.data.code == 200) {
           let _data = res.data.data
           if (!_data.length) {
-            if(wx.getStorageSync("storeId")) {
+            if (wx.getStorageSync("storeId")) {
               return register()
             }
             return wx.showModal({
@@ -113,7 +138,7 @@ function getUserInfo() {
 }
 
 // 绑定方法
-function bindMethod(url,isTab) {
+function bindMethod(url, isTab) {
   wx.showLoading({
     title: "登录中..."
   });
@@ -172,13 +197,17 @@ function register() {
     data: {
       companyId: wx.getStorageSync("companyId"),
       phone: wx.getStorageSync("phone"),
-      name: wx.getStorageSync("phone"),
-      storeId: wx.getStorageSync("storeId"),
+      name: "微信用户" + rand(1000, 9999), //wx.getStorageSync("phone"),
+      storeId: wx.getStorageSync("storeId") ? wx.getStorageSync("storeId") : storeId,
+      serviceUserId: wx.getStorageSync("serviceUserId") ? wx.getStorageSync("serviceUserId") : '',
       sex: 0
     },
     success(res) {
       if (res.data.code === 200) {
         bindMethod()
+        if(wx.getStorageSync("serviceUserId")) {
+          wxPush()
+        }
       } else {
         wx.showModal({
           title: "提示",
@@ -212,12 +241,26 @@ export function getMessage() {
             text: String(res.data.data.recCount)
           })
         }
-      } else {
-      }
+      } else {}
     }
   })
 }
+
+// 消息推送
+export function wxPush() {
+  HttpRequest({
+    url: window.api + '/sendmsg/user/customerself/registerMsg',
+    data: {
+      companyId: wx.getStorageSync("companyId"),
+      serviceUserId: wx.getStorageSync("serviceUserId"),
+      customerName: wx.getStorageSync("userInfo").name,
+      phone: wx.getStorageSync("phone")
+    }
+  })
+}
+
 export default {
   getPhoneNumber,
-  getMessage
+  getMessage,
+  wxPush
 }

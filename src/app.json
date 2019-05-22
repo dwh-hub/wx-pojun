@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/authorizeLogin/main",
     "pages/homepage/main",
+    "pages/authorizeLogin/main",
     "pages/register/main",
     "pages/mine/main",
     "pages/login/main",
@@ -32,8 +32,15 @@
       "index/main",
       "staff_appoint_teamclass/main",
       "allServices/main",
-      "member/main",
-      "appoint_coach/main"
+      "customer/main",
+      "appoint_coach/main",
+      "schedule_class/main",
+      "staff_message/main",
+      "staff_mine/main",
+      "staff_base_info/main",
+      "modify_cell/main",
+      "coach_student/main",
+      "customer_detail/main"
     ]
   }],
   "permission": {

@@ -1,16 +1,20 @@
 // 头部搜索
 .header-search {
   display: flex;
-  background-color: #fff;
+
   .store {
     line-height: 44px;
     padding-left: 10px;
+    color: #fff;
   }
+
   .search-wrapper {
     flex: 1;
+
     .van-search {
       padding-left: 10px;
     }
+
     .field-index--van-field {
       background-color: #f6f6f6;
     }
@@ -27,13 +31,17 @@
   background-color: rgba(0, 0, 0, 0.6);
 }
 
+
+// 带小图标的副标题
 .subtitle {
   padding: 10px 5px;
   background-color: #fff;
+
   .screening-icon {
     width: 18px;
     height: 18px;
     margin-right: 5px;
+
     .subtitle-text {
       font-size: 16px;
       font-weight: bold;
@@ -44,19 +52,52 @@
   }
 }
 
+// 工作台那种 上图标下文字 一排
 .icon-wrapper {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
   box-sizing: border-box;
   background-color: #fff;
+
   .icon-item {
     width: 25%;
     text-align: center;
     padding: 5px 0;
+
     >image {
       width: 24px;
       height: 24px;
     }
   }
+}
+
+// 左文字 右操作/文字
+.item-cell {
+  display: flex;
+  line-height: 36px;
+  height: 36px;
+
+  .cell-left {
+    flex-basis: auto;
+    padding: 0 15px;
+  }
+
+  .cell-right {
+    flex: 1;
+    display: flex;
+    >div {
+      flex: 1;
+    }
+  }
+}
+
+
+// vant-radio 单选 同一行
+.radio-group {
+  border: 1rpx solid #eee;
+}
+.radio {
+  display: inline-block;
+  margin: 10px 5px;
 }

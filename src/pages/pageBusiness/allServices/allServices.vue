@@ -280,7 +280,6 @@ export default {
   .icon-wrapper {
     margin-bottom: 10px;
     .icon-item {
-      width: 20%;
       .icon-text {
         font-size: 12px;
       }

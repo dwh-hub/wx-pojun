@@ -73,6 +73,7 @@
         <span class="showTooltips" @click="bind">绑定</span>
       </div>
     </van-popup>
+    <login-popup :options="options" v-if="!isLogin"></login-popup>
     <page-footer></page-footer>
   </div>
 </template>
@@ -82,13 +83,13 @@ import {
   setNavTab,
   window,
   wxLogin,
-  getCookie,
-  HttpRequest,
-  getThemeColor
+  HttpRequest
 } from "COMMON/js/common.js";
 import {getPhoneNumber} from "COMMON/js/api.js";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
+import colorMixin from "COMPS/colorMixin.vue"
+import loginPopup from "COMPS/loginPopup.vue"
 
 export default {
   data() {
@@ -146,7 +147,6 @@ export default {
       ],
       // 临时的用户数据
       userInfo: {},
-      isLogin: false,
       phone: "",
       showBindBox: false,
       companyList: [],
@@ -158,12 +158,13 @@ export default {
       myPoints: "",
       // 消费次数
       FreeCount:"",
-      themeColor: ""
+      // themeColor: ""
     };
   },
   components: {
     pageFooter
   },
+  mixins:[colorMixin],
   onShow() {
     this.getTimes();
     if(store.state.isLogin == false) {
@@ -178,7 +179,7 @@ export default {
     setNavTab();
     this.userInfo = wx.getStorageSync("userInfo");
     store.commit("saveUserInfo", this.userInfo);
-    this.isLogin = store.state.isLogin;
+    // this.isLogin = store.state.isLogin;
     this.themeColor = window.color
   },
   onPullDownRefresh() {
@@ -242,7 +243,7 @@ export default {
                     duration: 1000
                   });
                   wx.reLaunch({
-                    url: "../authorizeLogin/main"
+                    url: "./main"
                   });
                 } else {
                   wx.showModal({
@@ -292,42 +293,6 @@ export default {
         }
       });
     },
-    // 获取微信加密数据
-    // getPhoneNumber(e) {
-    //   let that = this;
-    //   if(!e.mp.detail.encryptedData) {
-    //     return
-    //   }
-    //   wx.showLoading({
-    //     title: "登录中..."
-    //   });
-    //   HttpRequest({
-    //     url: window.api + "/mini/getphone",
-    //     data: {
-    //       sessionKey: wx.getStorageSync("sessionKey"),
-    //       encryptedData: e.mp.detail.encryptedData,
-    //       iv: e.mp.detail.iv
-    //     },
-    //     success(res) {
-    //       if (res.data.code == 200) {
-    //         that.phone = res.data.data;
-    //         wx.setStorage({
-    //           key: "phone",
-    //           data: res.data.data
-    //         });
-    //         that.login();
-    //       } else {
-    //         wx.hideLoading();
-    //       }
-    //     }
-    //   });
-    // },
-    // 登录
-    // login() {
-    //   this.getUserInfo().then(() => {
-    //     this.bindMethod();
-    //   });
-    // },
     // 选择公司
     selectCompany(item) {
       this.curCompany = item;
@@ -351,107 +316,6 @@ export default {
       });
       this.bindMethod();
     },
-    // 绑定方法
-    // bindMethod() {
-    //   let that = this;
-    //   wx.request({
-    //     url: window.api + "/wxcustomer/bindCard",
-    //     data: {
-    //       phone: that.phone,
-    //       companyId: that.userInfo.companyId,
-    //       miniOpenId: wx.getStorageSync("openId")
-    //       // smsSendLogId: that.smsSendLogId
-    //     },
-    //     success(res) {
-    //       wx.setStorage({
-    //         key: "Cookie",
-    //         data: res.header["Set-Cookie"]
-    //       });
-    //       if (res.data.code === 200) {
-    //         wx.showToast({
-    //           title: "登录成功",
-    //           icon: "success",
-    //           duration: 1000
-    //         });
-    //         store.commit("changeLogin", true);
-    //         getThemeColor();
-    //         setTimeout(() => {
-    //           wx.reLaunch({
-    //             url: "../mine/main"
-    //           });
-    //         }, 1000);
-    //       } else {
-    //         return wx.showModal({
-    //           title: "提示",
-    //           content: res.data.message,
-    //           showCancel: false
-    //         });
-    //       }
-    //     }
-    //   });
-    // },
-    // 获取用户信息
-    // getUserInfo() {
-    //   // wx.showLoading({
-    //   //   title: "正在登录..."
-    //   // });
-    //   let that = this;
-    //   return new Promise(function(resolve) {
-    //     wx.request({
-    //       url: window.api + "/wxcustomer/findAllCustomer",
-    //       data: {
-    //         phone: that.phone,
-    //         companyId: wx.getStorageSync("companyId")
-    //       },
-    //       success(res) {
-    //         wx.hideLoading();
-    //         if (res.data.code == 200) {
-    //           let _data = res.data.data
-    //           if (!_data.length) {
-    //             return wx.showModal({
-    //               title: "提示",
-    //               content: "没有找到您的登记信息，请先登记信息",
-    //               success(res) {
-    //                 if (res.confirm) {
-    //                   wx.navigateTo({
-    //                     url: "../register/main"
-    //                   });
-    //                 }
-    //               }
-    //             });
-    //           }
-
-    //           if (_data.length == 1) {
-    //             that.userInfo = _data[0];
-    //             store.commit("saveUserInfo", _data[0]);
-    //             wx.setStorage({
-    //               key: "userInfo",
-    //               data: _data[0]
-    //             });
-    //             wx.setStorage({
-    //               key: "companyId",
-    //               data: _data[0].companyId
-    //             });
-    //             wx.setStorage({
-    //               key: "companyName",
-    //               data: _data[0].companyName
-    //             });
-    //             return resolve();
-    //           }
-    //           that.showBindBox = true;
-    //           that.companyList = _data;
-    //           that.curCompany = _data[0];
-    //         } else {
-    //           wx.showModal({
-    //             title: "提示",
-    //             content: res.data.message,
-    //             showCancel: false
-    //           });
-    //         }
-    //       }
-    //     });
-    //   });
-    // }
   }
 };
 </script>

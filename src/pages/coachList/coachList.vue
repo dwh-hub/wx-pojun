@@ -3,7 +3,7 @@
     <div class="nav-tab">
       <div class="nav-tab-left">
         <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
-          <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: window.color}">{{curStore}}</span>
+          <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: themeColor}">{{curStore}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showStoreList}">
             <div class="store-nav-list" :class="{slide: showStoreList}">
@@ -17,7 +17,7 @@
           </div>
         </div>
         <div class="signing" :class="{active: currentNav==2}" @click="selectNav(2)">
-          <span v-show="currentNav!=2">{{curCoachStatus}}</span><span v-show="currentNav==2" :style="{color: window.color}">{{curCoachStatus}}</span>
+          <span v-show="currentNav!=2">{{curCoachStatus}}</span><span v-show="currentNav==2" :style="{color: themeColor}">{{curCoachStatus}}</span>
           <i class="triangle-icon"></i>
           <div class="list-warpper" :class="{slideWrap: showSigning}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showSigning}">
@@ -28,7 +28,7 @@
           </div>
         </div>
         <div class="search" v-show="currentNav!=3" @click="selectNav(3)">搜索</div>
-        <div class="search" v-show="currentNav==3" :style="{color: window.color}" @click="selectNav(3)">搜索</div>
+        <div class="search" v-show="currentNav==3" :style="{color: themeColor}" @click="selectNav(3)">搜索</div>
       </div>
       <div class="search-wrapper" :class="{'show-search':showSearch}">
         <van-search
@@ -56,6 +56,7 @@ import coachItem from "COMPS/coachItem.vue";
 import noneResult from "COMPS/noneResult";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
+import colorMixin from "COMPS/colorMixin.vue"
 export default {
   data() {
     return {
@@ -93,10 +94,12 @@ export default {
     noneResult,
     pageFooter
   },
+  mixins:[colorMixin],
   onLoad() {
     this.customerId = wx.getStorageSync("userInfo").id;
     this.companyId = wx.getStorageSync("companyId");
   },
+  
   onUnload() {
     this.curCoachList = [{}, {}, {}, {}, {}];
   },

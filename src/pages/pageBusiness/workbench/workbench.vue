@@ -10,7 +10,7 @@
       <div class="search-wrapper">
         <van-search
           :value="searchText"
-          background="#fff"
+          :background="themeColor"
           @change="searchChange"
           placeholder="请输入搜索内容"
         ></van-search>
@@ -31,17 +31,19 @@
         <div class="services-icon icon-text">{{item.text}}</div>
       </div>
     </div>
-    <van-tabbar :active="activeIndex" @change="changeTabbar">
-      <van-tabbar-item icon="home-o">首页</van-tabbar-item>
-      <van-tabbar-item icon="manager-o" dot>会员</van-tabbar-item>
-      <van-tabbar-item icon="desktop-o" info="5">工作台</van-tabbar-item>
-      <van-tabbar-item icon="setting-o" info="20">我的</van-tabbar-item>
+    <van-tabbar active="2" @change="changeTabbar">
+      <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
+      <van-tabbar-item icon="question-o" dot>帮助</van-tabbar-item>
+      <van-tabbar-item icon="desktop-o">工作台</van-tabbar-item>
+      <van-tabbar-item icon="chat-o" info="5">消息</van-tabbar-item>
+      <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
     </van-tabbar>
   </div>
 </template>
 
 <script>
 import { setNavTab, window } from "COMMON/js/common.js";
+import colorMixin from "COMPS/colorMixin.vue"
 // import echarts from "echarts";
 // import mpvueEcharts from "mpvue-echarts";
 
@@ -94,11 +96,11 @@ export default {
         {
           iconUrl: "/static/images/staff/customer_icon_1.svg",
           text: "客户",
-          navUrl: ""
+          navUrl: "../customer/main"
         },{
           iconUrl: "/static/images/staff/services_icon_2.svg",
-          text: "合同",
-          navUrl: ""
+          text: "学员",
+          navUrl: "../coach_student/main"
         },{
           iconUrl: "/static/images/staff/coach_icon_1.svg",
           text: "私教",
@@ -126,8 +128,9 @@ export default {
         }]
     };
   },
+  mixins:[colorMixin],
   // components: {
-  //   mpvueEcharts
+  //  mpvueEcharts
   // },
   mounted() {
     setNavTab();
@@ -142,15 +145,19 @@ export default {
       });
     },
     changeTabbar(e) {
-      this.activeIndex = e.mp.detail;
-      if (e.mp.detail == 1) {
-        wx.navigateTo({
-          url: "../member/main"
-        });
-      }
       if (e.mp.detail == 0) {
         wx.redirectTo({
           url: "../index/main"
+        });
+      }
+      if (e.mp.detail == 3) {
+        wx.redirectTo({
+          url: "../staff_message/main"
+        });
+      }
+      if (e.mp.detail == 4) {
+        wx.redirectTo({
+          url: "../staff_mine/main"
         });
       }
     },

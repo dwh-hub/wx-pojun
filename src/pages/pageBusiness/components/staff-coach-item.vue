@@ -1,28 +1,32 @@
 <template>
-  <div class="staff-coach-item">
-    <div>
+  <div class="staff-coach-item" @click="clickItem">
+    <div v-if="info.id">
       <div class="cover">
         <!-- <image src="" mode="aspectFill"></image> -->
         <div class="avatar"></div>
       </div>
       <div class="coach-info">
-        <div class="coach-name">教练名字</div>
+        <div class="coach-name">
+          <span class="first-1">{{info.first_tip_1 || ''}}{{info.first_1 || ''}}</span>
+          <span class="first-2">{{info.first_tip_2 || ''}}{{info.first_2 || ''}}</span>
+        </div>
         <div class="coach-times">
-          <span>2019-04-23 18:00 - 19:00</span>
+          <span class="second-1">{{info.second_tip_1 || ''}}{{info.second_1 || ''}}</span>
+          <span class="second-2">{{info.second_tip_2 || ''}}{{info.second_2 || ''}}</span>
         </div>
         <div class="coach-desc">
-          <span>服务：1对1私教服务</span>
-          <span>教练：陈曦</span>
+          <span class="third-1">{{info.third_tip_1 || ''}}{{info.third_1 || ''}}</span>
+          <span class="third-2">{{info.third_tip_2 || ''}}{{info.third_2 || ''}}</span>
         </div>
       </div>
       <div class="tag" v-if='isTag'>
         <div class="coach-type">上课中</div>
       </div>
-      <div class="icon-right" @click="clickIcon">
+      <div class="icon-right" @click.stop="clickIcon">
         <slot></slot>
       </div>
     </div>
-    <div class="coach-skeleton" v-if="false">
+    <div class="coach-skeleton" v-else>
       <div class="cover">
         <div class="avatar"></div>
       </div>
@@ -42,12 +46,30 @@ export default {
     isTag: {
       type: Boolean,
       default: false
+    },
+    info: {
+      type: Object,
+      default: function() {
+        return {
+          id: "",
+          cover: "",
+          first_1: "",
+          first_2: "",
+          second_1: "",
+          second_2: "",
+          third_1: "",
+          third_2: "",
+        }
+      }
     }
   },
   computed: {},
   methods: {
     clickIcon() {
       this.$emit("clickIcon")
+    },
+    clickItem() {
+      this.$emit("clickItem")
     }
   }
 };
@@ -64,9 +86,9 @@ export default {
     padding-right: 10px;
   }
   .cover {
-    flex: 0 0 52px;
-    width: 52px;
-    height: 52px;
+    flex: 0 0 60px;
+    width: 60px;
+    height: 60px;
     padding-left: 12px;
     .avatar {
       width: 100%;
@@ -99,6 +121,18 @@ export default {
         margin-right: 5px;
       }
     }
+    .first-1 {
+      font-weight: bold;
+    }
+    .first-2 {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 12px;
+      color: #808080;
+    }
+    .third-1 {
+      color: #aeaeae;
+    }
   }
   .tag {
     .coach-type {
@@ -123,15 +157,15 @@ export default {
   // }
   .coach-skeleton {
     .cover {
-      > image {
-        background-color: #eee;
-      }
+      flex: 0 0 70px;
+      width: 70px;
+      height: 70px;
     }
     .skeleton-wrapper {
       padding: 0 12px;
       width: 100%;
       .skeleton-name {
-        margin-top: 8px;
+        margin-top: 4px;
         height: 16px;
         background-color: #eee;
       }

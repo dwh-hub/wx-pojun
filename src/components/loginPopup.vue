@@ -1,48 +1,26 @@
 <template>
-  <div class="authorize-login">
-    <image src="https://pojun-tech.cn/assets/img/coordinates.png" mode="aspectFit"></image>
-    <div class="authorize-bottom" v-if="isShow">
-      <div class="tip">请完成微信授权以继续使用</div>
-      <button
-        v-if="!scope_userInfo"
-        class="authorize"
-        type="primary"
-        open-type="getUserInfo"
-        @getuserinfo="_getUserInfo"
-      >获取用户信息</button>
-      <button
-        v-if="scope_userInfo"
-        class="authorize"
-        type="primary"
-        open-type="getPhoneNumber"
-        @getphonenumber="_getPhoneNumber"
-      >微信授权登录</button>
-      <div class="toHome" @click="toHome">暂不登录</div>
-    </div>
-    <van-popup
-      :show="showBindBox"
-      :duration="200"
-      custom-style="width:85%;border-radius: 5px;"
-    >
-      <div class="storeList">
-        <p>您本次浏览的门店是：</p>
-        <div class="companyMain">
-          <span
-            v-for="(item, index) in storeList"
-            :key="index"
-            :class="{active:　item.id == curStore.id}"
-            @click="selectStore(item)"
-          >{{item.name}}</span>
-        </div>
-        <span class="showTooltips" @click="register">进入</span>
+  <div class="login-popup" v-show="showPopup">
+    <div class="authorize-popup">
+      <div class="logo">
+        <image :src="window.api + companyInfo.logimage" mode="aspectFill"></image>
       </div>
-    </van-popup>
+      <div class="name">{{companyInfo.name}}</div>
+      <div class="tip">{{systemSteup.enterTags || '注册成功后将获得惊喜大礼包'}}</div>
+      <div class="btn-wrapper">
+        <button
+          class="authorize"
+          type="primary"
+          open-type="getPhoneNumber"
+          @getphonenumber="_getPhoneNumber"
+        >微信快捷登录</button>
+        <button class="login-none" v-if="!systemSteup.isNeedLogin" @click="showPopup = false">暂不登录</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import {
-  setNavTab,
   window,
   wxLogin,
   HttpRequest,
@@ -50,99 +28,84 @@ import {
   getCompanyColor,
   getThemeColor
 } from "COMMON/js/common.js";
-import store from "../../utils/store";
-import { getMessage } from "COMMON/js/api.js";
+import store from "../utils/store";
+import { getMessage, wxPush } from "COMMON/js/api.js";
 export default {
+  props: ["options"],
   data() {
     return {
+      showPopup: true,
       userInfo: {},
-      // phone: "",
-      showBindBox: false,
-      // companyList: [],
-      // 选择的公司
-      // curCompany: {},
-      isShow: true,
-      scope_userInfo: false,
+      companyInfo: {},
       storeList: [],
       curStore: {},
+      systemSteup: {},
     };
   },
-  onLoad(options) {
-    wxLogin();
-    wx.getLocation({
-      type: "wgs84",
-      success(res) {}
-    });
-    // 获取公司id --> 获取公司主题色
-    if (options.appid) {
-      // 通过微信公众号appId获取公司信息(companyId, companyName)
-      getWXCompany(options.appid).then(() => {
-        this.login();
-      });
-    } else if (options.scene) {
-      // 扫码进入时携带scene参数时(参数：公司id,门店id)
-      var scene = decodeURIComponent(options.scene);
-      var companyId = scene.split("-")[0];
-      var storeId = scene.split("-")[1];
-      wx.setStorageSync("companyId", companyId);
-      wx.setStorageSync("storeId", storeId);
-      getThemeColor();
-      this.login();
-    } else {
-      // 直接进入小程序时，设置默认公司id
-      getCompanyColor().then(() => {
-        this.login();
-      });
-    }
-  },
   mounted() {
+    this._onLoad(this.options);
+    this.getCompanyInfo();
     let that = this;
-    wx.getSetting({
-      success(res) {
-        if (!res.authSetting["scope.userInfo"]) {
-          that.scope_userInfo = false;
-          wx.authorize({
-            scope: "scope.userInfo",
-            success() {
-              // 用户已经同意小程序使用录音功能，后续调用 wx.startRecord 接口不会弹窗询问
-              wx.startRecord();
-            }
-          });
-        } else {
-          wx.getUserInfo({
-            success(res) {
-              that.userInfo = res.userInfo
-              wx.setStorageSync("wx_userInfo", res.userInfo);
-            }
-          })
-          that.scope_userInfo = true;
-        }
-      }
-    });
   },
-  onPullDownRefresh() {
-    if (store.state.isLogin) {
-      wx.switchTab({
-        url: "../homepage/main"
-      });
-    } else {
-      this.isShow = true;
+  computed: {
+    window() {
+      return window;
     }
-    wx.stopPullDownRefresh();
   },
   methods: {
-    toHome() {
-      wx.switchTab({
-        url: "../homepage/main"
+    rand(min,max) {
+      return Math.floor(Math.random()*(max-min))+min;
+    },
+    getCompanyInfo() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/system/set/wxcompanyinfo",
+        data: {
+          companyId: wx.getStorageSync("companyId")
+        },
+        success(res) {
+          that.companyInfo = JSON.parse(res.data.data.baseInfo);
+        }
       });
     },
-    _getPhoneNumber(e) {
-      this.getPhoneNumber(e, "../homepage/main", true);
+    getSystemSteup() {
+      let that = this
+      HttpRequest({
+        url: window.api + '/system/setup/company/query',
+        data: {
+          companyId: wx.getStorageSync("companyId")
+        },
+        success(res) {
+          that.systemSteup = res.data.data
+        }
+      })
     },
-    _getUserInfo(e) {
-      if (JSON.stringify(e.mp.detail).indexOf("fail") == -1) {
-        wx.setStorageSync("wx_userInfo", e.mp.detail.userInfo);
-        this.scope_userInfo = true;
+    _onLoad(options) {
+      wxLogin();
+      // 获取公司id --> 获取公司主题色
+      if (options.appid) {
+        console.log("appid:" + options.appid);
+        // 通过微信公众号appId获取公司信息(companyId, companyName)
+        getWXCompany(options.appid).then(() => {
+          this.login();
+        });
+      } else if (options.scene) {
+        console.log("scene:" + options.scene);
+        // 扫码进入时携带scene参数时(参数：公司id,门店id)
+        var scene = decodeURIComponent(options.scene);
+        var companyId = scene.split("-")[0];
+        var storeId = scene.split("-")[1];
+        var serviceUserId = scene.split("-")[2];
+        wx.setStorageSync("companyId", companyId);
+        wx.setStorageSync("storeId", storeId);
+        wx.setStorageSync("serviceUserId", serviceUserId);
+        getThemeColor();
+        this.login();
+      } else {
+        // 直接进入小程序时，设置默认公司id
+        getCompanyColor().then(() => {
+          this.login();
+        });
       }
     },
     login() {
@@ -184,9 +147,6 @@ export default {
         }
       });
     },
-    selectStore(item) {
-      this.curStore = item
-    },
     getAllStore() {
       let that = this;
       wx.request({
@@ -202,15 +162,16 @@ export default {
                 id: e.storeId
               };
             });
-            that.curStore = that.storeList[0]
-            that.showBindBox = true
+            that.curStore = that.storeList[0];
           }
         }
       });
     },
-    // 已下临时从api.js里拆出来的方法
+    _getPhoneNumber(e) {
+      this.getPhoneNumber(e, "../homepage/main", true);
+    },
     getPhoneNumber(e, url, isTab) {
-      let that = this
+      let that = this;
       if (!e.mp.detail.encryptedData) {
         return;
       }
@@ -246,13 +207,14 @@ export default {
     },
     // 登录
     _login(url, isTab) {
+      this.getAllStore();
       this.getUserInfo().then(() => {
         this.bindMethod(url, isTab);
       });
     },
     // 获取用户信息
     getUserInfo() {
-      let that = this
+      let that = this;
       return new Promise(function(resolve) {
         wx.request({
           url: window.api + "/wxcustomer/findAllCustomer",
@@ -265,25 +227,10 @@ export default {
             if (res.data.code == 200) {
               let _data = res.data.data;
               if (!_data.length) {
-                if (wx.getStorageSync("storeId")) {
-                  return that.register();
-                }
-                // return wx.showModal({
-                //   title: "提示",
-                //   content: "您目前不是该店会员，是否前往注册会员？",
-                //   success(res) {
-                //     if (res.confirm) {
-                //       wx.navigateTo({
-                //         url: "../register/main"
-                //       });
-                //     }
-                //   }
-                // });
-                that.getAllStore()
+                return that.register();
               }
 
               if (_data.length == 1) {
-                // that.userInfo = _data[0];
                 store.commit("saveUserInfo", _data[0]);
                 wx.setStorage({
                   key: "userInfo",
@@ -299,9 +246,6 @@ export default {
                 });
                 return resolve();
               }
-              // that.showBindBox = true;
-              // that.companyList = _data;
-              // that.curCompany = _data[0];
             } else {
               wx.showModal({
                 title: "提示",
@@ -315,6 +259,7 @@ export default {
     },
     // 绑定方法
     bindMethod(url, isTab) {
+      let that = this
       wx.showLoading({
         title: "登录中..."
       });
@@ -341,6 +286,7 @@ export default {
             getMessage();
             store.commit("changeLogin", true);
             getThemeColor();
+            // that.loginSuccess = true
             let _url = url ? url : "./main";
             if (isTab) {
               setTimeout(() => {
@@ -367,7 +313,7 @@ export default {
     },
     // 注册
     register() {
-      let that = this
+      let that = this;
       wx.showLoading({
         title: "加载中..."
       });
@@ -376,18 +322,21 @@ export default {
         data: {
           companyId: wx.getStorageSync("companyId"),
           phone: wx.getStorageSync("phone"),
+          serviceUserId: wx.getStorageSync("serviceUserId") ? wx.getStorageSync("serviceUserId") : '',
           // 扫码进入时
           // name: wx.getStorageSync("phone"),
           // storeId: wx.getStorageSync("storeId"),
           // sex: 0
-          name: wx.getStorageSync("wx_userInfo").nickName,
-          storeId: that.curStore.id || wx.getStorageSync("storeId"),
-          sex: wx.getStorageSync("wx_userInfo").gender
+          name: "微信用户"+that.rand(1000,9999),// wx.getStorageSync("wx_userInfo").nickName,
+          storeId: wx.getStorageSync("storeId")? wx.getStorageSync("storeId") : that.curStore.id,//that.curStore.id || wx.getStorageSync("storeId"),
+          sex: 0 //wx.getStorageSync("wx_userInfo").gender
         },
         success(res) {
-            wx.hideLoading();
+          wx.hideLoading();
           if (res.data.code === 200) {
-            // that.bindMethod();
+            if(wx.getStorageSync("serviceUserId")) {
+              wxPush()
+            }
             that._login("../homepage/main", true);
           } else {
             wx.showModal({
@@ -404,65 +353,64 @@ export default {
 </script>
 
 <style lang="less">
-@import "~COMMON/less/reset.less";
-
-.authorize-login {
-  padding: 15px;
-  padding-top: 50px;
-  > image {
-    width: 100%;
-  }
-  .authorize-bottom {
-    // position: fixed;
-    // bottom: 120px;
-    // left: 0;
-    // padding: 15px;
-    // margin-top: 20px;
-    text-align: center;
-    box-sizing: border-box;
-    width: 100%;
-    .tip {
-      text-align: center;
-      line-height: 36px;
-    }
-    .authorize {
-      font-size: 16px;
-      height: 36px;
-      line-height: 36px;
-      margin-bottom: 10px;
-    }
-  }
+.login-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  width: 100vw;
+  height: 100vh;
+  .authorize-popup,
+  .success-popup,
   .storeList {
-    padding: 15px;
-    background: white;
-    .companyMain {
-      > span {
-        &.active {
-          color: @theme-color;
-          border: 1rpx solid @theme-color;
-        }
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    border-radius: 6px;
+    background-color: #fff;
+    z-index: 99;
+  }
+  .authorize-popup {
+    text-align: center;
+    padding: 30px;
+    .logo {
+      margin-bottom: 15px;
+      > image {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto;
+        border-radius: 50%;
       }
     }
-    > p {
-      width: 100%;
-      text-align: center;
+    .name {
+      margin-bottom: 50px;
+      font-size: 24px;
+      font-weight: bold;
     }
-    span {
-      display: block;
-      height: 32px;
-      line-height: 32px;
-      width: 100%;
-      text-align: center;
-      border-radius: 5px;
-      border: 1px solid #cccccc;
-      margin-top: 10px;
+    .tip {
+      color: #999;
+      line-height: 24px;
+      font-size: 12px;
+      margin-bottom: 15px;
     }
-    .showTooltips {
-      background-color: #1aad19;
-      color: #fff;
+    .btn-wrapper {
+      > button {
+        line-height: 42px;
+        border-radius: 21px;
+        font-size: 16px;
+        background-color: #46c260;
+      }
+      .login-none {
+        margin-top: 10px;
+        background-color: #fff;
+        color: #46c260;
+        border: 1px solid #46c260;
+      }
     }
   }
 }
 </style>
-
-

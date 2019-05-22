@@ -1,5 +1,4 @@
 <template>
-  <!-- @touchstart="touchStart" @touchend="touchEnd" -->
   <div class="homepage">
     <swiper
       class="swiper"
@@ -12,24 +11,10 @@
     >
       <div v-for="(item,index) in bannerList" :key="index">
         <swiper-item>
-          <!-- <img :src="item" class="banner"> -->
           <image :src="item" mode="aspectFill" class="banner" @click="previewImage(item)"></image>
-          <!-- <img
-            class="banner"
-            src="http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg"
-          >-->
         </swiper-item>
       </div>
     </swiper>
-    <!-- <div class="company">
-      <div class="company-cover">
-        <img src="https://www.pojun-tech.com/images/company_log/3/1.5355962923289521E12.png" alt>
-      </div>
-      <div class="company-detail">
-        <div class="company-title">破军科技</div>
-        <div class="company-text">在更好的为会员服务的道路上越走越远。</div>
-      </div>
-    </div>-->
     <div class="tab-list">
       <div class="tab-item" @click="toNav('../teamClassList/main')">
         <img src="/static/images/icon-team.png" :style="{'background-color': themeColor}">
@@ -63,10 +48,8 @@
           :key="index"
           @click="toStoreDetail(item.storeId)"
         >
-          <!-- http://pojun-tech.cn/images/company_exhibition/37/1.5460718947810068E12.jpeg -->
           <div class="cover">
             <image :src="item.cover" mode="aspectFill"></image>
-            <!-- <img :src="item.cover"> -->
           </div>
           <div class="nearby-bottom">
             <span class="name">{{item.storeName}}</span>
@@ -77,7 +60,6 @@
     </div>
     <div class="recommend-wrapper">
       <title-cell title="为你推荐" :titleSize="18"></title-cell>
-      <!-- <team-class-item :info="item" v-for="(item, index)  in recommendClass" :key="index"></team-class-item> -->
         <div class="class-item">
           <div v-if="!recommendClass.loading && recommendClass.teamScheduleId" @click="toDetail">
             <div class="class-cover">
@@ -107,6 +89,8 @@
         </div>
       <coach-item :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
     </div>
+    <login-popup :options="options" v-if="!isLogin"></login-popup>
+
     <page-footer></page-footer>
   </div>
 </template>
@@ -119,15 +103,17 @@ import {
   getRange,
   formatDate,
   getWXCompany,
-  getThemeColor,
   getCompanyColor
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import coachItem from "COMPS/coachItem.vue";
 import pageFooter from "COMPS/pageFooter.vue"
+import loginPopup from "COMPS/loginPopup.vue"
+import colorMixin from "COMPS/colorMixin.vue"
 import store from "../../utils/store";
 import {getPhoneNumber} from "COMMON/js/api.js";
+
 export default {
   data() {
     return {
@@ -141,20 +127,19 @@ export default {
       },
       companyId: "",
       nearbyStoreList: [{},{}],
-      themeColor: "#2a82e4"
+      // themeColor: "",
+      options: null
     };
   },
+  mixins:[colorMixin],
   components: {
     titleCell,
     teamClassItem,
     coachItem,
-    pageFooter
+    pageFooter,
+    loginPopup
   },
   mounted() {
-    // getCompanyColor().then(() => {
-    //     this.setTheme()
-    //     this._mounted()
-    // })
   },
   onShow() {
     let that = this;
@@ -176,48 +161,27 @@ export default {
     if(!this.nearbyStoreList.length) {
       this.getNearbyStoreList();
     }
-    wx.getSetting({
-      success(res) {
-        if (!res.authSetting['scope.userLocation']) {
-          wx.showModal({
-            title: "授权",
-            content: "部分功能需要地理位置，是否授权？",
-            success(res) {
-              if (res.confirm) {
-                wx.openSetting()
-              }
-            }
-          });
-        }
-      }
-    })
+    // wx.getSetting({
+    //   success(res) {
+    //     if (!res.authSetting['scope.userLocation']) {
+    //       wx.showModal({
+    //         title: "授权",
+    //         content: "部分功能需要地理位置，是否授权？",
+    //         success(res) {
+    //           if (res.confirm) {
+    //             wx.openSetting()
+    //           }
+    //         }
+    //       });
+    //     }
+    //   }
+    // })
   },
-  onLoad() {
+  onLoad(options) {
     this.setTheme()
     this._mounted()
-    
-    // if (options.appid) {
-    //   getWXCompany(options.appid).then(() => {
-    //     this.setTheme()
-    //     this._mounted()
-    //   });
-    // } else if(options.scene) {
-    //   // 有scene参数时
-    //   var scene = decodeURIComponent(options.scene) // 公司id,门店id
-    //   var companyId = scene.split(",")[0]
-    //   var storeId = scene.split(",")[1]
-    //    wx.setStorageSync('companyId', companyId)
-    //    wx.setStorageSync('storeId', storeId)
-    // } else { // wx90e290f98e838e66
-    //   // getWXCompany('wx842adcf8a0ea1c9a').then(() => {
-    //   //   this.setTheme()
-    //   //   this._mounted()
-    //   // });
-    //   getCompanyColor().then(() => {
-    //     this.setTheme()
-    //     this._mounted()
-    //   })
-    // }
+    this.options = options
+    // this.getCompanyInfo()
   },
   computed: {
     isLogin() {
@@ -225,9 +189,6 @@ export default {
     },
     window() {
       return window
-    },
-    windowColor() {
-      return window.color;
     }
   },
   onPullDownRefresh() {
@@ -263,7 +224,7 @@ export default {
       } else {
         setNavTab(wx.getStorageSync("companyName"));
       }
-      this.themeColor = window.color || "#2a82e4";
+      // this.themeColor = window.color || "#2a82e4";
     },
     toNav(url) {
       if (!url) {
@@ -322,16 +283,12 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data) {
             let _data = res.data.data
-            // let _list = []
-            // _list.push(res.data.data)
             _data.coachNameArrayStr = _data.coachNameArrayStr.replace(/null/g,'');
             _data.timeStart = formatDate(new Date(_data.timeStart), "hh:mm")
             _data.timeEnd = formatDate(new Date(_data.timeEnd), "hh:mm")
             that.recommendClass = res.data.data;
-            console.log(that.recommendClass)
           } else {
             that.recommendClass = {loading: false}
-            console.log(that.recommendClass)
           }
         }
       });
@@ -365,7 +322,7 @@ export default {
       wx.request({
         url: window.api + "/store/all-store-name-list-nolimit",
         data: {
-          companyId: that.companyId
+          companyId: wx.getStorageSync("companyId")
         },
         success(res) {
           if (res.data.code === 200) {

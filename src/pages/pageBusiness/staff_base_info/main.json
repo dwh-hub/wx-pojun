@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "编辑个人资料",
+  "usingComponents": {
+    "van-cell": "../../../../static/vant/cell/index",
+    "van-cell-group": "../../../../static/vant/cell-group/index",
+    "van-action-sheet": "../../../../static/vant/action-sheet/index"
+  }
+}

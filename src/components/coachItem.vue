@@ -50,6 +50,7 @@
 import store from "../utils/store";
 import {getPhoneNumber} from "COMMON/js/api.js";
 import { window } from "COMMON/js/common";
+import colorMixin from "COMPS/colorMixin.vue"
 export default {
   name: "coach-item",
   props: {
@@ -72,6 +73,7 @@ export default {
       default: true
     }
   },
+  mixins:[colorMixin],
   computed: {
     isLogin() {
       return store.state.isLogin
@@ -81,9 +83,6 @@ export default {
         return window.api + this.info.headImgPath;
       }
       return "http://pojun-tech.cn/assets/img/morenTo.png";
-    },
-    themeColor() {
-      return window.color;
     }
   },
   methods: {

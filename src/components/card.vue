@@ -88,9 +88,9 @@ export default {
   box-shadow: 0px 2px 5px #999;
   // 元卡 绿色  天卡 黄色  次卡 蓝色
   &.day {
-    background-image: linear-gradient(to left top, #87c6ff, #159bff);
+    background-image: linear-gradient(to left top, #ffc66c, #ff7f44);
     .card-status {
-      color: #159bff;
+      color: #ff7f44;
     }
   }
   &.yuan {
@@ -100,9 +100,9 @@ export default {
     }
   }
   &.times {
-    background-image: linear-gradient(to left top, #ffc66c, #ff7f44);
+    background-image: linear-gradient(to left top, #87c6ff, #159bff);
     .card-status {
-      color: #ff7f44;
+      color: #159bff;
     }
   }
   &.none {

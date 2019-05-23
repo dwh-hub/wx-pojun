@@ -11,7 +11,7 @@
           <span class="first-2">{{info.first_tip_2 || ''}}{{info.first_2 || ''}}</span>
         </div>
         <div class="coach-times">
-          <span class="second-1">{{info.second_tip_1 || ''}}{{info.second_1 || ''}}</span>
+          <span class="second-1">{{info.second_tip_1 || ''}}{{undefined == info.second_1 ? '' : info.second_1}}</span>
           <span class="second-2">{{info.second_tip_2 || ''}}{{info.second_2 || ''}}</span>
         </div>
         <div class="coach-desc">

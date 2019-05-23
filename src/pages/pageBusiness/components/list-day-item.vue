@@ -21,10 +21,10 @@ export default {
       type: Object,
       default: function () {
         return {
-          day: '18',
-          month: '08',
-          topText: '上面的文本',
-          bottomText: '下面的文本',
+          day: '',
+          month: '',
+          topText: '',
+          bottomText: '',
         }
       }
     }
@@ -33,6 +33,7 @@ export default {
 </script>
 
 <style lang="less">
+@import "~COMMON/less/common.less";
 .flex-wrapper {
   padding: 0;
   padding-right: 15px;
@@ -42,8 +43,7 @@ export default {
   .flex-left {
     flex: 0 0 50px;
     padding: 10px 15px;
-    margin-right: 15px;
-    border-right: 1rpx solid #eee;
+    // margin-right: 15px;
     > div {
       text-align: center;
       font-weight: bold;
@@ -58,7 +58,12 @@ export default {
     }
   }
   .flex-middle {
+    border-left: 1rpx solid #eee;
     padding: 10px 0;
+    padding-left: 15px;
+    >div {
+      .Mult-line(3);
+    }
   }
 }
 </style>

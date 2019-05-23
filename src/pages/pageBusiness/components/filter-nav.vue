@@ -95,7 +95,7 @@ export default {
     }
   },
   mounted() {
-    this._nav = this.nav
+    this._nav = this.nav;
   },
   methods: {
     search(e) {
@@ -111,11 +111,14 @@ export default {
       this.maskShow = true;
       this.showStoreNav = true;
     },
-    clickSonNav(index,item) {
-      this._nav[index].navTitle = item.sonText
+    clickSonNav(index, item) {
+      this._nav[index].navTitle = item.sonText;
       this.maskShow = false;
       this.showStoreNav = false;
-      this.$emit("selectFilter", item);
+      // this.$emit("selectFilter", item);
+      if (item.action) {
+        item.action();
+      }
     },
     clickMask() {
       this.maskShow = false;
@@ -150,7 +153,7 @@ export default {
       transform: rotate(-180deg);
     }
   }
-  >div {
+  > div {
     flex: 1;
     line-height: 42px;
     text-align: center;

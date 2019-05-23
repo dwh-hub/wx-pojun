@@ -41,7 +41,7 @@ export default {
       HttpRequest({
         url: window.api + "/user/login",
         data: {
-          phone: "18888888888",
+          phone: "18888888881",
           password: "2131"
         },
         success(res) {

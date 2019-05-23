@@ -54,22 +54,6 @@ function login(url, isTab) {
   });
 }
 
-
-function getAllStore() {
-  wx.request({
-    url: window.api + "/store/all-store-name-list-nolimit",
-    data: {
-      companyId: wx.getStorageSync("companyId")
-    },
-    success(res) {
-      if (res.data.code === 200) {
-        storeId = res.data.data[0].storeId
-      }
-    }
-  });
-}
-getAllStore()
-
 // 随机4位数
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -205,7 +189,7 @@ function register() {
     success(res) {
       if (res.data.code === 200) {
         bindMethod()
-        if(wx.getStorageSync("serviceUserId")) {
+        if (wx.getStorageSync("serviceUserId")) {
           wxPush()
         }
       } else {
@@ -218,6 +202,29 @@ function register() {
     }
   });
 }
+
+export function getAllStore() {
+  console.log("api.js==>getAllStore")
+  return new Promise(function (resolve, reject) {
+    wx.request({
+      url: window.api + "/store/all-store-name-list-nolimit",
+      data: {
+        companyId: wx.getStorageSync("companyId")
+      },
+      success(res) {
+        // if (res.data.code === 200) {
+          // storeId = res.data.data[0].storeId
+          resolve(res)
+        // }
+      }
+    });
+  })
+}
+getAllStore().then((res) => {
+  if (res.data.code === 200) {
+    storeId = res.data.data[0].storeId
+  }
+})
 
 export function getMessage() {
   HttpRequest({

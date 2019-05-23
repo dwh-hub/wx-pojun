@@ -5,8 +5,8 @@
         <div class="avatar"></div>
       </div>
       <div class="coach-info">
-        <div class="coach-name">王老板</div>
-        <div class="coach-phone">18000000000</div>
+        <div class="coach-name">{{userInfo.name}}</div>
+        <div class="coach-phone">{{userInfo.phone}}</div>
       </div>
       <div class="icon-right">
         <img src="/static/images/staff/phone.svg" alt>
@@ -21,7 +21,9 @@
       <van-tab title="跟进回访">
         <header-data :headerData="FollowUpData"></header-data>
         <filter-nav></filter-nav>
-        <list-day-item :info="item" v-for="(item,index) in FollowUpList" :key="index"></list-day-item>
+        <div class="tab-list-wrapper">
+          <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item>
+        </div>
       </van-tab>
       <van-tab title="合同">
         <header-data :headerData="cardData"></header-data>
@@ -34,25 +36,58 @@
       <van-tab title="更多信息">
         <div class="info">
           <van-cell-group custom-class="van-cell-group">
-            <van-cell title="姓名" :value="customerInfo.baseInfo.name"/>
-            <van-cell title="性别" :value="customerInfo.baseInfo.sex"/>
-            <van-cell title="手机号" :value="customerInfo.baseInfo.phone"/>
-            <van-cell title="出生日期" :value="customerInfo.baseInfo.birthDay"/>
-            <van-cell title="身份证号" :value="customerInfo.baseInfo.identityCard"/>
+            <van-cell title="姓名" :value="userInfo.name"/>
+            <van-cell title="性别" :value="userInfo.sexChar"/>
+            <van-cell title="手机号" :value="userInfo.phone"/>
+            <van-cell title="出生日期" :value="userInfo.birthTime || '未填写'"/>
+            <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/>
           </van-cell-group>
-          <van-cell title="服务教练" is-link/>
-          <van-cell title="服务销售" is-link/>
+          <van-cell title="服务教练" @click="showCoachList()">
+            <div slot="right-icon">
+              <div class="tab-cover" v-for="(item, index) in serviceCoachList" :key="index">
+                <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+              </div>
+              <van-icon name="arrow" color="#999"/>
+            </div>
+          </van-cell>
+          <van-cell title="服务销售" @click="showSaleList()">
+            <div slot="right-icon">
+              <div class="tab-cover" v-for="(item, index) in serviceSaleList" :key="index">
+                <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+              </div>
+              <van-icon name="arrow" color="#999"/>
+            </div>
+          </van-cell>
           <van-cell title="健身目的" is-link/>
-          <van-cell title="客户星级" is-link/>
+          <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
         </div>
       </van-tab>
     </van-tabs>
+
+    <van-popup
+      :show="showPopup"
+      @close="showPopup = false"
+      :duration="200"
+      position="bottom"
+      custom-style="width:100%"
+    >
+      <div class="list">
+        <div class="item" v-for="(item, index) in actionList" :key="index">
+          <div class="avatar">
+            <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+          </div>
+          <div class="name">{{item.name}}</div>
+          <div class="store">{{item.storeName}}</div>
+        </div>
+      </div>
+    </van-popup>
+
     <suspension-window v-if="!isOperate" :operateList="operateList" @operate="operate"></suspension-window>
   </div>
 </template>
 
 <script>
-import { setNavTab, window } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import listDayItem from "../components/list-day-item.vue";
@@ -63,6 +98,7 @@ export default {
   data() {
     return {
       tabIndex: 0,
+      id: 0,
       isOperate: false,
       checkInData: [
         {
@@ -106,20 +142,7 @@ export default {
           dataNum: "39"
         }
       ],
-      FollowUpList: [
-        {
-          day: "18",
-          month: "08",
-          topText: "跟进教练",
-          bottomText: "跟进内容"
-        },
-        {
-          day: "18",
-          month: "08",
-          topText: "跟进教练",
-          bottomText: "跟进内容"
-        }
-      ],
+      followUpList: [],
       checkInList: [{}, {}, {}],
       cardList: [
         {
@@ -183,6 +206,7 @@ export default {
           remarks: null
         }
       ],
+      appointList: [],
       operateList: [
         {
           text: "一键上课",
@@ -210,7 +234,13 @@ export default {
           birthDay: "1998-08-18",
           identityCard: "3623335649875615231"
         }
-      }
+      },
+      serviceCoachList: [],
+      serviceSaleList: [],
+      userInfo: {},
+      showPopup: false,
+      // 下弹出来的list
+      actionList: []
     };
   },
   mixins: [colorMixin],
@@ -224,7 +254,132 @@ export default {
   mounted() {
     setNavTab();
   },
+  onLoad(options) {
+    this.id = options.id;
+    this.getDetail();
+    this.getFollowUpList();
+    this.getCardList();
+  },
   methods: {
+    getDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/customer/archives/detail",
+        data: {
+          customerId: that.id
+        },
+        success: function(res) {
+          if (res.data.code == 200) {
+            let _data = res.data.data
+            let _serviceCoachList = []
+            let _serviceSaleList = []
+            
+            _data.starLevel = _data.starLevel ? _data.starLevel+'星':'暂无'
+            that.userInfo = _data;
+
+            _data.customerStoreArrays.forEach(e => {
+              _serviceCoachList.push({
+                storeId:e.storeId,
+                storeName: e.storeName,
+                name: e.serviceCoachName,
+                id: e.serviceCoachId
+              })
+              _serviceSaleList.push({
+                storeId:e.storeId,
+                storeName: e.storeName,
+                name: e.serviceUserName,
+                id: e.serviceUserId
+              })
+            })
+
+            that.serviceCoachList = _serviceCoachList
+            that.serviceSaleList = _serviceSaleList
+          }
+        }
+      });
+    },
+    showCoachList() {
+      this.showPopup = true
+      this.actionList = this.serviceCoachList
+    },
+    showSaleList() {
+      this.showPopup = true
+      this.actionList = this.serviceSaleList
+    },
+    // 跟进
+    getFollowUpList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/user/work/customer/track",
+        data: {
+          customerId: that.id
+        },
+        success: function(res) {
+          if (res.data.code == 200) {
+            that.followUpList = res.data.data.map(e => {
+              return {
+                id: e.trackUserId,
+                day: e.trackTime.substring(8, 10),
+                month: e.trackTime.substring(5, 7),
+                topText: "操作人：" + e.userName,
+                bottomText: "内容:" + e.content
+              };
+            });
+          }
+        }
+      });
+    },
+    // 合同
+    getCardList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/customer/card/cardInfos",
+        data: {
+          customerId: that.id,
+          page: 1
+        },
+        success: function(res) {
+          if (res.data.code == 200) {
+            that.cardList = res.data.data.result;
+          }
+        }
+      });
+    },
+    // 预约
+    getAppointList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/user/work/customer/reserved/own",
+        data: {
+          customerId: that.id
+        },
+        success: function(res) {
+          if (res.data.code == 200) {
+            that.appointList = res.data.data.map(e => {
+              return {};
+            });
+          }
+        }
+      });
+    },
+    // 签到/出勤/消费
+    getCheckInList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/consumption/log/pages",
+        data: {
+          customerId: that.id,
+          pageNo: 1
+        },
+        success: function(res) {
+          if (res.data.code == 200) {
+            that.checkInList = res.data.data.map(e => {
+              return {};
+            });
+          }
+        }
+      });
+    },
     changeTab(e) {
       console.log(e.mp.detail);
       this.changeTab.tabIndex = e.mp.detail.index;
@@ -284,6 +439,10 @@ page {
       top: 240px;
     }
   }
+  .tab-list-wrapper {
+    overflow: auto;
+    height: 60vh;
+  }
   .card-list {
     padding: 0 20px;
     .card {
@@ -292,6 +451,49 @@ page {
   }
   ._van-cell-group {
     margin-bottom: 5px;
+  }
+
+  .list {
+    .item {
+      padding-right: 15px;
+      border-top: 1rpx solid #eee;
+      >div {
+        display: inline-block;
+      }
+      .avatar {
+        width: 50px;
+        height: 50px;
+        padding: 7px 10px;
+        > img {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+        }
+      }
+      .store {
+        float: right;
+      }
+      .name,
+      .store {
+        line-height: 65px;
+      }
+    }
+  }
+  .tab-cover {
+    display: inline-block;
+    vertical-align: middle;
+    width: 25px;
+    height: 25px;
+    margin-right: 5px;
+    > img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
+  }
+  .van-icon {
+    display: inline-block;
+    vertical-align: middle;
   }
 }
 </style>

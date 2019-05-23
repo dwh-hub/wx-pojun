@@ -1,7 +1,11 @@
 <template>
   <div class="index">
     <div class="header-search">
-      <div class="store" :style="{background: themeColor}">门店</div>
+      <!-- <div class="store" :style="{background: themeColor}">门店</div> -->
+      <div class="store" :style="{background: themeColor}">
+        <sapn class="store-text">门店</sapn>
+        <i class="triangle-icon"></i>
+      </div>
       <div class="search-wrapper">
         <van-search
           :value="searchText"
@@ -16,7 +20,11 @@
       <div class="list-header">
         <span class="title">私教预约</span>
         <span class="info">今日约课13节私教</span>
-        <span class="btn" :style="{background: themeColor}" @click="toNav('../staff_appoint_teamclass/main')">约课</span>
+        <span
+          class="btn"
+          :style="{background: themeColor}"
+          @click="toNav('../staff_appoint_teamclass/main')"
+        >约课</span>
       </div>
       <staff-coach-item></staff-coach-item>
       <div class="see-more" :style="{color: themeColor}">查看更多</div>
@@ -46,7 +54,7 @@
 import { setNavTab, window } from "COMMON/js/common.js";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import headerData from "../components/header-data.vue";
-import colorMixin from "COMPS/colorMixin.vue"
+import colorMixin from "COMPS/colorMixin.vue";
 export default {
   data() {
     return {
@@ -63,7 +71,7 @@ export default {
     staffCoachItem,
     headerData
   },
-  mixins:[colorMixin],
+  mixins: [colorMixin],
   methods: {
     search(e) {
       console.log(e);

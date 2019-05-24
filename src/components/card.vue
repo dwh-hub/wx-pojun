@@ -47,6 +47,9 @@ export default {
       return ""
     },
     backClass() {
+      if(this.info.cardStatus != 2) {
+        return 'none'
+      }
       if(this.info.authorityUnit == '次' || this.info.authorityUnit == '2') {
         this.type = '次'
         return 'times'
@@ -58,9 +61,6 @@ export default {
       if(this.info.authorityUnit == '天' || this.info.authorityUnit == '1') {
         this.type = '天'
         return 'day'
-      }
-      if(this.info.cardStatus != 2) {
-        return 'none'
       }
     }
   },

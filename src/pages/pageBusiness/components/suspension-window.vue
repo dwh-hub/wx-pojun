@@ -37,6 +37,9 @@ export default {
     },
     operate(item) {
       this.showOperate = false
+      if(item.action) {
+        item.action()
+      }
       this.$emit("operate",item.text)
     }
   }
@@ -55,6 +58,8 @@ export default {
       float: right;
       width: 45px;
       height: 45px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff 50%, rgba(0,0,0,0) 50%)
     }
     .operate-wrapper {
       text-align: right;

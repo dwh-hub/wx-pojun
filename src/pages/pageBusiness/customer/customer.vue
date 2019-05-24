@@ -1,7 +1,7 @@
 <template>
   <div class="customer">
     <div class="tabs" :style="{background: themeColor}">
-      <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">客户列表</span>
+      <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
       <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
       <!-- @click="tabIndex = 2" -->
     </div>
@@ -44,7 +44,7 @@
             <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
           </div>
         </div>
-        <staff-coach-item @clickIcon="call" @clickItem="toDetail(item,index)" :info="item">
+        <staff-coach-item @clickIcon="call(item)" @clickItem="toDetail(item,index)" :info="item">
           <div>
             <img src="/static/images/staff/phone.svg" alt>
             <img src="/static/images/staff/right-arrow.svg" alt>
@@ -457,9 +457,9 @@ export default {
       if (param == "发送手机短信") {
       }
     },
-    call() {
+    call(item) {
       wx.makePhoneCall({
-        phoneNumber: ""
+        phoneNumber: item.phone
       });
     },
     // 选择教练/销售 分配
@@ -555,8 +555,8 @@ export default {
       } else {
         const DAY = 24 * 60 * 60 * 1000;
         let stamp = new Date().getTime();
-        let startTime = formatDate(new Date(stamp), "yyyy-MM-dd hh:mm:ss");
-        let endTime = formatDate(
+        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd hh:mm:ss");
+        let startTime = formatDate(
           new Date(stamp - DAY * day),
           "yyyy-MM-dd hh:mm:ss"
         );
@@ -610,7 +610,7 @@ page {
       overflow: auto;
       z-index: 99;
       .store-item {
-        padding: 10px 15px;
+        padding: 15px;
         background-color: #fff;
         border-bottom: 1rpx solid #eee;
         box-shadow: none;

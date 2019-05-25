@@ -63,7 +63,7 @@ function rand(min, max) {
 function getUserInfo() {
   return new Promise(function (resolve) {
     wx.request({
-      url: window.api + "/wxcustomer/findAllCustomer",
+      url: window.api + "/wxcustomer/findCustomerStore",
       data: {
         phone: wx.getStorageSync("phone"),
         companyId: wx.getStorageSync("companyId")
@@ -73,24 +73,32 @@ function getUserInfo() {
         if (res.data.code == 200) {
           let _data = res.data.data
           if (!_data.length) {
-            if (wx.getStorageSync("storeId")) {
+            // if (wx.getStorageSync("storeId")) {
               return register()
-            }
-            return wx.showModal({
-              title: "提示",
-              content: "您目前不是该店会员，是否前往注册会员？",
-              success(res) {
-                if (res.confirm) {
-                  wx.navigateTo({
-                    url: "../register/main"
-                  });
-                }
-              }
-            });
+            // }
+            // return wx.showModal({
+            //   title: "提示",
+            //   content: "您目前不是该店会员，是否前往注册会员？",
+            //   success(res) {
+            //     if (res.confirm) {
+            //       wx.navigateTo({
+            //         url: "../register/main"
+            //       });
+            //     }
+            //   }
+            // });
           }
 
-          if (_data.length == 1) {
-            // that.userInfo = _data[0];
+          if (_data.length) {
+            if (
+              wx.getStorageSync("storeId") &&
+              !_data.filter(e => {
+                return e.storeId == wx.getStorageSync("storeId");
+              }).length
+            ) {
+              return register();
+            }
+
             store.commit("saveUserInfo", _data[0]);
             wx.setStorage({
               key: "userInfo",
@@ -105,7 +113,26 @@ function getUserInfo() {
               data: _data[0].companyName
             });
             return resolve();
+            
           }
+
+          // if (_data.length) {
+          //   // that.userInfo = _data[0];
+          //   store.commit("saveUserInfo", _data[0]);
+          //   wx.setStorage({
+          //     key: "userInfo",
+          //     data: _data[0]
+          //   });
+          //   wx.setStorage({
+          //     key: "companyId",
+          //     data: _data[0].companyId
+          //   });
+          //   wx.setStorage({
+          //     key: "companyName",
+          //     data: _data[0].companyName
+          //   });
+          //   return resolve();
+          // }
           // that.showBindBox = true;
           // that.companyList = _data;
           // that.curCompany = _data[0];
@@ -179,15 +206,17 @@ function register() {
   HttpRequest({
     url: window.api + "/wxcustomer/addCustomer",
     data: {
+      id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : undefined,
       companyId: wx.getStorageSync("companyId"),
       phone: wx.getStorageSync("phone"),
-      name: "微信用户" + rand(1000, 9999), //wx.getStorageSync("phone"),
+      name: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + that.rand(1000, 9999)),
       storeId: wx.getStorageSync("storeId") ? wx.getStorageSync("storeId") : storeId,
       serviceUserId: wx.getStorageSync("serviceUserId") ? wx.getStorageSync("serviceUserId") : '',
       sex: 0
     },
     success(res) {
       if (res.data.code === 200) {
+        wx.removeStorageSync("storeId")
         bindMethod()
         if (wx.getStorageSync("serviceUserId")) {
           wxPush()

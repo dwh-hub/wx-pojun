@@ -61,7 +61,7 @@
         :titleSize="16"
         @tapMore="toAllStore('../coachList/main')"
       ></title-cell>
-      <coach-item :info="item" v-for="(item, index) in coachList" :key="index"></coach-item>
+      <coach-item :color="themeColor" :info="item" v-for="(item, index) in coachList" :key="index"></coach-item>
     </div>
     <page-footer></page-footer>
   </div>

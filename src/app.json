@@ -40,7 +40,17 @@
       "staff_base_info/main",
       "modify_cell/main",
       "coach_student/main",
-      "customer_detail/main"
+      "customer_detail/main",
+      "QRCodeSignIn/main",
+      "appoint_result/main",
+      "contract_list/main",
+      "public_sea/main",
+      "customer_interview/main",
+      "follow_up_log/main",
+      "private_coach_class/main",
+      "staff_team_class/main",
+      "team_class_scheduling/main",
+      "scheduling_detail/main"
     ]
   }],
   "permission": {

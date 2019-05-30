@@ -1,22 +1,5 @@
 <template>
   <div class="appoint_coach" :class="{'isPhoneX-wrap':isPhoneX}">
-    <div class="cell-list-sm">
-      <title-cell
-        title="授课门店"
-        :moreText="storeCellText"
-        :moreSize="14"
-        :titleSize="16"
-        @tapMore="isStorePopup = true"
-      ></title-cell>
-      <title-cell
-        title="预约时间"
-        :moreText="timeCellText"
-        :moreSize="14"
-        :titleSize="16"
-        @tapMore="showTimePopup"
-      ></title-cell>
-    </div>
-
     <div class="cell-list-lg">
       <title-cell
         title="扣费合同"
@@ -30,6 +13,13 @@
 
     <div class="cell-list-sm">
       <title-cell
+        title="授课门店"
+        :moreText="storeCellText"
+        :moreSize="14"
+        :titleSize="16"
+        @tapMore="showStorePopup"
+      ></title-cell>
+      <title-cell
         title="预约场馆"
         :moreText="venueCellText"
         :moreSize="14"
@@ -42,6 +32,16 @@
         :moreSize="14"
         :titleSize="16"
         @tapMore="showProjectPopup"
+      ></title-cell>
+    </div>
+
+    <div class="cell-list-sm">
+      <title-cell
+        title="预约时间"
+        :moreText="timeCellText"
+        :moreSize="14"
+        :titleSize="16"
+        @tapMore="showTimePopup"
       ></title-cell>
     </div>
 
@@ -235,10 +235,9 @@
       @click="appointCoach"
       :style="{'background-color': themeColor}"
     >
-      发起预约
+      {{appointType}}
       <div class="block" v-if="isPhoneX"></div>
     </div>
-    <page-footer></page-footer>
   </div>
 </template>
 
@@ -251,13 +250,14 @@ import {
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
-import store from "../../..//utils/store";
-import pageFooter from "COMPS/pageFooter.vue";
+import store from "../../../utils/store";
 
 export default {
   name: "appointment-coach",
   data() {
     return {
+      id: "",
+      appointType: "",
       // 门店选择文本
       storeCellText: "请选择",
       // 时间选择文本
@@ -315,8 +315,8 @@ export default {
       venueList: [],
       // 项目列表
       projectList: [],
-      // 当前登录客户信息
-      userInfo: "",
+      // 当前登录用户信息
+      userInfo: {},
       // 预约的参数
       // 门店id
       selectStoreId: "",
@@ -328,21 +328,24 @@ export default {
       venueId: "",
       // 项目id
       projectId: "",
-      // 教练信息
-      coachInfo: {},
+      // 学员信息
+      studentInfo: {},
       // 不能预约的时间
       todayPeriodTime: []
     };
   },
   components: {
     titleCell,
-    selectDate,
-    pageFooter
+    selectDate
   },
-  onLoad(option) {
-    // 进页面前先清空数据
-    Object.assign(this.$data, this.$options.data());
+  onLoad(options) {
+    this.id = options.id;
+    this.appointType = options.type;
+    this.userInfo = wx.getStorageSync("staff_info");
     setNavTab();
+  },
+  onUnload() {
+    Object.assign(this.$data, this.$options.data());
   },
   onPullDownRefresh() {
     setTimeout(() => {
@@ -351,7 +354,10 @@ export default {
   },
   mounted() {
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
-    this.computedTime()
+    // this.computedTime();
+    this.getStudentDetail();
+    this.getCardList();
+    this.getPeriodTime();
   },
   computed: {
     isPhoneX() {
@@ -381,26 +387,75 @@ export default {
   methods: {
     // 时间
     showTimePopup() {
-      if (!this.selectStoreId) {
-        this.isTimePopup = true;
-      }
+      this.isTimePopup = true;
     },
     // 合同
     showCardPopop() {
+      if (!this.cardList.length) {
+        return wx.showModal({
+          title: "提示",
+          content: "未找到可消费合同",
+          showCancel: false
+        });
+      }
       this.isCardPopup = true;
+    },
+    // 门店
+    showStorePopup() {
+      if (!this.selectCardId) {
+        return wx.showModal({
+          title: "提示",
+          content: "请先选择消费的合同",
+          showCancel: false
+        });
+      }
+      this.isStorePopup = true;
     },
     // 场馆
     showVenuePopup() {
+      if (!this.selectStoreId || !this.selectCardId) {
+        return wx.showModal({
+          title: "提示",
+          content: "请先选择门店和合同",
+          showCancel: false
+        });
+      }
+      if (this.selectStoreId && this.selectCardId && !this.venueList.length) {
+        return wx.showModal({
+          title: "提示",
+          content: "该合同无消费的场馆，不可预约",
+          showCancel: false
+        });
+      }
       this.isVenuePopup = true;
     },
     // 项目
     showProjectPopup() {
+      if (!this.venueId) {
+        return wx.showModal({
+          title: "提示",
+          content: "请先选择场馆",
+          showCancel: false
+        });
+      }
+      if (
+        this.selectStoreId &&
+        this.selectCardId &&
+        this.venueId &&
+        !this.venueList.length
+      ) {
+        return wx.showModal({
+          title: "提示",
+          content: "未找到可消费的项目，不可预约",
+          showCancel: false
+        });
+      }
       this.isProjectPopup = true;
     },
     // 选择时间
     selectHour(item, index) {
       if (item.disable) {
-        return; 
+        return;
       }
       this.curTimeObj = item;
       let _item;
@@ -428,16 +483,16 @@ export default {
       this.curEndTime = this.curEndTime.split(":")[0] + ":" + item.second;
       this.curSecondIndex = index;
     },
-    // 判断当前时间节点是否被占用的函数 
+    // 判断当前时间节点是否被占用的函数
     isUsed(start, end) {
       for (let i in this.todayPeriodTime) {
         let element = this.todayPeriodTime[i];
 
         if (
           // 开始时间在预约时间内
-          (element.timeStart - 60 * 60 * 1000 < start &&
-            start < element.timeEnd) ||
-          (element.timeStart < end && end < element.timeEnd)
+          (element.timeStart - 60 * 60 * 1000 <= start &&
+            start <= element.timeEnd) ||
+          (element.timeStart <= end && end <= element.timeEnd)
         ) {
           return true;
         }
@@ -535,9 +590,10 @@ export default {
       }
       this.dayTime = target;
     },
-    // 选择门店
-    selectStore(item) {
-      this.isStorePopup = false;
+    // 组件select-date返回的日期
+    onDate(date) {
+      this.getPeriodTime(date);
+      this.curDate = date;
     },
     // 选择合同
     selectCard(item) {
@@ -548,6 +604,39 @@ export default {
       this.projectCellText = "请选择";
 
       this.isCardPopup = false;
+      this.cardCellText = item.cardClassName;
+      this.selectCardId = item.id;
+      this.cardClassId = item.cardClassId;
+      if (this.selectCardId) {
+        this.getStoreList();
+      }
+    },
+    // 选择门店
+    selectStore(item) {
+      this.isStorePopup = false;
+      this.storeCellText = item.storeName;
+      this.selectStoreId = item.storeId;
+      if (this.selectStoreId && this.selectCardId) {
+        this.getVenueList();
+      }
+      this.getStoreQuery();
+    },
+    // 选择场馆
+    selectVenue(item) {
+      this.isVenuePopup = false;
+      this.venueId = item.venueId;
+      this.venueCellText = item.venueName;
+      this.getProList();
+      if (!this.projectId) {
+        this.isProjectPopup = true;
+      }
+    },
+    // 选择项目
+    selectProject(item) {
+      this.isProjectPopup = false;
+      this.projectId = item.projectId;
+      this.projectCellText = item.projectName;
+      this.isTimePopup = true;
     },
     // 确认选择时间
     selectDate() {
@@ -568,35 +657,353 @@ export default {
         this.showCardPopop();
       }
     },
-    // 选择场馆
-    selectVenue(item) {
-      this.isVenuePopup = false;
+    // 获取学员信息
+    getStudentDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/customer/archives/detail",
+        data: {
+          customerId: that.id
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            that.studentInfo = res.data.data;
+          }
+        }
+      });
     },
-    // 选择项目
-    selectProject(item) {
-      this.isProjectPopup = false;
+    // 获取可用合同
+    getCardList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/customer/card/cardInfos",
+        data: {
+          customerId: that.id,
+          pageCount: 100
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            let _list = [];
+            if (!res.data.data.result.length) {
+              return wx.showModal({
+                title: "提示",
+                content: "未找到可消费合同",
+                showCancel: false
+              });
+            }
+            _list = res.data.data.result.map(e => {
+              if (e.teachCardType == 2 && e.cardStatus == 2) {
+                e.doomsday = e.doomsday.split(" ")[0];
+                // _list.push(e);
+              }
+              return e;
+            });
+            that.cardList = _list;
+            if (that.cardList.length == 1) {
+              that.selectCard(that.cardList[0]);
+            } else {
+              that.isCardPopup = true;
+            }
+          }
+        }
+      });
+    },
+    // 获取教练的授课门店列表
+    getStoreList() {
+      wx.showLoading({
+        title: "加载中..."
+      });
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/getAttendStore",
+        success(res) {
+          if (res.data.code == 200) {
+            that.storeList = res.data.data;
+            if (that.storeList.length == 1) {
+              that.selectStore(that.storeList[0]);
+            } else {
+              that.isStorePopup = true;
+            }
+          }
+          wx.hideLoading();
+        }
+      });
+    },
+    // 获取场馆列表
+    getVenueList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/getAttendVenue",
+        data: {
+          storeId: that.selectStoreId,
+          cardClassId: that.cardClassId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.venueList = res.data.data;
+            if (that.venueList.length == 1) {
+              that.selectVenue(that.venueList[0]);
+            } else {
+              that.isVenuePopup = true;
+            }
+          } else {
+            that.venueList = [];
+          }
+        }
+      });
+    },
+    // 获取项目列表
+    getProList() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/getproject",
+        data: {
+          storeId: that.selectStoreId,
+          cardClassId: that.cardClassId,
+          venueId: that.venueId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.projectList = res.data.data;
+            if (that.projectList.length == 1) {
+              that.selectProject(that.projectList[0]);
+            }
+          } else {
+            that.projectList = [];
+          }
+        }
+      });
+    },
+    // 获取教练被占用的时间
+    getPeriodTime(date) {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/coach/private/caochTimePeriod",
+        data: {
+          coachId: that.userInfo.userId,
+          calendar: date || formatDate(new Date(), "yyyy-MM-dd")
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            /*let _time = []
+            _time = res.data.data.map(function(e) {
+              return {
+                startTime: formatDate(new Date(e.timeStart), "yyyy-MM-dd hh:mm"),
+                endTime: formatDate(new Date(e.timeEnd), "yyyy-MM-dd hh:mm")
+              }
+            })
+            console.log(_time)*/
+            that.todayPeriodTime = res.data.data;
+            that.computedTime();
+          } else {
+            that.todayPeriodTime = [];
+          }
+        }
+      });
+    },
+    // 门店系统设置，获取营业时间
+    getStoreQuery() {
+      let that = this;
+      return new Promise(function(resolve) {
+        HttpRequest({
+          url: window.api + "/system/setup/store/query",
+          data: {
+            storeId: that.selectStoreId
+          },
+          success(res) {
+            if (res.data.code == 200) {
+              that.openTimeStart = res.data.data.openingHoursStart || "00";
+              that.openTimeEnd = res.data.data.openingHoursEnd || "24";
+              that.computedTime();
+              resolve();
+            }
+          }
+        });
+      });
     },
     // 确认预约
-    appointCoach() {},
-    // 组件select-date返回的日期
-    onDate(date) {
-      this.getPeriodTime(date);
-      this.curDate = date;
+    appointCoach() {
+      let that = this;
+      if (!this.selectCardId) {
+        return wx.showToast({
+          title: "请选择扣费合同",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (!this.selectStoreId) {
+        return wx.showToast({
+          title: "请选择授课门店",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (!this.venueId) {
+        return wx.showToast({
+          title: "请选择消费场馆",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (!this.projectId) {
+        return wx.showToast({
+          title: "请选择消费项目",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (this.cardCellText == "请选择" || this.cardCellText == "") {
+        return wx.showToast({
+          title: "请选择预约时间",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      wx.showLoading({
+        title: "预约中..."
+      });
+      let params = {
+        status: 1,
+        customerId: that.id,
+        coachId: that.userInfo.userId,
+        cardId: that.selectCardId,
+        storeId: that.selectStoreId,
+        venueId: that.venueId,
+        projectId: that.projectId,
+        calendar: that.curDate + " " + "00:00:00",
+        timeStart: that.curDate + " " + that.curTime + ":00",
+        timeEnd: that.curDate + " " + that.curEndTime + ":00",
+        name: that.userInfo.name,
+        phone: that.userInfo.phone
+      };
+      console.log(this.appointType);
+      if (this.appointType == "预约") {
+        this.confirmAppoint(params);
+      } else if (this.appointType == "一键上课") {
+        this.confirmAttendClass(params);
+      }
     },
-    // 获取教练信息
-    getCoachDetail() {},
-    // 获取教练的授课门店列表
-    getStoreList() {},
-    // 获取可用合同
-    getCardList() {},
-    // 获取场馆列表
-    getVenueList() {},
-    // 获取项目列表
-    getProList() {},
-    // 获取教练被占用的时间
-    getPeriodTime(date) {},
-    // 门店系统设置，获取营业时间
-    getStoreQuery() {}
+    // 上课 确认按钮 点击上课 -> 获取设置的上课方式 -> 走对应的上课流程
+    confirmAttendClass(params) {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/directset",
+        data: params,
+        success(res) {
+          wx.hideLoading();
+          if (res.data.code == 200) {
+            let _appointId = res.data.data;
+            console.log("_appointId:" + _appointId);
+            that.attendClassWay(_appointId);
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
+    },
+    // 预约 确认按钮
+    confirmAppoint(params) {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/set",
+        data: params,
+        success(res) {
+          wx.hideLoading();
+          if (res.data.code == 200) {
+            wx.redirectTo({
+              url:
+                "../appoint_result/main?coachAppointId=" +
+                res.data.data.coachAppointId
+            });
+            // wx.showModal({
+            //   title: "提示",
+            //   content: res.data.message,
+            //   success: function success(res2) {
+            //     if (res2.confirm) {
+            //     }
+            //   }
+            // });
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
+    },
+    // 获取上课方式
+    attendClassWay(appointId) {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/coach/private/eliminateclass/way",
+        data: {
+          storeId: that.selectStoreId
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            let way = res.data.data.privateSignWay;
+            if (way == 1) {
+              // 教练自签
+              that.attendclass(appointId);
+            } else {
+              let params;
+              params = {
+                way: way,
+                coachName: that.userInfo.name,
+                coachId: that.userInfo.userId,
+                studentName: that.studentInfo.name,
+                studentId: that.studentInfo.id,
+                appointId: appointId
+              };
+
+              wx.navigateTo({
+                url: "../QRCodeSignIn/main?params=" + JSON.stringify(params)
+              });
+            }
+
+            // else if (way == 2) {
+            //   // 教练+会员确认
+            // } else if (way == 3) {
+            //   // 教练+会员+前台确认
+            // } else if (way == 4) {
+            //   // 教练+前台确认
+            // }
+          }
+        }
+      });
+    },
+    // 上课
+    attendclass(appointId) {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/attendclass",
+        data: {
+          coachAppointId: appointId,
+          coachId: that.userInfo.userId
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
+    }
   }
 };
 </script>

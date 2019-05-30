@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "合同列表",
+  "usingComponents": {
+    "van-loading": "../../../../static/vant/loading/index"
+  }
+}

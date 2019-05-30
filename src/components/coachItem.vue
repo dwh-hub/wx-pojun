@@ -12,7 +12,7 @@
         <div class="coach-desc">{{info.individualResume || '暂无个人简介'}}</div>
         <div
           class="coach-times"
-          :style="{'color': themeColor}"
+          :style="{'color': color}"
         >已授课：{{(info.privateCountByCoach + info.teamCountByCoach) || '0'}}节</div>
       </div>
       <div class="tag" v-if="hasTag">
@@ -21,14 +21,14 @@
       </div>
       <div
         class="appoint"
-        :style="{'background-color': themeColor}"
+        :style="{'background-color': color}"
         v-if="hasBtn && isLogin"
         @click.stop="toAppoint"
       >预约</div>
       <button
         v-else
         class="appoint clearBtn"
-        :style="{'background-color': themeColor}"
+        :style="{'background-color': color}"
         type="default"
         @click.stop
         open-type="getPhoneNumber"
@@ -50,7 +50,6 @@
 import store from "../utils/store";
 import {getPhoneNumber} from "COMMON/js/api.js";
 import { window } from "COMMON/js/common";
-import colorMixin from "COMPS/colorMixin.vue"
 export default {
   name: "coach-item",
   props: {
@@ -71,9 +70,11 @@ export default {
     isToDetail: {
       type: Boolean,
       default: true
+    },
+    color: {
+      type: String
     }
   },
-  mixins:[colorMixin],
   computed: {
     isLogin() {
       return store.state.isLogin

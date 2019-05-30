@@ -38,6 +38,7 @@ export default {
   },
   methods: {
     login() {
+      let that = this;
       HttpRequest({
         url: window.api + "/user/login",
         data: {
@@ -45,15 +46,23 @@ export default {
           password: "2131"
         },
         success(res) {
-          wx.setStorage({
-            key: "Cookie",
-            data: res.header["Set-Cookie"]
-          });
-          // wx.setStorage({
-          //   key: 'staff_userInfo',
-          //   data: res.data.data
-          // });
-          console.log(res.data);
+          console.log("/?/、//")
+          if (res.data.code == 200) {
+            setStorageSync("Cookie", res.header["Set-Cookie"]);
+            setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+          console.log("------------/?/、//")
+            that.getStaffInfo();
+          }
+        }
+      });
+    },
+    getStaffInfo() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/user/detail/own",
+        success(res) {
+          wx.setStorageSync("staff_info", res.data.data);
+          // positionType 0 销售 1 教练 2 销售+教练 null 都不是
         }
       });
     },

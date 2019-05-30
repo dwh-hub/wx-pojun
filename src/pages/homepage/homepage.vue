@@ -87,7 +87,7 @@
             </div>
           </div>
         </div>
-      <coach-item :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
+      <coach-item :color="themeColor" :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
     </div>
     <login-popup :options="options" v-if="!isLogin"></login-popup>
 
@@ -305,6 +305,7 @@ export default {
             _list.push({
               userName: _data.coachName,
               userId: _data.coachId,
+              headImgPath: _data.coachHeadImg,
               individualResume: _data.individualResume,
               teamCountByCoach: _data.teamCountByCoach,
               privateCountByCoach: _data.privateCountByCoach

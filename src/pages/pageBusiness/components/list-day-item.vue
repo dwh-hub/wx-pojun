@@ -7,14 +7,17 @@
         <div class="month">{{info.month}}月</div>
       </div>
       <div class="flex-middle">
-        <div class="flex-middle-item">{{info.topText}}</div>
-        <div class="flex-middle-item">{{info.bottomText}}</div>
+        <wxParse :content="info.topText||'<p></p>'" />
+        <wxParse :content="info.bottomText||'<p></p>'" />
+        <!-- <div class="flex-middle-item">{{info.topText}}</div> -->
+        <!-- <div class="flex-middle-item">{{info.bottomText}}</div> -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import wxParse from "mpvue-wxparse";
 export default {
   props: {
     info: {
@@ -28,6 +31,9 @@ export default {
         }
       }
     }
+  },
+  components: {
+    wxParse
   }
 };
 </script>

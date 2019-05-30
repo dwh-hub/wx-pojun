@@ -42,7 +42,7 @@
     </div>
     <div class="coach-list">
       <!-- <div class="sub-title">$标题$</div> -->
-      <coach-item :info="item" v-for="(item, index) in curCoachList" :key="index"></coach-item>
+      <coach-item :color="themeColor" :info="item" v-for="(item, index) in curCoachList" :key="index"></coach-item>
     </div>
     <div class="mask" v-show="maskShow" @click="clickMask"></div>
     <none-result v-if="!curCoachList.length"></none-result>

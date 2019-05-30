@@ -1,45 +1,23 @@
 // 头部搜索
 .header-search {
   display: flex;
-
-  .store {
-    .store-text {
-      display: inline-block;
-      vertical-align: middle;
-      line-height: 44px;
-      height: 44px;
-      padding-left: 10px;
-      color: #fff;
-    }
-
-    .triangle-icon {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      margin-left: 5px;
-      vertical-align: middle;
-      background-size: 100%;
-      background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTU0ODg1MDMwOTQ5IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIxODgiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTUxMS45OTk0ODggODE5LjQxMzQ2MiA3Mi44Mzc0IDIwNC41ODY1MzggOTUxLjE2MjYgMjA0LjU4NjUzOFoiIHAtaWQ9IjIxODkiIGZpbGw9IiM5OTk5OTkiPjwvcGF0aD48L3N2Zz4=");
-      transition: transform 0.3s;
-
-      &.active {
-        transform: rotate(-180deg);
-      }
-    }
-  }
-
   .search-wrapper {
     flex: 1;
+    padding: 0;
     height: 44px;
-
     .van-search {
       padding-left: 10px;
     }
-
     .field-index--van-field {
       background-color: #f6f6f6;
     }
   }
+}
+
+.van-loading {
+  display: block !important;
+  margin: 0 auto;
+  margin-top: 20px;
 }
 
 .mask-all {
@@ -123,4 +101,15 @@
 .radio {
   display: inline-block;
   margin: 10px 5px;
+}
+
+
+.fixed-bottom-btn {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  line-height: 46px;
+  text-align: center;
+  color: #fff;
 }

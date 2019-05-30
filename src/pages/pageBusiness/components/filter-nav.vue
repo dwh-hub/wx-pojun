@@ -6,10 +6,10 @@
       <i class="triangle-icon"></i>
       <div
         class="list-warpper"
-        :class="{slideWrap: (showStoreNav && currentNav==index)}"
+        :class="{slideWrap: (showSlideList && currentNav==index)}"
         @click.stop="clickMask"
       >
-        <div class="store-nav-list" :class="{slide: (showStoreNav && currentNav==index)}">
+        <div class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
           <div
             class="store-nav-item"
             v-for="(itemS, indexS) in item.children"
@@ -19,11 +19,10 @@
         </div>
       </div>
     </div>
-    <div class="all-filter" @click="allFilter()">
+    <!-- <div class="all-filter" @click="allFilter()">
       <span>筛选</span>
-      <!-- <i class="screening-icon"></i> -->
       <img class="screening-icon" src="/static/images/staff/screening.png">
-    </div>
+    </div> -->
     <div class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
   </div>
 </template>
@@ -85,7 +84,7 @@ export default {
       searchText: "",
       currentNav: 0,
       maskShow: false,
-      showStoreNav: false,
+      showSlideList: false,
       _nav: []
     };
   },
@@ -95,26 +94,26 @@ export default {
     }
   },
   mounted() {
-    this._nav = this.nav;
+    this._nav = this.nav
   },
   methods: {
     search(e) {
       console.log(e);
     },
     selectNav(index) {
-      if (index == this.currentNav && this.showStoreNav) {
+      if (index == this.currentNav && this.showSlideList) {
         this.maskShow = false;
-        this.showStoreNav = false;
+        this.showSlideList = false;
         return;
       }
       this.currentNav = index;
       this.maskShow = true;
-      this.showStoreNav = true;
+      this.showSlideList = true;
     },
     clickSonNav(index, item) {
       this._nav[index].navTitle = item.sonText;
       this.maskShow = false;
-      this.showStoreNav = false;
+      this.showSlideList = false;
       // this.$emit("selectFilter", item);
       if (item.action) {
         item.action();
@@ -122,11 +121,11 @@ export default {
     },
     clickMask() {
       this.maskShow = false;
-      this.showStoreNav = false;
+      this.showSlideList = false;
     },
     allFilter() {
       this.maskShow = false;
-      this.showStoreNav = false;
+      this.showSlideList = false;
       this.$emit("allFilter");
     }
   }

@@ -16,32 +16,53 @@
       <van-tab title="出勤信息">
         <header-data :headerData="checkInData"></header-data>
         <filter-nav></filter-nav>
-        <div class="tab-list-wrapper">
-          <list-day-item v-for="(item,index) in checkInList" :key="index"></list-day-item>
-        </div>
+        <scroll-view
+          scroll-y
+          :style="{height: scrollViewHeight + 'px'}"
+          @scrolltolower="getCheckInList()"
+        >
+          <list-day-item :info="item" v-for="(item,index) in checkInList" :key="index"></list-day-item>
+          <none-result text="暂无出勤记录" v-if="!checkInList.length && !isCheckInLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isCheckInLoading"/>
+        </scroll-view>
       </van-tab>
       <van-tab title="跟进回访">
         <header-data :headerData="FollowUpData"></header-data>
         <filter-nav></filter-nav>
-        <div class="tab-list-wrapper">
+        <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
           <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item>
-        </div>
+          <none-result text="暂无跟进回访" v-if="!followUpList.length && !isFollowUpLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isFollowUpLoading"/>
+        </scroll-view>
       </van-tab>
       <van-tab title="合同">
         <header-data :headerData="cardData"></header-data>
         <filter-nav></filter-nav>
-        <div class="tab-list-wrapper">
+        <scroll-view
+          scroll-y
+          :style="{height: scrollViewHeight + 'px'}"
+          @scrolltolower="getCardList()"
+        >
           <div class="card-list">
-            <card v-for="(item,index) in cardList" :info="item" :key="index"></card>
+            <card
+              v-for="(item,index) in cardList"
+              :info="item"
+              :key="index"
+              @hasClick="toCardDetail(item)"
+            ></card>
           </div>
-        </div>
+          <none-result text="暂无合同" v-if="!cardList.length && !isCardLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isCardLoading"/>
+        </scroll-view>
       </van-tab>
       <van-tab title="预约记录">
         <header-data :headerData="appointData"></header-data>
         <filter-nav></filter-nav>
-        <div class="tab-list-wrapper">
+        <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
           <list-day-item :info="item" v-for="(item,index) in appointList" :key="index"></list-day-item>
-        </div>
+          <none-result text="预约记录" v-if="!appointList.length && !isAppointLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isAppointLoading"/>
+        </scroll-view>
       </van-tab>
       <!-- <van-tab title="订单信息"></van-tab> -->
       <van-tab title="更多信息">
@@ -131,12 +152,12 @@
             @click="selectListType=1;selectList = trackResult;showSelectPopup = true"
           />
           <van-cell title="下次跟进" is-link :value="currentDate" @click="showDatePopup = true"/>
-          <van-cell
+          <!-- <van-cell
             title="跟进类型"
             is-link
             :value="selectedTrackType.text"
             @click="selectListType=2;selectList = trackusertype;showSelectPopup = true"
-          />
+          /> -->
           <textarea class="textarea" v-model="trackContent" placeholder="请输入跟进内容"/>
         </div>
         <div class="popup-bottom-btn">
@@ -204,9 +225,14 @@ import listDayItem from "../components/list-day-item.vue";
 import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import card from "COMPS/card";
+import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
     return {
+      // 页面总高度
+      windowHeight: 0,
+      // scroll-view的高度
+      scrollViewHeight: 0,
       tabIndex: 0,
       id: 0,
       storeId: 0,
@@ -268,74 +294,20 @@ export default {
         }
       ],
       appointList: [],
+      isAppointLoading: true,
       followUpList: [],
-      checkInList: [{}, {}, {}],
-      cardList: [
-        {
-          id: 213697,
-          storeId: 94,
-          customerId: 310742,
-          name: "会员",
-          sex: null,
-          phone: "18000241486",
-          handleUserId: null,
-          cardClassId: 727,
-          cardBalance: null,
-          buyCardTime: "2019-05-06 17:11:39.0",
-          openCardTime: null,
-          endCardTime: null,
-          cardStatus: "2",
-          cardStatusChar: "使用中",
-          cardClassName: "会籍1000元卡",
-          cardClass: null,
-          storeName: "思明店",
-          balanceAuthority: 1000.0,
-          totalAuthority: 1000.0,
-          authorityUnit: "元",
-          isCanTransCard: 1,
-          masterClassName: "普通会籍卡",
-          activateDate: "2019-05-06 17:11:56",
-          doomsday: "2020-05-04 17:11:56",
-          cardNo: null,
-          companyId: null,
-          isSubscriptionPact: 0,
-          isCanBack: null,
-          physicsCardNo: "1171149410660148",
-          authorityUnitChar: null,
-          pactId: "3213",
-          openId: null,
-          periodOfValidity: 365,
-          canTeachCard: 0,
-          isActivityByPhoto: null,
-          sellingPrice: 1000.0,
-          canTransfer: 1,
-          canLossMake: 1,
-          isCanStopCard: 0,
-          isCanOverdueStopCard: 0,
-          isRealCanstopCard: null,
-          isRealCanLossMake: null,
-          isRealCanTransfer: null,
-          isRealCanTransCard: null,
-          isRealCanLabel: null,
-          coachName: null,
-          coachUserId: null,
-          coachSex: null,
-          transactUserId: 986,
-          transactUserName: "王老板",
-          otherDays: null,
-          otherAuthority: null,
-          cardAddTime: 1557133916000,
-          timesUser: null,
-          mainUser: "会员",
-          teachCardType: 0,
-          compactNum: 1,
-          remarks: null
-        }
-      ],
+      isFollowUpLoading: true,
+      checkInList: [],
+      isCheckInLoading: true,
+      cardList: [],
+      isCardLoading: true,
       operateList: [
         {
           text: "一键上课",
-          iconUrl: "/static/images/staff/close.svg"
+          iconUrl: "/static/images/staff/close.svg",
+          action: () => {
+            this.attendClass();
+          }
         },
         {
           text: "客户跟进",
@@ -353,9 +325,16 @@ export default {
         },
         {
           text: "预约上课",
-          iconUrl: "/static/images/staff/close.svg"
+          iconUrl: "/static/images/staff/close.svg",
+          action: () => {
+            this.toAppoint();
+          }
         }
       ],
+      checkInPage: 1,
+      // followUpPage: 1,
+      cardpage: 1,
+      // appointPage: 1,
       // 姓名、电话、性别 、出身月份、身份证
       customerInfo: {
         baseInfo: {
@@ -393,7 +372,7 @@ export default {
       selectObjective: { id: "", text: "请选择" },
       trackContent: "",
       operateText: "",
-      selectListType: 0, // 1 跟进结果列表 2 跟进类型列表 3 预约目的
+      selectListType: 0 // 1 跟进结果列表 2 跟进类型列表 3 预约目的
     };
   },
   mixins: [colorMixin],
@@ -402,20 +381,77 @@ export default {
     filterNav,
     listDayItem,
     suspensionWindow,
-    card
+    card,
+    noneResult
   },
   mounted() {
     setNavTab();
-  },
-  onLoad(options) {
-    this.id = options.id;
+    this.computedScrollHeight();
     this.getDetail();
     this.getAppointList();
     this.getCheckInList();
     this.getFollowUpList();
     this.getCardList();
   },
+  onLoad(options) {
+    this.id = options.id;
+  },
+  onHide() {
+    console.log("customer_detail_onHide");
+  },
+  onUnload() {
+    this.clearData();
+    console.log("customer_detail_onUnload");
+  },
   methods: {
+    toCardDetail(item) {
+      wx.navigateTo({
+        // url: "../../cardDetail/main?id=" + item.id
+        url: `../../cardDetail/main?id=${item.id}&type=staff`
+      });
+    },
+    attendClass() {
+      let that = this;
+      wx.navigateTo({
+        url: `../appoint_coach/main?id=${that.id}&type=一键上课`
+      });
+    },
+    toAppoint() {
+      let that = this;
+      wx.navigateTo({
+        url: `../appoint_coach/main?id=${that.id}&type=预约`
+      });
+    },
+    clearData() {
+      this.checkInPage = 1;
+      this.cardpage = 1;
+      this.appointList = [];
+      this.followUpList = [];
+      this.checkInList = [];
+      this.cardList = [];
+      this.userInfo = {};
+      this.isAppointLoading = true;
+      this.isFollowUpLoading = true;
+      (this.isCheckInLoading = true), (this.isCardLoading = true);
+    },
+    computedScrollHeight() {
+      let that = this;
+      wx.getSystemInfo({
+        success: function(res) {
+          that.windowHeight = res.windowHeight;
+        }
+      });
+
+      let query = wx.createSelectorQuery();
+      query.select(".customer-base-info").boundingClientRect();
+      let tabsFixedHeight = 164;
+
+      query.exec(res => {
+        let infoHeight = res[0].height;
+        let scrollViewHeight = this.windowHeight - infoHeight - 164;
+        this.scrollViewHeight = scrollViewHeight;
+      });
+    },
     call() {
       let that = this;
       wx.makePhoneCall({
@@ -451,18 +487,22 @@ export default {
             that.getTrackusertype();
 
             _data.customerStoreArrays.forEach(e => {
-              _serviceCoachList.push({
-                storeId: e.storeId,
-                storeName: e.storeName,
-                name: e.serviceCoachName,
-                id: e.serviceCoachId
-              });
-              _serviceSaleList.push({
-                storeId: e.storeId,
-                storeName: e.storeName,
-                name: e.serviceUserName,
-                id: e.serviceUserId
-              });
+              if (e.serviceCoachId) {
+                _serviceCoachList.push({
+                  storeId: e.storeId,
+                  storeName: e.storeName,
+                  name: e.serviceCoachName,
+                  id: e.serviceCoachId
+                });
+              }
+              if (e.serviceUserId) {
+                _serviceSaleList.push({
+                  storeId: e.storeId,
+                  storeName: e.storeName,
+                  name: e.serviceUserName,
+                  id: e.serviceUserId
+                });
+              }
             });
 
             that.serviceCoachList = _serviceCoachList;
@@ -478,30 +518,6 @@ export default {
     showSaleList() {
       this.showPopup = true;
       this.actionList = this.serviceSaleList;
-    },
-    // 跟进
-    getFollowUpList() {
-      let that = this;
-      HttpRequest({
-        url: window.api + "/user/work/customer/track",
-        data: {
-          customerId: that.id
-        },
-        success: function(res) {
-          if (res.data.code == 200) {
-            that.FollowUpData[0].dataNum = res.data.data.length || 0;
-            that.followUpList = res.data.data.map(e => {
-              return {
-                id: e.trackUserId,
-                day: e.trackTime.substring(8, 10),
-                month: e.trackTime.substring(5, 7),
-                topText: "操作人：" + e.userName,
-                bottomText: "内容：" + e.content
-              };
-            });
-          }
-        }
-      });
     },
     // 跟进类型
     getTrackusertype() {
@@ -523,32 +539,66 @@ export default {
         }
       });
     },
-    // 合同
-    getCardList() {
+    // 跟进列表
+    getFollowUpList() {
       let that = this;
+      this.isFollowUpLoading = true;
       HttpRequest({
-        url: window.api + "/customer/card/cardInfos",
+        url: window.api + "/user/work/customer/track",
         data: {
-          customerId: that.id,
-          page: 1
+          customerId: that.id
         },
         success: function(res) {
+          that.isFollowUpLoading = false;
           if (res.data.code == 200) {
-            that.cardData[0].dataNum = res.data.data.pageSize;
-            that.cardList = res.data.data.result;
+            that.FollowUpData[0].dataNum = res.data.data.length || 0;
+            that.followUpList = res.data.data.map(e => {
+              return {
+                id: e.trackUserId,
+                day: e.trackTime.substring(8, 10),
+                month: e.trackTime.substring(5, 7),
+                topText: "操作人：" + e.userName,
+                bottomText: "内容：" + e.content
+              };
+            });
           }
         }
       });
     },
-    // 预约
+    // 合同列表
+    getCardList() {
+      let that = this;
+      this.isCardLoading = true;
+      HttpRequest({
+        url: window.api + "/customer/card/cardInfos",
+        data: {
+          customerId: that.id,
+          page: that.cardpage
+        },
+        success: function(res) {
+          that.isCardLoading = false;
+          if (res.data.code == 200) {
+            if (!res.data.data.result.length) {
+              return;
+            }
+            that.cardpage++;
+            that.cardData[0].dataNum = res.data.data.pageSize;
+            that.cardList = that.cardList.concat(res.data.data.result);
+          }
+        }
+      });
+    },
+    // 预约列表
     getAppointList() {
       let that = this;
+      this.isAppointLoading = true;
       HttpRequest({
         url: window.api + "/user/work/customer/reserved/own",
         data: {
           customerId: that.id
         },
         success: function(res) {
+          that.isAppointLoading = false;
           if (res.data.code == 200) {
             that.appointData[0].dataNum = res.data.data.length;
             that.appointList = res.data.data.map(e => {
@@ -564,21 +614,26 @@ export default {
         }
       });
     },
-    // 签到/出勤/消费
+    // 签到/出勤/消费 列表
     getCheckInList() {
       let that = this;
+      this.isCheckInLoading = true;
       HttpRequest({
         url: window.api + "/consumption/log/pages",
 
         data: {
           customerId: that.id,
-          pageNo: 1
+          pageNo: that.checkInPage
         },
         success: function(res) {
-          console.log(res);
+          that.isCheckInLoading = false;
           that.checkInData[0].dataNum = res.data.data.recCount;
           if (res.data.code == 200) {
-            that.checkInList = res.data.data.result.map(e => {
+            if (!res.data.data.result.length) {
+              return;
+            }
+            that.checkInPage++;
+            let _data = res.data.data.result.map(e => {
               return {
                 id: e.consumptionLogId,
                 day: e.startTime.substring(8, 10),
@@ -587,12 +642,12 @@ export default {
                 bottomText: e.passModeValue
               };
             });
+            that.checkInList = that.checkInList.concat(_data);
           }
         }
       });
     },
     changeTab(e) {
-      console.log(e.mp.detail);
       this.changeTab.tabIndex = e.mp.detail.index;
     },
     // 通过回传的iconText来获取对应的列表
@@ -643,11 +698,11 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             wx.showToast({
-              title: res.data.message || '跟进成功',
+              title: res.data.message || "跟进成功",
               icon: "success",
               duration: 1000
             });
-            that.getFollowUpList()
+            that.getFollowUpList();
             that.showFollowUpPopup = false;
           } else {
             wx.showModal({
@@ -674,7 +729,7 @@ export default {
           duration: 1000
         });
       }
-      let that = this
+      let that = this;
       HttpRequest({
         url: window.api + "/customer/reserved/addreserved",
         data: {
@@ -686,13 +741,13 @@ export default {
           storeId: that.storeId
         },
         success(res) {
-          if(res.data.code == 200) {
+          if (res.data.code == 200) {
             wx.showToast({
-              title: res.data.message || '预约成功',
+              title: res.data.message || "预约成功",
               icon: "success",
               duration: 1000
             });
-            that.getAppointList()
+            that.getAppointList();
             that.showAppointPopup = false;
           } else {
             wx.showModal({
@@ -705,12 +760,12 @@ export default {
       });
     },
     selectListItem(item) {
-      if(this.selectListType==1) {
-        this.selectTrackResult = item
-      } else if (this.selectListType==2) {
-        this.selectedTrackType = item
-      } else if (this.selectListType==3) {
-        this.selectObjective = item
+      if (this.selectListType == 1) {
+        this.selectTrackResult = item;
+      } else if (this.selectListType == 2) {
+        this.selectedTrackType = item;
+      } else if (this.selectListType == 3) {
+        this.selectObjective = item;
       }
       this.showSelectPopup = false;
     }
@@ -767,10 +822,6 @@ page {
     .mask {
       top: 240px;
     }
-  }
-  .tab-list-wrapper {
-    overflow: auto;
-    height: 61vh;
   }
   .card-list {
     padding: 0 20px;
@@ -865,6 +916,9 @@ page {
   .van-cell__title,
   .van-cell__value {
     flex-basis: auto;
+  }
+  .van-cell-group {
+    margin-bottom: 5px;
   }
 }
 </style>

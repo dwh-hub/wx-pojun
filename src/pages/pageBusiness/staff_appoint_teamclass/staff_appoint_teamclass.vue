@@ -34,7 +34,7 @@
         </div>
         <span class="left-text">全选</span>
       </div>
-      <div class="middle">已选{{selectNum}}节</div>
+      <div class="middle">已选{{selectNum || '0'}}节</div>
       <div class="right">
         <div class="btn" @click="isOperate = false">取消操作</div>
         <div class="btn" @click="batchCancel">批量取消课程</div>

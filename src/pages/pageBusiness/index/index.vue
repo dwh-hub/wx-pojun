@@ -1,11 +1,6 @@
 <template>
   <div class="index">
     <div class="header-search">
-      <!-- <div class="store" :style="{background: themeColor}">门店</div> -->
-      <div class="store" :style="{background: themeColor}">
-        <sapn class="store-text">门店</sapn>
-        <i class="triangle-icon"></i>
-      </div>
       <div class="search-wrapper">
         <van-search
           :value="searchText"

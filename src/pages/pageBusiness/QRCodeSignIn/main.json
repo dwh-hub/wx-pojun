@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "消课",
+  "usingComponents": {
+    "van-icon": "../../../../static/vant/icon/index"
+  }
+}

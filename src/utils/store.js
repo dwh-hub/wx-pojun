@@ -10,7 +10,8 @@ const store = new Vuex.Store({
     userInfo: {},
     isIphoneX: false,
     longitude: '', // 经度
-    latitude: '' // 纬度
+    latitude: '', // 纬度
+    allStore: []
   },
   mutations: {
     changeCount(state, value) {
@@ -30,6 +31,9 @@ const store = new Vuex.Store({
     },
     saveLatitude(state, value) {
       state.latitude = value
+    },
+    saveAllStore(state, value) {
+      state.allStore = value
     }
   }
 })

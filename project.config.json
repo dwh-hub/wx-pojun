@@ -10,7 +10,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx8a6408ab22fdeea4",
+	"appid": "wx30a8e0c9c1d59f09",
 	"projectname": "wx-pojun",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
@@ -32,13 +32,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 5,
 			"list": [
 				{
 					"id": 0,
 					"name": "主页",
 					"pathName": "pages/homepage/main",
-					"query": "scene=52-117-114514",
+					"query": "scene=37-102-114514",
 					"scene": null
 				},
 				{
@@ -70,16 +70,16 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "评价",
-					"pathName": "pages/assess/main",
+					"id": 5,
+					"name": "排期",
+					"pathName": "pages/pageBusiness/team_class_scheduling/main",
 					"query": "",
 					"scene": null
 				},
 				{
-					"id": -1,
+					"id": 6,
 					"name": "demo",
-					"pathName": "pages/authorizeLogin/main",
+					"pathName": "pages/pageBusiness/team_class_scheduling/main",
 					"query": "",
 					"scene": null
 				},

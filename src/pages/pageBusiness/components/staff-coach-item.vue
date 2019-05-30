@@ -14,7 +14,7 @@
           <span class="second-1">{{info.second_tip_1 || ''}}{{undefined == info.second_1 ? '' : info.second_1}}</span>
           <span class="second-2">{{info.second_tip_2 || ''}}{{info.second_2 || ''}}</span>
         </div>
-        <div class="coach-desc">
+        <div class="coach-desc" v-if="info.third_1">
           <span class="third-1">{{info.third_tip_1 || ''}}{{info.third_1 || ''}}</span>
           <span class="third-2">{{info.third_tip_2 || ''}}{{info.third_2 || ''}}</span>
         </div>
@@ -23,6 +23,7 @@
         <div class="coach-type">上课中</div>
       </div>
       <div class="icon-right" @click.stop="clickIcon">
+        <div v-if="info.rightText" :style="{color: info.color?info.color:'#333'}">{{info.rightText}}</div>
         <slot></slot>
       </div>
     </div>

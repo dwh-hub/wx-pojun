@@ -14,7 +14,7 @@
     <div class="card-info">
       <div class="carad-info-item">
         <span class="item-title">拥有人</span>
-        <span class="item-content">{{cardInfo.mainUser}}</span>
+        <span class="item-content">{{cardInfo.mainUser || cardInfo.name ||  '--'}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">联系方式</span>
@@ -52,6 +52,7 @@ import pageFooter from "COMPS/pageFooter.vue"
 export default {
   data() {
     return {
+      type: '', // 登录状态是客户还是staff
       cardId: '',
       // 合同详情
       cardInfo: {},
@@ -65,6 +66,7 @@ export default {
   },
   onLoad(option) {
     this.cardId = option.id
+    this.type = option.type || ''
     setNavTab();
   },
   mounted() {
@@ -106,9 +108,15 @@ export default {
     },
     // 获取消费统计
     getCustomer(id) {
+      let _url = ""
+      if(this.type == "staff") {
+        _url = "/consumption/log/pages"
+      } else {
+        _url = '/consumption/log/pages/customer'
+      }
       let that = this
       HttpRequest({
-        url: window.api + '/consumption/log/pages/customer',
+        url: window.api + _url,
         data: {
           pactId: id
         },

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "客户约访",
+  "usingComponents": {
+    "van-loading": "../../../../static/vant/loading/index"
+  }
+}

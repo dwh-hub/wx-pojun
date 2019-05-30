@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "跟进日志",
+  "usingComponents": {
+    "van-loading": "../../../../static/vant/loading/index"
+  }
+}

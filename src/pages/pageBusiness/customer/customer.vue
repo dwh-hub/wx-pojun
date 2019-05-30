@@ -5,28 +5,12 @@
       <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
       <!-- @click="tabIndex = 2" -->
     </div>
-    <div class="header-search">
-      <div class="store" :style="{background: themeColor}" @click="toggleStore">
-        <sapn class="store-text">{{selectedStore.storeName}}</sapn>
-        <i class="triangle-icon"></i>
-      </div>
-      <div class="store-list" v-show="showStoreList">
-        <div
-          class="store-item"
-          @click="selectStore(item)"
-          v-for="(item,index) in storeList"
-          :key="index"
-        >{{item.storeName}}</div>
-      </div>
-      <div class="search-wrapper">
-        <van-search
-          :value="searchText"
-          :background="themeColor"
-          @change="searchChange"
-          placeholder="请输入搜索内容"
-        ></van-search>
-      </div>
-    </div>
+    <header-search
+      :storeList="storeList"
+      :color="themeColor"
+      :search="searchChange"
+      @selectStore="selectStore"
+    ></header-search>
     <header-data :headerData="headerData"></header-data>
     <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
 
@@ -51,6 +35,8 @@
           </div>
         </staff-coach-item>
       </div>
+      <van-loading :color="themeColor" v-if="isLoading"/>
+      <none-result text="暂无客户" v-if="!customerList.length && !isLoading"></none-result>
     </div>
 
     <div class="operate-bottom" v-if="isOperate">
@@ -60,7 +46,7 @@
         </div>
         <span class="left-text">全选</span>
       </div>
-      <div class="middle">已选{{selectNum}}人</div>
+      <div class="middle">已选{{selectNum || '0'}}人</div>
       <div class="right">
         <div class="btn" @click="cancelOperate()" :style="{background: themeColor}">取消操作</div>
         <div class="btn" @click="operate" :style="{background: themeColor}">{{operateText}}</div>
@@ -90,7 +76,6 @@
       </div>
     </van-popup>
     <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
-    <div class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></div>
   </div>
 </template>
 
@@ -99,19 +84,21 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  debounce
 } from "COMMON/js/common.js";
-import { getAllStore } from "COMMON/js/api.js";
+import store from "@/utils/store.js"
+import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
+import noneResult from "COMPS/noneResult.vue";
 
 export default {
   data() {
     return {
-      searchText: "",
       isShowFilter: false,
       tabIndex: 1,
       nav: [
@@ -203,15 +190,15 @@ export default {
       headerData: [
         {
           dataText: "人数",
-          dataNum: "12"
+          dataNum: "0"
         },
         {
           dataText: "数据二",
-          dataNum: "42"
+          dataNum: "0"
         },
         {
           dataText: "数据三",
-          dataNum: "39"
+          dataNum: "0"
         }
       ],
       operateList: [
@@ -223,16 +210,17 @@ export default {
           text: "分配教练",
           iconUrl: "/static/images/staff/calendar.svg"
         },
-        {
-          text: "发送手机短信",
-          iconUrl: "/static/images/staff/calendar.svg"
-        },
-        {
-          text: "关注",
-          iconUrl: "/static/images/staff/calendar.svg"
-        }
+        // {
+        //   text: "发送手机短信",
+        //   iconUrl: "/static/images/staff/calendar.svg"
+        // },
+        // {
+        //   text: "关注",
+        //   iconUrl: "/static/images/staff/calendar.svg"
+        // }
       ],
       customerList: [{}, {}, {}, {}],
+      isLoading: true,
       isOperate: false,
       isAllSelect: false,
       showSalesPopup: false,
@@ -243,10 +231,9 @@ export default {
       actionList: [],
       selectedRole: {},
       selectedStore: {},
-      showMask: false,
-      showStoreList: false,
       operateText: "",
       filter: {
+        namePhone: "",
         customerClass: "",
         addTimeStart: "",
         addTimeEnd: ""
@@ -255,20 +242,24 @@ export default {
   },
   mounted() {
     setNavTab();
-    getAllStore().then(res => {
-      if (res.data.code === 200) {
-        this.storeList = res.data.data;
-        this.selectedStore = res.data.data[0];
-        this.getCustomerList();
-      }
-    });
+    this.storeList = store.state.allStore
+    this.selectedStore = this.storeList[0]
+    this.getCustomerList();
+  },
+  onHide() {
+    this.clearFilter()
+  },
+  onUnload() {
+    this.clearFilter()
   },
   mixins: [colorMixin],
   components: {
     headerData,
     filterNav,
     staffCoachItem,
-    suspensionWindow
+    suspensionWindow,
+    headerSearch,
+    noneResult
   },
   computed: {
     window() {
@@ -288,21 +279,18 @@ export default {
     this.getCustomerList();
   },
   methods: {
-    toggleStore() {
-      this.showMask = !this.showMask;
-      this.showStoreList = !this.showStoreList;
+    clearFilter() {
+      for(let key in this.filter) {
+        this.filter[key] = ""
+      }
     },
     selectStore(item) {
-      if (this.selectedStore.storeId == item.storeId) {
-        return;
-      }
       this.selectedStore = item;
-      this.showMask = false;
-      this.showStoreList = false;
       this.page = 1;
       this.getCustomerList();
     },
     getCustomerList() {
+      this.isLoading = true
       let that = this;
       var _data = Object.assign(
         {},
@@ -316,18 +304,17 @@ export default {
         url: window.api + "/customer/list/search",
         data: _data,
         success(res) {
+          that.isLoading = false
           if (res.data.code == 200) {
             let _res = res.data.data;
             let _data;
-            if (!_res.result.length) {
-              if (that.page == 1) {
-                return (that.customerList = []);
-              } else {
-                return;
-              }
+            if (!_res.result.length && that.page == 1) {
+              return (that.customerList = []);
             }
             that.page++;
-            that.headerData[0].dataNum = _res.recCount;
+            if(that.headerData[0].dataNum == "0") {
+              that.headerData[0].dataNum = _res.recCount;
+            }
             _data = _res.result.map(e => {
               return {
                 isSelect: false,
@@ -422,8 +409,8 @@ export default {
         this.selectCustomer(item, index);
         return;
       }
-      if(!item.id) {
-        return
+      if (!item.id) {
+        return;
       }
       wx.navigateTo({
         url: "../customer_detail/main?id=" + item.id
@@ -432,8 +419,10 @@ export default {
     showFilter() {
       this.isShowFilter = true;
     },
-    searchChange(e) {
-      console.log(e);
+    searchChange(event) {
+      this.filter.namePhone = event;
+      this.page = 1;
+      this.getCustomerList();
     },
     // 通过回传的iconText来获取对应的列表
     getOperate(param) {
@@ -555,11 +544,8 @@ export default {
       } else {
         const DAY = 24 * 60 * 60 * 1000;
         let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd hh:mm:ss");
-        let startTime = formatDate(
-          new Date(stamp - DAY * day),
-          "yyyy-MM-dd hh:mm:ss"
-        );
+        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + ' 23:59:59';
+        let startTime = formatDate(new Date(stamp - DAY * day),"yyyy-MM-dd") + ' 23:59:59';
         this.filter.addTimeStart = startTime;
         this.filter.addTimeEnd = endTime;
       }
@@ -596,25 +582,6 @@ page {
       color: #fff;
       &.underline {
         border-bottom: 2px solid #fff;
-      }
-    }
-  }
-  .header-search {
-    position: relative;
-    .store-list {
-      position: absolute;
-      top: 44px;
-      width: 100%;
-      min-height: 44px;
-      max-height: 40vh;
-      overflow: auto;
-      z-index: 99;
-      .store-item {
-        padding: 15px;
-        background-color: #fff;
-        border-bottom: 1rpx solid #eee;
-        box-shadow: none;
-        border-radius: 0px;
       }
     }
   }
@@ -697,6 +664,7 @@ page {
     }
   }
   .sales-list {
+    max-height: 50vh;
     .sales-item {
       display: flex;
       border-top: 1rpx solid #eee;

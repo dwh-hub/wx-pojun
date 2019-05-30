@@ -186,7 +186,7 @@ export default {
 };
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 @import "../common/less/staff_common.less";
 page {
   height: 100%;

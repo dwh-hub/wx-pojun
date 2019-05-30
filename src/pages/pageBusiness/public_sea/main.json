@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "销售公海",
+  "disableScroll": true,
+  "usingComponents": {
+    "van-loading": "../../../../static/vant/loading/index"
+  }
+}

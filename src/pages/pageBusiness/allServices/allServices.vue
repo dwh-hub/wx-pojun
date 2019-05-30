@@ -1,10 +1,7 @@
 <template>
   <div class="all-services">
-    <div class="icon-wrapper" v-for="(item,index) in iconList" :key="index">
-      <div class="subtitle">
-        <img class="screening-icon" src="/static/images/staff/title-icon.svg">
-        <span class="subtitle-text">{{item.title}}</span>
-      </div>
+    <div class="icon-group" v-for="(item,index) in iconList" :key="index">
+      <div class="icon-title">{{item.title}}</div>
       <div class="common-services icon-wrapper">
         <div
           class="services-item icon-item"
@@ -26,146 +23,194 @@ export default {
     return {
       iconList: [
         {
-          title: "业务",
+          title: "工作台",
           list: [
             {
-              iconUrl: "/static/images/staff/business_icon_1.svg",
-              text: "购买会籍卡",
+              iconUrl:
+                "/static/images/staff/workbench_icon/workbench_icon_1.svg",
+              text: "业务",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_2.svg",
-              text: "购买私教卡",
+              iconUrl:
+                "/static/images/staff/workbench_icon/workbench_icon_2.svg",
+              text: "签到",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_3.svg",
-              text: "购买团课卡",
+              iconUrl:
+                "/static/images/staff/workbench_icon/workbench_icon_3.svg",
+              text: "确认信息",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_4.svg",
-              text: "转让",
+              iconUrl:
+                "/static/images/staff/workbench_icon/workbench_icon_4.svg",
+              text: "商品",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_5.svg",
-              text: "升级",
+              iconUrl:
+                "/static/images/staff/workbench_icon/workbench_icon_5.svg",
+              text: "营销",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_6.svg",
-              text: "补卡",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/business_icon_7.svg",
-              text: "预交定金",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/business_icon_8.svg",
-              text: "退款",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/business_icon_9.svg",
-              text: "",
-              navUrl: "请假停卡"
+              iconUrl: "",
+              text: "客户约访",
+              navUrl: "../customer_interview/main"
             }
           ]
         },
         {
-          title: "客户服务",
+          title: "会员服务",
           list: [
             {
-              iconUrl: "/static/images/staff/customer_icon_1.svg",
-              text: "客户",
-              navUrl: ""
+              iconUrl:
+                "/static/images/staff/workbench_icon/member_service_icon_1.svg",
+              text: "会员",
+              navUrl: "../customer/main"
             },
             {
-              iconUrl: "/static/images/staff/customer_icon_2.svg",
-              text: "人脸识别",
-              navUrl: ""
+              iconUrl:
+                "/static/images/staff/workbench_icon/member_service_icon_2.svg",
+              text: "学员",
+              navUrl: "../coach_student/main"
             },
             {
-              iconUrl: "/static/images/staff/customer_icon_3.svg",
-              text: "拍照",
-              navUrl: ""
+              iconUrl:
+                "/static/images/staff/workbench_icon/member_service_icon_3.svg",
+              text: "合同",
+              navUrl: "../contract_list/main"
             }
           ]
         },
         {
-          title: "私教服务",
+          title: "课程",
           list: [
             {
-              iconUrl: "/static/images/staff/business_icon_1.svg",
-              text: "私教预约",
-              navUrl: ""
+              iconUrl: "/static/images/staff/workbench_icon/class_icon_1.svg",
+              text: "团课",
+              navUrl: "../staff_team_class/main"
             },
             {
-              iconUrl: "/static/images/staff/business_icon_2.svg",
-              text: "服务教练分配",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/business_icon_3.svg",
-              text: "上课教练分配",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/business_icon_4.svg",
-              text: "私教延期",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/coach_icon_1.svg",
-              text: "私教会员",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/coach_icon_2.svg",
-              text: "教练crm",
-              navUrl: ""
+              iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
+              text: "私教",
+              navUrl: "../private_coach_class/main"
             }
           ]
         },
         {
-          title: "销售服务",
+          title: "销售管理",
           list: [
             {
-              iconUrl: "/static/images/staff/business_icon_1.svg",
-              text: "销售客户",
+              iconUrl:
+                "/static/images/staff/workbench_icon/sale_manage_icon_1.svg",
+              text: "销售CRM",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_2.svg",
-              text: "服务教练分配",
+              iconUrl:
+                "/static/images/staff/workbench_icon/sale_manage_icon_2.svg",
+              text: "客户公海",
+              navUrl: "../public_sea/main"
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/sale_manage_icon_3.svg",
+              text: "销售分配",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_3.svg",
-              text: "会籍卡延期",
+              iconUrl:
+                "/static/images/staff/workbench_icon/sale_manage_icon_4.svg",
+              text: "销售工作分析表",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/sale_icon_1.svg",
-              text: "销售crm",
-              navUrl: ""
+              iconUrl:"",
+              text: "跟进日志",
+              navUrl: "../follow_up_log/main?trackUserType=1"
             }
           ]
         },
         {
-          title: "团课服务",
+          title: "教练服务",
           list: [
             {
-              iconUrl: "/static/images/staff/business_icon_1.svg",
-              text: "排课",
+              iconUrl:
+                "/static/images/staff/workbench_icon/coach_service_icon_1.svg",
+              text: "团课排课",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_2.svg",
-              text: "团课签到",
+              iconUrl:
+                "/static/images/staff/workbench_icon/coach_service_icon_2.svg",
+              text: "教练分配",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/coach_service_icon_3.svg",
+              text: "教练跟进表",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/coach_service_icon_4.svg",
+              text: "课时统计报表",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/coach_service_icon_5.svg",
+              text: "上课统计报表",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/coach_service_icon_6.svg",
+              text: "教练CRM",
+              navUrl: ""
+            },
+            {
+              iconUrl: "",
+              text: "跟进日志",
+              navUrl: "../follow_up_log/main?trackUserType=2"
+            }
+          ]
+        },
+        {
+          title: "运营报表",
+          list: [
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/operation_report_icon_1.svg",
+              text: "运营流水",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
+              text: "业绩报表",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/operation_report_icon_3.svg",
+              text: "课程报表",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/operation_report_icon_4.svg",
+              text: "评分报表",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/operation_report_icon_5.svg",
+              text: "签到报表",
               navUrl: ""
             }
           ]
@@ -174,83 +219,68 @@ export default {
           title: "场馆管理",
           list: [
             {
-              iconUrl: "/static/images/staff/business_icon_1.svg",
-              text: "门店设置",
+              iconUrl:
+                "/static/images/staff/workbench_icon/field_manage_icon_1.svg",
+              text: "门店",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/business_icon_2.svg",
-              text: "场馆设置",
+              iconUrl:
+                "/static/images/staff/workbench_icon/field_manage_icon_2.svg",
+              text: "手牌",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/venue_icon_1.svg",
-              text: "人事",
+              iconUrl:
+                "/static/images/staff/workbench_icon/field_manage_icon_3.svg",
+              text: "短信",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/venue_icon_1.svg",
+              iconUrl:
+                "/static/images/staff/workbench_icon/field_manage_icon_4.svg",
+              text: "标签",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/field_manage_icon_5.svg",
+              text: "设备管理",
+              navUrl: ""
+            },
+            {
+              iconUrl:
+                "/static/images/staff/workbench_icon/field_manage_icon_6.svg",
               text: "公告",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/venue_icon_1.svg",
-              text: "消息",
               navUrl: ""
             }
           ]
         },
         {
-          title: "经营数据",
+          title: "员工管理",
           list: [
             {
-              iconUrl: "/static/images/staff/manage_icon_1.svg",
-              text: "营业报表",
+              iconUrl:
+                "/static/images/staff/workbench_icon/staff_manage_icon_1.svg",
+              text: "待入职人员",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/manage_icon_2.svg",
-              text: "会籍卡销售报表",
+              iconUrl:
+                "/static/images/staff/workbench_icon/staff_manage_icon_2.svg",
+              text: "人事",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/manage_icon_3.svg",
-              text: "私教销售报表",
+              iconUrl:
+                "/static/images/staff/workbench_icon/staff_manage_icon_3.svg",
+              text: "组织架构",
               navUrl: ""
             },
             {
-              iconUrl: "/static/images/staff/manage_icon_4.svg",
-              text: "团课销售报表",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/manage_icon_5.svg",
-              text: "卡销售分析",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/manage_icon_6.svg",
-              text: "私教上课报表",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/manage_icon_7.svg",
-              text: "入场签到报表",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/manage_icon_8.svg",
-              text: "业绩统计报表",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/manage_icon_9.svg",
-              text: "业绩排行榜",
-              navUrl: ""
-            },
-            {
-              iconUrl: "/static/images/staff/manage_icon_10.svg",
-              text: "客户分析",
+              iconUrl:
+                "/static/images/staff/workbench_icon/staff_manage_icon_4.svg",
+              text: "公告",
               navUrl: ""
             }
           ]
@@ -277,10 +307,30 @@ export default {
 <style lang="less">
 @import "../common/less/staff_common.less";
 .all-services {
-  .icon-wrapper {
-    margin-bottom: 10px;
+  padding-bottom: 30px;
+  .icon-group {
+    &:first-of-type {
+      .icon-title {
+        margin-top: 0;
+      }
+    }
+    .icon-title {
+      line-height: 24px;
+      padding-left: 15px;
+      margin-top: 10px;
+      font-size: 12px;
+      color: #222;
+      background-color: #f4f4f4;
+    }
     .icon-item {
+      padding: 0;
+      margin-top: 5px;
+      >image {
+        width: 50px;
+        height: 50px;
+      }
       .icon-text {
+        margin-top: -12px; 
         font-size: 12px;
       }
     }

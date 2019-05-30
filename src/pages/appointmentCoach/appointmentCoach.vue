@@ -2,7 +2,7 @@
   <div class="appointment-coach" :class="{'isPhoneX-wrap':isPhoneX}">
     <div class="coach">
       <div class="cover">
-        <img>
+        <img :src="window.api + coachInfo.headImgPath">
       </div>
       <div class="coach-info">
         <div class="coach-name">{{coachInfo.userName || '教练名'}}</div>
@@ -506,9 +506,9 @@ export default {
 
         if (
           // 开始时间在预约时间内
-          (element.timeStart - 60 * 60 * 1000 < start &&
-            start < element.timeEnd) ||
-          (element.timeStart < end && end < element.timeEnd)
+          (element.timeStart - 60 * 60 * 1000 <= start &&
+            start <= element.timeEnd) ||
+          (element.timeStart <= end && end <= element.timeEnd)
         ) {
           return true;
         }

@@ -21,7 +21,7 @@
       <img class="screening-icon" src="/static/images/staff/title-icon.svg">
       <span class="subtitle-text">经营分析</span>
     </div>
-    <div class="subtitle">
+    <div class="subtitle" style="padding-bottom: 0px;">
       <img class="screening-icon" src="/static/images/staff/title-icon.svg">
       <span class="subtitle-text">常用服务</span>
     </div>
@@ -70,59 +70,37 @@ export default {
       // onInit: initChart,
       activeIndex: 2,
       searchText: "",
-      // quickEnter: [
-      //   {
-      //     iconUrl: "/static/images/staff/card.svg",
-      //     text: "购卡",
-      //     navUrl: ""
-      //   },
-      //   {
-      //     iconUrl: "/static/images/staff/add.svg",
-      //     text: "添加客户",
-      //     navUrl: ""
-      //   },
-      //   {
-      //     iconUrl: "/static/images/staff/active.svg",
-      //     text: "营销活动",
-      //     navUrl: ""
-      //   },
-      //   {
-      //     iconUrl: "/static/images/staff/check-in.svg",
-      //     text: "入场签到",
-      //     navUrl: ""
-      //   }
-      // ],
       services: [
         {
-          iconUrl: "/static/images/staff/customer_icon_1.svg",
+          iconUrl: "/static/images/staff/workbench_icon/member_service_icon_1.svg",
           text: "客户",
           navUrl: "../customer/main"
         },{
-          iconUrl: "/static/images/staff/services_icon_2.svg",
+          iconUrl: "/static/images/staff/workbench_icon/member_service_icon_2.svg",
           text: "学员",
           navUrl: "../coach_student/main"
         },{
-          iconUrl: "/static/images/staff/coach_icon_1.svg",
+          iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
           text: "私教",
           navUrl: ""
         },{
-          iconUrl: "/static/images/staff/services_icon_4.svg",
+          iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_1.svg",
           text: "团课排课",
           navUrl: ""
         },{
-          iconUrl: "/static/images/staff/venue_icon_1.svg",
+          iconUrl: "/static/images/staff/workbench_icon/staff_manage_icon_2.svg",
           text: "人事",
           navUrl: ""
         },{
-          iconUrl: "/static/images/staff/sale_icon_1.svg",
-          text: "销售crm",
+          iconUrl: "/static/images/staff/workbench_icon/sale_manage_icon_1.svg",
+          text: "销售CRM",
           navUrl: ""
         },{
-          iconUrl: "/static/images/staff/coach_icon_2.svg",
-          text: "教练crm",
+          iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_6.svg",
+          text: "教练CRM",
           navUrl: ""
         },{
-          iconUrl: "/static/images/staff/services_icon_8.svg",
+          iconUrl: "",
           text: "全部服务",
           navUrl: "../allServices/main"
         }]
@@ -178,6 +156,21 @@ page {
 .workbench {
   .subtitle {
     margin-top: 5px;
+  }
+  .icon-item {
+    padding: 0;
+    margin-top: 5px;
+    >image {
+      width: 50px;
+      height: 50px;
+    }
+    .icon-text {
+      margin-top: -12px; 
+      font-size: 12px;
+    }
+  }
+  .common-services {
+    padding-bottom: 15px;
   }
 }
 </style>

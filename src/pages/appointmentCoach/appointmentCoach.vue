@@ -633,8 +633,9 @@ export default {
       if (this.selectStoreId && this.selectCardId) {
         this.getVenueList();
       }
-      if (!this.venueId) {
+      if (this.cardClassId) {
         this.isVenuePopup = true;
+        // this.showVenuePopup()
       }
     },
     // 确认选择时间

@@ -132,7 +132,7 @@ export default {
     teamClassItem,
     pageFooter
   },
-  onLoad(option) {
+  onLoad(options) {
     if (options.nav) {
       this.currentNav = options.nav;
     }
@@ -155,10 +155,10 @@ export default {
     // },
     isBottomAppoint() {
       if (this.teamClassList.length || this.coachList.length) {
-        if (this.teamClassList[0] || this.coachList[0]) {
-          return true;
+        if (!this.teamClassList[0].teamScheduleId || !this.coachList[0].coachAppointId) {
+          return false;
         }
-        return false;
+        return true;
       }
       return false;
     }

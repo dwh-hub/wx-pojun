@@ -46,26 +46,27 @@ export default {
           password: "2131"
         },
         success(res) {
-          console.log("/?/、//")
           if (res.data.code == 200) {
-            setStorageSync("Cookie", res.header["Set-Cookie"]);
-            setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
-          console.log("------------/?/、//")
-            that.getStaffInfo();
+            let info = {}
+            info
+            wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+            wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+            wx.setStorageSync("staff_info", res.data.data);
+            // that.getStaffInfo();
           }
         }
       });
     },
-    getStaffInfo() {
-      let that = this;
-      HttpRequest({
-        url: window.api + "/user/detail/own",
-        success(res) {
-          wx.setStorageSync("staff_info", res.data.data);
-          // positionType 0 销售 1 教练 2 销售+教练 null 都不是
-        }
-      });
-    },
+    // getStaffInfo() {
+    //   let that = this;
+    //   HttpRequest({
+    //     url: window.api + "/user/detail/own",
+    //     success(res) {
+    //       wx.setStorageSync("staff_info", res.data.data);
+    //       // positionType 0 销售 1 教练 2 销售+教练 null 都不是
+    //     }
+    //   });
+    // },
     baseInfoCell() {
       wx.navigateTo({
         url: "../staff_base_info/main"

@@ -56,7 +56,7 @@ export default {
               navUrl: ""
             },
             {
-              iconUrl: "",
+              iconUrl: "/static/images/staff/workbench_icon/workbench_icon_6.jpg",
               text: "客户约访",
               navUrl: "../customer_interview/main"
             }
@@ -128,7 +128,7 @@ export default {
               navUrl: ""
             },
             {
-              iconUrl:"",
+              iconUrl:"/static/images/staff/workbench_icon/sale_manage_icon_6.jpg",
               text: "跟进日志",
               navUrl: "../follow_up_log/main?trackUserType=1"
             }
@@ -174,7 +174,7 @@ export default {
               navUrl: ""
             },
             {
-              iconUrl: "",
+              iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_7.jpg",
               text: "跟进日志",
               navUrl: "../follow_up_log/main?trackUserType=2"
             }

@@ -320,6 +320,7 @@ export default {
     // 获取附近门店列表
     getNearbyStoreList() {
       let that = this;
+      console.log("=====getNearbyStoreList=======")
       wx.request({
         url: window.api + "/store/all-store-name-list-nolimit",
         data: {

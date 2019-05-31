@@ -37,12 +37,19 @@ export function getPhoneNumber(e, url, isTab) {
           }
         });
       } else {
-        wx.hideLoading();
-        wx.showModal({
-          title: "提示",
-          content: res.data.message,
-          showCancel: false
+        wx.setStorage({
+          key: "phone",
+          data: "18888888881",
+          success: function () {
+            login(url, isTab);
+          }
         });
+        // wx.hideLoading();
+        // wx.showModal({
+        //   title: "提示",
+        //   content: res.data.message,
+        //   showCancel: false
+        // });
       }
     }
   });
@@ -59,10 +66,10 @@ function staff_login() {
       },
       success(res) {
         if (res.data.code == 200 || res.data.code == 201) {
-          setStorageSync("Cookie", res.header["Set-Cookie"]);
-          setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+          wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
           if (res.data.code == 200) {
-            // TODO: 200的话能返回信息，在这里做一次字段转换
+            wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+            wx.setStorageSync("staff_info", res.data.data);
           }
           resolve(true)
         } else {
@@ -75,15 +82,9 @@ function staff_login() {
 
 // 登录
 function login(url, isTab) {
-  staff_login().then(res => {
-    if (res) {
-      // TODO: 商户端有账号跳转商户页
-    } else {
-      getUserInfo().then(() => {
-        bindMethod(url, isTab);
-      });
-    }
-  })
+  getUserInfo().then(() => {
+    bindMethod(url, isTab);
+  });
 }
 
 // 随机4位数
@@ -105,20 +106,7 @@ function getUserInfo() {
         if (res.data.code == 200) {
           let _data = res.data.data
           if (!_data.length) {
-            // if (wx.getStorageSync("storeId")) {
             return register()
-            // }
-            // return wx.showModal({
-            //   title: "提示",
-            //   content: "您目前不是该店会员，是否前往注册会员？",
-            //   success(res) {
-            //     if (res.confirm) {
-            //       wx.navigateTo({
-            //         url: "../register/main"
-            //       });
-            //     }
-            //   }
-            // });
           }
 
           if (_data.length) {
@@ -145,35 +133,9 @@ function getUserInfo() {
               data: _data[0].companyName
             });
             return resolve();
-
           }
-
-          // if (_data.length) {
-          //   // that.userInfo = _data[0];
-          //   store.commit("saveUserInfo", _data[0]);
-          //   wx.setStorage({
-          //     key: "userInfo",
-          //     data: _data[0]
-          //   });
-          //   wx.setStorage({
-          //     key: "companyId",
-          //     data: _data[0].companyId
-          //   });
-          //   wx.setStorage({
-          //     key: "companyName",
-          //     data: _data[0].companyName
-          //   });
-          //   return resolve();
-          // }
-          // that.showBindBox = true;
-          // that.companyList = _data;
-          // that.curCompany = _data[0];
         } else {
-          wx.showModal({
-            title: "提示",
-            content: res.data.message,
-            showCancel: false
-          });
+          register()
         }
       }
     });
@@ -241,7 +203,7 @@ function register() {
       id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : undefined,
       companyId: wx.getStorageSync("companyId"),
       phone: wx.getStorageSync("phone"),
-      name: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + that.rand(1000, 9999)),
+      name: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + rand(1000, 9999)),
       storeId: wx.getStorageSync("storeId") ? wx.getStorageSync("storeId") : storeId,
       serviceUserId: wx.getStorageSync("serviceUserId") ? wx.getStorageSync("serviceUserId") : '',
       sex: 0
@@ -273,10 +235,7 @@ export function getAllStore() {
         companyId: wx.getStorageSync("companyId")
       },
       success(res) {
-        // if (res.data.code === 200) {
-        // storeId = res.data.data[0].storeId
         resolve(res)
-        // }
       }
     });
   })

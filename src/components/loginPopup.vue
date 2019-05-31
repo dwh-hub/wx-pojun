@@ -29,7 +29,7 @@ import {
   getThemeColor
 } from "COMMON/js/common.js";
 import store from "../utils/store";
-import { getMessage, wxPush } from "COMMON/js/api.js";
+import { getPhoneNumber,getMessage } from "COMMON/js/api.js";
 export default {
   props: ["options"],
   data() {
@@ -37,8 +37,8 @@ export default {
       showPopup: true,
       userInfo: {},
       companyInfo: {},
-      storeList: [],
-      curStore: {},
+      // storeList: [],
+      // curStore: {},
       systemSteup: {}
     };
   },
@@ -155,226 +155,226 @@ export default {
         }
       });
     },
-    getAllStore() {
-      let that = this;
-      wx.request({
-        url: window.api + "/store/all-store-name-list-nolimit",
-        data: {
-          companyId: wx.getStorageSync("companyId")
-        },
-        success(res) {
-          if (res.data.code === 200) {
-            that.storeList = res.data.data.map(e => {
-              return {
-                name: e.storeName,
-                id: e.storeId
-              };
-            });
-            that.curStore = that.storeList[0];
-          }
-        }
-      });
-    },
+    // getAllStore() {
+    //   let that = this;
+    //   wx.request({
+    //     url: window.api + "/store/all-store-name-list-nolimit",
+    //     data: {
+    //       companyId: wx.getStorageSync("companyId")
+    //     },
+    //     success(res) {
+    //       if (res.data.code === 200) {
+    //         that.storeList = res.data.data.map(e => {
+    //           return {
+    //             name: e.storeName,
+    //             id: e.storeId
+    //           };
+    //         });
+    //         that.curStore = that.storeList[0];
+    //       }
+    //     }
+    //   });
+    // },
     _getPhoneNumber(e) {
-      this.getPhoneNumber(e, "../homepage/main", true);
+      getPhoneNumber(e, "../homepage/main", true);
     },
-    getPhoneNumber(e, url, isTab) {
-      let that = this;
-      if (!e.mp.detail.encryptedData) {
-        return;
-      }
-      wx.showLoading({
-        title: "登录中..."
-      });
-      HttpRequest({
-        url: window.api + "/mini/getphone",
-        data: {
-          sessionKey: wx.getStorageSync("sessionKey"),
-          encryptedData: e.mp.detail.encryptedData,
-          iv: e.mp.detail.iv
-        },
-        success(res) {
-          if (res.data.code == 200) {
-            wx.setStorage({
-              key: "phone",
-              data: res.data.data,
-              success: function() {
-                that._login(url, isTab);
-              }
-            });
-          } else {
-            wx.hideLoading();
-            wx.showModal({
-              title: "提示",
-              content: res.data.message,
-              showCancel: false
-            });
-          }
-        }
-      });
-    },
-    // 登录
-    _login(url, isTab) {
-      this.getAllStore();
-      this.getUserInfo().then(() => {
-        this.bindMethod(url, isTab);
-      });
-    },
-    // 获取用户信息
-    getUserInfo() {
-      let that = this;
-      // findCustomerStore
-      return new Promise(function(resolve) {
-        wx.request({
-          url: window.api + "/wxcustomer/findCustomerStore",
-          data: {
-            phone: wx.getStorageSync("phone"),
-            companyId: wx.getStorageSync("companyId")
-          },
-          success(res) {
-            wx.hideLoading();
-            if (res.data.code == 200) {
-              let _data = res.data.data;
+    // getPhoneNumber(e, url, isTab) {
+    //   let that = this;
+    //   if (!e.mp.detail.encryptedData) {
+    //     return;
+    //   }
+    //   wx.showLoading({
+    //     title: "登录中..."
+    //   });
+    //   HttpRequest({
+    //     url: window.api + "/mini/getphone",
+    //     data: {
+    //       sessionKey: wx.getStorageSync("sessionKey"),
+    //       encryptedData: e.mp.detail.encryptedData,
+    //       iv: e.mp.detail.iv
+    //     },
+    //     success(res) {
+    //       if (res.data.code == 200) {
+    //         wx.setStorage({
+    //           key: "phone",
+    //           data: res.data.data,
+    //           success: function() {
+    //             that._login(url, isTab);
+    //           }
+    //         });
+    //       } else {
+    //         wx.hideLoading();
+    //         wx.showModal({
+    //           title: "提示",
+    //           content: res.data.message,
+    //           showCancel: false
+    //         });
+    //       }
+    //     }
+    //   });
+    // },
+    // // 登录
+    // _login(url, isTab) {
+    //   this.getAllStore();
+    //   this.getUserInfo().then(() => {
+    //     this.bindMethod(url, isTab);
+    //   });
+    // },
+    // // 获取用户信息
+    // getUserInfo() {
+    //   let that = this;
+    //   // findCustomerStore
+    //   return new Promise(function(resolve) {
+    //     wx.request({
+    //       url: window.api + "/wxcustomer/findCustomerStore",
+    //       data: {
+    //         phone: wx.getStorageSync("phone"),
+    //         companyId: wx.getStorageSync("companyId")
+    //       },
+    //       success(res) {
+    //         wx.hideLoading();
+    //         if (res.data.code == 200) {
+    //           let _data = res.data.data;
 
-              //  || (wx.getStorageSync("storeId") && wx.getStorageSync("userInfo").storeId != wx.getStorageSync("storeId"))
-              if (!_data.length) {
-                return that.register();
-              }
+    //           //  || (wx.getStorageSync("storeId") && wx.getStorageSync("userInfo").storeId != wx.getStorageSync("storeId"))
+    //           if (!_data.length) {
+    //             return that.register();
+    //           }
 
-              if (_data.length) {
-                if (
-                  wx.getStorageSync("storeId") &&
-                  !_data.filter(e => {
-                    return e.storeId == wx.getStorageSync("storeId");
-                  }).length
-                ) {
-                  return that.register();
-                }
+    //           if (_data.length) {
+    //             if (
+    //               wx.getStorageSync("storeId") &&
+    //               !_data.filter(e => {
+    //                 return e.storeId == wx.getStorageSync("storeId");
+    //               }).length
+    //             ) {
+    //               return that.register();
+    //             }
 
-                store.commit("saveUserInfo", _data[0]);
-                wx.setStorage({
-                  key: "userInfo",
-                  data: _data[0]
-                });
-                wx.setStorage({
-                  key: "companyId",
-                  data: _data[0].companyId
-                });
-                wx.setStorage({
-                  key: "companyName",
-                  data: _data[0].companyName
-                });
-                return resolve();
+    //             store.commit("saveUserInfo", _data[0]);
+    //             wx.setStorage({
+    //               key: "userInfo",
+    //               data: _data[0]
+    //             });
+    //             wx.setStorage({
+    //               key: "companyId",
+    //               data: _data[0].companyId
+    //             });
+    //             wx.setStorage({
+    //               key: "companyName",
+    //               data: _data[0].companyName
+    //             });
+    //             return resolve();
                 
-              }
-            } else {
-              wx.showModal({
-                title: "提示",
-                content: res.data.message,
-                showCancel: false
-              });
-            }
-          }
-        });
-      });
-    },
-    // 绑定方法
-    bindMethod(url, isTab) {
-      let that = this;
-      wx.showLoading({
-        title: "登录中..."
-      });
-      wx.request({
-        url: window.api + "/wxcustomer/bindCard",
-        data: {
-          phone: wx.getStorageSync("phone"),
-          companyId: wx.getStorageSync("companyId"),
-          miniOpenId: wx.getStorageSync("openId")
-        },
-        success(res) {
-          wx.setStorage({
-            key: "Cookie",
-            data: res.header["Set-Cookie"]
-          });
-          if (res.data.code === 200) {
-            wx.hideLoading();
-            wx.showToast({
-              title: "登录成功",
-              icon: "success",
-              duration: 1000
-            });
-            wx.removeStorageSync("storeId");
-            getMessage();
-            store.commit("changeLogin", true);
-            getThemeColor();
-            // that.loginSuccess = true
-            let _url = url ? url : "./main";
-            if (isTab) {
-              setTimeout(() => {
-                wx.reLaunch({
-                  url: _url
-                });
-              }, 1000);
-            } else {
-              setTimeout(() => {
-                wx.redirectTo({
-                  url: _url
-                });
-              }, 1000);
-            }
-          } else {
-            return wx.showModal({
-              title: "提示",
-              content: res.data.message,
-              showCancel: false
-            });
-          }
-        }
-      });
-    },
-    // 注册
-    register() {
-      let that = this;
-      wx.showLoading({
-        title: "加载中..."
-      });
-      HttpRequest({
-        url: window.api + "/wxcustomer/addCustomer",
-        data: {
-          id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : undefined,
-          companyId: wx.getStorageSync("companyId"),
-          phone: wx.getStorageSync("phone"),
-          serviceUserId: wx.getStorageSync("serviceUserId")
-            ? wx.getStorageSync("serviceUserId")
-            : "",
-          // 扫码进入时
-          // name: wx.getStorageSync("phone"),
-          // storeId: wx.getStorageSync("storeId"),
-          // sex: 0
-          name:  wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + that.rand(1000, 9999)), // wx.getStorageSync("wx_userInfo").nickName,
-          storeId: wx.getStorageSync("storeId")
-            ? wx.getStorageSync("storeId")
-            : that.curStore.id, //that.curStore.id || wx.getStorageSync("storeId"),
-          sex: 0 //wx.getStorageSync("wx_userInfo").gender
-        },
-        success(res) {
-          wx.hideLoading();
-          if (res.data.code === 200) {
-            wx.removeStorageSync("storeId");
-            if (wx.getStorageSync("serviceUserId")) {
-              wxPush();
-            }
-            that._login("../homepage/main", true);
-          } else {
-            wx.showModal({
-              title: "提示",
-              content: res.data.message,
-              showCancel: false
-            });
-          }
-        }
-      });
-    }
+    //           }
+    //         } else {
+    //           wx.showModal({
+    //             title: "提示",
+    //             content: res.data.message,
+    //             showCancel: false
+    //           });
+    //         }
+    //       }
+    //     });
+    //   });
+    // },
+    // // 绑定方法
+    // bindMethod(url, isTab) {
+    //   let that = this;
+    //   wx.showLoading({
+    //     title: "登录中..."
+    //   });
+    //   wx.request({
+    //     url: window.api + "/wxcustomer/bindCard",
+    //     data: {
+    //       phone: wx.getStorageSync("phone"),
+    //       companyId: wx.getStorageSync("companyId"),
+    //       miniOpenId: wx.getStorageSync("openId")
+    //     },
+    //     success(res) {
+    //       wx.setStorage({
+    //         key: "Cookie",
+    //         data: res.header["Set-Cookie"]
+    //       });
+    //       if (res.data.code === 200) {
+    //         wx.hideLoading();
+    //         wx.showToast({
+    //           title: "登录成功",
+    //           icon: "success",
+    //           duration: 1000
+    //         });
+    //         wx.removeStorageSync("storeId");
+    //         getMessage();
+    //         store.commit("changeLogin", true);
+    //         getThemeColor();
+    //         // that.loginSuccess = true
+    //         let _url = url ? url : "./main";
+    //         if (isTab) {
+    //           setTimeout(() => {
+    //             wx.reLaunch({
+    //               url: _url
+    //             });
+    //           }, 1000);
+    //         } else {
+    //           setTimeout(() => {
+    //             wx.redirectTo({
+    //               url: _url
+    //             });
+    //           }, 1000);
+    //         }
+    //       } else {
+    //         return wx.showModal({
+    //           title: "提示",
+    //           content: res.data.message,
+    //           showCancel: false
+    //         });
+    //       }
+    //     }
+    //   });
+    // },
+    // // 注册
+    // register() {
+    //   let that = this;
+    //   wx.showLoading({
+    //     title: "加载中..."
+    //   });
+    //   HttpRequest({
+    //     url: window.api + "/wxcustomer/addCustomer",
+    //     data: {
+    //       id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : undefined,
+    //       companyId: wx.getStorageSync("companyId"),
+    //       phone: wx.getStorageSync("phone"),
+    //       serviceUserId: wx.getStorageSync("serviceUserId")
+    //         ? wx.getStorageSync("serviceUserId")
+    //         : "",
+    //       // 扫码进入时
+    //       // name: wx.getStorageSync("phone"),
+    //       // storeId: wx.getStorageSync("storeId"),
+    //       // sex: 0
+    //       name:  wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + that.rand(1000, 9999)), // wx.getStorageSync("wx_userInfo").nickName,
+    //       storeId: wx.getStorageSync("storeId")
+    //         ? wx.getStorageSync("storeId")
+    //         : that.curStore.id, //that.curStore.id || wx.getStorageSync("storeId"),
+    //       sex: 0 //wx.getStorageSync("wx_userInfo").gender
+    //     },
+    //     success(res) {
+    //       wx.hideLoading();
+    //       if (res.data.code === 200) {
+    //         wx.removeStorageSync("storeId");
+    //         if (wx.getStorageSync("serviceUserId")) {
+    //           wxPush();
+    //         }
+    //         that._login("../homepage/main", true);
+    //       } else {
+    //         wx.showModal({
+    //           title: "提示",
+    //           content: res.data.message,
+    //           showCancel: false
+    //         });
+    //       }
+    //     }
+    //   });
+    // }
   }
 };
 </script>

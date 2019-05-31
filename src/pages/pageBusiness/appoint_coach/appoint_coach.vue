@@ -873,7 +873,7 @@ export default {
         calendar: that.curDate + " " + "00:00:00",
         timeStart: that.curDate + " " + that.curTime + ":00",
         timeEnd: that.curDate + " " + that.curEndTime + ":00",
-        name: that.userInfo.name,
+        name: that.userInfo.userName,
         phone: that.userInfo.phone
       };
       console.log(this.appointType);
@@ -955,11 +955,12 @@ export default {
               let params;
               params = {
                 way: way,
-                coachName: that.userInfo.name,
+                coachName: that.userInfo.userName,
                 coachId: that.userInfo.userId,
                 studentName: that.studentInfo.name,
                 studentId: that.studentInfo.id,
-                appointId: appointId
+                appointId: appointId,
+                storeId: that.selectStoreId
               };
 
               wx.navigateTo({

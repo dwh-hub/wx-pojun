@@ -157,7 +157,7 @@ export default {
   mounted() {
     setNavTab();
   },
-  onLoad(option) {
+  onLoad(options) {
     if (options.nav) {
       this.navIndex = options.nav;
     }

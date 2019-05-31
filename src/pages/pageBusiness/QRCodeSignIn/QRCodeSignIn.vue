@@ -36,7 +36,7 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import QR from "@/libs/weapp-qrcode.js";
-// import goEasy from "@/libs/goeasy.js";
+// import GoEasy from "@/libs/goeasy-wx.0.0.1.min";
 export default {
   data() {
     return {
@@ -52,7 +52,8 @@ export default {
       qrcodeURL: "",
       studentText: "正在等待学员确认...",
       receptionText: "正在等待前台确认...",
-      timer: null
+      timer: null,
+      normalCoachCourse: null
     };
   },
   onLoad(options) {
@@ -70,6 +71,11 @@ export default {
     this.timer = setInterval(() => {
       this.getNowTime();
     }, 1000);
+
+    // this.normalCoachCourse = new GoEasy({
+    //   appkey: wx.getStorageSync("instMsgSubKey")
+    // });
+    // this.addHit()
   },
   onUnload() {
     clearInterval(this.timer);
@@ -127,6 +133,153 @@ export default {
           }
         }
       });
+    },
+    addHit() {
+      let that = this;
+      this.normalCoachCourse.subscribe({
+        channel:
+          "channel_" +
+          wx.getStorageSync("companyId") +
+          "_" +
+          that.params.storeId,
+        onMessage: function(message) {
+          console.log("Receive：" + message.content);
+          var valueType = JSON.parse(
+            message.content.substring(0, message.content.length)
+          );
+          if (valueType.channelType == "normal_coach_course") {
+            that.addHits(valueType);
+          } else if (valueType.channelType == "coach_front") {
+            that.coachFronts(valueType);
+          }
+        }
+      });
+    },
+    cancelHit() {
+      this.normalCoachCourse.unsubscribe({
+        channel:
+          "channel_" +
+          wx.getStorageSync("companyId") +
+          "_" +
+          that.params.storeId
+      });
+    },
+    addHits(valueType) {
+      var frontSures = valueType.data;
+      if (!frontSures) {
+        if (valueType.message) {
+          wx.showModal({
+            title: "提示",
+            content: valueType.message,
+            showCancel: false
+          });
+          return;
+        }
+        return;
+      } else {
+      }
+      if (
+        frontSures.coachSubscribe == 1 &&
+        frontSures.coachSubscribeId == this.params.appointId &&
+        valueType.status &&
+        valueType.status == 200
+      ) {
+        this.receptionText = "前台已确认";
+        setTimeout(() => {
+          this.cancelHit();
+        }, 500);
+      } else if (
+        valueType.message &&
+        valueType.message != "已确认上课，请等待系统核对"
+      ) {
+        wx.showModal({
+          title: "提示",
+          content: valueType.message,
+          showCancel: false
+        });
+      } else if (valueType.message == "扫描二维码已被使用，请勿重复扫描") {
+        wx.showModal({
+          title: "提示",
+          content: valueType.message,
+          showCancel: false
+        });
+      } else if (valueType.status) {
+        if (valueType.status == 402) {
+          wx.showModal({
+            title: "提示",
+            content: "前台已取消预约",
+            showCancel: false
+          });
+        } else if (valueType.status == 401) {
+          wx.showModal({
+            title: "提示",
+            content: "无法执行此操作,预约状态异常",
+            showCancel: false
+          });
+        } else if (valueType.status == 403) {
+          wx.showModal({
+            title: "提示",
+            content: "前台已取消失败",
+            showCancel: false
+          });
+        }
+      } else {
+        if (this.params.way == 2) {
+          if (
+            frontSures.coachAppointOut.coachAppointId == this.params.appointId
+          ) {
+            // TODO: 上课
+            // addclassport(frontSures.coachAppointOut.coachAppointId);
+            // messageOnClass = false;
+          }
+        } else if (this.params.way == 3) {
+          if (
+            frontSures.coachAppointOut.coachAppointId == this.params.appointId
+          ) {
+            this.studentText = "学员已确认";
+          }
+        }
+        // qrCodes = false;
+      }
+    },
+    coachFronts(valueType) {
+      var frontSures = valueType.data;
+      if (
+        frontSures.coachSubscribe == 1 &&
+        frontSures.coachSubscribeId == this.params.appointId &&
+        valueType.status &&
+        valueType.status == 200
+      ) {
+        if (privateSignWay == 4) {
+          if (frontSures.coachSubscribeId == this.params.appointId) {
+            this.receptionText = "前台已确认";
+          }
+        }
+      } else if (valueType.status) {
+        if (
+          valueType.status == 402 &&
+          frontSures.coachSubscribeId == this.params.appointId
+        ) {
+        } else if (
+          valueType.status == 401 &&
+          frontSures.coachSubscribeId == this.params.appointId
+        ) {
+          wx.showModal({
+            title: "提示",
+            content: "无法执行此操作,预约状态异常",
+            showCancel: false
+          });
+        } else if (
+          valueType.status == 403 &&
+          frontSures.coachSubscribeId == this.params.appointId
+        ) {
+          wx.showModal({
+            title: "提示",
+            content: "前台已取消失败",
+            showCancel: false
+          });
+        }
+      }
     }
   }
 };

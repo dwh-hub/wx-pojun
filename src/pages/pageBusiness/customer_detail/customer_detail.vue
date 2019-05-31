@@ -55,7 +55,7 @@
           <van-loading :color="themeColor" v-if="isCardLoading"/>
         </scroll-view>
       </van-tab>
-      <van-tab title="预约记录">
+      <!-- <van-tab title="预约记录">
         <header-data :headerData="appointData"></header-data>
         <filter-nav></filter-nav>
         <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
@@ -63,7 +63,7 @@
           <none-result text="预约记录" v-if="!appointList.length && !isAppointLoading"></none-result>
           <van-loading :color="themeColor" v-if="isAppointLoading"/>
         </scroll-view>
-      </van-tab>
+      </van-tab> -->
       <!-- <van-tab title="订单信息"></van-tab> -->
       <van-tab title="更多信息">
         <div class="info">
@@ -90,6 +90,7 @@
               <van-icon name="arrow" color="#999"/>
             </div>
           </van-cell>
+          <van-cell title="预约记录" is-link/>
           <van-cell title="健身目的" is-link/>
           <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
         </div>

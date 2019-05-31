@@ -32,13 +32,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 5,
+			"current": 0,
 			"list": [
 				{
 					"id": 0,
 					"name": "主页",
 					"pathName": "pages/homepage/main",
-					"query": "scene=37-102-114514",
+					"query": "scene=52-120-114514",
 					"scene": null
 				},
 				{

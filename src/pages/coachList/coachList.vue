@@ -5,7 +5,7 @@
         <div class="store" :class="{active: currentNav==1}" @click="selectNav(1)">
           <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: themeColor}">{{curStore}}</span>
           <i class="triangle-icon"></i>
-          <div class="list-warpper" :class="{slideWrap: showStoreList}">
+          <div class="list-warpper" :class="{slideWrap: showStoreList}" @click.stop="clickMask">
             <div class="store-nav-list" :class="{slide: showStoreList}">
               <div
                 class="store-nav-item"

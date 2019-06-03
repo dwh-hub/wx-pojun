@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "运营报表",
   "usingComponents": {
-    "ff-canvas": "@antv/f2-canvas"
+    "ff-canvas": "/static/f2-canvas/f2-canvas"
   }
 }

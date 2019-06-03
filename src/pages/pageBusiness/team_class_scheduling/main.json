@@ -8,6 +8,7 @@
     "van-checkbox": "../../../../static/vant/checkbox/index",
     "van-checkbox-group": "../../../../static/vant/checkbox-group/index",
     "van-radio": "../../../../static/vant/radio/index",
-    "van-radio-group": "../../../../static/vant/radio-group/index"
+    "van-radio-group": "../../../../static/vant/radio-group/index",
+    "van-icon": "../../../../static/vant/icon/index"
   }
 }

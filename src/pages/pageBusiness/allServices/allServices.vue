@@ -186,8 +186,8 @@ export default {
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/operation_report_icon_1.svg",
-              text: "运营流水",
-              navUrl: ""
+              text: "运营报表",
+              navUrl: "../operation_chart/main"
             },
             {
               iconUrl:

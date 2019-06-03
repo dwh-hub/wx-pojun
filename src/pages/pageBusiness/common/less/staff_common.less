@@ -74,18 +74,19 @@
 // 左文字 右操作/文字
 .item-cell {
   display: flex;
-  line-height: 36px;
-  height: 36px;
-
+  padding: 10px 15px;
+  line-height: 24px;
+  box-sizing: border-box;
   .cell-left {
     flex-basis: auto;
-    padding: 0 15px;
+    flex: 1;
   }
 
   .cell-right {
     flex: 1;
+    text-align: right;
     display: flex;
-
+    color: #999;
     >div {
       flex: 1;
     }

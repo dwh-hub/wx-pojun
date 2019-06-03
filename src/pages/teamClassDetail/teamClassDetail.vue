@@ -29,7 +29,7 @@
         @click="toNav(item.coachId)"
       >
         <div class="cover">
-          <img :scr="window.api + item.coachHeadImg">
+          <img :src="window.api + item.coachHeadImg">
         </div>
         <div class="name">{{item.coachName || '教练名'}}</div>
       </div>

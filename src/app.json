@@ -50,7 +50,8 @@
       "private_coach_class/main",
       "staff_team_class/main",
       "team_class_scheduling/main",
-      "scheduling_detail/main"
+      "scheduling_detail/main",
+      "operation_chart/main"
     ]
   }],
   "permission": {

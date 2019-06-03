@@ -62,10 +62,25 @@ export default {
     return {
       nav: [
         {
-          navTitle: "筛选条件一",
+          navTitle: "今日",
           children: [
             {
-              sonText: "全部"
+              sonText: "今日",
+              action: () => {
+                this.filterDate(1);
+              }
+            },
+            {
+              sonText: "本周",
+              action: () => {
+                this.filterDate(7);
+              }
+            },
+            {
+              sonText: "本月",
+              action: () => {
+                this.filterDate(30);
+              }
             }
           ]
         },
@@ -146,14 +161,16 @@ export default {
       isLoading: true,
       isOperate: false,
       classList: [{}, {}, {}, {}],
-      page: 1
+      page: 1,
+      filter: {}
     };
   },
   mounted() {
     setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.getClassList();
+    // this.getClassList();
+    this.filterDate(1);
   },
   mixins: [colorMixin],
   components: {
@@ -201,9 +218,10 @@ export default {
               that.headerData[0].dataNum = _res.recCount;
             }
             _data = res.data.data.result.map(e => {
-              if (!e.masterImg) {
-                e.masterImg = "/assets/img/morenImg.png";
-              }
+              // TODO:
+              // if (!e.masterImg) {
+              e.masterImg = "/assets/img/morenImg.png";
+              // }
               return e;
             });
             if (that.page == 2 || that.page == 1) {
@@ -235,6 +253,7 @@ export default {
         this.filter.calendarEnd = endTime;
       }
       this.page = 1;
+      this.getClassList();
     },
     selectClass(item) {
       this.showOperatePopup = true;
@@ -244,8 +263,7 @@ export default {
       this.showOperatePopup = false;
       wx.navigateTo({
         url:
-          "../team_class_scheduling/main?teamScheduleId=" +
-          this.selectedClass.teamScheduleId
+          `../team_class_scheduling/main?teamTempStoreId=${this.selectedClass.teamTempStoreId}&storeId=${this.selectedClass.storeId}`
       });
     }
   }
@@ -266,7 +284,10 @@ page {
     }
   }
   .team-class-item {
+    padding: 10px 0;
+    padding-left: 10px;
     border-bottom: 1px solid #eee;
+    background-color: #fff;
   }
   .team-class-item-y {
     box-shadow: none;

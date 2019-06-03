@@ -6,7 +6,9 @@
 		"postcss": true,
 		"minified": false,
 		"newFeature": true,
-		"autoAudits": false
+		"autoAudits": false,
+		"checkInvalidKey": true,
+		"nodeModules": true
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",

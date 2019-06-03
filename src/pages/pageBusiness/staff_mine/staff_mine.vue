@@ -47,8 +47,6 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            let info = {}
-            info
             wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
             wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
             wx.setStorageSync("staff_info", res.data.data);

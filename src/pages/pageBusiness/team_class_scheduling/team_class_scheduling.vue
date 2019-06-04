@@ -10,11 +10,11 @@
     <van-cell-group custom-class="van-cell-group">
       <van-cell
         title="场地"
-        @click="showVenuePopup = true"
-        :value="schedulingDetail.venueNameArray?schedulingDetail.venueNameArray[0]:''"
+        @click="showVenue"
+        :value="schedulingDetail.venueNameArray?schedulingDetail.venueNameArray[0]:schedulingDetail.venueName"
         is-link
       />
-      <van-cell title="课程时长" :value="schedulingDetail.timeSpan + '分钟'"/>
+      <van-cell title="课程时长" :value="(schedulingDetail.timeSpan|| '--') + '分钟'"/>
       <van-cell title="教练" is-link @click="showCoachPopup = true" :value="selectedCoachStr"/>
     </van-cell-group>
     <div class="cell-subtitle">课程排期</div>
@@ -112,7 +112,7 @@
       :duration="200"
       overlay-style="background-color:rgba(0,0,0,0.6);"
       position="bottom"
-      custom-style="width:100%"
+      custom-style="width:100%;max-height: 50vh;"
       :z-index="101"
     >
       <div class="action-list">
@@ -123,7 +123,8 @@
           @click="selectCoach(item, index)"
         >
           <div class="coach-cover">
-            <img :src="item.headImgPath" alt>
+            <!-- <img :src="item.headImgPath" alt> -->
+            <image :src="item.headImgPath" mode="aspectFill"></image>
           </div>
           <div class="text">{{item.userName}}</div>
           <div class="icon" v-if="item.isSelect">
@@ -164,9 +165,14 @@ import colorMixin from "COMPS/colorMixin.vue";
 export default {
   data() {
     return {
+      type: "",
+      /* 单日排期参数 */
       teamTempStoreId: 0,
       storeId: 0,
       schedullingType: "",
+      /* 修改 */
+      teamScheduleId: 0,
+      /* ---- */
       schedulingDetail: {},
       coachList: [],
       selectedCoachStr: "",
@@ -192,17 +198,35 @@ export default {
     if (options.teamTempStoreId) {
       this.teamTempStoreId = options.teamTempStoreId;
       this.storeId = options.storeId;
-      this.schedullingType = options.type || '单日'
     }
+    if(options.teamScheduleId) {
+      this.teamScheduleId = options.teamScheduleId
+      this.storeId = options.storeId;
+    }
+    this.type = options.type
+  },
+  onUnload() {
+    Object.assign(this.$data, this.$options.data());
   },
   mounted() {
     setNavTab();
-    this.getSchedulingDetail();
+    if(this.type == "single") {
+      this.getSchedulingDetail();
+      this.getVenueList();
+    }
+    if(this.type == "modify") {
+      this.getTeamSchedule()
+    }
     this.getCoachList();
-    this.getVenueList();
   },
   mixins: [colorMixin],
   methods: {
+    showVenue() {
+      if(this.type == "modify") {
+        return
+      }
+      this.showVenuePopup = true
+    },
     changeDate(e) {
       this.currentDateStamp = e.mp.detail;
       this.classDate = formatDate(new Date(e.mp.detail), "yyyy-MM-dd");
@@ -249,6 +273,32 @@ export default {
             res.data.data.venueId = res.data.data.venueIdIntArray[0];
             that.isAppoint = res.data.data.isNeedAppoint == 0 ? "2" : "1";
             that.isAppointAttend = res.data.data.isNeedAppoint == 1 ? "1" : "2";
+            that.schedulingDetail = res.data.data;
+          }
+        }
+      });
+    },
+    getTeamSchedule() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/teamClass/teamSchedule/getOne",
+        data: {
+          teamScheduleId: that.teamScheduleId
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            // TODO:
+            // if(!res.data.data.masterImg) {
+            res.data.data.masterImg = window.api + "/assets/img/morenImg.png";
+            // }
+            that.isAppoint = res.data.data.isNeedAppoint == 0 ? "2" : "1";
+            that.isAppointAttend = res.data.data.isNeedAppoint == 1 ? "1" : "2";
+            that.classDate = formatDate(new Date(res.data.data.timeStart), "yyyy-MM-dd")
+            that.classStartTime = formatDate(new Date(res.data.data.timeStart), "hh:mm")
+            that.classEndTime = formatDate(new Date(res.data.data.timeEnd), "hh:mm")
+            that.selectedCoachStr = res.data.data.coachNameArray.join(',')
+            that.selectedCoachIdStr = res.data.data.coachIdIntArray.join(',')
+            
             that.schedulingDetail = res.data.data;
           }
         }
@@ -446,7 +496,7 @@ page {
         height: 40px;
         border-radius: 3px;
         margin: 0 15px;
-        > img {
+        > image {
           width: 100%;
           height: 100%;
         }
@@ -460,7 +510,8 @@ page {
       }
       > div {
         display: inline-block;
-        // vertical-align: middle;
+
+        vertical-align: middle;
       }
     }
     .coach-popup-item {

@@ -69,6 +69,7 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import noneResult from "COMPS/noneResult.vue";
+import { format } from "path";
 export default {
   data() {
     return {
@@ -178,7 +179,7 @@ export default {
     if (options.type) {
       this.type = options.type;
       this.venueId = options.venueId;
-      this.teamScheduleId = options.teamScheduleId
+      this.teamScheduleId = options.teamScheduleId;
     }
   },
   mounted() {
@@ -211,10 +212,10 @@ export default {
     },
     toCardDetail(item) {
       if (this.type == "addStudent") {
-        this.selectedCard = item
+        this.selectedCard = item;
         // 新增上课学员
-        this.getProject()
-        return
+        this.getProject();
+        return;
       }
       wx.navigateTo({
         url: `../../cardDetail/main?id=${item.id}&type=staff`
@@ -285,15 +286,33 @@ export default {
       if (!day || day == 0) {
         this.filter.transactTimeEnd = "";
         this.filter.transactTimeStart = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        let startTime =
-          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        this.filter.transactTimeStart = startTime;
-        this.filter.transactTimeEnd = endTime;
+        return
       }
+        // const DAY = 24 * 60 * 60 * 1000;
+        // let stamp = new Date().getTime();
+        // let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
+        // let startTime =
+        //   formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
+        // this.filter.transactTimeStart = startTime;
+        // this.filter.transactTimeEnd = endTime;
+        let date = new Date();
+        const DAY = 24 * 60 * 60 * 1000;
+        const HOUR8 = 8 * 60 * 60 *1000;
+        let nowStamp = date.getTime();
+        let today = date.getDate() - 1;
+        let weekday = date.getDay() - 1;
+        if (day == 1) {
+          this.filter.transactTimeStart = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8), 'yyyy-MM-dd hh:mm:ss');
+          this.filter.transactTimeEnd = formatDate(new Date(parseInt(nowStamp / DAY) * DAY  + DAY - HOUR8 - 1), 'yyyy-MM-dd hh:mm:ss');
+        }
+        if(day == 7) {
+          this.filter.transactTimeStart = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - weekday*DAY), 'yyyy-MM-dd hh:mm:ss');
+          this.filter.transactTimeEnd = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 + (7-weekday)*DAY-1), 'yyyy-MM-dd hh:mm:ss');
+        }
+        if(day == 30) {
+          this.filter.transactTimeStart = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - today*DAY), 'yyyy-MM-dd hh:mm:ss');
+          this.filter.transactTimeEnd = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 + (30-today)*DAY-1), 'yyyy-MM-dd hh:mm:ss');
+        }
       this.page = 1;
       this.getCardPage();
     },
@@ -303,14 +322,14 @@ export default {
       this.getCardPage();
     },
     selectProject(item) {
-      this.selectedProject = item
-      this.showProjectPopup = false
-      this.getUserp()
+      this.selectedProject = item;
+      this.showProjectPopup = false;
+      this.getUserp();
     },
     selectUser(item) {
-      this.selectedUser = item
-      this.showUserPopup = false
-      this.addAttend()
+      this.selectedUser = item;
+      this.showUserPopup = false;
+      this.addAttend();
     },
     /* 上课流程 - 开始 */
     // 获取项目
@@ -327,7 +346,7 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
-              that.selectedProject = res.data.data[0]
+              that.selectedProject = res.data.data[0];
               that.getUserp();
             } else {
               that.showProjectPopup = true;
@@ -348,8 +367,8 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
-              that.selectedUser = res.data.data[0]
-              that.addAttend()
+              that.selectedUser = res.data.data[0];
+              that.addAttend();
             } else {
               that.showUserPopup = true;
               that.userpList = res.data.data;

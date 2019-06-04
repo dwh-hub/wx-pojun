@@ -115,20 +115,20 @@ export default {
           dataNum: "0"
         }
       ],
-      operateList: [
-        {
-          text: "单日排期",
-          iconUrl: "/static/images/staff/close.svg",
-          action: () => {}
-        },
-        {
-          text: "批量排期",
-          iconUrl: "/static/images/staff/calendar.svg",
-          action: () => {
-            console.log("批量排期");
-          }
-        }
-      ],
+      // operateList: [
+      //   {
+      //     text: "单日排期",
+      //     iconUrl: "/static/images/staff/close.svg",
+      //     action: () => {}
+      //   },
+      //   {
+      //     text: "批量排期",
+      //     iconUrl: "/static/images/staff/calendar.svg",
+      //     action: () => {
+      //       console.log("批量排期");
+      //     }
+      //   }
+      // ],
       storeList: [],
       actionList: [
         {
@@ -263,7 +263,7 @@ export default {
       this.showOperatePopup = false;
       wx.navigateTo({
         url:
-          `../team_class_scheduling/main?teamTempStoreId=${this.selectedClass.teamTempStoreId}&storeId=${this.selectedClass.storeId}`
+          `../team_class_scheduling/main?teamTempStoreId=${this.selectedClass.teamTempStoreId}&storeId=${this.selectedClass.storeId}&type=single`
       });
     }
   }

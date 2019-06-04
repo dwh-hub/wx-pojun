@@ -6,6 +6,7 @@
         <div class="name">{{classDetail.anotherName}}</div>
         <div class="duration">时长：{{classDetail.timeSpan}}分钟</div>
       </div>
+      <div @click="toModify">修改</div>
     </div>
     <van-cell-group custom-class="van-cell-group">
       <van-cell title="门店" :value="classDetail.storeName" is-link/>
@@ -70,6 +71,11 @@ export default {
     setNavTab();
   },
   methods: {
+    toModify() {
+      wx.navigateTo({
+        url: `../team_class_scheduling/main?teamScheduleId=${this.classDetail.teamScheduleId}&type=modify&storeId=${this.classDetail.storeId}`
+      })
+    },
     addStudent() {
       if(this.classDetail.timeEnd < new Date().getTime()) {
         return wx.showModal({
@@ -190,13 +196,6 @@ page {
       border-radius: 3px;
       background-color: #eee;
     }
-    .block-info {
-      flex: 1;
-      margin-left: 15px;
-      > div {
-        line-height: 30px;
-      }
-    }
     .class-info {
       > div {
         line-height: 22px;
@@ -211,6 +210,13 @@ page {
       }
       .third {
         font-size: 12px;
+      }
+    }
+    .block-info {
+      flex: 1;
+      margin-left: 15px;
+      > div {
+        line-height: 30px;
       }
     }
     .class-over {

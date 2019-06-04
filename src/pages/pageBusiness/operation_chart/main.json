@@ -1,6 +1,8 @@
 {
   "navigationBarTitleText": "运营报表",
   "usingComponents": {
-    "ff-canvas": "/static/f2-canvas/f2-canvas"
+    "ff-canvas": "/static/f2-canvas/f2-canvas",
+    "van-tab": "../../../static/vant/tab/index",
+    "van-tabs": "../../../static/vant/tabs/index"
   }
 }

@@ -85,7 +85,7 @@ export default {
   display: flex;
   position: relative;
   .store {
-    height: 85rpx;
+    height: 86rpx;
     .store-text {
       display: inline-block;
       vertical-align: middle;

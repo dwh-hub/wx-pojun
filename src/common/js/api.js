@@ -37,19 +37,19 @@ export function getPhoneNumber(e, url, isTab) {
           }
         });
       } else {
-        wx.setStorage({
-          key: "phone",
-          data: "18888888881",
-          success: function () {
-            login(url, isTab);
-          }
-        });
-        // wx.hideLoading();
-        // wx.showModal({
-        //   title: "提示",
-        //   content: res.data.message,
-        //   showCancel: false
+        // wx.setStorage({
+        //   key: "phone",
+        //   data: "18888888881",
+        //   success: function () {
+        //     login(url, isTab);
+        //   }
         // });
+        wx.hideLoading();
+        wx.showModal({
+          title: "提示",
+          content: res.data.message,
+          showCancel: false
+        });
       }
     }
   });
@@ -200,7 +200,7 @@ function register() {
   HttpRequest({
     url: window.api + "/wxcustomer/addCustomer",
     data: {
-      id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : undefined,
+      id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : 0,
       companyId: wx.getStorageSync("companyId"),
       phone: wx.getStorageSync("phone"),
       name: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + rand(1000, 9999)),

@@ -166,6 +166,7 @@ export default {
     return {
       teamTempStoreId: 0,
       storeId: 0,
+      schedullingType: "",
       schedulingDetail: {},
       coachList: [],
       selectedCoachStr: "",
@@ -191,6 +192,7 @@ export default {
     if (options.teamTempStoreId) {
       this.teamTempStoreId = options.teamTempStoreId;
       this.storeId = options.storeId;
+      this.schedullingType = options.type || '单日'
     }
   },
   mounted() {
@@ -431,6 +433,7 @@ page {
     width: 100%;
     text-align: center;
     color: #fff;
+    z-index: 5;
   }
   .action-list {
     max-height: 50vh;

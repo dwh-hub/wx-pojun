@@ -40,7 +40,7 @@
 					"id": 0,
 					"name": "主页",
 					"pathName": "pages/homepage/main",
-					"query": "scene=52-120-114514",
+					"query": "scene=52-119-773",
 					"scene": null
 				},
 				{
@@ -81,7 +81,7 @@
 				{
 					"id": 6,
 					"name": "demo",
-					"pathName": "pages/pageBusiness/team_class_scheduling/main",
+					"pathName": "pages/pageBusiness/operation_chart/main",
 					"query": "",
 					"scene": null
 				},

@@ -199,7 +199,7 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/operation_report_icon_3.svg",
               text: "课程报表",
-              navUrl: ""
+              navUrl: "../operation_chart/main?nav=1"
             },
             {
               iconUrl:

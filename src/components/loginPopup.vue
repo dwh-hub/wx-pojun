@@ -29,7 +29,7 @@ import {
   getThemeColor
 } from "COMMON/js/common.js";
 import store from "../utils/store";
-import { getPhoneNumber,getMessage } from "COMMON/js/merge_login.js";
+import { getPhoneNumber,getMessage } from "COMMON/js/api.js";
 export default {
   props: ["options"],
   data() {

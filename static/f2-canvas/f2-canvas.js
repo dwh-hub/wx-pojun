@@ -67,7 +67,7 @@ Component({
    * 组件的方法列表
    */
   methods: {
-    init: function(callback) {
+    init: function(callback, initData, unit) {
       const version = wx.version.version.split('.').map(n => parseInt(n, 10));
       const isValid = version[0] > 1 || (version[0] === 1 && version[1] > 9)
         || (version[0] === 1 && version[1] === 9 && version[2] >= 91);
@@ -83,7 +83,7 @@ Component({
       const query = wx.createSelectorQuery().in(this);
       query.select('.f2-canvas').boundingClientRect(res => {
         if (typeof callback === 'function') {
-          this.chart = callback(canvas, res.width, res.height);
+          this.chart = callback(canvas, res.width, res.height, initData, unit);
         } else if (this.data.opts && this.data.opts.onInit) {
           this.chart = this.data.opts.onInit(canvas, res.width, res.height);
         }

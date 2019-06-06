@@ -51,7 +51,8 @@
       "staff_team_class/main",
       "team_class_scheduling/main",
       "scheduling_detail/main",
-      "operation_chart/main"
+      "operation_chart/main",
+      "select_scheduling_date/main"
     ]
   }],
   "permission": {
@@ -67,35 +68,35 @@
     "enablePullDownRefresh": true,
     "onReachBottomDistance": 50
   },
-   "tabBar": {
-      "color": "#dbdbdb",
-      "selectedColor": "#fff",
-      "borderStyle": "white",
-      "list": [{
-        "pagePath": "pages/homepage/main",
-        "text": "首页",
-        "iconPath": "static/tabs/home.png",
-        "selectedIconPath": "static/tabs/home-active.png"
-      },{
-        "pagePath": "pages/active/main",
-        "text": "活动",
-        "iconPath": "static/tabs/active.png",
-        "selectedIconPath": "static/tabs/active-active.png"
-      },{
-        "pagePath": "pages/appointmentClass/main",
-        "text": "约课",
-        "iconPath": "static/tabs/appoint.png",
-        "selectedIconPath": "static/tabs/appoint-active.png"
-      },{
-        "pagePath": "pages/message/main",
-        "text": "消息",
-        "iconPath": "static/tabs/message.png",
-        "selectedIconPath": "static/tabs/message-active.png"
-      },{
-        "pagePath": "pages/mine/main",
-        "text": "我的",
-        "iconPath": "static/tabs/mine.png",
-        "selectedIconPath": "static/tabs/mine-active.png"
-      }]
-    }
+  "tabBar": {
+    "color": "#dbdbdb",
+    "selectedColor": "#fff",
+    "borderStyle": "white",
+    "list": [{
+      "pagePath": "pages/homepage/main",
+      "text": "首页",
+      "iconPath": "static/tabs/home.png",
+      "selectedIconPath": "static/tabs/home-active.png"
+    }, {
+      "pagePath": "pages/active/main",
+      "text": "活动",
+      "iconPath": "static/tabs/active.png",
+      "selectedIconPath": "static/tabs/active-active.png"
+    }, {
+      "pagePath": "pages/appointmentClass/main",
+      "text": "约课",
+      "iconPath": "static/tabs/appoint.png",
+      "selectedIconPath": "static/tabs/appoint-active.png"
+    }, {
+      "pagePath": "pages/message/main",
+      "text": "消息",
+      "iconPath": "static/tabs/message.png",
+      "selectedIconPath": "static/tabs/message-active.png"
+    }, {
+      "pagePath": "pages/mine/main",
+      "text": "我的",
+      "iconPath": "static/tabs/mine.png",
+      "selectedIconPath": "static/tabs/mine-active.png"
+    }]
+  }
 }

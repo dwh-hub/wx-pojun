@@ -71,6 +71,9 @@ export default {
     this.teamScheduleId = "";
     setNavTab();
   },
+  onUnLoad() {
+    Object.assign(this.$data, this.$options.data());
+  },
   onPullDownRefresh() {
     setTimeout(() => {
       wx.stopPullDownRefresh();

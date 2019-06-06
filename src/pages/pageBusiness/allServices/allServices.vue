@@ -141,13 +141,13 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_1.svg",
               text: "团课排课",
-              navUrl: ""
+              navUrl: "../staff_team_class/main"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_2.svg",
               text: "教练分配",
-              navUrl: ""
+              navUrl: "../coach_student/main"
             },
             {
               iconUrl:

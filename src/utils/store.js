@@ -11,7 +11,10 @@ const store = new Vuex.Store({
     isIphoneX: false,
     longitude: '', // 经度
     latitude: '', // 纬度
-    allStore: []
+    allStore: [],
+    classStartTime: "",
+    classEndTime: "",
+    schedulingWeekArr: []
   },
   mutations: {
     changeCount(state, value) {
@@ -34,6 +37,15 @@ const store = new Vuex.Store({
     },
     saveAllStore(state, value) {
       state.allStore = value
+    },
+    changeClassStartTime(state, value) {
+      state.classStartTime = value
+    },
+    changeClassEndTime(state, value) {
+      state.classEndTime = value
+    },
+    changeSchedulingWeekArr(state, value) {
+      state.schedulingWeekArr = value
     }
   }
 })

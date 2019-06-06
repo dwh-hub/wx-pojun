@@ -6,20 +6,20 @@
         <div class="name">{{classDetail.anotherName}}</div>
         <div class="duration">时长：{{classDetail.timeSpan}}分钟</div>
       </div>
-      <div @click="toModify">修改</div>
+      <div @click="toModify">修改团课</div>
     </div>
     <van-cell-group custom-class="van-cell-group">
-      <van-cell title="门店" :value="classDetail.storeName" is-link/>
-      <van-cell title="场地" :value="classDetail.venueName" is-link/>
-      <van-cell title="课程时长" :value="classDetail.timeSpan+'分钟'" is-link/>
-      <van-cell title="教练" :value="classDetail.coachStr" is-link/>
-      <van-cell title="上课日期" :value="classDetail.classStartTime" is-link/>
-      <van-cell title="上课时间" :value="classDetail.classStartDate" is-link/>
-      <van-cell title="是否预约" :value="classDetail.isNeedAppointText" is-link/>
-      <van-cell title="最小上课人数" :value="classDetail.minPeople" is-link/>
-      <van-cell title="最大上课人数" :value="classDetail.maxPeople" is-link/>
-      <van-cell title="预约截止时间" :value="classDetail.stopAppoint" is-link/>
-      <van-cell title="预约开始时间" :value="classDetail.advanceAppoint+'分钟'" is-link/>
+      <van-cell title="门店" :value="classDetail.storeName" />
+      <van-cell title="场地" :value="classDetail.venueName" />
+      <van-cell title="课程时长" :value="(classDetail.timeSpan || '--')+'分钟'" />
+      <van-cell title="教练" :value="classDetail.coachStr" />
+      <van-cell title="上课日期" :value="classDetail.classStartTime" />
+      <van-cell title="上课时间" :value="classDetail.classStartDate" />
+      <van-cell title="是否预约" :value="classDetail.isNeedAppointText" />
+      <van-cell title="最小上课人数" :value="classDetail.minPeople" />
+      <van-cell title="最大上课人数" :value="classDetail.maxPeople" />
+      <van-cell title="预约截止时间" :value="classDetail.stopAppoint" />
+      <van-cell title="预约开始时间" :value="classDetail.advanceAppoint+'分钟'" />
     </van-cell-group>
     <div class="cell-title">上课列表</div>
     <div class="student-list">

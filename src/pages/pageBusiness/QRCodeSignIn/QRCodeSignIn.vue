@@ -1,6 +1,6 @@
 <template>
   <div class="qrcode-sign">
-    <div class="class-info">教练正在准备为学员上课</div>
+    <div class="class-info">教练{{params.coachName}}正在准备为学员{{params.studentName}}上课</div>
     <div class="class-time">上课时间：{{nowTime}}</div>
     <div class="qrcode-wrapper" v-if="params.way == 2 || params.way == 3">
       <van-icon
@@ -36,7 +36,7 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import QR from "@/libs/weapp-qrcode.js";
-// import GoEasy from "@/libs/goeasy-wx.0.0.1.min";
+import GoEasy from "@/libs/goeasy-wx.0.0.1.min";
 export default {
   data() {
     return {
@@ -48,18 +48,18 @@ export default {
         // studentId: '',
         // appointId: ''
       },
-      nowTime: "",
+      nowTime: formatDate(new Date(), "hh:mm"),
       qrcodeURL: "",
       studentText: "正在等待学员确认...",
       receptionText: "正在等待前台确认...",
       timer: null,
-      normalCoachCourse: null
+      normalCoachCourse: null,
+      checkQRStatus: null
     };
   },
   onLoad(options) {
     if (options.params) {
       this.params = JSON.parse(options.params);
-      console.log(this.params);
       this.getQrCode();
     }
     wx.setNavigationBarColor({
@@ -70,15 +70,29 @@ export default {
   mounted() {
     this.timer = setInterval(() => {
       this.getNowTime();
+    }, 60000);
+    this.timer;
+    this.checkQRStatus = setInterval(() => {
+      this.getQRCodeResult();
     }, 1000);
-
-    // this.normalCoachCourse = new GoEasy({
-    //   appkey: wx.getStorageSync("instMsgSubKey")
-    // });
-    // this.addHit()
+    this.checkQRStatus;
+    if (this.params.way == 3 || this.params.way == 4) {
+      this.pushMsg();
+    }
+    this.normalCoachCourse = new GoEasy({
+      appkey: wx.getStorageSync("instMsgSubKey")
+    });
+    this.addHit();
   },
   onUnload() {
+    this.cancelHit()
     clearInterval(this.timer);
+    clearInterval(this.checkQRStatus);
+  },
+  onHide() {
+    this.cancelHit()
+    clearInterval(this.timer);
+    clearInterval(this.checkQRStatus);
   },
   computed: {
     tip() {
@@ -94,7 +108,7 @@ export default {
   },
   methods: {
     getNowTime() {
-      this.nowTime = formatDate(new Date(), "hh:mm:ss");
+      this.nowTime = formatDate(new Date(), "hh:mm");
     },
     drawImg(url) {
       var imgData = QR.drawImg(url, {
@@ -130,7 +144,20 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            that.studentText = "学员已确认";
+            console.log(that.studentText);
+            clearInterval(that.checkQRStatus);
           }
+        }
+      });
+    },
+    pushMsg() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/attendclass/verify/coachAndFront",
+        data: {
+          coachId: that.params.coachId,
+          coachAppointId: that.params.appointId
         }
       });
     },
@@ -143,7 +170,6 @@ export default {
           "_" +
           that.params.storeId,
         onMessage: function(message) {
-          console.log("Receive：" + message.content);
           var valueType = JSON.parse(
             message.content.substring(0, message.content.length)
           );
@@ -156,6 +182,7 @@ export default {
       });
     },
     cancelHit() {
+      let that = this;
       this.normalCoachCourse.unsubscribe({
         channel:
           "channel_" +
@@ -185,8 +212,18 @@ export default {
         valueType.status == 200
       ) {
         this.receptionText = "前台已确认";
+        wx.showModal({
+          title: "提示",
+          content: "上课成功",
+          showCancel: false
+        });
         setTimeout(() => {
           this.cancelHit();
+          wx.redirectTo({
+            url: `../appoint_result/main?coachAppointId=${
+              this.params.appointId
+            }&type=attend`
+          });
         }, 500);
       } else if (
         valueType.message &&

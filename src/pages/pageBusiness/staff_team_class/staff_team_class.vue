@@ -115,20 +115,20 @@ export default {
           dataNum: "0"
         }
       ],
-      // operateList: [
-      //   {
-      //     text: "单日排期",
-      //     iconUrl: "/static/images/staff/close.svg",
-      //     action: () => {}
-      //   },
-      //   {
-      //     text: "批量排期",
-      //     iconUrl: "/static/images/staff/calendar.svg",
-      //     action: () => {
-      //       console.log("批量排期");
-      //     }
-      //   }
-      // ],
+      operateList: [
+        {
+          text: "单日排期",
+          iconUrl: "/static/images/staff/close.svg",
+          action: () => {}
+        },
+        {
+          text: "批量排期",
+          iconUrl: "/static/images/staff/calendar.svg",
+          action: () => {
+            console.log("批量排期");
+          }
+        }
+      ],
       storeList: [],
       actionList: [
         {
@@ -145,13 +145,13 @@ export default {
         {
           text: "单日排期",
           action: () => {
-            this.toScheduling();
+            this.toScheduling('single');
           }
         },
         {
           text: "批量排期",
           action: () => {
-            this.toScheduling();
+            this.toScheduling('batch');
           }
         }
       ],
@@ -259,11 +259,11 @@ export default {
       this.showOperatePopup = true;
       this.selectedClass = item;
     },
-    toScheduling() {
+    toScheduling(type) {
       this.showOperatePopup = false;
       wx.navigateTo({
         url:
-          `../team_class_scheduling/main?teamTempStoreId=${this.selectedClass.teamTempStoreId}&storeId=${this.selectedClass.storeId}&type=single`
+          `../team_class_scheduling/main?teamTempStoreId=${this.selectedClass.teamTempStoreId}&storeId=${this.selectedClass.storeId}&type=${type}`
       });
     }
   }

@@ -128,9 +128,6 @@ export default {
               action: () => {
                 this.getDate(30);
               }
-            },
-            {
-              sonText: "自定义"
             }
           ]
         },
@@ -145,9 +142,6 @@ export default {
             },
             {
               sonText: "本月"
-            },
-            {
-              sonText: "自定义"
             }
           ]
         },

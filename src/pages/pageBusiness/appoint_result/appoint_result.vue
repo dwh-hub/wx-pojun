@@ -1,7 +1,8 @@
 <template>
   <div class="appoint_result">
     <div class="result-img">
-      <image src="http://pojun-tech.cn/assets/img/order_success.png" mode="aspectFit" alt=""></image>
+      <image src="http://pojun-tech.cn/assets/img/come_class.png" mode="aspectFit" alt="" v-if="type=='attend'"></image>
+      <image src="http://pojun-tech.cn/assets/img/order_success.png" mode="aspectFit" alt="" v-else></image>
     </div>
     <van-cell-group>
       <van-cell title="上课日期" :value="timeStart" />
@@ -23,12 +24,14 @@ export default {
   data() {
     return {
       coachAppointId: '', // 预约成功后返回的预约id
-      classDetail: {}
+      classDetail: {},
+      type: ''
     }
   },
   onLoad(options) {
     if(options.coachAppointId) {
       this.coachAppointId = options.coachAppointId
+      this.type  = options.type || ''
     }
   },
   mounted() {

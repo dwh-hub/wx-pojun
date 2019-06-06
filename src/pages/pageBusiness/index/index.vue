@@ -37,9 +37,9 @@
 
     <van-tabbar active="0" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
-      <van-tabbar-item icon="question-o" dot>帮助</van-tabbar-item>
+      <van-tabbar-item icon="question-o">帮助</van-tabbar-item>
       <van-tabbar-item icon="desktop-o">工作台</van-tabbar-item>
-      <van-tabbar-item icon="chat-o" info="5">消息</van-tabbar-item>
+      <van-tabbar-item icon="chat-o">消息</van-tabbar-item>
       <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
     </van-tabbar>
   </div>

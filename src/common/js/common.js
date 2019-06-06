@@ -1,13 +1,13 @@
 const window = {}
-window.DEBUGGING = false
-window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://www.pojun-tech.cn'
+window.DEBUGGING = true
+window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
 // 获取 ext.json 配置信息
 const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
 if (extConfig.companyId) {
   wx.setStorageSync('companyId', extConfig.companyId)
 }
-
+console.log("common.js")
 // 获取sessionKey 需调用wx.login获取sessionKey
 function initsessionKey() {
   let sessionKey = wx.getStorageSync("sessionKey");
@@ -62,7 +62,7 @@ export function getCompanyColor() {
       if (extConfig.companyId) {
         wx.setStorageSync('companyId', extConfig.companyId)
       } else {
-        wx.setStorageSync('companyId', '52')
+        wx.setStorageSync('companyId', '55')
       }
       return getThemeColor()
     }

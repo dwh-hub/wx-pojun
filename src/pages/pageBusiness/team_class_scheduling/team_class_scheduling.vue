@@ -18,7 +18,26 @@
       <van-cell title="教练" is-link @click="showCoachPopup = true" :value="selectedCoachStr"/>
     </van-cell-group>
     <div class="cell-subtitle">课程排期</div>
-    <van-cell-group custom-class="van-cell-group">
+    <div class="batch-time" v-if="type == 'batch'">
+      <van-cell
+        title="开始日期"
+        @click="showDatePopup = true; dateType='startDate'"
+        :value="classStartDate"
+        is-link
+      />
+      <van-cell
+        title="结束日期"
+        @click="showDatePopup = true; dateType='endDate'"
+        :value="classEndDate"
+        is-link
+      />
+      <div class="shcheduling-date" v-if="batchStartTime">
+        <div class="time">{{batchStartTime}} - {{batchEndTime}}</div>
+        <div class="date">{{batchWeekStr}}</div>
+      </div>
+      <div class="add-time-btn" @click="addSchedulingTime" :style="{color: themeColor}">新增课程时间</div>  
+    </div>
+    <van-cell-group custom-class="van-cell-group" v-else>
       <van-cell title="课程日期" @click="changeClassDate" :value="classDate" is-link/>
       <van-cell
         title="开始时间"
@@ -32,16 +51,16 @@
         :value="classEndTime"
         is-link
       />
-      <div class="item-cell">
-        <div class="cell-left">是否预约</div>
-        <div class="cell-right">
-          <van-radio-group :value="isAppoint" @change="onChangeAppoint" custom-class="radio-group">
-            <van-radio :checked-color="themeColor" custom-class="radio" name="1">是</van-radio>
-            <van-radio :checked-color="themeColor" custom-class="radio" name="2">否</van-radio>
-          </van-radio-group>
-        </div>
-      </div>
     </van-cell-group>
+    <div class="item-cell">
+      <div class="cell-left">是否预约</div>
+      <div class="cell-right">
+        <van-radio-group :value="isAppoint" @change="onChangeAppoint" custom-class="radio-group">
+          <van-radio :checked-color="themeColor" custom-class="radio" name="1">是</van-radio>
+          <van-radio :checked-color="themeColor" custom-class="radio" name="2">否</van-radio>
+        </van-radio-group>
+      </div>
+    </div>
 
     <van-cell-group custom-class="van-cell-group" v-if="isAppoint == 1">
       <div class="item-cell">
@@ -79,7 +98,7 @@
       </div>
     </van-cell-group>
 
-    <div class="save-btn" :style="{backgroundColor: themeColor}" @click="addTeamSchedule">保存</div>
+    <div class="save-btn" :style="{backgroundColor: themeColor}" @click="save">保存</div>
 
     <van-popup
       :show="showDatePopup"
@@ -128,7 +147,7 @@
           </div>
           <div class="text">{{item.userName}}</div>
           <div class="icon" v-if="item.isSelect">
-            <van-icon name="checked" color="#07c160" size="2em"/>
+            <van-icon name="checked" :color="themeColor" size="2em"/>
           </div>
         </div>
       </div>
@@ -161,6 +180,7 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
+import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
 export default {
   data() {
@@ -185,13 +205,22 @@ export default {
       showVenuePopup: false,
       actionList: [],
       currentDateStamp: new Date().getTime(),
-      timeType: "",
+      timeType: "", // 控制时间选择
+      dateType: "", // 控制日期选择
       currentTime: "00:00",
       classDate: formatDate(new Date(), "yyyy-MM-dd"),
       classStartTime: "00:00",
       classEndTime: "23:59",
+      /* 批量排期日期 */
+      classStartDate: formatDate(new Date(), "yyyy-MM-dd"),
+      classEndDate: "",
+      batchStartTime: "",
+      batchEndTime: "",
+      batchWeek: [],
+      batchWeekStr: "",
+       /* 批量排期日期 */
       isAppoint: "1", // 是否预约
-      isAppointAttend: "1" // 是否预约才能上课
+      isAppointAttend: "1", // 是否预约才能上课
     };
   },
   onLoad(options) {
@@ -208,14 +237,41 @@ export default {
   onUnload() {
     Object.assign(this.$data, this.$options.data());
   },
+  onShow() {
+    if(store.state.classStartTime) {
+      this.batchStartTime = store.state.classStartTime
+      this.batchEndTime = store.state.classEndTime
+      this.batchWeek = store.state.schedulingWeekArr.sort(function(a,b){
+        return Number(a) - Number(b);
+      })
+      let _weekStr = ''
+      this.batchWeek.forEach(e => {
+        if(e == 1) {
+          _weekStr += '星期一,'
+        }if(e == 2) {
+          _weekStr += '星期二,'
+        }if(e == 3) {
+          _weekStr += '星期三,'
+        }if(e == 4) {
+          _weekStr += '星期四,'
+        }if(e == 5) {
+          _weekStr += '星期五,'
+        }if(e == 6) {
+          _weekStr += '星期六,'
+        }if(e == 0) {
+          _weekStr += '星期日,'
+        }
+      });
+      this.batchWeekStr = _weekStr
+    }
+  },
   mounted() {
     setNavTab();
-    if(this.type == "single") {
-      this.getSchedulingDetail();
-      this.getVenueList();
-    }
     if(this.type == "modify") {
       this.getTeamSchedule()
+    } else {
+      this.getSchedulingDetail();
+      this.getVenueList();
     }
     this.getCoachList();
   },
@@ -228,6 +284,19 @@ export default {
       this.showVenuePopup = true
     },
     changeDate(e) {
+      if(this.dateType == 'startDate') {
+        this.classStartDate =  formatDate(new Date(e.mp.detail), "yyyy-MM-dd");
+      }
+      if(this.dateType == 'endDate') {
+        if(new Date(e.mp.detail).getTime() < new Date(this.classStartDate).getTime()) {
+          return wx.showModal({
+            title: "提示",
+            content: "结束时间必须大于开始时间",
+            showCancel: false
+          });
+        }
+        this.classEndDate = formatDate(new Date(e.mp.detail), "yyyy-MM-dd");
+      }
       this.currentDateStamp = e.mp.detail;
       this.classDate = formatDate(new Date(e.mp.detail), "yyyy-MM-dd");
       this.showDatePopup = false;
@@ -398,6 +467,14 @@ export default {
     changeClassDate() {
       this.showDatePopup = true;
     },
+    save() {
+      if(this.type == "modify") {
+        this.updateSchedule()
+      } else {
+        this.addTeamSchedule()
+      }
+    },
+    // 排期
     addTeamSchedule() {
       let that = this;
       if (this.selectedCoachIdStr == "") {
@@ -406,6 +483,18 @@ export default {
           content: "请选择上课教练",
           showCancel: false
         });
+      }
+      let _timeStr
+      if(this.type == "batch") {
+        _timeStr = this.eachTime(this.batchStartTime,this.batchEndTime)
+      } else {
+        _timeStr = [
+            {
+              calendar: that.classDate + " 00:00:00",
+              timeStart: that.classDate + " " + that.classStartTime + ":00",
+              timeEnd: that.classDate + " " + that.classEndTime + ":00"
+            }
+          ]
       }
       HttpRequest({
         url: window.api + "/teamClass/teamSchedule/add",
@@ -419,22 +508,93 @@ export default {
           maxPeople: that.schedulingDetail.maxPeople,
           stopAppoint: that.schedulingDetail.stopAppoint,
           advanceAppoint: that.schedulingDetail.advanceAppoint,
-          teamScheduleTimeJsonStr: [
-            {
-              calendar: that.classDate + " 00:00:00",
-              timeStart: that.classDate + " " + that.classStartTime + ":00",
-              timeEnd: that.classDate + " " + that.classEndTime + ":00"
-            }
-          ]
+          teamScheduleTimeJsonStr: _timeStr
         },
         success(res) {
           wx.showModal({
             title: "提示",
             content: res.data.message,
-            showCancel: false
+            showCancel: false,
+            success() {
+              if(res.data.code == 200) {
+                wx.navigateBack({
+                  delta: 1
+                })
+              }
+            }
           });
         }
       });
+    },
+    // 修改团课
+    updateSchedule() {
+      let that = this
+      HttpRequest({
+        url: window.api + "/teamClass/teamSchedule/update",
+        data: {
+          teamScheduleId: that.teamScheduleId,
+          coachIdArray: that.selectedCoachIdStr,
+          calendar: that.classDate + " 00:00:00",
+          timeStart: that.classDate + " " + that.classStartTime + ":00",
+          timeEnd: that.classDate + " " + that.classEndTime + ":00",
+          isNeedAppoint: that.schedulingDetail.isNeedAppoint,
+          minPeople: that.schedulingDetail.minPeople,
+          maxPeople: that.schedulingDetail.maxPeople,
+          stopAppoint: that.schedulingDetail.stopAppoint,
+          advanceAppoint: that.schedulingDetail.advanceAppoint,
+        },
+        success(res) {
+          wx.showModal({
+            title: "提示",
+            content: res.data.message,
+            showCancel: false,
+            success() {
+              if(res.data.code == 200) {
+                wx.navigateBack({
+                  delta: 1
+                })
+              }
+            }
+          });
+        }
+      })
+    },
+    addSchedulingTime() {
+      if(this.classStartDate == "") {
+        return wx.showModal({
+          title: "提示",
+          content: "请选择结束时间",
+          showCancel: false
+        });
+      }
+      if(this.classEndDate == "") {
+        return wx.showModal({
+          title: "提示",
+          content: "请选择结束时间",
+          showCancel: false
+        });
+      }
+      wx.navigateTo({
+        url: "../select_scheduling_date/main"
+      })
+    },
+    eachTime(classStart,classEnd){
+      var arr = []
+      var teamClassWeekendArr = this.batchWeek;
+      var timeStareStr = (new Date(this.classStartDate)).getTime();
+      var timeEndStr = (new Date(this.classEndDate)).getTime();
+      for(var i = timeStareStr ; i <= timeEndStr ; i+=86400000){
+        for(var j = 0 ; j < teamClassWeekendArr.length ; j++){
+          if((new Date(i)).getDay() == teamClassWeekendArr[j]){
+            var contentParam = {}; 
+            contentParam.calendar = formatDate(new Date(i), 'yyyy-MM-dd')+" 00:00:00";
+            contentParam.timeStart = formatDate(new Date(i), 'yyyy-MM-dd')+" "+classStart+":00";
+            contentParam.timeEnd = formatDate(new Date(i), 'yyyy-MM-dd')+" "+classEnd+":00"
+            arr.push(contentParam);
+          }
+        }
+      }
+      return arr;
     }
   }
 };
@@ -525,6 +685,22 @@ page {
     }
     .radio {
       margin: 0 5px !important;
+    }
+  }
+  .batch-time {
+    margin-bottom: 15px;
+    .shcheduling-date {
+      padding: 6px 15px;
+      background-color: #fff;
+      border-bottom: 1rpx solid #eee;
+      .time, .date {
+        line-height: 24px;
+      }
+    }
+    .add-time-btn {
+      line-height: 40px;
+      text-align: center;
+      background-color: #fff;
     }
   }
 }

@@ -78,13 +78,10 @@ export default {
               }
             },
             {
-              sonText: "本月",
+              sonText: "本月", 
               action: () => {
                 this.filterDate(30);
               }
-            },
-            {
-              sonText: "自定义"
             }
           ]
         },
@@ -187,6 +184,9 @@ export default {
     this.getClassList();
     this.getCoachList();
   },
+  onHide() {
+    Object.assign(this.$data, this.$options.data());
+  },
   mixins: [colorMixin],
   components: {
     headerData,
@@ -202,10 +202,12 @@ export default {
     selectStore(item) {
       this.selectedStore = item;
       this.page = 1;
+      this.getClassList()
     },
     searchChange(event) {
       this.filter.namePhone = event;
       this.page = 1;
+      this.getClassList()
     },
     getClassList() {
       this.isLoading = true;
@@ -214,6 +216,7 @@ export default {
         {},
         {
           page: that.page,
+          pageNo: that.page,
           searchStore: that.selectedStore.storeId
         },
         that.filter
@@ -324,7 +327,7 @@ export default {
     },
     // 上课
     attendClass() {
-      this.getAttendClassWay();
+      this.checkAttendStatus()
     },
     // 取消预约
     cancelClass() {
@@ -365,9 +368,7 @@ export default {
       });
     },
     // 改约
-    anotherTime() {
-      
-    },
+    anotherTime() {},
     // 下课
     classOver() {
       let that = this;
@@ -491,6 +492,55 @@ export default {
       this.filter.coachId = id || "";
       this.page = 1;
       this.getClassList();
+    },
+    checkAttendStatus() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/coach/private/appoint/verify",
+        data: {
+          coachAppointId: that.curSelectClass.coachAppointId
+        },
+        success(res) {
+          if(res.data.code == 200) {
+            that.getAttendClassWay();
+          }
+          if (res.data.code == 300) {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              success(modal_res) {
+                if (modal_res.confirm) {
+                  HttpRequest({
+                    url: window.api + "/mobile/coach/appoint/finishclass",
+                    data: {
+                      coachAppointId: that.curSelectClass.coachAppointId,
+                      realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
+                    },
+                    success(finish_res) {
+                      if (finish_res.data.code == 200) {
+                        that.getAttendClassWay()
+                      } else {
+                        wx.showModal({
+                          title: "提示",
+                          content: finish_res.data.message || finish_res.data,
+                          showCancel: false
+                        });
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          }
+          if (res.data.code == 405) {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
     }
   }
 };

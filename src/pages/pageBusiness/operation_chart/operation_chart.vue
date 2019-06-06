@@ -1,13 +1,14 @@
 <template>
   <div class="operation_chart">
+    <filter-nav :nav="nav"></filter-nav>
     <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
       <van-tab title="运营报表"></van-tab>
       <van-tab title="课程报表"></van-tab>
     </van-tabs>
     <div class="operation" v-show="navIndex == 0">
       <div class="sub-tab">
-        <div class="chart-list" @click="operationNavIndex = 1;renderChart()">汇总</div>
-        <div class="total-detail" @click="operationNavIndex = 2;renderChart()">明细</div>
+        <div class="chart-list" :class="{active: operationNavIndex==1}" @click="operationNavIndex = 1;renderChart()">汇总</div>
+        <div class="total-detail" :class="{active: operationNavIndex==2}" @click="operationNavIndex = 2;renderChart()">明细</div>
       </div>
       <div v-show="operationNavIndex == 1">
         <div class="chart-title">门店排行</div>
@@ -31,7 +32,7 @@
           <ff-canvas id="customer-line" canvas-id="customer-line" :opts="opts"/>
         </div>
       </div>
-      <div v-show="operationNavIndex == 2" class="operation-detail-wrapper">
+      <div v-if="operationNavIndex == 2" class="operation-detail-wrapper">
         <div class="tabel-wrapper">
           <table>
             <tr>
@@ -94,8 +95,8 @@
     </div>
     <div class="store_chart" v-show="navIndex == 1">
       <div class="sub-tab">
-        <div class="chart-list" @click="classNavIndex = 1;renderChart()">汇总</div>
-        <div class="total-detail" @click="classNavIndex = 2;renderChart()">明细</div>
+        <div class="chart-list" :class="{active: classNavIndex==1}" @click="classNavIndex = 1;renderChart()">汇总</div>
+        <div class="total-detail" :class="{active: classNavIndex==2}" @click="classNavIndex = 2;renderChart()">明细</div>
       </div>
       <div v-show="classNavIndex == 1">
         <div class="chart-title">门店授课排行</div>
@@ -121,9 +122,11 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
+import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import F2 from "../../../../static/f2-canvas/lib/f2";
 import listDayItem from "../components/list-day-item";
+import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 export default {
   data() {
@@ -131,6 +134,41 @@ export default {
       navIndex: 0,
       operationNavIndex: 1,
       classNavIndex: 1,
+      nav: [
+        {
+          navTitle: "",
+          children: []
+        },
+        {
+          navTitle: "选择时间",
+          children: [
+            {
+              sonText: "全部",
+              action: () => {
+                this.filterDate(0);
+              }
+            },
+            {
+              sonText: "今日",
+              action: () => {
+                this.filterDate(1);
+              }
+            },
+            {
+              sonText: "本周",
+              action: () => {
+                this.filterDate(7);
+              }
+            },
+            {
+              sonText: "本月",
+              action: () => {
+                this.filterDate(30);
+              }
+            }
+          ]
+        }
+      ],
       opts: {
         lazyLoad: true
       },
@@ -142,19 +180,22 @@ export default {
       filter: {
         timeStart: "2019-05-04 00:00:00",
         timeEnd: "2019-06-04 23:59:59",
-        storeId: ""
+        storeId: "126"
       },
       sellInfo: {},
       sellList: [],
       coachList: [],
       sellPage: 1,
-      coachPage: 1
+      coachPage: 1,
+      storeList: [],
+      selectedStore: {}
     };
   },
   mixins: [colorMixin],
   components: {
     listDayItem,
-    staffCoachItem
+    staffCoachItem,
+    filterNav
   },
   onLoad(options) {
     if (options.nav) {
@@ -168,6 +209,20 @@ export default {
   },
   mounted() {
     setNavTab();
+
+    this.storeList = store.state.allStore;
+    this.selectedStore = this.storeList[0];
+    this.nav[0].navTitle = this.selectedStore.storeName;
+    this.filter.storeId = this.selectedStore.storeId;
+    this.nav[0].children = this.storeList.map(e => {
+      return {
+        sonText: e.storeName,
+        action: () => {
+          this.filterStore(e.storeId);
+        }
+      };
+    });
+
     this.getSellInfo();
     this.getSellList();
     this.getCoachList();
@@ -191,12 +246,35 @@ export default {
         this.getCoachClassData();
       }
     },
+    changeFilter() {
+      if (this.navIndex == 0) {
+        if(this.operationNavIndex == 1) {
+          this.getStoreChartData();
+          this.getCardChartData();
+          this.getSaleChartData();
+          this.getCustomerChartData();
+          this.getLineData();
+        }
+        if(this.operationNavIndex == 2) {
+          this.getSellInfo()
+          this.getSellList()
+        }
+      }
+      if (this.navIndex == 1) {
+        if( this.classNavIndex == 1) {
+          this.getStoreClassData();
+          this.getCoachClassData();
+        }
+        if(this.operationNavIndex == 2) {
+          this.getCoachList()
+        }
+      }
+    },
     getStoreChartData() {
       let that = this;
       HttpRequest({
         url: window.api + "/finance/statement/pieView",
         data: {
-          storeId: that.filter.storeId,
           timeStart: that.filter.timeStart,
           timeEnd: that.filter.timeEnd
         },
@@ -284,7 +362,6 @@ export default {
       HttpRequest({
         url: window.api + "/mobile/coach/statement/attendstrore",
         data: {
-          storeId: that.filter.storeId,
           calendarStart: that.filter.timeStart,
           calendarEnd: that.filter.timeEnd
         },
@@ -326,19 +403,30 @@ export default {
     },
     initDataChart(canvas, width, height, initData, unit) {
       let sumCost = 0;
-      initData.forEach(e => {
-        sumCost += e.cost;
-      });
-      let data = initData.map(e => {
-        return {
-          name: e.name,
-          percent:
-            sumCost == 0
-              ? Number((1 / this.initialData.length * 100).toFixed(2))
-              : Number((e.cost / sumCost).toFixed(2)) * 100,
-          cost: e.cost
-        };
-      });
+      let data = [];
+      if (!initData.length) {
+        data = [
+          {
+            name: "无",
+            percent: 100,
+            cost: 0
+          }
+        ];
+      } else {
+        initData.forEach(e => {
+          sumCost += e.cost;
+        });
+        data = initData.map(e => {
+          return {
+            name: e.name,
+            percent:
+              sumCost == 0
+                ? Number(((1 / initData.length) * 100).toFixed(2))
+                : Number(((e.cost / sumCost) * 100).toFixed(2)),
+            cost: e.cost
+          };
+        });
+      }
       let map = {};
       data.map(function(obj) {
         map[obj.name] = obj.cost + unit + " " + obj.percent + "%";
@@ -535,9 +623,67 @@ export default {
               rightText: e.attendNumber + "节课"
             };
           });
-          console.log(that.coachList);
         }
       });
+    },
+    filterDate(day) {
+      if (!day || day == 0) {
+        this.filter.timeEnd = "";
+        this.filter.timeStart = "";
+        this.sellPage = 1;
+        this.coachPage = 1;
+        this.changeFilter()
+        return;
+      }
+      let date = new Date();
+      const DAY = 24 * 60 * 60 * 1000;
+      const HOUR8 = 8 * 60 * 60 * 1000;
+      let nowStamp = date.getTime();
+      let today = date.getDate() - 1;
+      let weekday = date.getDay() - 1;
+      if (day == 1) {
+        this.filter.timeStart = formatDate(
+          new Date(parseInt(nowStamp / DAY) * DAY - HOUR8),
+          "yyyy-MM-dd hh:mm:ss"
+        );
+        this.filter.timeEnd = formatDate(
+          new Date(parseInt(nowStamp / DAY) * DAY + DAY - HOUR8 - 1),
+          "yyyy-MM-dd hh:mm:ss"
+        );
+      }
+      if (day == 7) {
+        this.filter.timeStart = formatDate(
+          new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - weekday * DAY),
+          "yyyy-MM-dd hh:mm:ss"
+        );
+        this.filter.timeEnd = formatDate(
+          new Date(
+            parseInt(nowStamp / DAY) * DAY - HOUR8 + (7 - weekday) * DAY - 1
+          ),
+          "yyyy-MM-dd hh:mm:ss"
+        );
+      }
+      if (day == 30) {
+        this.filter.timeStart = formatDate(
+          new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - today * DAY),
+          "yyyy-MM-dd hh:mm:ss"
+        );
+        this.filter.timeEnd = formatDate(
+          new Date(
+            parseInt(nowStamp / DAY) * DAY - HOUR8 + (30 - today) * DAY - 1
+          ),
+          "yyyy-MM-dd hh:mm:ss"
+        );
+      }
+      this.sellPage = 1;
+      this.coachPage = 1;
+      this.changeFilter()
+    },
+    filterStore(id) {
+      this.filter.storeId = id;
+      this.sellPage = 1;
+      this.coachPage = 1;
+      this.changeFilter()
     }
   }
 };
@@ -550,6 +696,9 @@ export default {
       line-height: 40px;
       border-bottom: 1px solid;
     }
+  }
+  .filter-nav {
+    border-bottom: 1rpx solid #eee;
   }
   .chart-title {
     line-height: 38px;
@@ -565,6 +714,11 @@ export default {
       width: 50%;
       line-height: 36px;
       text-align: center;
+    }
+    .active {
+      font-size: 16px;
+      color: #000;
+      font-weight: bold;
     }
   }
   .tabel-wrapper {

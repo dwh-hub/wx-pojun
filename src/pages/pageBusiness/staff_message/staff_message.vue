@@ -55,16 +55,15 @@
               </div>
             </div>
             <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
-            <page-footer v-if="messageYList.length"></page-footer>
           </div>
         </van-tab>
       </van-tabs>
     </div>
     <van-tabbar active="3" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
-      <van-tabbar-item icon="question-o" dot>帮助</van-tabbar-item>
+      <van-tabbar-item icon="question-o">帮助</van-tabbar-item>
       <van-tabbar-item icon="desktop-o">工作台</van-tabbar-item>
-      <van-tabbar-item icon="chat-o" info="5">消息</van-tabbar-item>
+      <van-tabbar-item icon="chat-o">消息</van-tabbar-item>
       <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
     </van-tabbar>
   </div>
@@ -78,6 +77,7 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue";
+import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
     return {
@@ -99,6 +99,9 @@ export default {
     setNavTab();
     this.getMessage(0, 1);
     this.getMessage(1, 1);
+  },
+  components: {
+    noneResult
   },
   mixins: [colorMixin],
   onReachBottom() {

@@ -154,17 +154,28 @@ export default {
     //   return "";
     // },
     isBottomAppoint() {
-      if (this.teamClassList.length || this.coachList.length) {
-        if (!this.teamClassList[0].teamScheduleId || !this.coachList[0].coachAppointId) {
+      // if (this.teamClassList.length || this.coachList.length) {
+      //   if (!this.teamClassList[0].teamScheduleId || !this.coachList[0].coachAppointId) {
+      //     return false;
+      //   }
+      //   return true;
+      // }
+      if (this.teamClassList.length) {
+        if (!this.teamClassList[0].teamScheduleId) {
           return false;
         }
         return true;
       }
+      
+      if (this.coachList.length) {
+        if (!this.coachList[0].coachAppointId) {
+          return false;
+        }
+        return true;
+      }
+
       return false;
     }
-    // themeColor() {
-    //   return window.color;
-    // }
   },
   methods: {
     _onLoad() {

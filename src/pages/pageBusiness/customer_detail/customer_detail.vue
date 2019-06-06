@@ -307,7 +307,7 @@ export default {
           text: "一键上课",
           iconUrl: "/static/images/staff/close.svg",
           action: () => {
-            this.attendClass();
+            this.checkAttendStatus()
           }
         },
         {
@@ -769,6 +769,55 @@ export default {
         this.selectObjective = item;
       }
       this.showSelectPopup = false;
+    },
+    checkAttendStatus() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/coach/private/appoint/verifycoachId",
+        data: {
+          coachId: wx.getStorageSync('staff_info').userId
+        },
+        success(res) {
+          if(res.data.code == 200) {
+            that.attendClass()
+          }
+          if (res.data.code == 300) {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              success(modal_res) {
+                if (modal_res.confirm) {
+                  HttpRequest({
+                    url: window.api + "/mobile/coach/appoint/finishclass",
+                    data: {
+                      coachAppointId: res.data.data[0].coachAppointId,
+                      realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
+                    },
+                    success(finish_res) {
+                      if (finish_res.data.code == 200) {
+                        that.attendClass()
+                      } else {
+                        wx.showModal({
+                          title: "提示",
+                          content: finish_res.data.message || finish_res.data,
+                          showCancel: false
+                        });
+                      }
+                    }
+                  });
+                }
+              }
+            });
+          }
+          if (res.data.code == 405) {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
     }
   }
 };

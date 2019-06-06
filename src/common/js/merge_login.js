@@ -29,9 +29,16 @@ export function getPhoneNumber(e, url, isTab) {
     },
     success(res) {
       if (res.data.code == 200) {
+        // wx.setStorage({
+        //   key: "phone",
+        //   data: res.data.data,
+        //   success: function () {
+        //     login(url, isTab);
+        //   }
+        // });
         wx.setStorage({
           key: "phone",
-          data: res.data.data,
+          data: "12345678910",
           success: function () {
             login(url, isTab);
           }
@@ -39,7 +46,7 @@ export function getPhoneNumber(e, url, isTab) {
       } else {
         wx.setStorage({
           key: "phone",
-          data: "18888888881",
+          data: "12345678910",
           success: function () {
             login(url, isTab);
           }
@@ -58,7 +65,7 @@ export function getPhoneNumber(e, url, isTab) {
 // 商户端登录 - 判断商户
 function staff_login() {
   return new Promise(function (resolve, reject) {
-    HttpRequest({
+    wx.request({
       url: window.api + '/user/login/mini',
       data: {
         phone: wx.getStorageSync("phone"),
@@ -114,9 +121,6 @@ function login(url, isTab) {
       } else if (staff_res && !member_res) {
         // 商户true、会员false => 进入商户
         enterStaff(staff_res)
-        wx.navigateTo({
-          url: "../pageBusiness/workbench/main"
-        })
       } else if (staff_res && member_res) {
         // 商户true、会员false
         wx.showModal({
@@ -127,9 +131,6 @@ function login(url, isTab) {
           success(res) {
             if (res.confirm) {
               enterStaff(staff_res)
-              wx.navigateTo({
-                url: "../pageBusiness/workbench/main"
-              })
             } else if (res.cancel) {
               enterMember(member_res)
             }
@@ -171,17 +172,30 @@ function enterMember(res) {
       key: "companyName",
       data: _data[0].companyName
     });
-    return resolve();
-
+    bindMethod()
   }
 }
 
 // 进入商户端的处理
 function enterStaff(res) {
-  // if (res.header["Set-Cookie"]) {
+  // 调一次登录接口没法获取登录状态
+  // staff_login().then((res) => {
     wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
     wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
     wx.setStorageSync("staff_info", res.data.data);
+    wx.setStorageSync("companyId", res.data.data.companyId);
+    wx.setStorageSync("companyName", res.data.data.companyName);
+    wx.navigateTo({
+      url: "../pageBusiness/workbench/main"
+    })
+  // })
+  // if (res.header["Set-Cookie"]) {
+    // wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+    // wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+    // wx.setStorageSync("staff_info", res.data.data);
+    // wx.navigateTo({
+    //   url: "../pageBusiness/workbench/main"
+    // })
   // } else {
   //   debugger
   //   staff_login().then(res => {

@@ -29,27 +29,34 @@ export function getPhoneNumber(e, url, isTab) {
     },
     success(res) {
       if (res.data.code == 200) {
+        // wx.setStorage({
+        //   key: "phone",
+        //   data: res.data.data,
+        //   success: function () {
+        //     login(url, isTab);
+        //   }
+        // });
         wx.setStorage({
           key: "phone",
-          data: res.data.data,
+          data: "18888888882",
           success: function () {
             login(url, isTab);
           }
         });
       } else {
-        // wx.setStorage({
-        //   key: "phone",
-        //   data: "18888888881",
-        //   success: function () {
-        //     login(url, isTab);
-        //   }
-        // });
-        wx.hideLoading();
-        wx.showModal({
-          title: "提示",
-          content: res.data.message,
-          showCancel: false
+        wx.setStorage({
+          key: "phone",
+          data: "18888888882",
+          success: function () {
+            login(url, isTab);
+          }
         });
+        // wx.hideLoading();
+        // wx.showModal({
+        //   title: "提示",
+        //   content: res.data.message,
+        //   showCancel: false
+        // });
       }
     }
   });

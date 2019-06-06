@@ -29,7 +29,7 @@ import {
   getThemeColor
 } from "COMMON/js/common.js";
 import store from "../utils/store";
-import { getPhoneNumber,getMessage } from "COMMON/js/api.js";
+import { getPhoneNumber,getMessage } from "COMMON/js/merge_login.js";
 export default {
   props: ["options"],
   data() {
@@ -81,7 +81,7 @@ export default {
       });
     },
     _onLoad(options) {
-      wxLogin();
+      wxLogin()
       // 获取公司id --> 获取公司主题色
       if (options.appid) {
         console.log("appid:" + options.appid);

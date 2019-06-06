@@ -1,0 +1,11 @@
+{
+    "navigationBarTitleText": "选择排期时间",
+    "usingComponents": {
+      "van-popup": "../../../../static/vant/popup/index",
+      "van-cell": "../../../../static/vant/cell/index",
+      "van-cell-group": "../../../../static/vant/cell-group/index",
+      "van-datetime-picker": "../../../../static/vant/datetime-picker/index",
+      "van-icon": "../../../../static/vant/icon/index"
+    }
+  }
+  

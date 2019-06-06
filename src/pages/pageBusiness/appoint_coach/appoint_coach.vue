@@ -873,8 +873,8 @@ export default {
         calendar: that.curDate + " " + "00:00:00",
         timeStart: that.curDate + " " + that.curTime + ":00",
         timeEnd: that.curDate + " " + that.curEndTime + ":00",
-        name: that.userInfo.userName,
-        phone: that.userInfo.phone
+        name: that.studentInfo.name,
+        phone: that.studentInfo.phone
       };
       console.log(this.appointType);
       if (this.appointType == "预约") {
@@ -963,7 +963,7 @@ export default {
                 storeId: that.selectStoreId
               };
 
-              wx.navigateTo({
+              wx.redirectTo({
                 url: "../QRCodeSignIn/main?params=" + JSON.stringify(params)
               });
             }
@@ -1004,7 +1004,15 @@ export default {
           }
         }
       });
-    }
+    },
+    // 上课校验
+    // checkStatus() {
+    //   let that = this
+    //   HttpRequest({
+    //     url: window.api + '/coach/private/appoint/verify',
+    //     data: {}
+    //   })
+    // }
   }
 };
 </script>

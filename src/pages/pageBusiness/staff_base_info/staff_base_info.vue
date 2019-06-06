@@ -39,20 +39,20 @@ export default {
   },
   methods: {
     toModify() {
-      let cellInfo = {
-        url: "", // 接口地址
-        cellText: this.nickName // 当前要改的信息
-      }
-      wx.navigateTo({
-        url: "../modify_cell/main?cellInfo=" + JSON.stringify(cellInfo)
-      });
+      // let cellInfo = {
+      //   url: "", // 接口地址
+      //   cellText: this.nickName // 当前要改的信息
+      // }
+      // wx.navigateTo({
+      //   url: "../modify_cell/main?cellInfo=" + JSON.stringify(cellInfo)
+      // });
     },
     sexCell() {
-      this.showSex = true;
+      // this.showSex = true;
     },
     selectSex(event) {
-      this.showSex = false;
-      this.sex = event.mp.detail.name;
+      // this.showSex = false;
+      // this.sex = event.mp.detail.name;
     }
   }
 };

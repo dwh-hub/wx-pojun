@@ -69,7 +69,6 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import noneResult from "COMPS/noneResult.vue";
-import { format } from "path";
 export default {
   data() {
     return {
@@ -179,7 +178,7 @@ export default {
     if (options.type) {
       this.type = options.type;
       this.venueId = options.venueId;
-      this.teamScheduleId = options.teamScheduleId;
+      this.teamScheduleId = options.teamScheduleId
     }
   },
   mounted() {
@@ -212,10 +211,10 @@ export default {
     },
     toCardDetail(item) {
       if (this.type == "addStudent") {
-        this.selectedCard = item;
+        this.selectedCard = item
         // 新增上课学员
-        this.getProject();
-        return;
+        this.getProject()
+        return
       }
       wx.navigateTo({
         url: `../../cardDetail/main?id=${item.id}&type=staff`
@@ -322,14 +321,14 @@ export default {
       this.getCardPage();
     },
     selectProject(item) {
-      this.selectedProject = item;
-      this.showProjectPopup = false;
-      this.getUserp();
+      this.selectedProject = item
+      this.showProjectPopup = false
+      this.getUserp()
     },
     selectUser(item) {
-      this.selectedUser = item;
-      this.showUserPopup = false;
-      this.addAttend();
+      this.selectedUser = item
+      this.showUserPopup = false
+      this.addAttend()
     },
     /* 上课流程 - 开始 */
     // 获取项目
@@ -346,7 +345,7 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
-              that.selectedProject = res.data.data[0];
+              that.selectedProject = res.data.data[0]
               that.getUserp();
             } else {
               that.showProjectPopup = true;
@@ -367,8 +366,8 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
-              that.selectedUser = res.data.data[0];
-              that.addAttend();
+              that.selectedUser = res.data.data[0]
+              that.addAttend()
             } else {
               that.showUserPopup = true;
               that.userpList = res.data.data;

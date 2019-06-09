@@ -93,15 +93,7 @@ function getUserInfo() {
       },
       success(res) {
         wx.hideLoading();
-        if (res.data.code == 200) {
-          if (!res.data.data.length) {
-            resolve(false)
-          } else {
-            resolve(res)
-          }
-        } else {
-          resolve(false)
-        }
+        resolve(res)
       }
     });
   });
@@ -145,7 +137,7 @@ function login(url, isTab) {
 function enterMember(res) {
   wx.hideLoading();
   let _data = res.data.data
-  if (!_data.length) {
+  if (!_data || !_data.length) {
     return register()
   }
 
@@ -267,7 +259,7 @@ function register() {
   HttpRequest({
     url: window.api + "/wxcustomer/addCustomer",
     data: {
-      id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : undefined,
+      id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : 0,
       companyId: wx.getStorageSync("companyId"),
       phone: wx.getStorageSync("phone"),
       name: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + rand(1000, 9999)),

@@ -45,7 +45,6 @@ export default {
   mounted() {
     this._onLoad(this.options);
     this.getCompanyInfo();
-    let that = this;
   },
   computed: {
     window() {
@@ -112,7 +111,9 @@ export default {
       let that = this;
       if (!wx.getStorageSync("phone") || !wx.getStorageSync("openId")) {
         // this.isShow = true;
-        return store.commit("changeLogin", false);
+        store.commit("changeLogin", false);
+        this.staff_login()
+        return
       }
       console.log("storeid:" + wx.getStorageSync("storeId"));
       console.log("userInfo.storeId:" + wx.getStorageSync("userInfo").storeId);
@@ -154,6 +155,30 @@ export default {
           }
         }
       });
+    },
+    staff_login() {
+      if(!wx.getStorageSync("instMsgSubKey") || !wx.getStorageSync("phone")) {
+        return
+      }
+      wx.request({
+        url: window.api + '/user/login/mini',
+        data: {
+          phone: wx.getStorageSync("phone"),
+          companyId: wx.getStorageSync("companyId")
+        },
+        success(res) {
+          if (res.data.code == 200 || res.data.code == 201) {
+            wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+            wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+            wx.setStorageSync("staff_info", res.data.data);
+            wx.setStorageSync("companyId", res.data.data.companyId);
+            wx.setStorageSync("companyName", res.data.data.companyName);
+            wx.navigateTo({
+              url: "../pageBusiness/workbench/main"
+            })
+          }
+        }
+      })
     },
     // getAllStore() {
     //   let that = this;

@@ -100,7 +100,7 @@ export default {
           text: "教练CRM",
           navUrl: ""
         },{
-          iconUrl: "",
+          iconUrl: "/static/images/staff/workbench_icon/workbench_icon_4.svg",
           text: "全部服务",
           navUrl: "../allServices/main"
         }]
@@ -128,6 +128,11 @@ export default {
           url: "../index/main"
         });
       }
+      if (e.mp.detail == 1) {
+        wx.navigateTo({
+          url: "../service_web/main"
+        });
+      }
       if (e.mp.detail == 3) {
         wx.redirectTo({
           url: "../staff_message/main"
@@ -148,6 +153,7 @@ export default {
 
 <style lang="less">
 @import "../common/less/staff_common.less";
+@import "../common/less/font.less";
 
 page {
   height: 100%;

@@ -1,18 +1,21 @@
 <template>
   <div class="staff_mine">
-    <van-cell value="基本信息" value-class="cell-right" @click="baseInfoCell">
+    <van-cell value="基本信息" custom-class="lg-cell" value-class="cell-right" is-link @click="baseInfoCell">
       <view slot="title">
-        <div class="avatar">
+        <!-- <div class="avatar">
           <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+        </div>-->
+        <div class="avatar">
+          <open-data type="userAvatarUrl"></open-data>
         </div>
-        <div class="name">王老板</div>
+        <div class="name">{{userInfo.userName || "昵称"}}</div>
       </view>
     </van-cell>
 
     <van-cell-group custom-class="van-cell-group">
       <van-cell title="信息展示" is-link/>
       <van-cell title="消息设置" is-link/>
-      <van-cell title="专属二维码" is-link/>
+      <van-cell title="专属二维码" is-link @click="showStore = true"/>
     </van-cell-group>
 
     <button @click="login">登录</button>
@@ -24,17 +27,61 @@
       <van-tabbar-item icon="chat-o">消息</van-tabbar-item>
       <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
     </van-tabbar>
+
+    <van-popup
+      :show="showQR"
+      @close="showQR = false"
+      :duration="200"
+      custom-style="border-radius: 4px;"
+    >
+      <div class="qr-code-popup">
+        <div class="popup-header">
+          <div class="avatar">
+            <open-data type="userAvatarUrl"></open-data>
+          </div>
+          <div class="info">
+            <div class="user-name">
+              <span>{{userInfo.userName || "昵称"}}</span>
+              <span class="sex"></span>
+            </div>
+          </div>
+        </div>
+        <img class="qr-code" :src="QRSrc">
+        <p class="qr-code-tip">扫一扫上面二维码，浏览俱乐部实景信息</p>
+      </div>
+    </van-popup>
+
+    <van-action-sheet
+      :show="showStore"
+      :actions="storeList"
+      @close="showStore = false"
+      @select="selectStore"
+    />
   </div>
 </template>
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import store from "@/utils/store.js";
 export default {
   data() {
-    return {};
+    return {
+      showQR: false,
+      showStore: false,
+      storeList: [],
+      selectedStore: {},
+      QRSrc: "",
+      userInfo: {}
+    };
   },
   mounted() {
     setNavTab();
+    this.storeList = store.state.allStore.map(e => {
+      e["name"] = e.storeName;
+      return e;
+    });
+    this.selectedStore = this.storeList[0];
+    this.userInfo = wx.getStorageSync("staff_info");
   },
   methods: {
     login() {
@@ -42,8 +89,9 @@ export default {
       wx.request({
         url: window.api + "/user/login",
         data: {
-          phone: "12345678910",
-          password: "2131"
+          phone: "18000241486",
+          password: "2131",
+          companyId: "55"
         },
         success(res) {
           if (res.data.code == 200) {
@@ -86,6 +134,41 @@ export default {
           url: "../staff_message/main"
         });
       }
+    },
+    selectStore(e) {
+      this.showStore = false;
+      this.selectedStore = e.mp.detail;
+      this.getQRCode().then(() => {
+        this.showQR = true;
+      });
+      // this.getQRCode()
+    },
+    getQRCode() {
+      let that = this;
+      wx.showLoading();
+      return new Promise(resolve => {
+        HttpRequest({
+          url: window.api + "/mini/getCodeUnlimit",
+          data: {
+            scene: `${that.userInfo.companyId}-${that.selectedStore.storeId}-${
+              that.userInfo.userId
+            }`
+          },
+          success(res) {
+            wx.hideLoading();
+            if (res.data.code == 200) {
+              that.QRSrc = window.api + res.data.data;
+              resolve();
+            } else {
+              wx.showModal({
+                title: "提示",
+                content: res.data.message,
+                showCancel: false
+              });
+            }
+          }
+        });
+      });
     }
   }
 };
@@ -97,6 +180,11 @@ page {
   background-color: #f6f6f6;
 }
 .staff_mine {
+  .lg-cell {
+    .van-cell__right-icon-wrap {
+      margin-top: 12px;
+    }
+  }
   .van-cell-group {
     margin-top: 5px;
     background-color: #fff;
@@ -119,6 +207,43 @@ page {
   .cell-right {
     line-height: 50px;
     vertical-align: middle;
+  }
+  .qr-code-popup {
+    padding: 20px;
+    .popup-header {
+      display: flex;
+      padding-bottom: 15px;
+      color: #333;
+      .avatar {
+        margin-right: 15px;
+        width: 50px;
+        height: 50px;
+      }
+      .info {
+        vertical-align: top;
+        font-size: 14px;
+        color: #333;
+      }
+      .sex {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-left: 5px;
+        vertical-align: middle;
+        background-size: 100%;
+        background-repeat: no-repeat;
+      }
+    }
+    .qr-code {
+      width: 70vw;
+      height: 70vw;
+    }
+    .qr-code-tip {
+      text-align: center;
+      margin: 15px 0;
+      font-size: 12px;
+      color: #999;
+    }
   }
 }
 </style>

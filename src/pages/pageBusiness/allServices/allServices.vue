@@ -9,7 +9,8 @@
           v-for="(item2,index2) in item.list"
           :key="index2"
         >
-          <image mode="aspectFit" :src="item2.iconUrl"></image>
+          <image mode="aspectFit" :src="item2.iconUrl" v-if="item2.isOpen"></image>
+          <i class="icon" :class="item2.class" v-else></i>
           <div class="services-icon icon-text">{{item2.text}}</div>
         </div>
       </div>
@@ -29,36 +30,49 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/workbench_icon_1.svg",
               text: "业务",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-workbench_icon_1"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/workbench_icon_2.svg",
               text: "签到",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-workbench_icon_2"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/workbench_icon_3.svg",
               text: "确认信息",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-workbench_icon_3"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/workbench_icon_4.svg",
               text: "商品",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-workbench_icon_4"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/workbench_icon_5.svg",
               text: "营销",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-operation_report_icon_2"
             },
             {
-              iconUrl: "/static/images/staff/workbench_icon/workbench_icon_6.jpg",
+              iconUrl:
+                "/static/images/staff/workbench_icon/workbench_icon_6.jpg",
               text: "客户约访",
-              navUrl: "../customer_interview/main"
+              navUrl: "../customer_interview/main",
+              isOpen: true,
+              class: "iconfont icon-workbench_icon_6"
             }
           ]
         },
@@ -69,19 +83,25 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/member_service_icon_1.svg",
               text: "会员",
-              navUrl: "../customer/main"
+              navUrl: "../customer/main",
+              isOpen: true,
+              class: "iconfont icon-member_service_icon_1"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/member_service_icon_2.svg",
               text: "学员",
-              navUrl: "../coach_student/main"
+              navUrl: "../coach_student/main",
+              isOpen: true,
+              class: "iconfont icon-member_service_icon_2"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/member_service_icon_3.svg",
               text: "合同",
-              navUrl: "../contract_list/main"
+              navUrl: "../contract_list/main",
+              isOpen: true,
+              class: "iconfont icon-member_service_icon_3"
             }
           ]
         },
@@ -91,12 +111,16 @@ export default {
             {
               iconUrl: "/static/images/staff/workbench_icon/class_icon_1.svg",
               text: "团课",
-              navUrl: "../staff_team_class/main"
+              navUrl: "../staff_team_class/main",
+              isOpen: true,
+              class: "iconfont icon-class_icon_1"
             },
             {
               iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
               text: "私教",
-              navUrl: "../private_coach_class/main"
+              navUrl: "../private_coach_class/main",
+              isOpen: true,
+              class: "iconfont icon-class_icon_2"
             }
           ]
         },
@@ -107,30 +131,41 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/sale_manage_icon_1.svg",
               text: "销售CRM",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-sale_manage_icon_1"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/sale_manage_icon_2.svg",
               text: "客户公海",
-              navUrl: "../public_sea/main"
+              navUrl: "../public_sea/main",
+              isOpen: true,
+              class: "iconfont icon-sale_manage_icon_2"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/sale_manage_icon_3.svg",
               text: "销售分配",
-              navUrl: ""
+              navUrl: "",
+              isOpen: true,
+              class: "iconfont icon-sale_manage_icon_3"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/sale_manage_icon_4.svg",
               text: "销售工作分析表",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-sale_manage_icon_4"
             },
             {
-              iconUrl:"/static/images/staff/workbench_icon/sale_manage_icon_6.jpg",
+              iconUrl:
+                "/static/images/staff/workbench_icon/sale_manage_icon_6.jpg",
               text: "跟进日志",
-              navUrl: "../follow_up_log/main?trackUserType=1"
+              navUrl: "../follow_up_log/main?trackUserType=1",
+              isOpen: true,
+              class: "iconfont icon-sale_manage_icon_6"
             }
           ]
         },
@@ -141,42 +176,57 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_1.svg",
               text: "团课排课",
-              navUrl: "../staff_team_class/main"
+              navUrl: "../staff_team_class/main",
+              isOpen: true,
+              class: "iconfont icon-coach_service_icon_1"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_2.svg",
               text: "教练分配",
-              navUrl: "../coach_student/main"
+              navUrl: "../coach_student/main",
+              isOpen: true,
+              class: "iconfont icon-coach_service_icon_2"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_3.svg",
               text: "教练跟进表",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-coach_service_icon_3"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_4.svg",
               text: "课时统计报表",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-coach_service_icon_4"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_5.svg",
               text: "上课统计报表",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-coach_service_icon_5"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/coach_service_icon_6.svg",
               text: "教练CRM",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-coach_service_icon_"
             },
             {
-              iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_7.jpg",
+              iconUrl:
+                "/static/images/staff/workbench_icon/coach_service_icon_7.jpg",
               text: "跟进日志",
-              navUrl: "../follow_up_log/main?trackUserType=2"
+              navUrl: "../follow_up_log/main?trackUserType=2",
+              isOpen: true,
+              class: "iconfont icon-coach_service_icon_7"
             }
           ]
         },
@@ -187,31 +237,41 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/operation_report_icon_1.svg",
               text: "运营报表",
-              navUrl: "../operation_chart/main"
+              navUrl: "../operation_chart/main",
+              isOpen: true,
+              class: "iconfont icon-operation_report_icon_1"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
               text: "业绩报表",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-operation_report_icon_2"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/operation_report_icon_3.svg",
               text: "课程报表",
-              navUrl: "../operation_chart/main?nav=1"
+              navUrl: "../operation_chart/main?nav=1",
+              isOpen: true,
+              class: "iconfont icon-operation_report_icon_3"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/operation_report_icon_4.svg",
               text: "评分报表",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-operation_report_icon_4"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/operation_report_icon_5.svg",
               text: "签到报表",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-operation_report_icon_4"
             }
           ]
         },
@@ -222,37 +282,49 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/field_manage_icon_1.svg",
               text: "门店",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-field_manage_icon_"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/field_manage_icon_2.svg",
               text: "手牌",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-field_manage_icon_5"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/field_manage_icon_3.svg",
               text: "短信",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-field_manage_icon_4"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/field_manage_icon_4.svg",
               text: "标签",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-field_manage_icon_1"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/field_manage_icon_5.svg",
               text: "设备管理",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-field_manage_icon_3"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/field_manage_icon_6.svg",
               text: "公告",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-field_manage_icon_2"
             }
           ]
         },
@@ -263,25 +335,33 @@ export default {
               iconUrl:
                 "/static/images/staff/workbench_icon/staff_manage_icon_1.svg",
               text: "待入职人员",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-staff_manage_icon_1"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/staff_manage_icon_2.svg",
               text: "人事",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-staff_manage_icon_2"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/staff_manage_icon_3.svg",
               text: "组织架构",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-staff_manage_icon_"
             },
             {
               iconUrl:
                 "/static/images/staff/workbench_icon/staff_manage_icon_4.svg",
               text: "公告",
-              navUrl: ""
+              navUrl: "",
+              isOpen: false,
+              class: "iconfont icon-staff_manage_icon_3"
             }
           ]
         }
@@ -306,9 +386,14 @@ export default {
 
 <style lang="less">
 @import "../common/less/staff_common.less";
+@import "../common/less/font.less";
 .all-services {
   padding-bottom: 30px;
   .icon-group {
+    .icon {
+      font-size: 48px;
+      color: #999;
+    }
     &:first-of-type {
       .icon-title {
         margin-top: 0;
@@ -325,12 +410,12 @@ export default {
     .icon-item {
       padding: 0;
       margin-top: 5px;
-      >image {
+      > image {
         width: 50px;
         height: 50px;
       }
       .icon-text {
-        margin-top: -12px; 
+        margin-top: -12px;
         font-size: 12px;
       }
     }

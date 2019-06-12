@@ -97,7 +97,7 @@ let baseWebpackConfig = {
         }
       },
       {
-        test: /\.(woff2?|eot|ttf|otf|svg)(\?.*)?$/,
+        test: /\.(woff2?|eot|ttf|otf|svg|woff)(\?.*)?$/,
         loader: 'url-loader',
         options: {
           limit: 10000,

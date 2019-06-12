@@ -52,7 +52,8 @@
       "team_class_scheduling/main",
       "scheduling_detail/main",
       "operation_chart/main",
-      "select_scheduling_date/main"
+      "select_scheduling_date/main",
+      "service_web/main"
     ]
   }],
   "permission": {

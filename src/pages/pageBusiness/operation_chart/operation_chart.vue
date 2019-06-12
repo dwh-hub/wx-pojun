@@ -7,8 +7,16 @@
     </van-tabs>
     <div class="operation" v-show="navIndex == 0">
       <div class="sub-tab">
-        <div class="chart-list" :class="{active: operationNavIndex==1}" @click="operationNavIndex = 1;renderChart()">汇总</div>
-        <div class="total-detail" :class="{active: operationNavIndex==2}" @click="operationNavIndex = 2;renderChart()">明细</div>
+        <div
+          class="chart-list"
+          :class="{active: operationNavIndex==1}"
+          @click="operationNavIndex = 1;renderChart()"
+        >汇总</div>
+        <div
+          class="total-detail"
+          :class="{active: operationNavIndex==2}"
+          @click="operationNavIndex = 2;renderChart()"
+        >明细</div>
       </div>
       <div v-show="operationNavIndex == 1">
         <div class="chart-title">门店排行</div>
@@ -95,8 +103,16 @@
     </div>
     <div class="store_chart" v-show="navIndex == 1">
       <div class="sub-tab">
-        <div class="chart-list" :class="{active: classNavIndex==1}" @click="classNavIndex = 1;renderChart()">汇总</div>
-        <div class="total-detail" :class="{active: classNavIndex==2}" @click="classNavIndex = 2;renderChart()">明细</div>
+        <div
+          class="chart-list"
+          :class="{active: classNavIndex==1}"
+          @click="classNavIndex = 1;renderChart()"
+        >汇总</div>
+        <div
+          class="total-detail"
+          :class="{active: classNavIndex==2}"
+          @click="classNavIndex = 2;renderChart()"
+        >明细</div>
       </div>
       <div v-show="classNavIndex == 1">
         <div class="chart-title">门店授课排行</div>
@@ -248,25 +264,25 @@ export default {
     },
     changeFilter() {
       if (this.navIndex == 0) {
-        if(this.operationNavIndex == 1) {
+        if (this.operationNavIndex == 1) {
           this.getStoreChartData();
           this.getCardChartData();
           this.getSaleChartData();
           this.getCustomerChartData();
           this.getLineData();
         }
-        if(this.operationNavIndex == 2) {
-          this.getSellInfo()
-          this.getSellList()
+        if (this.operationNavIndex == 2) {
+          this.getSellInfo();
+          this.getSellList();
         }
       }
       if (this.navIndex == 1) {
-        if( this.classNavIndex == 1) {
+        if (this.classNavIndex == 1) {
           this.getStoreClassData();
           this.getCoachClassData();
         }
-        if(this.operationNavIndex == 2) {
-          this.getCoachList()
+        if (this.operationNavIndex == 2) {
+          this.getCoachList();
         }
       }
     },
@@ -421,8 +437,8 @@ export default {
             name: e.name,
             percent:
               sumCost == 0
-                ? Number(((1 / initData.length) * 100).toFixed(2))
-                : Number(((e.cost / sumCost) * 100).toFixed(2)),
+                ? Number((1 / initData.length * 100).toFixed(2))
+                : Number((e.cost / sumCost * 100).toFixed(2)),
             cost: e.cost
           };
         });
@@ -517,7 +533,17 @@ export default {
       });
     },
     initDataLine(canvas, width, height, initData) {
-      let data = initData;
+      let data = []
+      if (!initData.length) {
+        data = [
+          {
+            time: formatDate(new Date(), "yyyy-MM-dd"),
+            tem: ""
+          }
+        ];
+      } else {
+        data = initData;
+      }
       let chart = new F2.Chart({
         el: canvas,
         width,
@@ -632,7 +658,7 @@ export default {
         this.filter.timeStart = "";
         this.sellPage = 1;
         this.coachPage = 1;
-        this.changeFilter()
+        this.changeFilter();
         return;
       }
       let date = new Date();
@@ -677,13 +703,13 @@ export default {
       }
       this.sellPage = 1;
       this.coachPage = 1;
-      this.changeFilter()
+      this.changeFilter();
     },
     filterStore(id) {
       this.filter.storeId = id;
       this.sellPage = 1;
       this.coachPage = 1;
-      this.changeFilter()
+      this.changeFilter();
     }
   }
 };

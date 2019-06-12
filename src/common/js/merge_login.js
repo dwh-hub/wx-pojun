@@ -8,8 +8,9 @@ import store from "../../utils/store.js"
 
 let storeId
 
+/* 点击登录按钮逻辑-开始 */
 /**
- * 
+ * 获取手机号
  * @param {*} e 微信返回的加密数据
  * @param {*} url 登录成功后要跳转的地址
  */
@@ -98,7 +99,6 @@ function getUserInfo() {
     });
   });
 }
-
 
 // 登录
 function login(url, isTab) {
@@ -284,8 +284,9 @@ function register() {
     }
   });
 }
+/* 点击登录按钮逻辑-结束 */
 
-export function getAllStore() {
+function getAllStore() {
   console.log("api.js==>getAllStore")
   return new Promise(function (resolve, reject) {
     wx.request({
@@ -334,7 +335,7 @@ export function getMessage() {
 }
 
 // 消息推送
-export function wxPush() {
+function wxPush() {
   HttpRequest({
     url: window.api + '/sendmsg/user/customerself/registerMsg',
     data: {
@@ -348,6 +349,5 @@ export function wxPush() {
 
 export default {
   getPhoneNumber,
-  getMessage,
-  wxPush
+  getMessage
 }

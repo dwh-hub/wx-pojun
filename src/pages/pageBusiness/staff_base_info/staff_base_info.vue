@@ -1,9 +1,9 @@
 <template>
   <div class="base-info">
     <van-cell-group custom-class="van-cell-group">
-      <van-cell title="昵称" :value="nickName" is-link @click="toModify()" />
-      <van-cell title="性别" :value="sex" is-link @click="sexCell()" />
-      <van-cell title="手机号" :value="phone" is-link />
+      <van-cell title="昵称" :value="userInfo.userName" is-link @click="toModify()"/>
+      <van-cell title="性别" :value="sex" is-link @click="sexCell()"/>
+      <van-cell title="手机号" :value="userInfo.phone" is-link/>
     </van-cell-group>
     <van-action-sheet
       :show="showSex"
@@ -20,13 +20,14 @@ import { setNavTab, window } from "COMMON/js/common.js";
 export default {
   data() {
     return {
+      userInfo: {},
       showSex: false,
       sexAction: [
         {
           name: "男"
         },
         {
-          name: "女" 
+          name: "女"
         }
       ],
       nickName: "王老板",
@@ -36,6 +37,8 @@ export default {
   },
   mounted() {
     setNavTab();
+    this.userInfo = wx.getStorageSync("staff_info");
+    this.sex = this.userInfo.sex == 0 ? "未知" : (this.userInfo.sex == 1 ? "男" : "女");
   },
   methods: {
     toModify() {

@@ -7,6 +7,7 @@ const store = new Vuex.Store({
   state: {
     count: 0,
     isLogin: false,
+    isCheckLogin: false,
     userInfo: {},
     isIphoneX: false,
     longitude: '', // 经度
@@ -19,6 +20,9 @@ const store = new Vuex.Store({
   mutations: {
     changeCount(state, value) {
       state.count = value
+    },
+    changeCheckLogin(state, value) {
+      state.isCheckLogin = value
     },
     changeLogin(state, value) {
       state.isLogin = value

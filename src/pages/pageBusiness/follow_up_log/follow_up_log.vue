@@ -158,7 +158,7 @@ export default {
     },
     toCardDetail(item) {
       wx.navigateTo({
-        url: `../../cardDetail/main?id=${item.id}&type=staff`
+        url: `../customer_detail/main?id=${item.id}&type=staff`
       });
     },
     call(item) {

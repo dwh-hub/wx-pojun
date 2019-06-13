@@ -85,7 +85,7 @@ import {
   wxLogin,
   HttpRequest
 } from "COMMON/js/common.js";
-import {getPhoneNumber} from "COMMON/js/api.js";
+import {getPhoneNumber} from "COMMON/js/merge_login.js";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
 import colorMixin from "COMPS/colorMixin.vue"

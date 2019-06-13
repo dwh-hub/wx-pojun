@@ -7,13 +7,15 @@
           <image mode="aspectFit" :src="item.iconUrl"></image>
         </div>
       </div>
-      <image @click="toggleOperate" mode="aspectFit" src="/static/images/staff/suspension.svg"></image>
+      <!-- <image @click="toggleOperate" mode="aspectFit" src="/static/images/staff/suspension.svg"></image> -->
+      <i class="icon-suspension" @click="toggleOperate" :style="{'color': themeColor}"></i>
     </div>
     <div class="mask-all" v-show="showOperate" @click="showOperate = false"></div>
   </div>
 </template>
 
 <script>
+import { window } from "COMMON/js/common.js";
 export default {
   props: {
     operateList: {
@@ -30,6 +32,11 @@ export default {
     return {
       showOperate: false
     };
+  },
+  computed: {
+    themeColor() {
+      return window.color
+    }
   },
   methods: {
     toggleOperate() {
@@ -48,22 +55,27 @@ export default {
 
 <style lang="less">
 @import "../common/less/staff_common.less";
+@import "../common/less/font.less";
 .suspension_window {
   .suspension {
     position: fixed;
     right: 20px;
     bottom: 20px;
     z-index: 2;
-    > image {
+    .icon-suspension {
       float: right;
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      background: radial-gradient(circle, #fff 50%, rgba(0,0,0,0) 50%)
+      font-size: 35px;
     }
+    // > image {
+    //   float: right;
+    //   width: 45px;
+    //   height: 45px;
+    //   border-radius: 50%;
+    //   background: radial-gradient(circle, #fff 50%, rgba(0,0,0,0) 50%)
+    // }
     .operate-wrapper {
       text-align: right;
-      margin-right: 5px;
+      margin-right: 3px;
       .operate-item {
         margin-bottom: 10px;
         > span {

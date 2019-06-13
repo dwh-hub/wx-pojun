@@ -8,16 +8,6 @@ if (extConfig.companyId) {
   wx.setStorageSync('companyId', extConfig.companyId)
 }
 console.log("common.js")
-// 获取sessionKey 需调用wx.login获取sessionKey
-function initsessionKey() {
-  let sessionKey = wx.getStorageSync("sessionKey");
-
-  if (sessionKey) {
-    this.sessionKey = sessionKey;
-    return Promise.resolve(sessionKey);
-  }
-  return Promise.resolve();
-}
 
 // 获取Set-Cookie
 function initCookie() {

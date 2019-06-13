@@ -68,7 +68,7 @@
           @click="selectRole(item)"
         >
           <div class="avatar">
-            <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+            <img :src="window.api + item.headImgPath" alt>
           </div>
           <div class="name">{{item.userName}}</div>
           <div class="phone"></div>

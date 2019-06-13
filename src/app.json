@@ -53,7 +53,8 @@
       "scheduling_detail/main",
       "operation_chart/main",
       "select_scheduling_date/main",
-      "service_web/main"
+      "service_web/main",
+      "common_list/main"
     ]
   }],
   "permission": {

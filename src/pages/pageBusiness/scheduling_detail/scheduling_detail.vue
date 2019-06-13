@@ -1,7 +1,7 @@
 <template>
   <div class="scheduling_detail">
     <div class="class-info-wrapper block-wrapper">
-      <img src alt>
+      <img :src="classDetail.masterImg" alt>
       <div class="class-info block-info">
         <div class="name">{{classDetail.anotherName}}</div>
         <div class="duration">时长：{{classDetail.timeSpan}}分钟</div>
@@ -108,6 +108,7 @@ export default {
           if (res.data.code == 200) {
             let _res = res.data.data;
             _res.coachStr = String(_res.coachNameArray);
+            _res.masterImg = window.api + _res.masterImg
             _res.classStartTime =
               formatDate(new Date(_res.timeStart), "hh:mm") +
               "-" +
@@ -216,7 +217,7 @@ page {
       flex: 1;
       margin-left: 15px;
       > div {
-        line-height: 30px;
+        line-height: 20px;
       }
     }
     .class-over {

@@ -7,7 +7,8 @@ import store from "../../utils/store.js"
 
 
 let storeId
-
+let url = ""
+let isTab = true
 /* 点击登录按钮逻辑-开始 */
 /**
  * 获取手机号
@@ -30,41 +31,41 @@ export function getPhoneNumber(e, url, isTab) {
     },
     success(res) {
       if (res.data.code == 200) {
+        wx.setStorage({
+          key: "phone",
+          data: res.data.data,
+          success: function () {
+            login(url, isTab);
+          }
+        });
         // wx.setStorage({
         //   key: "phone",
-        //   data: res.data.data,
+        //   data: "15080132345",
         //   success: function () {
         //     login(url, isTab);
         //   }
         // });
-        wx.setStorage({
-          key: "phone",
-          data: "12345678910",
-          success: function () {
-            login(url, isTab);
-          }
-        });
       } else {
-        wx.setStorage({
-          key: "phone",
-          data: "12345678910",
-          success: function () {
-            login(url, isTab);
-          }
-        });
-        // wx.hideLoading();
-        // wx.showModal({
-        //   title: "提示",
-        //   content: res.data.message,
-        //   showCancel: false
+        // wx.setStorage({
+        //   key: "phone",
+        //   data: "12345678910",
+        //   success: function () {
+        //     login(url, isTab);
+        //   }
         // });
+        wx.hideLoading();
+        wx.showModal({
+          title: "提示",
+          content: res.data.message,
+          showCancel: false
+        });
       }
     }
   });
 }
 
 // 商户端登录 - 判断商户
-function staff_login() {
+export function staff_login() {
   return new Promise(function (resolve, reject) {
     wx.request({
       url: window.api + '/user/login/mini',
@@ -84,7 +85,7 @@ function staff_login() {
 }
 
 // 判断会员
-function getUserInfo() {
+export function getUserInfo() {
   return new Promise(function (resolve) {
     wx.request({
       url: window.api + "/wxcustomer/findCustomerStore",
@@ -101,7 +102,9 @@ function getUserInfo() {
 }
 
 // 登录
-function login(url, isTab) {
+export function login(url, isTab) {
+  url = url || ''
+  isTab = isTab || true
   staff_login().then((staff_res) => {
     getUserInfo().then((member_res) => {
       if (!staff_res && !member_res) {
@@ -134,7 +137,7 @@ function login(url, isTab) {
 }
 
 // 进入会员的逻辑
-function enterMember(res) {
+export function enterMember(res) {
   wx.hideLoading();
   let _data = res.data.data
   if (!_data || !_data.length) {
@@ -169,25 +172,25 @@ function enterMember(res) {
 }
 
 // 进入商户端的处理
-function enterStaff(res) {
+export function enterStaff(res) {
   // 调一次登录接口没法获取登录状态
   // staff_login().then((res) => {
-    wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
-    wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
-    wx.setStorageSync("staff_info", res.data.data);
-    wx.setStorageSync("companyId", res.data.data.companyId);
-    wx.setStorageSync("companyName", res.data.data.companyName);
-    wx.navigateTo({
-      url: "../pageBusiness/workbench/main"
-    })
+  wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+  wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+  wx.setStorageSync("staff_info", res.data.data);
+  wx.setStorageSync("companyId", res.data.data.companyId);
+  wx.setStorageSync("companyName", res.data.data.companyName);
+  wx.navigateTo({
+    url: "../pageBusiness/workbench/main"
+  })
   // })
   // if (res.header["Set-Cookie"]) {
-    // wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
-    // wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
-    // wx.setStorageSync("staff_info", res.data.data);
-    // wx.navigateTo({
-    //   url: "../pageBusiness/workbench/main"
-    // })
+  // wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+  // wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+  // wx.setStorageSync("staff_info", res.data.data);
+  // wx.navigateTo({
+  //   url: "../pageBusiness/workbench/main"
+  // })
   // } else {
   //   debugger
   //   staff_login().then(res => {
@@ -202,7 +205,7 @@ function rand(min, max) {
 }
 
 // 绑定方法
-function bindMethod(url, isTab) {
+function bindMethod() {
   wx.showLoading({
     title: "登录中..."
   });
@@ -349,5 +352,10 @@ function wxPush() {
 
 export default {
   getPhoneNumber,
-  getMessage
+  getMessage,
+  login,
+  staff_login,
+  getUserInfo,
+  enterMember,
+  enterStaff
 }

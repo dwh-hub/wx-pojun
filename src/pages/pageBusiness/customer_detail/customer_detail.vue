@@ -63,16 +63,17 @@
           <none-result text="预约记录" v-if="!appointList.length && !isAppointLoading"></none-result>
           <van-loading :color="themeColor" v-if="isAppointLoading"/>
         </scroll-view>
-      </van-tab> -->
+      </van-tab>-->
       <!-- <van-tab title="订单信息"></van-tab> -->
       <van-tab title="更多信息">
         <div class="info">
           <van-cell-group custom-class="van-cell-group">
-            <van-cell title="姓名" :value="userInfo.name"/>
+            <van-cell title="基本信息" is-link @click="toUserInfo"/>
+            <!-- <van-cell title="姓名" :value="userInfo.name"/>
             <van-cell title="性别" :value="userInfo.sexChar"/>
             <van-cell title="手机号" :value="userInfo.phone"/>
             <van-cell title="出生日期" :value="userInfo.birthTime || '未填写'"/>
-            <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/>
+            <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/> -->
           </van-cell-group>
           <van-cell title="服务教练" @click="showCoachList()">
             <div slot="right-icon">
@@ -90,7 +91,7 @@
               <van-icon name="arrow" color="#999"/>
             </div>
           </van-cell>
-          <van-cell title="预约记录" is-link/>
+          <van-cell title="预约记录" is-link @click="toAppointList"/>
           <van-cell title="健身目的" is-link/>
           <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
         </div>
@@ -158,7 +159,7 @@
             is-link
             :value="selectedTrackType.text"
             @click="selectListType=2;selectList = trackusertype;showSelectPopup = true"
-          /> -->
+          />-->
           <textarea class="textarea" v-model="trackContent" placeholder="请输入跟进内容"/>
         </div>
         <div class="popup-bottom-btn">
@@ -280,22 +281,22 @@ export default {
           dataNum: "0"
         }
       ],
-      appointData: [
-        {
-          dataText: "预约数",
-          dataNum: "12"
-        },
-        {
-          dataText: "数据一",
-          dataNum: "0"
-        },
-        {
-          dataText: "数据二",
-          dataNum: "0"
-        }
-      ],
+      // appointData: [
+      //   {
+      //     dataText: "预约数",
+      //     dataNum: "12"
+      //   },
+      //   {
+      //     dataText: "数据一",
+      //     dataNum: "0"
+      //   },
+      //   {
+      //     dataText: "数据二",
+      //     dataNum: "0"
+      //   }
+      // ],
       appointList: [],
-      isAppointLoading: true,
+      // isAppointLoading: true,
       followUpList: [],
       isFollowUpLoading: true,
       checkInList: [],
@@ -307,7 +308,7 @@ export default {
           text: "一键上课",
           iconUrl: "/static/images/staff/close.svg",
           action: () => {
-            this.checkAttendStatus()
+            this.checkAttendStatus();
           }
         },
         {
@@ -410,6 +411,11 @@ export default {
         // url: "../../cardDetail/main?id=" + item.id
         url: `../../cardDetail/main?id=${item.id}&type=staff`
       });
+    },
+    toUserInfo(item) {
+      wx.navigateTo({
+        url: "../staff_base_info/main?id=" + this.userInfo.id
+      })
     },
     attendClass() {
       let that = this;
@@ -592,17 +598,14 @@ export default {
     // 预约列表
     getAppointList() {
       let that = this;
-      this.isAppointLoading = true;
       HttpRequest({
         url: window.api + "/user/work/customer/reserved/own",
         data: {
           customerId: that.id
         },
         success: function(res) {
-          that.isAppointLoading = false;
           if (res.data.code == 200) {
-            that.appointData[0].dataNum = res.data.data.length;
-            that.appointList = res.data.data.map(e => {
+            let list = res.data.data.map(e => {
               return {
                 id: e.reservedId,
                 day: e.appointmentTime.substring(8, 10),
@@ -611,8 +614,21 @@ export default {
                 bottomText: "内容：" + e.remarks
               };
             });
+            that.appointList = list;
           }
         }
+      });
+    },
+    toAppointList() {
+      if (!this.appointList.length) {
+        return wx.showToast({
+          title: "暂无预约记录",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      wx.navigateTo({
+        url: `../common_list/main?list=${this.appointList}&title=预约记录`
       });
     },
     // 签到/出勤/消费 列表
@@ -775,11 +791,11 @@ export default {
       HttpRequest({
         url: window.api + "/coach/private/appoint/verifycoachId",
         data: {
-          coachId: wx.getStorageSync('staff_info').userId
+          coachId: wx.getStorageSync("staff_info").userId
         },
         success(res) {
-          if(res.data.code == 200) {
-            that.attendClass()
+          if (res.data.code == 200) {
+            that.attendClass();
           }
           if (res.data.code == 300) {
             wx.showModal({
@@ -795,7 +811,7 @@ export default {
                     },
                     success(finish_res) {
                       if (finish_res.data.code == 200) {
-                        that.attendClass()
+                        that.attendClass();
                       } else {
                         wx.showModal({
                           title: "提示",

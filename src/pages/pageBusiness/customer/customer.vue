@@ -68,7 +68,7 @@
           @click="selectRole(item)"
         >
           <div class="avatar">
-            <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+            <img :src="window.api + item.headImgPath" alt>
           </div>
           <div class="name">{{item.userName}}</div>
           <div class="phone"></div>
@@ -87,7 +87,7 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
-import store from "@/utils/store.js"
+import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
@@ -128,7 +128,14 @@ export default {
               action: () => {
                 this.getDate(30);
               }
-            }
+            },
+            // {
+            //   sonText: "自定义",
+            //   isDiyDate: true,
+            //   action: (date) => {
+            //     this.getDate(date);
+            //   }
+            // }
           ]
         },
         {
@@ -203,7 +210,7 @@ export default {
         {
           text: "分配教练",
           iconUrl: "/static/images/staff/calendar.svg"
-        },
+        }
         // {
         //   text: "发送手机短信",
         //   iconUrl: "/static/images/staff/calendar.svg"
@@ -236,15 +243,15 @@ export default {
   },
   mounted() {
     setNavTab();
-    this.storeList = store.state.allStore
-    this.selectedStore = this.storeList[0]
+    this.storeList = store.state.allStore;
+    this.selectedStore = this.storeList[0];
     this.getCustomerList();
   },
   onHide() {
-    this.clearFilter()
+    this.clearFilter();
   },
   onUnload() {
-    this.clearFilter()
+    this.clearFilter();
   },
   mixins: [colorMixin],
   components: {
@@ -274,8 +281,8 @@ export default {
   },
   methods: {
     clearFilter() {
-      for(let key in this.filter) {
-        this.filter[key] = ""
+      for (let key in this.filter) {
+        this.filter[key] = "";
       }
     },
     selectStore(item) {
@@ -284,7 +291,7 @@ export default {
       this.getCustomerList();
     },
     getCustomerList() {
-      this.isLoading = true
+      this.isLoading = true;
       let that = this;
       var _data = Object.assign(
         {},
@@ -298,7 +305,7 @@ export default {
         url: window.api + "/customer/list/search",
         data: _data,
         success(res) {
-          that.isLoading = false
+          that.isLoading = false;
           if (res.data.code == 200) {
             let _res = res.data.data;
             let _data;
@@ -306,7 +313,7 @@ export default {
               return (that.customerList = []);
             }
             that.page++;
-            if(that.headerData[0].dataNum == "0") {
+            if (that.headerData[0].dataNum == "0") {
               that.headerData[0].dataNum = _res.recCount;
             }
             _data = _res.result.map(e => {
@@ -538,8 +545,9 @@ export default {
       } else {
         const DAY = 24 * 60 * 60 * 1000;
         let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + ' 23:59:59';
-        let startTime = formatDate(new Date(stamp - DAY * day),"yyyy-MM-dd") + ' 23:59:59';
+        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
+        let startTime =
+          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
         this.filter.addTimeStart = startTime;
         this.filter.addTimeEnd = endTime;
       }

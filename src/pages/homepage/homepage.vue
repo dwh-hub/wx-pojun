@@ -112,7 +112,6 @@ import pageFooter from "COMPS/pageFooter.vue"
 import loginPopup from "COMPS/loginPopup.vue"
 import colorMixin from "COMPS/colorMixin.vue"
 import store from "../../utils/store";
-import {getPhoneNumber} from "COMMON/js/api.js";
 
 export default {
   data() {
@@ -207,9 +206,6 @@ export default {
     }, 1000);
   },
   methods: {
-    _getPhoneNumber(e) {
-      getPhoneNumber(e)
-    },
     _mounted() {
       this.companyId = wx.getStorageSync("companyId");
       console.log(this.companyId)

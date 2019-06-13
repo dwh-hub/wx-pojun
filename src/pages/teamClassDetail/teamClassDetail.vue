@@ -29,7 +29,8 @@
         @click="toNav(item.coachId)"
       >
         <div class="cover">
-          <img :src="window.api + item.coachHeadImg">
+          <image :src="window.api + item.coachHeadImg" mode="aspectFill"></image>
+          <!-- <img :src="window.api + item.coachHeadImg"> -->
         </div>
         <div class="name">{{item.coachName || '教练名'}}</div>
       </div>
@@ -360,7 +361,7 @@ export default {
         width: 100%;
         padding: 12px;
         box-sizing: border-box;
-        > img {
+        > image {
           width: 66px;
           height: 66px;
           border-radius: 50%;

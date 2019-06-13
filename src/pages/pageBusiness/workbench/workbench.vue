@@ -44,6 +44,7 @@
 <script>
 import { setNavTab, window } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue"
+import {getOpenServiceList} from "../common/js/service_config.js"
 // import echarts from "echarts";
 // import mpvueEcharts from "mpvue-echarts";
 
@@ -70,40 +71,7 @@ export default {
       // onInit: initChart,
       activeIndex: 2,
       searchText: "",
-      services: [
-        {
-          iconUrl: "/static/images/staff/workbench_icon/member_service_icon_1.svg",
-          text: "客户",
-          navUrl: "../customer/main"
-        },{
-          iconUrl: "/static/images/staff/workbench_icon/member_service_icon_2.svg",
-          text: "学员",
-          navUrl: "../coach_student/main"
-        },{
-          iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
-          text: "私教",
-          navUrl: ""
-        },{
-          iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_1.svg",
-          text: "团课排课",
-          navUrl: ""
-        },{
-          iconUrl: "/static/images/staff/workbench_icon/staff_manage_icon_2.svg",
-          text: "人事",
-          navUrl: ""
-        },{
-          iconUrl: "/static/images/staff/workbench_icon/sale_manage_icon_1.svg",
-          text: "销售CRM",
-          navUrl: ""
-        },{
-          iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_6.svg",
-          text: "教练CRM",
-          navUrl: ""
-        },{
-          iconUrl: "/static/images/staff/workbench_icon/workbench_icon_4.svg",
-          text: "全部服务",
-          navUrl: "../allServices/main"
-        }]
+      services: []
     };
   },
   mixins:[colorMixin],
@@ -112,6 +80,12 @@ export default {
   // },
   mounted() {
     setNavTab();
+    this.services = getOpenServiceList().slice(0,7)
+    this.services.push({
+      iconUrl: "/static/images/staff/workbench_icon/workbench_icon_4.svg",
+      text: "全部服务",
+      navUrl: "../allServices/main"
+    })
   },
   methods: {
     toNav(url) {

@@ -15,15 +15,24 @@
             v-for="(itemS, indexS) in item.children"
             :key="indexS"
             @click.stop="clickSonNav(index,itemS)"
-          >{{itemS.sonText}}</div>
+          >
+            <span v-if="!item.isDiyDate">{{itemS.sonText}}</span>
+            <picker v-else mode="date" :value="date" @change="dateChange($event, item)">
+              <view class="picker">{{itemS.sonText}}</view>
+            </picker>
+          </div>
         </div>
       </div>
     </div>
     <!-- <div class="all-filter" @click="allFilter()">
       <span>筛选</span>
       <img class="screening-icon" src="/static/images/staff/screening.png">
-    </div> -->
+    </div>-->
     <div class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
+
+    <!-- <picker mode="date" :value="date" @change="dateChange">
+      <view class="picker">当前选择: {{date}}</view>
+    </picker> -->
   </div>
 </template>
 
@@ -85,6 +94,7 @@ export default {
       currentNav: 0,
       maskShow: false,
       showSlideList: false,
+      date: "",
       _nav: []
     };
   },
@@ -94,9 +104,14 @@ export default {
     }
   },
   mounted() {
-    this._nav = this.nav
+    this._nav = this.nav;
   },
   methods: {
+    dateChange(e, item) {
+      console.log(e);
+      console.log(e.mp.detail);
+      console.log(item)
+    },
     search(e) {
       console.log(e);
     },
@@ -115,7 +130,9 @@ export default {
       this.maskShow = false;
       this.showSlideList = false;
       // this.$emit("selectFilter", item);
-      if (item.action) {
+      if (item.isDiyDate) {
+      }
+      if (item.action && !item.isDiyDate) {
         item.action();
       }
     },

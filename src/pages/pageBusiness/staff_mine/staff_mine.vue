@@ -18,7 +18,7 @@
       <van-cell title="专属二维码" is-link @click="showStore = true"/>
     </van-cell-group>
 
-    <button @click="login">登录</button>
+    <!-- <button @click="login">登录</button> -->
 
     <van-tabbar active="4" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
@@ -56,6 +56,7 @@
       :actions="storeList"
       @close="showStore = false"
       @select="selectStore"
+      title="请选择门店"
     />
   </div>
 </template>
@@ -115,7 +116,7 @@ export default {
     // },
     baseInfoCell() {
       wx.navigateTo({
-        url: "../staff_base_info/main"
+        url: "../staff_base_info/main?id=" + this.userInfo.id
       });
     },
     changeTabbar(e) {

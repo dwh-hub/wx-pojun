@@ -29,7 +29,14 @@ import {
   getThemeColor
 } from "COMMON/js/common.js";
 import store from "../utils/store";
-import { getPhoneNumber,getMessage } from "COMMON/js/merge_login.js";
+import {
+  getPhoneNumber,
+  getMessage,
+  staff_login,
+  getUserInfo,
+  enterMember,
+  enterStaff
+} from "COMMON/js/merge_login.js";
 export default {
   props: ["options"],
   data() {
@@ -80,7 +87,7 @@ export default {
       });
     },
     _onLoad(options) {
-      wxLogin()
+      wxLogin();
       // 获取公司id --> 获取公司主题色
       if (options.appid) {
         console.log("appid:" + options.appid);
@@ -108,78 +115,93 @@ export default {
       }
     },
     login() {
-      let that = this;
-      if (!wx.getStorageSync("phone") || !wx.getStorageSync("openId")) {
-        // this.isShow = true;
-        store.commit("changeLogin", false);
-        this.staff_login()
-        return
+      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey")) {
+        getUserInfo().then((member_res) => {
+          enterMember(member_res)
+        })
       }
-      console.log("storeid:" + wx.getStorageSync("storeId"));
-      console.log("userInfo.storeId:" + wx.getStorageSync("userInfo").storeId);
-      if (
-        wx.getStorageSync("storeId") &&
-        wx.getStorageSync("userInfo").storeId != wx.getStorageSync("storeId")
-      ) {
-        return store.commit("changeLogin", false);
+      if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
+        staff_login().then((staff_res) => {
+          enterStaff(staff_res)
+        })
       }
-      // this.isShow = false;
-      wx.showLoading({
-        title: "加载中..."
-      });
-      wx.request({
-        url: window.api + "/wxcustomer/bindCard",
-        data: {
-          phone: wx.getStorageSync("phone"),
-          companyId: wx.getStorageSync("userInfo").companyId,
-          miniOpenId: wx.getStorageSync("openId")
-        },
-        success(res) {
-          wx.setStorage({
-            key: "Cookie",
-            data: res.header["Set-Cookie"]
-          });
-          if (res.data.code === 200) {
-            store.commit("changeLogin", true);
-            getMessage();
-            wx.hideLoading();
-            wx.reLaunch({
-              url: "../homepage/main"
-            });
-          } else {
-            // that.isShow = true;
-            store.commit("changeLogin", false);
-            wx.hideLoading();
-            wx.removeStorageSync("userInfo");
-            wx.removeStorageSync("phone");
-          }
-        }
-      });
     },
-    staff_login() {
-      if(!wx.getStorageSync("instMsgSubKey") || !wx.getStorageSync("phone")) {
-        return
-      }
-      wx.request({
-        url: window.api + '/user/login/mini',
-        data: {
-          phone: wx.getStorageSync("phone"),
-          companyId: wx.getStorageSync("companyId")
-        },
-        success(res) {
-          if (res.data.code == 200 || res.data.code == 201) {
-            wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
-            wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
-            wx.setStorageSync("staff_info", res.data.data);
-            wx.setStorageSync("companyId", res.data.data.companyId);
-            wx.setStorageSync("companyName", res.data.data.companyName);
-            wx.navigateTo({
-              url: "../pageBusiness/workbench/main"
-            })
-          }
-        }
-      })
-    },
+    _getPhoneNumber(e) {
+      getPhoneNumber(e, "../homepage/main", true);
+    }
+    // login() {
+    //   let that = this;
+    //   if (!wx.getStorageSync("phone") || !wx.getStorageSync("openId")) {
+    //     // this.isShow = true;
+    //     store.commit("changeLogin", false);
+    //     this.staff_login()
+    //     return
+    //   }
+    //   console.log("storeid:" + wx.getStorageSync("storeId"));
+    //   console.log("userInfo.storeId:" + wx.getStorageSync("userInfo").storeId);
+    //   if (
+    //     wx.getStorageSync("storeId") &&
+    //     wx.getStorageSync("userInfo").storeId != wx.getStorageSync("storeId")
+    //   ) {
+    //     return store.commit("changeLogin", false);
+    //   }
+    //   // this.isShow = false;
+    //   wx.showLoading({
+    //     title: "加载中..."
+    //   });
+    //   wx.request({
+    //     url: window.api + "/wxcustomer/bindCard",
+    //     data: {
+    //       phone: wx.getStorageSync("phone"),
+    //       companyId: wx.getStorageSync("userInfo").companyId,
+    //       miniOpenId: wx.getStorageSync("openId")
+    //     },
+    //     success(res) {
+    //       wx.setStorage({
+    //         key: "Cookie",
+    //         data: res.header["Set-Cookie"]
+    //       });
+    //       if (res.data.code === 200) {
+    //         store.commit("changeLogin", true);
+    //         getMessage();
+    //         wx.hideLoading();
+    //         wx.reLaunch({
+    //           url: "../homepage/main"
+    //         });
+    //       } else {
+    //         // that.isShow = true;
+    //         store.commit("changeLogin", false);
+    //         wx.hideLoading();
+    //         wx.removeStorageSync("userInfo");
+    //         wx.removeStorageSync("phone");
+    //       }
+    //     }
+    //   });
+    // },
+    // staff_login() {
+    //   if(!wx.getStorageSync("instMsgSubKey") || !wx.getStorageSync("phone")) {
+    //     return
+    //   }
+    //   wx.request({
+    //     url: window.api + '/user/login/mini',
+    //     data: {
+    //       phone: wx.getStorageSync("phone"),
+    //       companyId: wx.getStorageSync("companyId")
+    //     },
+    //     success(res) {
+    //       if (res.data.code == 200 || res.data.code == 201) {
+    //         wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+    //         wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+    //         wx.setStorageSync("staff_info", res.data.data);
+    //         wx.setStorageSync("companyId", res.data.data.companyId);
+    //         wx.setStorageSync("companyName", res.data.data.companyName);
+    //         wx.navigateTo({
+    //           url: "../pageBusiness/workbench/main"
+    //         })
+    //       }
+    //     }
+    //   })
+    // },
     // getAllStore() {
     //   let that = this;
     //   wx.request({
@@ -200,9 +222,6 @@ export default {
     //     }
     //   });
     // },
-    _getPhoneNumber(e) {
-      getPhoneNumber(e, "../homepage/main", true);
-    },
     // getPhoneNumber(e, url, isTab) {
     //   let that = this;
     //   if (!e.mp.detail.encryptedData) {
@@ -290,7 +309,7 @@ export default {
     //               data: _data[0].companyName
     //             });
     //             return resolve();
-                
+
     //           }
     //         } else {
     //           wx.showModal({

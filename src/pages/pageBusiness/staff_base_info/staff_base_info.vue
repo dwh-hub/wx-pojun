@@ -1,9 +1,11 @@
 <template>
   <div class="base-info">
     <van-cell-group custom-class="van-cell-group">
-      <van-cell title="昵称" :value="userInfo.userName" is-link @click="toModify()"/>
-      <van-cell title="性别" :value="sex" is-link @click="sexCell()"/>
+      <van-cell title="昵称" :value="userInfo.userName" is-link/>
+      <van-cell title="性别" :value="userInfo.sex" is-link @click="sexCell()"/>
       <van-cell title="手机号" :value="userInfo.phone" is-link/>
+      <van-cell title="出生日期" :value="userInfo.birthTime || '未填写'"/>
+      <!-- <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/> -->
     </van-cell-group>
     <van-action-sheet
       :show="showSex"
@@ -21,6 +23,7 @@ export default {
   data() {
     return {
       userInfo: {},
+      id: 0,
       showSex: false,
       sexAction: [
         {
@@ -29,33 +32,44 @@ export default {
         {
           name: "女"
         }
-      ],
-      nickName: "王老板",
-      sex: "男",
-      phone: "18111111111"
+      ]
     };
+  },
+  onLoad(options) {
+    if (options.id) {
+      this.id = options.id;
+      this.getDetail();
+    }
   },
   mounted() {
     setNavTab();
-    this.userInfo = wx.getStorageSync("staff_info");
-    this.sex = this.userInfo.sex == 0 ? "未知" : (this.userInfo.sex == 1 ? "男" : "女");
+
+    // this.userInfo = wx.getStorageSync("staff_info");
+    // this.sex =
+    //   this.userInfo.sex == 0 ? "未知" : this.userInfo.sex == 1 ? "男" : "女";
   },
   methods: {
-    toModify() {
-      // let cellInfo = {
-      //   url: "", // 接口地址
-      //   cellText: this.nickName // 当前要改的信息
-      // }
-      // wx.navigateTo({
-      //   url: "../modify_cell/main?cellInfo=" + JSON.stringify(cellInfo)
-      // });
-    },
-    sexCell() {
-      // this.showSex = true;
-    },
-    selectSex(event) {
-      // this.showSex = false;
-      // this.sex = event.mp.detail.name;
+    getDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/customer/archives/detail",
+        data: {
+          customerId: that.id
+        },
+        success: function(res) {
+          if (res.data.code == 200) {
+            let data = res.data.data;
+            that.userInfo = {
+              userName: data.nickName || "昵称",
+              sex:
+                data.sex == 0 ? "未填写" : this.userInfo.sex == 1 ? "男" : "女",
+              phone: data.phone || "未填写",
+              birthTime: data.birthTime || "未填写",
+              // idCardNum: data.idCardNum || "未填写"
+            };
+          }
+        }
+      });
     }
   }
 };

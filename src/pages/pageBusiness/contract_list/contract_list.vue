@@ -241,9 +241,9 @@ export default {
               return (that.cardList = []);
             }
             that.page++;
-            if (that.headerData[0].dataNum == "0") {
+            // if (that.headerData[0].dataNum == "0") {
               that.headerData[0].dataNum = res.data.data.recCount;
-            }
+            // }
             let _data = res.data.data.result.map(e => {
               return {
                 id: e.id,

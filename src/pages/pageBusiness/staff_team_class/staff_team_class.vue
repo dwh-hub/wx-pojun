@@ -214,9 +214,9 @@ export default {
               return (that.classList = []);
             }
             that.page++;
-            if (that.headerData[0].dataNum == "0") {
+            // if (that.headerData[0].dataNum == "0") {
               that.headerData[0].dataNum = _res.recCount;
-            }
+            // }
             _data = res.data.data.result.map(e => {
               // TODO:
               // if (!e.masterImg) {

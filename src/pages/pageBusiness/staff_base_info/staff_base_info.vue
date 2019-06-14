@@ -4,7 +4,7 @@
       <van-cell title="昵称" :value="userInfo.userName" is-link/>
       <van-cell title="性别" :value="userInfo.sex" is-link @click="sexCell()"/>
       <van-cell title="手机号" :value="userInfo.phone" is-link/>
-      <van-cell title="出生日期" :value="userInfo.birthTime || '未填写'"/>
+      <van-cell title="出生日期" :value="userInfo.birthTime || '未填写'" is-link/>
       <!-- <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/> -->
     </van-cell-group>
     <van-action-sheet
@@ -38,15 +38,17 @@ export default {
   onLoad(options) {
     if (options.id) {
       this.id = options.id;
-      this.getDetail();
+      if (options.type && options.type == "oneself") {
+        this.userInfo = wx.getStorageSync("staff_info");
+        this.userInfo.sex = this.userInfo.sex == 0 ? "未知" : (this.userInfo.sex == 1 ? "男" : "女");
+      } else {
+        this.getDetail();
+      }
+      
     }
   },
   mounted() {
     setNavTab();
-
-    // this.userInfo = wx.getStorageSync("staff_info");
-    // this.sex =
-    //   this.userInfo.sex == 0 ? "未知" : this.userInfo.sex == 1 ? "男" : "女";
   },
   methods: {
     getDetail() {
@@ -60,11 +62,11 @@ export default {
           if (res.data.code == 200) {
             let data = res.data.data;
             that.userInfo = {
-              userName: data.nickName || "昵称",
+              userName: data.nickName || data.name || "昵称",
               sex:
                 data.sex == 0 ? "未填写" : that.userInfo.sex == 1 ? "男" : "女",
               phone: data.phone || "未填写",
-              birthTime: data.birthTime || "未填写",
+              birthTime: data.birthTime || "未填写"
               // idCardNum: data.idCardNum || "未填写"
             };
           }

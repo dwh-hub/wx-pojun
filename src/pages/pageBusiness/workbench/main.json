@@ -1,6 +1,5 @@
 {
     "navigationBarTitleText": "工作台",
-    "disableScroll": true,
     "enablePullDownRefresh": false,
     "usingComponents": {
       "ff-canvas": "/static/f2-canvas/f2-canvas",

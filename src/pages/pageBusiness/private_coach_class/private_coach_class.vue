@@ -233,9 +233,9 @@ export default {
               return (that.classList = []);
             }
             that.page++;
-            if (that.headerData[0].dataNum == "0") {
+            // if (that.headerData[0].dataNum == "0") {
               that.headerData[0].dataNum = _res.recCount;
-            }
+            // }
             _data = _res.result.map(e => {
               return {
                 id: e.customerId,

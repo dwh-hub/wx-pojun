@@ -116,7 +116,7 @@ export default {
     // },
     baseInfoCell() {
       wx.navigateTo({
-        url: "../staff_base_info/main?id=" + this.userInfo.id
+        url: `../staff_base_info/main?id=${this.userInfo.userId}&type=oneself`
       });
     },
     changeTabbar(e) {

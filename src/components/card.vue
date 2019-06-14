@@ -5,7 +5,7 @@
       <div class="card-top">
         <div class="card-info pl">
           <div class="card-name">{{info.cardClassName || info.secondCardClass}}</div>
-          <div class="card-date">{{activateDate}}~{{doomsday}}</div>
+          <div class="card-date" v-if="activateDate || doomsday">{{activateDate}}~{{doomsday}}</div>
         </div>
         <div class="card-type pr">{{info.masterClassName || info.masterCradClass}}</div>
       </div>
@@ -48,7 +48,7 @@ export default {
     },
     backClass() {
       if(this.info.cardStatus != 2) {
-        return 'none'
+        return 'gray'
       }
       if(this.info.authorityUnit == '次' || this.info.authorityUnit == '2') {
         this.type = '次'
@@ -106,7 +106,7 @@ export default {
       color: #159bff;
     }
   }
-  &.none {
+  &.gray {
     color: gray;
     background-image: linear-gradient(to left top, lightgray, gray);
     .card-status {

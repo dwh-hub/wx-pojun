@@ -648,7 +648,6 @@ export default {
         });
       }
       this.isTimePopup = false;
-      console.log(this.confirmDate);
       this.timeCellText = this.confirmDate
         .replace(/（/g, "")
         .replace(/）/g, "");
@@ -876,7 +875,6 @@ export default {
         name: that.studentInfo.name,
         phone: that.studentInfo.phone
       };
-      console.log(this.appointType);
       if (this.appointType == "预约") {
         this.confirmAppoint(params);
       } else if (this.appointType == "一键上课") {

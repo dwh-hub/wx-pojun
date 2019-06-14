@@ -147,7 +147,9 @@ export default {
           that.isLoading = false;
           if (res.data.code == 200) {
             if (!res.data.data.result.length && that.page == 1) {
-              return (that.interviewList = []);
+              that.headerData[0].dataNum = 0
+              that.interviewList = []
+              return
             }
             that.page++;
             // if (that.headerData[0].dataNum == "0") {

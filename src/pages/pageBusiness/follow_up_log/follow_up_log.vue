@@ -192,7 +192,9 @@ export default {
           that.isLoading = false;
           if (res.data.code == 200) {
             if (!res.data.data.result.length && that.page == 1) {
-              return (that.followUpList = []);
+              that.headerData[0].dataNum = 0
+              that.followUpList = []
+              return
             }
             that.page++;
             // if (that.headerData[0].dataNum == "0") {

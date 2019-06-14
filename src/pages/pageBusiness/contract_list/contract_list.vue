@@ -82,7 +82,7 @@ export default {
             {
               sonText: "全部",
               action: () => {
-                this.filterDate(0);
+                this.filterDate();
               }
             },
             {
@@ -238,7 +238,9 @@ export default {
           that.isLoading = false;
           if (res.data.code == 200) {
             if (!res.data.data.result.length && that.page == 1) {
-              return (that.cardList = []);
+              that.cardList = []
+              that.headerData[0].dataNum = 0
+              return
             }
             that.page++;
             // if (that.headerData[0].dataNum == "0") {
@@ -282,9 +284,11 @@ export default {
       });
     },
     filterDate(day) {
-      if (!day || day == 0) {
+      if (!day) {
         this.filter.transactTimeEnd = "";
         this.filter.transactTimeStart = "";
+        this.page = 1;
+        this.getCardPage();
         return
       }
         // const DAY = 24 * 60 * 60 * 1000;

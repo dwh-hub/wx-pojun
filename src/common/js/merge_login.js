@@ -180,7 +180,7 @@ export function enterStaff(res) {
   wx.setStorageSync("staff_info", res.data.data);
   wx.setStorageSync("companyId", res.data.data.companyId);
   wx.setStorageSync("companyName", res.data.data.companyName);
-  wx.navigateTo({
+  wx.reLaunch({
     url: "../pageBusiness/workbench/main"
   })
   // })

@@ -92,7 +92,7 @@
             </div>
           </van-cell>
           <van-cell title="预约记录" is-link @click="toAppointList"/>
-          <van-cell title="健身目的" is-link/>
+          <van-cell title="健身目的" is-link value="未填写"/>
           <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
         </div>
       </van-tab>

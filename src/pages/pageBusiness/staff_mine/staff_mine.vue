@@ -125,6 +125,11 @@ export default {
           url: "../index/main"
         });
       }
+      if (e.mp.detail == 1) {
+        wx.navigateTo({
+          url: "../service_web/main"
+        });
+      }
       if (e.mp.detail == 2) {
         wx.redirectTo({
           url: "../workbench/main"

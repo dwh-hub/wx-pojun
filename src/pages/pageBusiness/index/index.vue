@@ -72,6 +72,11 @@ export default {
       console.log(e);
     },
     changeTabbar(e) {
+      if (e.mp.detail == 1) {
+        wx.navigateTo({
+          url: "../service_web/main"
+        });
+      }
       if (e.mp.detail == 2) {
         wx.redirectTo({
           url: "../workbench/main"

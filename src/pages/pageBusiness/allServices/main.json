@@ -1,3 +1,5 @@
 {
-  "navigationBarTitleText": "全部服务"
+  "navigationBarTitleText": "全部服务",
+  "disableScroll": true,
+  "enablePullDownRefresh": false
 }

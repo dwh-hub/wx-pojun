@@ -153,7 +153,7 @@ export default {
           ]
         },
         {
-          navTitle: "会员状态",
+          navTitle: "客户状态",
           children: [
             {
               sonText: "全部",
@@ -326,7 +326,7 @@ export default {
                 second_1: e.cardNum || 0,
                 second_tip_1: "合同数：",
                 second_2: "",
-                third_1: e.lastTrackTime,
+                third_1: e.lastTrackTime || '暂无',
                 third_tip_1: "最后签到时间："
               };
             });

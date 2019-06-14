@@ -1,6 +1,9 @@
 {
     "navigationBarTitleText": "工作台",
+    "disableScroll": true,
+    "enablePullDownRefresh": false,
     "usingComponents": {
+      "ff-canvas": "/static/f2-canvas/f2-canvas",
       "van-search": "../../../../static/vant/search/index",
       "van-tabbar": "../../../../static/vant/tabbar/index",
       "van-tabbar-item": "../../../../static/vant/tabbar-item/index"

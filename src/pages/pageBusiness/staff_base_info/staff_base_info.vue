@@ -18,7 +18,7 @@
 
 
 <script>
-import { setNavTab, window } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 export default {
   data() {
     return {
@@ -62,7 +62,7 @@ export default {
             that.userInfo = {
               userName: data.nickName || "昵称",
               sex:
-                data.sex == 0 ? "未填写" : this.userInfo.sex == 1 ? "男" : "女",
+                data.sex == 0 ? "未填写" : that.userInfo.sex == 1 ? "男" : "女",
               phone: data.phone || "未填写",
               birthTime: data.birthTime || "未填写",
               // idCardNum: data.idCardNum || "未填写"

@@ -5,7 +5,7 @@
       <div class="common-services icon-wrapper">
         <div
           class="services-item icon-item"
-          @click="toNav(item2.navUrl)"
+          @click="toNav(item2)"
           v-for="(item2,index2) in item.list"
           :key="index2"
         >
@@ -23,19 +23,23 @@ import {service} from "../common/js/service_config.js";
 export default {
   data() {
     return {
-      iconList: service
+      iconList: service,
+      serviceList: []
     };
   },
   mounted() {
     setNavTab();
+    this.serviceList = wx.getStorageSync('serviceList') || []
   },
   methods: {
-    toNav(url) {
-      if (!url) {
+    toNav(item) {
+      if (!item.navUrl) {
         return;
       }
+      this.serviceList.unshift(item.text)
+      wx.setStorageSync('serviceList', this.serviceList)
       wx.navigateTo({
-        url: url
+        url: item.navUrl
       });
     }
   }

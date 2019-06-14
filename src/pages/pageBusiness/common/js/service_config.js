@@ -5,28 +5,28 @@ const service = [{
         text: "业务",
         navUrl: "",
         isOpen: false,
-        class: "iconfont icon-workbench_icon_1"
+        class: "iconfont icon-workbench_icon_2"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_2.svg",
         text: "签到",
         navUrl: "",
         isOpen: false,
-        class: "iconfont icon-workbench_icon_2"
+        class: "iconfont icon-workbench_icon_1"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_3.svg",
         text: "确认信息",
         navUrl: "",
         isOpen: false,
-        class: "iconfont icon-workbench_icon_3"
+        class: "iconfont icon-workbench_icon_4"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_4.svg",
         text: "商品",
         navUrl: "",
         isOpen: false,
-        class: "iconfont icon-workbench_icon_4"
+        class: "iconfont icon-workbench_icon_3"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_5.svg",
@@ -48,7 +48,7 @@ const service = [{
     title: "会员服务",
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/member_service_icon_1.svg",
-        text: "会员",
+        text: "客户",
         navUrl: "../customer/main",
         isOpen: true,
         class: "iconfont icon-member_service_icon_1"
@@ -147,7 +147,7 @@ const service = [{
         text: "教练跟进表",
         navUrl: "",
         isOpen: false,
-        class: "iconfont icon-coach_service_icon_3"
+        class: "iconfont icon-coach_service_icon_2"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_4.svg",
@@ -161,7 +161,7 @@ const service = [{
         text: "上课统计报表",
         navUrl: "",
         isOpen: false,
-        class: "iconfont icon-coach_service_icon_5"
+        class: "iconfont icon-coach_service_icon_1"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_6.svg",
@@ -207,7 +207,7 @@ const service = [{
         text: "评分报表",
         navUrl: "",
         isOpen: false,
-        class: "iconfont icon-operation_report_icon_4"
+        class: "iconfont icon-operation_report_icon_1"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_5.svg",
@@ -298,19 +298,32 @@ const service = [{
   }
 ]
 
-function getOpenServiceList() {
-  let openServiceList = []
+function getUseServiceList() {
+  let useServiceList = []
+  let storageList = wx.getStorageSync('serviceList') || []
+  let usedList = []
+
   service.forEach((e, index) => {
     e.list.forEach((item, key) => {
       if (item.isOpen) {
-        openServiceList.push(item)
+        useServiceList.push(item)
+      }
+      if(storageList.includes(item.text)) {
+        usedList.push(item)
       }
     })
   })
-  return openServiceList
+  let list = usedList.concat(useServiceList)
+  list = list.slice(0, 7)
+  list.push({
+    iconUrl: "/static/images/staff/workbench_icon/workbench_icon_4.svg",
+    text: "全部服务",
+    navUrl: "../allServices/main"
+  })
+  return list
 }
 
 export {
   service,
-  getOpenServiceList
+  getUseServiceList
 }

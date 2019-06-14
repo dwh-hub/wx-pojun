@@ -65,6 +65,9 @@ export default {
     .icon-suspension {
       float: right;
       font-size: 35px;
+      // background-color: #fff;
+      background: radial-gradient(circle, #fff 50%, rgba(0,0,0,0) 50%);
+      // border-radius: 50%;
     }
     // > image {
     //   float: right;

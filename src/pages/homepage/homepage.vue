@@ -160,21 +160,21 @@ export default {
     if(!this.nearbyStoreList.length) {
       this.getNearbyStoreList();
     }
-    // wx.getSetting({
-    //   success(res) {
-    //     if (!res.authSetting['scope.userLocation']) {
-    //       wx.showModal({
-    //         title: "授权",
-    //         content: "部分功能需要地理位置，是否授权？",
-    //         success(res) {
-    //           if (res.confirm) {
-    //             wx.openSetting()
-    //           }
-    //         }
-    //       });
-    //     }
-    //   }
-    // })
+    wx.getSetting({
+      success(res) {
+        if (!res.authSetting['scope.userLocation']) {
+          wx.showModal({
+            title: "授权",
+            content: "部分功能需要地理位置，是否授权？",
+            success(res) {
+              if (res.confirm) {
+                wx.openSetting()
+              }
+            }
+          });
+        }
+      }
+    })
   },
   onLoad(options) {
     this.setTheme()

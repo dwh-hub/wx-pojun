@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "消课",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "van-icon": "../../../../static/vant/icon/index"
   }

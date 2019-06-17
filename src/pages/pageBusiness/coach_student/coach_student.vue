@@ -103,7 +103,7 @@ export default {
       tabIndex: 1,
       nav: [
         {
-          navTitle: "登记时间",
+          navTitle: "全部",
           children: [
             {
               sonText: "全部",
@@ -259,6 +259,11 @@ export default {
   },
   onReachBottom() {
     this.getCustomerList();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
   },
   methods: {
     appoint(item) {
@@ -570,8 +575,6 @@ page {
     }
   }
   .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
     .mask {
       top: 205px;
     }
@@ -601,7 +604,7 @@ page {
     }
   }
   .staff-coach-item {
-    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
     flex: 1;
     .icon-right {
       margin-top: 20px;

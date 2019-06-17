@@ -1,21 +1,20 @@
 <template>
   <div class="customer_interview">
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav :nav="nav"></filter-nav>
+    <div class="list-header">
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav :nav="nav"></filter-nav>
+    </div>
     <div class="card-list">
-      <staff-coach-item
-        v-for="(item, index) in interviewList"
-        :key="index"
-        :info="item"
-      ></staff-coach-item>
+      <staff-coach-item v-for="(item, index) in interviewList" :key="index" :info="item"></staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading"/>
       <none-result text="暂无约访记录" v-if="!interviewList.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && interviewList.length">暂无更多</div>
     </div>
   </div>
 </template>
@@ -34,12 +33,13 @@ import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import noneResult from "COMPS/noneResult.vue";
+import regeneratorRuntime from "../../../libs/regenerator-runtime/runtime.js";
 export default {
   data() {
     return {
       nav: [
         {
-          navTitle: "预约时间",
+          navTitle: "今日",
           children: [
             {
               sonText: "全部",
@@ -91,6 +91,7 @@ export default {
         }
       ],
       isLoading: true,
+      isNoMore: false,
       interviewList: [{}, {}, {}, {}],
       selectedStore: {},
       storeList: [],
@@ -100,7 +101,7 @@ export default {
         appointmentTimeStart: "",
         appointmentTimeEnd: ""
       },
-      logType: ''
+      logType: ""
     };
   },
   components: {
@@ -111,25 +112,36 @@ export default {
     noneResult
   },
   mixins: [colorMixin],
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   mounted() {
     setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.getInterviewPages();
+    // this.getInterviewPages();
+    this.filterDate(1);
   },
   methods: {
     searchChange(event) {
       this.filter.nameOrPhone = event;
       this.page = 1;
+      this.isNoMore = false;
       this.getInterviewPages();
     },
     selectStore(item) {
       this.selectedStore = item;
       this.page = 1;
+      this.isNoMore = false;
       this.getInterviewPages();
     },
     getInterviewPages() {
       // /customer/track/pages/
+      if (this.isNoMore) {
+        return;
+      }
       this.isLoading = true;
       let that = this;
       var _data = Object.assign(
@@ -146,19 +158,27 @@ export default {
         success(res) {
           that.isLoading = false;
           if (res.data.code == 200) {
-            if (!res.data.data.result.length && that.page == 1) {
-              that.headerData[0].dataNum = 0
-              that.interviewList = []
-              return
+            if (!res.data.data.result.length) {
+              that.isNoMore = true;
             }
             that.page++;
-            // if (that.headerData[0].dataNum == "0") {
-              that.headerData[0].dataNum = res.data.data.recCount;
-            // }
-            let _data = res.data.data.result.map(e => {
+            that.headerData[0].dataNum = res.data.data.recCount;
+            let _data = res.data.data.result.map(async e => {
+              if (e.headImgPath) {
+                if (e.headImgPath.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.headImgPath).then(res => {
+                    e.headImgPath = res;
+                  });
+                } else {
+                  e.headImgPath = window.api + e.headImgPath;
+                }
+              }
               return {
                 id: e.customerId,
-                cover: window.api + e.headImgPath,
+                sex: e.visitorSex,
+                cover: e.headImgPath
+                  ? e.headImgPath
+                  : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.visitorName,
                 second_1: e.appointmentPurposeChar,
                 second_tip_1: "预约目的：",
@@ -167,13 +187,28 @@ export default {
                 rightText: e.isVisitChar
               };
             });
-            if (that.page == 2 || that.page == 1) {
-              that.interviewList = _data;
-            } else {
-              that.interviewList = that.interviewList.concat(_data);
-            }
+            Promise.all(_data).then(result => {
+              _data = result;
+              if (that.page == 2 || that.page == 1) {
+                that.interviewList = _data;
+              } else {
+                that.interviewList = that.interviewList.concat(_data);
+              }
+            });
+          } else {
+            that.interviewList = [];
           }
         }
+      });
+    },
+    getAvatar(url) {
+      return new Promise(function(resolve, reject) {
+        wx.request({
+          url: window.api + url,
+          success(res) {
+            resolve(res.data);
+          }
+        });
       });
     },
     filterDate(day) {
@@ -190,6 +225,7 @@ export default {
         this.filter.appointmentTimeEnd = endTime;
       }
       this.page = 1;
+      this.isNoMore = false;
       this.getInterviewPages();
     }
   }
@@ -203,17 +239,12 @@ page {
 }
 .customer_interview {
   .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
     .mask {
       top: 165px;
     }
   }
-  .header-data {
-    margin-bottom: 5px;
-  }
   .staff-coach-item {
-    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
     .icon-right {
       line-height: 60px;
     }

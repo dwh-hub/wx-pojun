@@ -386,6 +386,11 @@ export default {
     card,
     noneResult
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   mounted() {
     setNavTab();
     this.computedScrollHeight();
@@ -884,7 +889,6 @@ page {
     }
   }
   .filter-nav {
-    margin-top: 5px;
     .mask {
       top: 240px;
     }

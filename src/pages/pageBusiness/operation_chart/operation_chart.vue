@@ -223,6 +223,11 @@ export default {
       this.getSellList();
     }
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   mounted() {
     setNavTab();
 
@@ -533,7 +538,7 @@ export default {
       });
     },
     initDataLine(canvas, width, height, initData) {
-      let data = []
+      let data = [];
       if (!initData.length) {
         data = [
           {
@@ -722,9 +727,6 @@ export default {
       line-height: 40px;
       border-bottom: 1px solid;
     }
-  }
-  .filter-nav {
-    border-bottom: 1rpx solid #eee;
   }
   .chart-title {
     line-height: 38px;

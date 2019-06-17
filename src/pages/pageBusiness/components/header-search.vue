@@ -84,8 +84,12 @@ export default {
 .header-search {
   display: flex;
   position: relative;
+  /* 兼容真机白边 */
+  margin-top: -1rpx;
   .store {
     height: 44px;
+    /* 兼容真机白边 */
+    margin-right: -1px;
     .store-text {
       display: inline-block;
       vertical-align: middle;

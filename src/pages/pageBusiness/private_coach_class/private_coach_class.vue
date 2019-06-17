@@ -31,7 +31,7 @@
           class="operate-item"
           v-for="(item, index) in actionList"
           :key="index"
-          @click="item.action"
+          @click="item.action(item)"
         >{{item.text}}</div>
       </div>
     </van-popup>
@@ -57,7 +57,7 @@ export default {
     return {
       nav: [
         {
-          navTitle: "课程时间",
+          navTitle: "今日",
           children: [
             {
               sonText: "全部",
@@ -78,7 +78,7 @@ export default {
               }
             },
             {
-              sonText: "本月", 
+              sonText: "本月",
               action: () => {
                 this.filterDate(30);
               }
@@ -143,6 +143,12 @@ export default {
       showOperate: false,
       actionList_1: [
         {
+          text: "查看详情",
+          action: () => {
+            this.toDetail();
+          }
+        },
+        {
           text: "上课",
           action: () => {
             this.attendClass();
@@ -163,6 +169,12 @@ export default {
       ],
       actionList_2: [
         {
+          text: "查看详情",
+          action: () => {
+            this.toDetail();
+          }
+        },
+        {
           text: "下课",
           action: () => {
             this.classOver();
@@ -181,10 +193,11 @@ export default {
     setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.getClassList();
+    // this.getClassList();
+    this.filterDate(1);
     this.getCoachList();
   },
-  onHide() {
+  onUnload() {
     Object.assign(this.$data, this.$options.data());
   },
   mixins: [colorMixin],
@@ -198,16 +211,29 @@ export default {
   onReachBottom() {
     this.getClassList();
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   methods: {
     selectStore(item) {
       this.selectedStore = item;
       this.page = 1;
-      this.getClassList()
+      this.getClassList();
     },
     searchChange(event) {
       this.filter.namePhone = event;
       this.page = 1;
-      this.getClassList()
+      this.getClassList();
+    },
+    toDetail() {
+      wx.navigateTo({
+        url: `../../appointmentResult/main?coachAppointId=${
+          this.curSelectClass.coachAppointId
+        }&type=staff`
+      });
+      this.showOperate = false;
     },
     getClassList() {
       this.isLoading = true;
@@ -234,7 +260,7 @@ export default {
             }
             that.page++;
             // if (that.headerData[0].dataNum == "0") {
-              that.headerData[0].dataNum = _res.recCount;
+            that.headerData[0].dataNum = _res.recCount;
             // }
             _data = _res.result.map(e => {
               return {
@@ -293,12 +319,13 @@ export default {
             ];
             that.nav[1].children = first.concat(that.coachList);
           }
-          console.log(that.coachList);
         }
       });
     },
     selectClass(item) {
+      this.curSelectClass = item;
       if (item.status != 1 && item.status != 2) {
+        this.toDetail();
         return;
       }
       if (item.status == 1) {
@@ -307,7 +334,6 @@ export default {
       if (item.status == 2) {
         this.actionList = this.actionList_2;
       }
-      this.curSelectClass = item;
       this.showOperate = true;
     },
     transformColor(status) {
@@ -327,7 +353,7 @@ export default {
     },
     // 上课
     attendClass() {
-      this.checkAttendStatus()
+      this.checkAttendStatus();
     },
     // 取消预约
     cancelClass() {
@@ -501,7 +527,7 @@ export default {
           coachAppointId: that.curSelectClass.coachAppointId
         },
         success(res) {
-          if(res.data.code == 200) {
+          if (res.data.code == 200) {
             that.getAttendClassWay();
           }
           if (res.data.code == 300) {
@@ -518,7 +544,7 @@ export default {
                     },
                     success(finish_res) {
                       if (finish_res.data.code == 200) {
-                        that.getAttendClassWay()
+                        that.getAttendClassWay();
                       } else {
                         wx.showModal({
                           title: "提示",
@@ -553,14 +579,12 @@ page {
 }
 .private_coach_class {
   .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
     .mask {
       top: 165px;
     }
   }
   .staff-coach-item {
-    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
     .icon-right {
       line-height: 60px;
     }

@@ -220,9 +220,10 @@ export default {
         setTimeout(() => {
           this.cancelHit();
           wx.redirectTo({
-            url: `../appoint_result/main?coachAppointId=${
-              this.params.appointId
-            }&type=attend`
+            // url: `../appoint_result/main?coachAppointId=${
+            //   this.params.appointId
+            // }&type=attend`
+            url: `../../appointmentResult/main?coachAppointId=${res.data.data.coachAppointId}&type=staff`
           });
         }, 500);
       } else if (

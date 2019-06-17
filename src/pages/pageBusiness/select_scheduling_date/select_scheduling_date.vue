@@ -101,6 +101,11 @@ export default {
     setNavTab();
   },
   mixins: [colorMixin],
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   methods: {
     changeTime(e) {
       this.currentTime = e.mp.detail;

@@ -1,18 +1,20 @@
 <template>
   <div class="customer">
-    <div class="tabs" :style="{background: themeColor}">
-      <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
-      <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
-      <!-- @click="tabIndex = 2" -->
+    <div class="list-header">
+      <div class="tabs" :style="{background: themeColor}">
+        <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
+        <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
+        <!-- @click="tabIndex = 2" -->
+      </div>
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
     </div>
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
 
     <van-popup
       :show="isShowFilter"
@@ -37,6 +39,7 @@
       </div>
       <van-loading :color="themeColor" v-if="isLoading"/>
       <none-result text="暂无客户" v-if="!customerList.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && customerList.length">暂无更多</div>
     </div>
 
     <div class="operate-bottom" v-if="isOperate">
@@ -95,6 +98,7 @@ import staffCoachItem from "../components/staff-coach-item.vue";
 import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import regeneratorRuntime from "../../../libs/regenerator-runtime/runtime.js";
 
 export default {
   data() {
@@ -103,7 +107,7 @@ export default {
       tabIndex: 1,
       nav: [
         {
-          navTitle: "登记时间",
+          navTitle: "全部",
           children: [
             {
               sonText: "全部",
@@ -128,7 +132,7 @@ export default {
               action: () => {
                 this.getDate(30);
               }
-            },
+            }
             // {
             //   sonText: "自定义",
             //   isDiyDate: true,
@@ -222,6 +226,7 @@ export default {
       ],
       customerList: [{}, {}, {}, {}],
       isLoading: true,
+      isNoMore: false,
       isOperate: false,
       isAllSelect: false,
       showSalesPopup: false,
@@ -251,7 +256,7 @@ export default {
     this.clearFilter();
   },
   onUnload() {
-    this.clearFilter();
+    Object.assign(this.$data, this.$options.data());
   },
   mixins: [colorMixin],
   components: {
@@ -279,6 +284,18 @@ export default {
   onReachBottom() {
     this.getCustomerList();
   },
+  onPullDownRefresh() {
+    this.customerList = [{}, {}, {}, {}];
+    this.page = 1;
+    this.isLoading = false;
+    this.isNoMore = false;
+    this.isOperate = false;
+    this.showSalesPopup = false;
+    this.getCustomerList();
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 1000);
+  },
   methods: {
     clearFilter() {
       for (let key in this.filter) {
@@ -288,9 +305,13 @@ export default {
     selectStore(item) {
       this.selectedStore = item;
       this.page = 1;
+      this.isNoMore = false;
       this.getCustomerList();
     },
     getCustomerList() {
+      if (this.isNoMore) {
+        return;
+      }
       this.isLoading = true;
       let that = this;
       var _data = Object.assign(
@@ -309,36 +330,65 @@ export default {
           if (res.data.code == 200) {
             let _res = res.data.data;
             let _data;
-            if (!_res.result.length && that.page == 1) {
-              return (that.customerList = []);
+            if (!_res.result.length) {
+              // if (that.page == 1) {
+              //   that.customerList = [];
+              // }
+              that.isNoMore = true;
             }
             that.page++;
             // if (that.headerData[0].dataNum == "0") {
-              that.headerData[0].dataNum = _res.recCount;
+            that.headerData[0].dataNum = _res.recCount;
             // }
-            _data = _res.result.map(e => {
+            _data = _res.result.map(async e => {
+              if (e.headImgPath) {
+                if (e.headImgPath.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.headImgPath).then(res => {
+                    e.headImgPath = res;
+                  });
+                } else {
+                  e.headImgPath = window.api + e.headImgPath
+                }
+              }
               return {
                 isSelect: false,
                 id: e.id,
-                cover: window.api + e.headImgPath,
+                sex: e.sex,
+                phone: e.phone,
+                cover: e.headImgPath
+                  ? e.headImgPath
+                  : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.name,
                 first_2: e.customerClassChar,
                 second_1: e.cardNum || 0,
                 second_tip_1: "合同数：",
                 second_2: "",
-                third_1: e.lastTrackTime || '暂无',
+                third_1: e.lastTrackTime || "暂无",
                 third_tip_1: "最后签到时间："
               };
             });
-            if (that.page == 2 || that.page == 1) {
-              that.customerList = _data;
-            } else {
-              that.customerList = that.customerList.concat(_data);
-            }
+            Promise.all(_data).then(result => {
+              _data = result;
+              if (that.page == 2 || that.page == 1) {
+                that.customerList = _data;
+              } else {
+                that.customerList = that.customerList.concat(_data);
+              }
+            });
           } else {
             that.customerList = [];
           }
         }
+      });
+    },
+    getAvatar(url) {
+      return new Promise(function(resolve, reject) {
+        wx.request({
+          url: window.api + url,
+          success(res) {
+            resolve(res.data);
+          }
+        });
       });
     },
     // 获取教练/销售列表 type 1 教练 0 销售
@@ -357,7 +407,7 @@ export default {
         });
       });
     },
-    // 分配销售
+    // 分配教练
     allotCoach() {
       let _customerIdStr = "";
       this.customerList.forEach(e => {
@@ -423,6 +473,7 @@ export default {
     searchChange(event) {
       this.filter.namePhone = event;
       this.page = 1;
+      this.isNoMore = false;
       this.getCustomerList();
     },
     // 通过回传的iconText来获取对应的列表
@@ -552,12 +603,14 @@ export default {
         this.filter.addTimeEnd = endTime;
       }
       this.page = 1;
+      this.isNoMore = false;
       this.getCustomerList();
     },
     // 会员状态 1 潜在 3 现有 4 订金 5失效
     toggleState(state) {
       this.filter.customerClass = state || "";
       this.page = 1;
+      this.isNoMore = false;
       this.getCustomerList();
     }
   }
@@ -588,8 +641,6 @@ page {
     }
   }
   .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
     .mask {
       top: 205px;
     }
@@ -609,7 +660,7 @@ page {
     }
   }
   .staff-coach-item {
-    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
     flex: 1;
     .icon-right {
       margin-top: 20px;

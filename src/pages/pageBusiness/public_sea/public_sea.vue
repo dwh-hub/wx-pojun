@@ -55,7 +55,7 @@ export default {
       page: 1,
       nav: [
         {
-          navTitle: "登记时间",
+          navTitle: "今日",
           children: [
             {
               sonText: "全部",
@@ -161,10 +161,16 @@ export default {
     setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.getCustomerList();
+    // this.getCustomerList();
+    this.filterDate();
   },
   onReachBottom() {
     this.getCustomerList();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
   },
   components: {
     headerData,
@@ -260,7 +266,7 @@ export default {
             }
             that.page++;
             // if (that.headerData[0].dataNum == "0") {
-              that.headerData[0].dataNum = _res.recCount;
+            that.headerData[0].dataNum = _res.recCount;
             // }
             _data = _res.result.map(e => {
               return {
@@ -301,7 +307,7 @@ export default {
         this.filter.addTimeEnd = endTime;
       }
       this.page = 1;
-      this.getCardPage();
+      this.getCustomerList();
     },
     filterType(type) {
       this.filter.customerClass = type || "";
@@ -354,7 +360,7 @@ export default {
                   showCancel: false
                 });
                 if (res.data.code == 200) {
-                  that.headerData[0].dataNum = 0
+                  that.headerData[0].dataNum = 0;
                   that.cancelOperate();
                   that.page = 1;
                   that.getCustomerList();
@@ -378,8 +384,6 @@ page {
 }
 .public-sea {
   .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
     .mask {
       top: 165px;
     }
@@ -399,7 +403,7 @@ page {
   }
   .staff-coach-item {
     flex: 1;
-    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
   }
 
   .icon-wrapper {

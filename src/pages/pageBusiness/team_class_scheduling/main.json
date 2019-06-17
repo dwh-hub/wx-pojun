@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "团课排期",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "van-popup": "../../../../static/vant/popup/index",
     "van-cell": "../../../../static/vant/cell/index",

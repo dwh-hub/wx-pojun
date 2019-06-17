@@ -156,6 +156,7 @@ export default {
   height: 42px;
   background-color: #fff;
   position: relative;
+  border-top: 1px solid #eee;
   .triangle-icon {
     display: inline-block;
     width: 10px;
@@ -174,14 +175,14 @@ export default {
     line-height: 42px;
     text-align: center;
   }
-  .nav-item {
+  // .nav-item {
     // border-top: 1rpx solid #eee;
     // border-bottom: 1rpx solid #eee;
     // border-right: 1rpx solid #eee;
     // &:nth-last-of-type(1) {
     //   border-right: none;
     // }
-  }
+  // }
   .all-filter {
     // flex: 1;
     // padding: 0 5px;

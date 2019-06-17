@@ -8,7 +8,12 @@
       </p>
       <div class="btn-group">
         <span class="cancel" @click="cancel" v-if="detail.status == 1">取消预约</span>
-        <span class="assess" :style="{'background-color': themeColor}" @click="assess" v-if="(!detail.evaluateId || !detail.teamClassEvaluteId) && detail.status == 3">评价</span>
+        <span
+          class="assess"
+          :style="{'background-color': themeColor}"
+          @click="assess"
+          v-if="(!detail.evaluateId || !detail.teamClassEvaluteId) && detail.status == 3"
+        >评价</span>
         <span class="again" :style="{'background-color': themeColor}" @click="again">再约一节</span>
       </div>
     </div>
@@ -37,11 +42,12 @@ import {
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
 import store from "../../utils/store";
-import pageFooter from "COMPS/pageFooter.vue"
+import pageFooter from "COMPS/pageFooter.vue";
 
 export default {
   data() {
     return {
+      type: "", // 判断是会员端还是商户端
       id: "",
       detail: {},
       storeInfo: {},
@@ -91,6 +97,7 @@ export default {
     }
     if (options.coachAppointId) {
       this.coachAppointId = options.coachAppointId;
+      this.type = options.type || "";
       this.getCoachDetail();
     }
     setNavTab();
@@ -102,7 +109,7 @@ export default {
   },
   methods: {
     assess() {
-      this.detail['image'] = this.storeInfo.cover
+      this.detail["image"] = this.storeInfo.cover;
       let detailStr = JSON.stringify(this.detail);
       if (this.teamAttendId) {
         wx.navigateTo({
@@ -278,6 +285,11 @@ export default {
         });
       }
       if (this.coachAppointId) {
+        if (this.type == "staff") {
+          return wx.redirectTo({
+            url: "../appoint_coach/main?coachId=" + this.detail.coachId
+          });
+        }
         wx.redirectTo({
           url: "../appointmentCoach/main?coachId=" + this.detail.coachId
         });

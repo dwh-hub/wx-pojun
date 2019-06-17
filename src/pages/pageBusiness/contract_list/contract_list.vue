@@ -77,7 +77,7 @@ export default {
       teamScheduleId: "", // options 的 teamScheduleId 参数
       nav: [
         {
-          navTitle: "办理时间",
+          navTitle: "今日",
           children: [
             {
               sonText: "全部",
@@ -185,10 +185,15 @@ export default {
     setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.getCardPage();
+    this.filterDate(1)
   },
   onReachBottom() {
     this.getCardPage();
+  },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
   },
   components: {
     headerSearch,
@@ -414,14 +419,12 @@ page {
 }
 .contract-list {
   .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
     .mask {
       top: 165px;
     }
   }
   .staff-coach-item {
-    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
     .coach-info {
       line-height: 26px;
     }

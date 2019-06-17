@@ -112,6 +112,11 @@ export default {
       this.getMessage(1, this.messageYPage);
     }
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   methods: {
     onChange(e) {
       this.navIndex = e.mp.detail.index;

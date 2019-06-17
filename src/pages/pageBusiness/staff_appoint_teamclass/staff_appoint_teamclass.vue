@@ -223,10 +223,6 @@ page {
   background-color: #f6f6f6;
 }
 .staff_appoint_teamclass {
-  .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
-  }
   .item-wrapper {
     display: flex;
     background-color: #fff;

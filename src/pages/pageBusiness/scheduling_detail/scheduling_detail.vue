@@ -67,6 +67,11 @@ export default {
     }
   },
   mixins: [colorMixin],
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   mounted() {
     setNavTab();
   },

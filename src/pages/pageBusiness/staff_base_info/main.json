@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "个人资料",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "van-cell": "../../../../static/vant/cell/index",
     "van-cell-group": "../../../../static/vant/cell-group/index",

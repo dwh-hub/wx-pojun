@@ -20,6 +20,11 @@ export default {
   mounted() {
     setNavTab();
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   onLoad(options) {
     console.log(options)
     if (options.list) {

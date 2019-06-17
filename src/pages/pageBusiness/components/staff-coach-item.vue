@@ -2,16 +2,20 @@
   <div class="staff-coach-item" @click="clickItem">
     <div v-if="info.id">
       <div class="cover">
-        <!-- <image src="" mode="aspectFill"></image> -->
-        <div class="avatar"></div>
+        <!-- <image class="avatar" :src="info.cover" mode="aspectFill"></image> -->
+        <div class="avatar" :style="{'background-image':'url('+info.cover+')'}"></div>
+        <!-- <img :src="sexSrc" class="sex"> -->
       </div>
       <div class="coach-info">
         <div class="coach-name">
+          <img :src="sexSrc_backup" class="sex" v-if="sexSrc_backup">
           <span class="first-1">{{info.first_tip_1 || ''}}{{info.first_1 || ''}}</span>
           <span class="first-2">{{info.first_tip_2 || ''}}{{info.first_2 || ''}}</span>
         </div>
         <div class="coach-times">
-          <span class="second-1">{{info.second_tip_1 || ''}}{{undefined == info.second_1 ? '' : info.second_1}}</span>
+          <span
+            class="second-1"
+          >{{info.second_tip_1 || ''}}{{undefined == info.second_1 ? '' : info.second_1}}</span>
           <span class="second-2">{{info.second_tip_2 || ''}}{{info.second_2 || ''}}</span>
         </div>
         <div class="coach-desc" v-if="info.third_1">
@@ -19,7 +23,7 @@
           <span class="third-2">{{info.third_tip_2 || ''}}{{info.third_2 || ''}}</span>
         </div>
       </div>
-      <div class="tag" v-if='isTag'>
+      <div class="tag" v-if="isTag">
         <div class="coach-type">上课中</div>
       </div>
       <div class="icon-right" @click.stop="clickIcon">
@@ -59,18 +63,37 @@ export default {
           second_1: "",
           second_2: "",
           third_1: "",
-          third_2: "",
-        }
+          third_2: ""
+        };
       }
     }
   },
-  computed: {},
+  computed: {
+    // sexSrc() {
+    //   if (this.info.sex == "1" || this.info.sex == "男") {
+    //     return "http://pojun-tech.cn/assets/img/man.png";
+    //   }
+    //   if (this.info.sex == "2" || this.info.sex == "女") {
+    //     return "http://pojun-tech.cn/assets/img/women.png";
+    //   }
+    //   return "";
+    // },
+    sexSrc_backup() {
+      if (this.info.sex == "1" || this.info.sex == "男") {
+        return "/static/images/staff/man.png";
+      }
+      if (this.info.sex == "2" || this.info.sex == "女") {
+        return "/static/images/staff/women.png";
+      }
+      return "";
+    }
+  },
   methods: {
     clickIcon() {
-      this.$emit("clickIcon")
+      this.$emit("clickIcon");
     },
     clickItem() {
-      this.$emit("clickItem")
+      this.$emit("clickItem");
     }
   }
 };
@@ -87,6 +110,7 @@ export default {
     padding-right: 10px;
   }
   .cover {
+    position: relative;
     flex: 0 0 60px;
     width: 60px;
     height: 60px;
@@ -100,6 +124,13 @@ export default {
       background-repeat: no-repeat;
       background-position: 50% 50%;
     }
+    // .sex {
+    //   position: absolute;
+    //   bottom: 0;
+    //   right: 0;
+    //   width: 12px;
+    //   height: 12px;
+    // }
   }
   .coach-info {
     flex: 1;
@@ -114,6 +145,15 @@ export default {
     }
     .coach-name {
       font-size: 14px;
+      >span {
+        vertical-align: middle;
+      }
+      .sex {
+        vertical-align: middle;
+        margin-right: 3px;
+        width: 15px;
+        height: 15px;
+      }
     }
     .coach-times,
     .coach-desc {

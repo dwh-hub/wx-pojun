@@ -914,8 +914,7 @@ export default {
           if (res.data.code == 200) {
             wx.redirectTo({
               url:
-                "../appoint_result/main?coachAppointId=" +
-                res.data.data.coachAppointId
+                `../../appointmentResult/main?coachAppointId=${res.data.data.coachAppointId}&type=staff`
             });
             // wx.showModal({
             //   title: "提示",

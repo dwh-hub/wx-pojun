@@ -32,7 +32,6 @@ export default {
 
 <style lang="less">
 .header-data {
-  margin-top: 5px;
   display: flex;
   background-color: #fff;
   .data-item {

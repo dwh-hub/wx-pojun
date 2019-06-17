@@ -34,6 +34,11 @@ export default {
       this.type  = options.type || ''
     }
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   mounted() {
     setNavTab();
     this.getCoachClassDetail()

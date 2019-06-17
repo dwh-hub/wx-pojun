@@ -185,6 +185,11 @@ export default {
   onReachBottom() {
     this.getClassList();
   },
+  onPullDownRefresh() {
+    setTimeout(() => {
+      wx.stopPullDownRefresh();
+    }, 2000);
+  },
   methods: {
     selectStore(item) {
       this.selectedStore = item;
@@ -277,8 +282,6 @@ page {
 }
 .satff_team_class {
   .filter-nav {
-    margin-top: 5px;
-    margin-bottom: 1px;
     .mask {
       top: 165px;
     }
@@ -286,14 +289,14 @@ page {
   .team-class-item {
     padding: 10px 0;
     padding-left: 10px;
-    border-bottom: 1px solid #eee;
+    border-top: 1px solid #eee;
     background-color: #fff;
   }
   .team-class-item-y {
     box-shadow: none;
   }
   .staff-coach-item {
-    border-bottom: 1rpx solid #eee;
+    border-top: 1rpx solid #eee;
     .icon-right {
       line-height: 60px;
     }

@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "我的",
+  "enablePullDownRefresh": false,
   "usingComponents": {
     "van-tabbar": "../../../../static/vant/tabbar/index",
     "van-tabbar-item": "../../../../static/vant/tabbar-item/index",

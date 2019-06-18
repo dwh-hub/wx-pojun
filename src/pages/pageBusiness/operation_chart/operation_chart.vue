@@ -448,6 +448,23 @@ export default {
           };
         });
       }
+      data.sort(function(a, b) {
+        return b.cost - a.cost;
+      });
+      if (data.length > 5) {
+        let otherList = data.slice(4);
+        let otherObj = {
+          name: "其他",
+          percent: 0,
+          cost: 0
+        };
+        otherList.forEach((e, i) => {
+          otherObj.percent += e.percent;
+          otherObj.cost += e.cost;
+        });
+        data = data.slice(0, 4);
+        data.push(otherObj);
+      }
       let map = {};
       data.map(function(obj) {
         map[obj.name] = obj.cost + unit + " " + obj.percent + "%";

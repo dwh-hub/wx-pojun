@@ -24,7 +24,7 @@
     ></van-popup>
 
     <div class="customer-list">
-      <div class="customer-item" v-for="(item,index) in customerList" :key="index">
+      <div class="customer-item" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">
             <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
@@ -38,8 +38,8 @@
         </staff-coach-item>
       </div>
       <van-loading :color="themeColor" v-if="isLoading"/>
-      <none-result text="暂无客户" v-if="!customerList.length && !isLoading"></none-result>
-      <div class="no-more" v-if="isNoMore && customerList.length">暂无更多</div>
+      <none-result text="暂无客户" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
 
     <div class="operate-bottom" v-if="isOperate">
@@ -71,7 +71,8 @@
           @click="selectRole(item)"
         >
           <div class="avatar">
-            <img :src="window.api + item.headImgPath" alt>
+            <!-- <img :src="item.headImgPath" alt> -->
+            <image :src="item.headImgPath" mode="aspectFill"></image>
           </div>
           <div class="name">{{item.userName}}</div>
           <div class="phone"></div>
@@ -97,8 +98,9 @@ import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
+import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
-import regeneratorRuntime from "../../../libs/regenerator-runtime/runtime.js";
+import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 
 export default {
   data() {
@@ -112,32 +114,32 @@ export default {
             {
               sonText: "全部",
               action: () => {
-                this.getDate(0);
+                this.filterDate(0);
               }
             },
             {
               sonText: "今日",
               action: () => {
-                this.getDate(1);
+                this.filterDate(1);
               }
             },
             {
               sonText: "本周",
               action: () => {
-                this.getDate(7);
+                this.filterDate(7);
               }
             },
             {
               sonText: "本月",
               action: () => {
-                this.getDate(30);
+                this.filterDate(30);
               }
             }
             // {
             //   sonText: "自定义",
             //   isDiyDate: true,
             //   action: (date) => {
-            //     this.getDate(date);
+            //     this.filterDate(date);
             //   }
             // }
           ]
@@ -207,10 +209,10 @@ export default {
         }
       ],
       operateList: [
-        {
-          text: "分配销售",
-          iconUrl: "/static/images/staff/close.svg"
-        },
+        // {
+        //   text: "分配销售",
+        //   iconUrl: "/static/images/staff/close.svg"
+        // },
         {
           text: "分配教练",
           iconUrl: "/static/images/staff/calendar.svg"
@@ -224,13 +226,9 @@ export default {
         //   iconUrl: "/static/images/staff/calendar.svg"
         // }
       ],
-      customerList: [{}, {}, {}, {}],
-      isLoading: true,
-      isNoMore: false,
       isOperate: false,
       isAllSelect: false,
       showSalesPopup: false,
-      page: 1,
       storeList: [],
       // coachList: [],
       // saleList: [],
@@ -247,18 +245,16 @@ export default {
     };
   },
   mounted() {
-    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.getCustomerList();
+    this.getList();
   },
   onHide() {
-    this.clearFilter();
+    // this.clearFilter();
   },
   onUnload() {
-    Object.assign(this.$data, this.$options.data());
   },
-  mixins: [colorMixin],
+  mixins: [colorMixin,listPageMixin],
   components: {
     headerData,
     filterNav,
@@ -273,7 +269,7 @@ export default {
     },
     selectNum() {
       let _num = 0;
-      this.customerList.forEach(e => {
+      this.list.forEach(e => {
         if (e.isSelect) {
           _num++;
         }
@@ -281,20 +277,9 @@ export default {
       return _num;
     }
   },
-  onReachBottom() {
-    this.getCustomerList();
-  },
   onPullDownRefresh() {
-    this.customerList = [{}, {}, {}, {}];
-    this.page = 1;
-    this.isLoading = false;
-    this.isNoMore = false;
     this.isOperate = false;
     this.showSalesPopup = false;
-    this.getCustomerList();
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 1000);
   },
   methods: {
     clearFilter() {
@@ -304,42 +289,29 @@ export default {
     },
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.isNoMore = false;
-      this.getCustomerList();
+      this.refreshList()
     },
-    getCustomerList() {
-      if (this.isNoMore) {
-        return;
-      }
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          page: that.page,
-          searchStore: that.selectedStore.storeId
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + "/customer/list/search",
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
+      return new Promise(function(resolve) {
+        var _data = Object.assign(
+          {},
+          {
+            page: that.page,
+            searchStore: that.selectedStore.storeId
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: "/customer/list/search",
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              return that.list = [];
+            }
             let _res = res.data.data;
             let _data;
-            if (!_res.result.length) {
-              // if (that.page == 1) {
-              //   that.customerList = [];
-              // }
-              that.isNoMore = true;
-            }
-            that.page++;
-            // if (that.headerData[0].dataNum == "0") {
             that.headerData[0].dataNum = _res.recCount;
-            // }
             _data = _res.result.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {
@@ -347,7 +319,7 @@ export default {
                     e.headImgPath = res;
                   });
                 } else {
-                  e.headImgPath = window.api + e.headImgPath
+                  e.headImgPath = window.api + e.headImgPath;
                 }
               }
               return {
@@ -368,25 +340,8 @@ export default {
               };
             });
             Promise.all(_data).then(result => {
-              _data = result;
-              if (that.page == 2 || that.page == 1) {
-                that.customerList = _data;
-              } else {
-                that.customerList = that.customerList.concat(_data);
-              }
+              resolve(result);
             });
-          } else {
-            that.customerList = [];
-          }
-        }
-      });
-    },
-    getAvatar(url) {
-      return new Promise(function(resolve, reject) {
-        wx.request({
-          url: window.api + url,
-          success(res) {
-            resolve(res.data);
           }
         });
       });
@@ -402,6 +357,9 @@ export default {
             positionType: type
           },
           success(res) {
+            res.data.data.forEach((e) => {
+              e.headImgPath = e.headImgPath ? window.api + e.headImgPath : 'https://pojun-tech.cn/assets/img/morenTo.png'
+            })
             resolve(res);
           }
         });
@@ -410,7 +368,8 @@ export default {
     // 分配教练
     allotCoach() {
       let _customerIdStr = "";
-      this.customerList.forEach(e => {
+      console.log(this.list)
+      this.list.forEach(e => {
         if (e.isSelect) {
           _customerIdStr = _customerIdStr + e.id + ",";
         }
@@ -434,7 +393,7 @@ export default {
     // 分配销售
     allotSale() {
       let _customerIdStr = "";
-      this.customerList.forEach(e => {
+      this.list.forEach(e => {
         if (e.isSelect) {
           _customerIdStr = _customerIdStr + e.id + ",";
         }
@@ -472,9 +431,6 @@ export default {
     },
     searchChange(event) {
       this.filter.namePhone = event;
-      this.page = 1;
-      this.isNoMore = false;
-      this.getCustomerList();
     },
     // 通过回传的iconText来获取对应的列表
     getOperate(param) {
@@ -547,8 +503,8 @@ export default {
       if (!this.isOperate) {
         return;
       }
-      this.customerList[index].isSelect = !item.isSelect;
-      if (this.customerList.filter(e => true !== e.isSelect).length > 0) {
+      this.list[index].isSelect = !item.isSelect;
+      if (this.list.filter(e => true !== e.isSelect).length > 0) {
         this.isAllSelect = false;
       } else {
         this.isAllSelect = true;
@@ -558,13 +514,13 @@ export default {
       let that = this;
       if (that.isAllSelect) {
         that.isAllSelect = false;
-        this.customerList = this.customerList.map(e => {
+        this.list = this.list.map(e => {
           e.isSelect = false;
           return e;
         });
       } else {
         that.isAllSelect = true;
-        this.customerList = this.customerList.map(e => {
+        this.list = this.list.map(e => {
           e.isSelect = true;
           return e;
         });
@@ -584,34 +540,19 @@ export default {
       this.isOperate = false;
       this.isAllSelect = false;
       this.showSalesPopup = false;
-      this.customerList = this.customerList.map(e => {
+      this.list = this.list.map(e => {
         e.isSelect = false;
         return e;
       });
     },
-    getDate(day) {
-      if (!day || day == 0) {
-        this.filter.addTimeStart = "";
-        this.filter.addTimeEnd = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        let startTime =
-          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        this.filter.addTimeStart = startTime;
-        this.filter.addTimeEnd = endTime;
-      }
-      this.page = 1;
-      this.isNoMore = false;
-      this.getCustomerList();
-    },
     // 会员状态 1 潜在 3 现有 4 订金 5失效
     toggleState(state) {
       this.filter.customerClass = state || "";
-      this.page = 1;
-      this.isNoMore = false;
-      this.getCustomerList();
+    },
+    filterDate(day) {
+      let obj = this.filterDateMethod(day);
+      this.filter.addTimeStart = obj.statrTime;
+      this.filter.addTimeEnd = obj.endTime;
     }
   }
 };
@@ -725,10 +666,11 @@ page {
         width: 50px;
         height: 50px;
         padding: 7px 10px;
-        > img {
+        > image {
           width: 100%;
           height: 100%;
           border-radius: 50%;
+          background-color: #eee;
         }
       }
       .name {

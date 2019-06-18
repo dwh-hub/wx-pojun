@@ -1,18 +1,20 @@
 <template>
   <div class="customer">
-    <div class="tabs" :style="{background: themeColor}">
-      <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
-      <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
-      <!-- @click="tabIndex = 2" -->
+    <div class="list-header">
+      <div class="tabs" :style="{background: themeColor}">
+        <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
+        <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
+        <!-- @click="tabIndex = 2" -->
+      </div>
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
     </div>
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
 
     <van-popup
       :show="isShowFilter"
@@ -22,7 +24,7 @@
     ></van-popup>
 
     <div class="customer-list">
-      <div class="customer-item" v-for="(item,index) in customerList" :key="index">
+      <div class="customer-item" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">
             <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
@@ -36,7 +38,8 @@
         </staff-coach-item>
       </div>
       <van-loading :color="themeColor" v-if="isLoading"/>
-      <none-result text="暂无学员" v-if="!customerList.length && !isLoading"></none-result>
+      <none-result text="暂无学员" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
 
     <div class="operate-bottom" v-if="isOperate">
@@ -58,7 +61,7 @@
       @close="showSalesPopup = false"
       :duration="200"
       position="bottom"
-      custom-style="width:100%"
+      custom-style="width:100%;max-height:50vh;"
     >
       <div class="sales-list">
         <div
@@ -93,8 +96,10 @@ import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import suspensionWindow from "../components/suspension-window.vue";
+import listPageMixin from "../components/list-page-mixin.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 
 export default {
   data() {
@@ -108,25 +113,25 @@ export default {
             {
               sonText: "全部",
               action: () => {
-                this.getDate(0);
+                this.filterDate(0);
               }
             },
             {
               sonText: "今日",
               action: () => {
-                this.getDate(1);
+                this.filterDate(1);
               }
             },
             {
               sonText: "本周",
               action: () => {
-                this.getDate(7);
+                this.filterDate(7);
               }
             },
             {
               sonText: "本月",
               action: () => {
-                this.getDate(30);
+                this.filterDate(30);
               }
             }
           ]
@@ -193,11 +198,11 @@ export default {
         {
           text: "分配销售",
           iconUrl: "/static/images/staff/close.svg"
-        },
-        {
-          text: "分配教练",
-          iconUrl: "/static/images/staff/calendar.svg"
         }
+        // {
+        //   text: "分配教练",
+        //   iconUrl: "/static/images/staff/calendar.svg"
+        // }
         // {
         //   text: "发送手机短信",
         //   iconUrl: "/static/images/staff/calendar.svg"
@@ -207,12 +212,12 @@ export default {
         //   iconUrl: "/static/images/staff/calendar.svg"
         // }
       ],
-      customerList: [{}, {}, {}, {}],
-      isLoading: true,
+      // list: [{}, {}, {}, {}],
+      // isLoading: true,
       isOperate: false,
       isAllSelect: false,
       showSalesPopup: false,
-      page: 1,
+      // page: 1,
       storeList: [],
       // coachList: [],
       // saleList: [],
@@ -229,12 +234,11 @@ export default {
     };
   },
   mounted() {
-    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.getCustomerList();
+    this.getList();
   },
-  mixins: [colorMixin],
+  mixins: [colorMixin, listPageMixin],
   components: {
     headerData,
     filterNav,
@@ -249,21 +253,13 @@ export default {
     },
     selectNum() {
       let _num = 0;
-      this.customerList.forEach(e => {
+      this.list.forEach(e => {
         if (e.isSelect) {
           _num++;
         }
       });
       return _num;
     }
-  },
-  onReachBottom() {
-    this.getCustomerList();
-  },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
   },
   methods: {
     appoint(item) {
@@ -278,60 +274,57 @@ export default {
     },
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.getCustomerList();
+      this.refreshList();
     },
-    getCustomerList() {
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          pageNo: that.page,
-          storeId: that.selectedStore.storeId
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + "/mobile/coach/resourcepool/pages",
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
+      return new Promise(function(resolve) {
+        var _data = Object.assign(
+          {},
+          {
+            pageNo: that.page,
+            storeId: that.selectedStore.storeId
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: window.api + "/mobile/coach/resourcepool/pages",
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              that.list = [];
+            }
             let _res = res.data.data;
             let _data;
-            if (!_res.result.length) {
-              if (that.page == 1) {
-                return (that.customerList = []);
-              } else {
-                return;
+            that.headerData[0].dataNum = _res.recCount;
+            _data = _res.result.map(async e => {
+              if (e.headImgPath) {
+                if (e.headImgPath.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.headImgPath).then(res => {
+                    e.headImgPath = res;
+                  });
+                } else {
+                  e.headImgPath = window.api + e.headImgPath;
+                }
               }
-            }
-            that.page++;
-            // if (that.headerData[0].dataNum == "0") {
-              that.headerData[0].dataNum = _res.recCount;
-            // }
-            _data = _res.result.map(e => {
               return {
                 isSelect: false,
                 id: e.customerId,
-                cover: window.api + e.headImgPath,
+                cover: e.headImgPath
+                  ? e.headImgPath
+                  : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.name,
                 second_1: e.serviceCoachName,
                 second_tip_1: "服务教练：",
-                third_1: e.lastTrackTime || '暂无',
+                third_1: e.lastTrackTime || "暂无",
                 third_tip_1: "最后签到时间："
               };
             });
-            if (that.page == 2 || that.page == 1) {
-              that.customerList = _data;
-            } else {
-              that.customerList = that.customerList.concat(_data);
-            }
-          } else {
-            that.customerList = [];
+            Promise.all(_data).then(result => {
+              resolve(result);
+            });
           }
-        }
+        });
       });
     },
     // 获取教练/销售列表 type 1 教练 0 销售
@@ -353,7 +346,7 @@ export default {
     // 分配销售
     allotCoach() {
       let _customerIdStr = "";
-      this.customerList.forEach(e => {
+      this.list.forEach(e => {
         if (e.isSelect) {
           _customerIdStr = _customerIdStr + e.id + ",";
         }
@@ -377,7 +370,7 @@ export default {
     // 分配销售
     allotSale() {
       let _customerIdStr = "";
-      this.customerList.forEach(e => {
+      this.list.forEach(e => {
         if (e.isSelect) {
           _customerIdStr = _customerIdStr + e.id + ",";
         }
@@ -415,8 +408,7 @@ export default {
     },
     searchChange(event) {
       this.filter.nameOrPhone = event;
-      this.page = 1;
-      this.getCustomerList();
+      this.refreshList();
     },
     // 通过回传的iconText来获取对应的列表
     getOperate(param) {
@@ -484,8 +476,8 @@ export default {
       if (!this.isOperate) {
         return;
       }
-      this.customerList[index].isSelect = !item.isSelect;
-      if (this.customerList.filter(e => true !== e.isSelect).length > 0) {
+      this.list[index].isSelect = !item.isSelect;
+      if (this.list.filter(e => true !== e.isSelect).length > 0) {
         this.isAllSelect = false;
       } else {
         this.isAllSelect = true;
@@ -495,13 +487,13 @@ export default {
       let that = this;
       if (that.isAllSelect) {
         that.isAllSelect = false;
-        this.customerList = this.customerList.map(e => {
+        this.list = this.list.map(e => {
           e.isSelect = false;
           return e;
         });
       } else {
         that.isAllSelect = true;
-        this.customerList = this.customerList.map(e => {
+        this.list = this.list.map(e => {
           e.isSelect = true;
           return e;
         });
@@ -521,31 +513,19 @@ export default {
       this.isOperate = false;
       this.isAllSelect = false;
       this.showSalesPopup = false;
-      this.customerList = this.customerList.map(e => {
+      this.list = this.list.map(e => {
         e.isSelect = false;
         return e;
       });
     },
-    getDate(day) {
-      if (!day || day == 0) {
-        this.filter.addTimeStart = "";
-        this.filter.addTimeEnd = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + ' 23:59:59';
-        let startTime = formatDate(new Date(stamp - DAY * day),"yyyy-MM-dd") + ' 23:59:59';
-        this.filter.addTimeStart = startTime;
-        this.filter.addTimeEnd = endTime;
-      }
-      this.page = 1;
-      this.getCustomerList();
-    },
     // 学员状态 1未办理，2已办理，3已失效
     toggleState(state) {
       this.filter.trainerStatus = state || "";
-      this.page = 1;
-      this.getCustomerList();
+    },
+    filterDate(day) {
+      let obj = this.filterDateMethod(day);
+      this.filter.addTimeStart = obj.statrTime;
+      this.filter.addTimeEnd = obj.endTime;
     }
   }
 };
@@ -672,6 +652,7 @@ page {
           width: 100%;
           height: 100%;
           border-radius: 50%;
+          background-color: #eee;
         }
       }
       .name {

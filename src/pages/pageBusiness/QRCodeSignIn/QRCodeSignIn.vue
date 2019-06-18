@@ -36,7 +36,7 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import QR from "@/libs/weapp-qrcode.js";
-import GoEasy from "@/libs/goeasy-wx.0.0.1.min";
+import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 export default {
   data() {
     return {

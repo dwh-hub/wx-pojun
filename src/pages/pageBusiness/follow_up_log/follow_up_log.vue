@@ -1,16 +1,18 @@
 <template>
   <div class="follow_up_log">
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav :nav="nav"></filter-nav>
+    <div class="list-header">
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav :nav="nav"></filter-nav>
+    </div>
     <div class="card-list">
       <staff-coach-item
-        v-for="(item, index) in followUpList"
+        v-for="(item, index) in list"
         :key="index"
         :info="item"
         @clickItem="toCardDetail(item)"
@@ -22,7 +24,8 @@
         </div>
       </staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading"/>
-      <none-result text="暂无合同" v-if="!followUpList.length && !isLoading"></none-result>
+      <none-result text="暂无合同" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
   </div>
 </template>
@@ -40,7 +43,9 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
+import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 export default {
   data() {
     return {
@@ -97,11 +102,8 @@ export default {
           dataNum: "0"
         }
       ],
-      isLoading: true,
-      followUpList: [{}, {}, {}, {}],
       selectedStore: {},
       storeList: [],
-      page: 1,
       filter: {
         nameOrPhone: "",
         searchTrackTimeEnd: "",
@@ -117,7 +119,7 @@ export default {
     staffCoachItem,
     noneResult
   },
-  mixins: [colorMixin],
+  mixins: [colorMixin, listPageMixin],
   onLoad(options) {
     if (options.trackUserType) {
       this.trackUserType = options.trackUserType;
@@ -126,26 +128,17 @@ export default {
   onUnload() {
     this.clearData();
   },
-  onReachBottom() {
-    this.getLogPages();
-  },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
-  },
   mounted() {
     let _title = this.trackUserType == 1 ? "销售跟进日志" : "教练跟进日志";
     setNavTab(_title);
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    // this.getLogPages();
     this.filterDate(1);
   },
   methods: {
     clearData() {
       this.page = 1;
-      this.followUpList = [{}, {}, {}, {}];
+      // this.list = [{}, {}, {}, {}];
       this.isLoading = true;
       this.headerData[0].dataNum = 0;
       for (let key in this.filter) {
@@ -154,13 +147,9 @@ export default {
     },
     searchChange(event) {
       this.filter.nameOrPhone = event;
-      this.page = 1;
-      this.getLogPages();
     },
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.getLogPages();
     },
     toCardDetail(item) {
       wx.navigateTo({
@@ -172,74 +161,65 @@ export default {
         phoneNumber: item.phone
       });
     },
-    getLogPages() {
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      let _url = "";
-      if (this.trackUserType == 1) {
-        _url = "/user/work/trackrecoredpages";
-      } else if (this.trackUserType == 2) {
-        _url = "/customer/track/pages";
-      }
-      var _data = Object.assign(
-        {},
-        {
-          page: that.page,
-          order: 1, // 1 id排序 2下次跟进排序
-          TrackUserType: that.trackUserType,
-          storeId: that.selectedStore.storeId
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + _url,
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
-            if (!res.data.data.result.length && that.page == 1) {
-              that.headerData[0].dataNum = 0;
-              that.followUpList = [];
-              return;
+      return new Promise(function(resolve) {
+        let _url = "";
+        if (that.trackUserType == 1) {
+          _url = "/user/work/trackrecoredpages";
+        } else if (that.trackUserType == 2) {
+          _url = "/customer/track/pages";
+        }
+        var _data = Object.assign(
+          {},
+          {
+            page: that.page,
+            order: 1, // 1 id排序 2下次跟进排序
+            TrackUserType: that.trackUserType,
+            storeId: that.selectedStore.storeId
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: _url,
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              return (that.list = []);
             }
-            that.page++;
-            // if (that.headerData[0].dataNum == "0") {
             that.headerData[0].dataNum = res.data.data.recCount;
-            // }
-            let _data = res.data.data.result.map(e => {
+            let _data = res.data.data.result.map(async e => {
+              if (e.headImgPath) {
+                if (e.headImgPath.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.headImgPath).then(res => {
+                    e.headImgPath = res;
+                  });
+                } else {
+                  e.headImgPath = window.api + e.headImgPath;
+                }
+              }
               return {
                 id: e.customerId,
-                cover: window.api + e.headImgPath,
+                cover: e.headImgPath
+                  ? e.headImgPath
+                  : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.customerName,
                 second_1: e.content,
                 second_tip_1: e.content ? "跟进内容：" : "--",
                 phone: e.phone
               };
             });
-            if (that.page == 2 || that.page == 1) {
-              that.followUpList = _data;
-            } else {
-              that.followUpList = that.followUpList.concat(_data);
-            }
+            Promise.all(_data).then(result => {
+              resolve(result);
+            });
           }
-        }
+        });
       });
     },
     filterDate(day) {
-      if (!day || day == 0) {
-        this.filter.searchTrackTimeEnd = "";
-        this.filter.searchTrackTimeEnd = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        let startTime =
-          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        this.filter.searchTrackTimeStart = startTime;
-        this.filter.searchTrackTimeEnd = endTime;
-      }
-      this.page = 1;
-      this.getLogPages();
+      let obj = this.filterDateMethod(day);
+      this.filter.searchTrackTimeStart = obj.statrTime;
+      this.filter.searchTrackTimeEnd = obj.endTime;
     }
   }
 };

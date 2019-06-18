@@ -1,24 +1,27 @@
 <template>
   <div class="satff_team_class">
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav :nav="nav"></filter-nav>
+    <div class="list-header">
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav :nav="nav"></filter-nav>
+    </div>
     <div class="class-list">
       <team-class-item
         :info="item"
         :isToDetail="false"
-        v-for="(item, index) in classList"
+        v-for="(item, index) in list"
         @clickClass="selectClass(item)"
         :key="index"
       ></team-class-item>
     </div>
     <van-loading :color="themeColor" v-if="isLoading"/>
-    <none-result text="暂无课程" v-if="!classList.length && !isLoading"></none-result>
+    <none-result text="暂无课程" v-if="!list.length && !isLoading"></none-result>
+    <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
 
     <van-popup
       :show="showOperatePopup"
@@ -52,10 +55,9 @@ import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
-// import staffCoachItem from "../components/staff-coach-item.vue";
-// import suspensionWindow from "../components/suspension-window.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import colorMixin from "COMPS/colorMixin.vue";
+import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
 export default {
   data() {
@@ -145,120 +147,84 @@ export default {
         {
           text: "单日排期",
           action: () => {
-            this.toScheduling('single');
+            this.toScheduling("single");
           }
         },
         {
           text: "批量排期",
           action: () => {
-            this.toScheduling('batch');
+            this.toScheduling("batch");
           }
         }
       ],
       selectedStore: {},
       selectedClass: {},
       showOperatePopup: false,
-      isLoading: true,
       isOperate: false,
-      classList: [{}, {}, {}, {}],
-      page: 1,
-      filter: {}
+      filter: {
+        namePhone: "",
+        calendarStart: "",
+        calendarEnd: ""
+      }
     };
   },
   mounted() {
-    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    // this.getClassList();
     this.filterDate(1);
   },
-  mixins: [colorMixin],
+  mixins: [colorMixin, listPageMixin],
   components: {
     headerData,
     filterNav,
-    // staffCoachItem,
     teamClassItem,
     headerSearch,
     noneResult
-    // suspensionWindow
-  },
-  onReachBottom() {
-    this.getClassList();
-  },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
+    // suspensionWindo
   },
   methods: {
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.getClassList();
+      this.refreshList();
     },
-    getClassList() {
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          pageNo: that.page,
-          page: that.page
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + "/teamClass/teamSchedule/pages",
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
+      return new Promise(function(resolve) {
+        var _data = Object.assign(
+          {},
+          {
+            pageNo: that.page,
+            page: that.page
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: window.api + "/teamClass/teamSchedule/pages",
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              return (that.list = []);
+            }
             let _res = res.data.data;
             let _data;
-            if (!_res.result.length && that.page == 1) {
-              return (that.classList = []);
-            }
-            that.page++;
-            // if (that.headerData[0].dataNum == "0") {
-              that.headerData[0].dataNum = _res.recCount;
-            // }
-            _data = res.data.data.result.map(e => {
-              // TODO:
-              // if (!e.masterImg) {
-              e.masterImg = "/assets/img/morenImg.png";
-              // }
-              return e;
+            that.headerData[0].dataNum = _res.recCount;
+            res.data.data.result.forEach(e => {
+              if (!e.masterImg) {
+                e.masterImg = "/assets/img/morenImg.png";
+              }
             });
-            if (that.page == 2 || that.page == 1) {
-              that.classList = _data;
-            } else {
-              that.classList = that.classList.concat(_data);
-            }
-          } else {
-            that.classList = [];
+            resolve(res.data.data.result);
           }
-        }
+        });
       });
     },
     searchChange(event) {
       this.filter.namePhone = event;
-      this.page = 1;
     },
     filterDate(day) {
-      if (!day || day == 0) {
-        this.filter.calendarEnd = "";
-        this.filter.calendarStart = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        let startTime =
-          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        this.filter.calendarStart = startTime;
-        this.filter.calendarEnd = endTime;
-      }
-      this.page = 1;
-      this.getClassList();
+      let obj = this.filterDateMethod(day);
+      this.filter.calendarStart = obj.statrTime;
+      this.filter.calendarEnd = obj.endTime;
     },
     selectClass(item) {
       this.showOperatePopup = true;
@@ -267,8 +233,9 @@ export default {
     toScheduling(type) {
       this.showOperatePopup = false;
       wx.navigateTo({
-        url:
-          `../team_class_scheduling/main?teamTempStoreId=${this.selectedClass.teamTempStoreId}&storeId=${this.selectedClass.storeId}&type=${type}`
+        url: `../team_class_scheduling/main?teamTempStoreId=${
+          this.selectedClass.teamTempStoreId
+        }&storeId=${this.selectedClass.storeId}&type=${type}`
       });
     }
   }

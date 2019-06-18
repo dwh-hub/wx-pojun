@@ -1,6 +1,3 @@
 {
-    "navigationBarTitleText": "团课列表",
-    "usingComponents": {
-      "van-transition": "../../../static/vant/transition/index"
-    }
+    "navigationBarTitleText": "团课列表"
   }

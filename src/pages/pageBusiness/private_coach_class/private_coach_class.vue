@@ -1,23 +1,26 @@
 <template>
   <div class="private_coach_class">
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
+    <div class="list-header">
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
+    </div>
     <div class="class-list">
       <staff-coach-item
         :info="item"
-        v-for="(item, index) in classList"
+        v-for="(item, index) in list"
         @clickItem="selectClass(item)"
         :key="index"
       ></staff-coach-item>
     </div>
     <van-loading :color="themeColor" v-if="isLoading"/>
-    <none-result text="暂无课程" v-if="!classList.length && !isLoading"></none-result>
+    <none-result text="暂无课程" v-if="!list.length && !isLoading"></none-result>
+    <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
 
     <van-popup
       :show="showOperate"
@@ -50,8 +53,11 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
+import listPageMinxi from "../components/list-page-mixin.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
+
 export default {
   data() {
     return {
@@ -136,9 +142,6 @@ export default {
       storeList: [],
       coachList: [],
       selectedStore: {},
-      isLoading: true,
-      classList: [{}, {}, {}, {}],
-      page: 1,
       actionList: [],
       showOperate: false,
       actionList_1: [
@@ -182,6 +185,7 @@ export default {
         }
       ],
       filter: {
+        coachId: "",
         calendarEnd: "",
         calendarStart: "",
         status: "" // 3 完成课程
@@ -190,17 +194,22 @@ export default {
     };
   },
   mounted() {
-    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    // this.getClassList();
+    // this.getList();
     this.filterDate(1);
     this.getCoachList();
+  },
+  watch: {
+    filter: {
+      handler() {},
+      deep: true
+    }
   },
   onUnload() {
     Object.assign(this.$data, this.$options.data());
   },
-  mixins: [colorMixin],
+  mixins: [colorMixin, listPageMinxi],
   components: {
     headerData,
     filterNav,
@@ -208,24 +217,13 @@ export default {
     headerSearch,
     noneResult
   },
-  onReachBottom() {
-    this.getClassList();
-  },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
-  },
   methods: {
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.getClassList();
+      this.refreshList();
     },
     searchChange(event) {
       this.filter.namePhone = event;
-      this.page = 1;
-      this.getClassList();
     },
     toDetail() {
       wx.navigateTo({
@@ -235,41 +233,45 @@ export default {
       });
       this.showOperate = false;
     },
-    getClassList() {
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          page: that.page,
-          pageNo: that.page,
-          searchStore: that.selectedStore.storeId
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + "/coach/private/appoint/pages",
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
+      return new Promise(function(resolve) {
+        var _data = Object.assign(
+          {},
+          {
+            page: that.page,
+            pageNo: that.page,
+            searchStore: that.selectedStore.storeId
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: window.api + "/coach/private/appoint/pages",
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              return (that.list = []);
+            }
             let _res = res.data.data;
             let _data;
-            if (!_res.result.length && that.page == 1) {
-              return (that.classList = []);
-            }
-            that.page++;
-            // if (that.headerData[0].dataNum == "0") {
             that.headerData[0].dataNum = _res.recCount;
-            // }
-            _data = _res.result.map(e => {
+            _data = _res.result.map(async e => {
+              if (e.coachHeadImg) {
+                if (e.coachHeadImg.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.coachHeadImg).then(res => {
+                    e.coachHeadImg = res;
+                  });
+                } else {
+                  e.coachHeadImg = window.api + e.coachHeadImg;
+                }
+              }
               return {
                 id: e.customerId,
                 coachAppointId: e.coachAppointId,
                 coachId: e.coachId,
                 coachName: e.coachName,
                 studentName: e.name,
-                cover: window.api + e.headImgPath,
+                cover: window.api + e.coachHeadImg,
                 status: e.status,
                 color: that.transformColor(e.status),
                 first_1: e.name,
@@ -278,15 +280,11 @@ export default {
                 rightText: e.statusChar || ""
               };
             });
-            if (that.page == 2 || that.page == 1) {
-              that.classList = _data;
-            } else {
-              that.classList = that.classList.concat(_data);
-            }
-          } else {
-            that.classList = [];
+            Promise.all(_data).then(result => {
+              resolve(result);
+            });
           }
-        }
+        });
       });
     },
     getCoachList() {
@@ -385,7 +383,7 @@ export default {
                   });
                 }
                 that.page = 1;
-                that.getClassList();
+                that.getList();
                 that.showOperate = false;
               }
             });
@@ -427,7 +425,7 @@ export default {
                   });
                 }
                 that.page = 1;
-                that.getClassList();
+                that.getList();
                 that.showOperate = false;
               }
             });
@@ -494,30 +492,15 @@ export default {
       });
     },
     filterDate(day) {
-      if (!day || day == 0) {
-        this.filter.calendarEnd = "";
-        this.filter.calendarStart = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        let startTime =
-          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        this.filter.calendarStart = startTime;
-        this.filter.calendarEnd = endTime;
-      }
-      this.page = 1;
-      this.getClassList();
+      let obj = this.filterDateMethod(day);
+      this.filter.calendarStart = obj.statrTime;
+      this.filter.calendarEnd = obj.endTime;
     },
     filterStatus(status) {
       this.filter.status = status || "";
-      this.page = 1;
-      this.getClassList();
     },
     filterCoach(id) {
       this.filter.coachId = id || "";
-      this.page = 1;
-      this.getClassList();
     },
     checkAttendStatus() {
       let that = this;

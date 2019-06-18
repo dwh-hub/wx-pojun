@@ -34,6 +34,7 @@
         <div class="services-icon icon-text">{{item.text}}</div>
       </div>
     </div>
+    <div class="welcome-tip">欢迎您，{{name}}<open-data type="userNickName" v-if="!name"></open-data>!</div>
     <van-tabbar active="5" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
       <van-tabbar-item icon="question-o">帮助</van-tabbar-item>
@@ -53,46 +54,25 @@ import { setNavTab, window, formatDate, HttpRequest } from "COMMON/js/common.js"
 import colorMixin from "COMPS/colorMixin.vue"
 import {getUseServiceList} from "../common/js/service_config.js"
 import F2 from "../../../../static/f2-canvas/lib/f2";
-// import echarts from "echarts";
-// import mpvueEcharts from "mpvue-echarts";
-
-// let chart = null;
-
-// function initChart(canvas, width, height) {
-//   chart = echarts.init(canvas, null, {
-//     width: width,
-//     height: height
-//   });
-//   canvas.setChart(chart);
-
-//   var option = {}; // ECharts 配置项
-
-//   chart.setOption(option);
-
-//   return chart; // 返回 chart 后可以自动绑定触摸操作
-// }
 
 export default {
   data() {
     return {
-      // echarts,
-      // onInit: initChart,
       activeIndex: 2,
       searchText: "",
       services: [],
       opts: {
         lazyLoad: true
-      }
+      },
+      name: ''
     };
   },
   mixins:[colorMixin],
-  // components: {
-  //  mpvueEcharts
-  // },
   mounted() {
     setNavTab();
     this.services = getUseServiceList()
     this.getLineView()
+    this.name = wx.getStorageSync('staff_info').userName
   },
   onShow() {
     this.services = getUseServiceList()
@@ -249,6 +229,11 @@ page {
       margin-top: 7px;
       border-radius: 50%;
     }
+  }
+  .welcome-tip {
+    text-align: center;
+    margin: 15px 0;
+    color: #999;
   }
 }
 </style>

@@ -1,20 +1,22 @@
 <template>
   <div class="customer_interview">
     <div class="list-header">
-      <header-search
-        :storeList="storeList"
-        :color="themeColor"
-        :search="searchChange"
-        @selectStore="selectStore"
-      ></header-search>
-      <header-data :headerData="headerData"></header-data>
-      <filter-nav :nav="nav"></filter-nav>
+      <div class="list-header">
+        <header-search
+          :storeList="storeList"
+          :color="themeColor"
+          :search="searchChange"
+          @selectStore="selectStore"
+        ></header-search>
+        <header-data :headerData="headerData"></header-data>
+        <filter-nav :nav="nav"></filter-nav>
+      </div>
     </div>
     <div class="card-list">
-      <staff-coach-item v-for="(item, index) in interviewList" :key="index" :info="item"></staff-coach-item>
+      <staff-coach-item v-for="(item, index) in list" :key="index" :info="item"></staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading"/>
-      <none-result text="暂无约访记录" v-if="!interviewList.length && !isLoading"></none-result>
-      <div class="no-more" v-if="isNoMore && interviewList.length">暂无更多</div>
+      <none-result text="暂无约访记录" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
   </div>
 </template>
@@ -32,8 +34,9 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
+import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
-import regeneratorRuntime from "../../../libs/regenerator-runtime/runtime.js";
+import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 export default {
   data() {
     return {
@@ -90,12 +93,8 @@ export default {
           dataNum: "0"
         }
       ],
-      isLoading: true,
-      isNoMore: false,
-      interviewList: [{}, {}, {}, {}],
       selectedStore: {},
       storeList: [],
-      page: 1,
       filter: {
         nameOrPhone: "",
         appointmentTimeStart: "",
@@ -111,57 +110,40 @@ export default {
     staffCoachItem,
     noneResult
   },
-  mixins: [colorMixin],
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
-  },
+  mixins: [colorMixin, listPageMixin],
   mounted() {
-    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    // this.getInterviewPages();
     this.filterDate(1);
   },
   methods: {
     searchChange(event) {
       this.filter.nameOrPhone = event;
-      this.page = 1;
-      this.isNoMore = false;
-      this.getInterviewPages();
     },
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.isNoMore = false;
-      this.getInterviewPages();
+      this.refreshList();
     },
-    getInterviewPages() {
-      // /customer/track/pages/
-      if (this.isNoMore) {
-        return;
-      }
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          page: that.page,
-          storeId: that.selectedStore.storeId
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + "/user/work/customer/reserved/pages",
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
-            if (!res.data.data.result.length) {
-              that.isNoMore = true;
+      return new Promise(function(resolve) {
+        var _data = Object.assign(
+          {},
+          {
+            page: that.page,
+            pageNo: that.page,
+            searchStore: that.selectedStore.storeId
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: "/user/work/customer/reserved/pages",
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              that.list = [];
+              return;
             }
-            that.page++;
             that.headerData[0].dataNum = res.data.data.recCount;
             let _data = res.data.data.result.map(async e => {
               if (e.headImgPath) {
@@ -188,45 +170,16 @@ export default {
               };
             });
             Promise.all(_data).then(result => {
-              _data = result;
-              if (that.page == 2 || that.page == 1) {
-                that.interviewList = _data;
-              } else {
-                that.interviewList = that.interviewList.concat(_data);
-              }
+              resolve(result);
             });
-          } else {
-            that.interviewList = [];
-          }
-        }
-      });
-    },
-    getAvatar(url) {
-      return new Promise(function(resolve, reject) {
-        wx.request({
-          url: window.api + url,
-          success(res) {
-            resolve(res.data);
           }
         });
       });
     },
     filterDate(day) {
-      if (!day || day == 0) {
-        this.filter.appointmentTimeStart = "";
-        this.filter.appointmentTimeEnd = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        let startTime =
-          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        this.filter.appointmentTimeStart = startTime;
-        this.filter.appointmentTimeEnd = endTime;
-      }
-      this.page = 1;
-      this.isNoMore = false;
-      this.getInterviewPages();
+      let obj = this.filterDateMethod(day);
+      this.filter.appointmentTimeStart = obj.statrTime;
+      this.filter.appointmentTimeEnd = obj.endTime;
     }
   }
 };

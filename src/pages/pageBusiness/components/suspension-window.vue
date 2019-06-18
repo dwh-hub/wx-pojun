@@ -61,7 +61,7 @@ export default {
     position: fixed;
     right: 20px;
     bottom: 20px;
-    z-index: 2;
+    z-index: 4;
     .icon-suspension {
       float: right;
       font-size: 35px;

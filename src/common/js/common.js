@@ -1,6 +1,6 @@
 const window = {}
-window.DEBUGGING = false
-window.api = window.DEBUGGING ? "http://192.168.1.115" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
+window.DEBUGGING = true
+window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
 // 获取 ext.json 配置信息
 const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
@@ -162,7 +162,7 @@ export function getWXCompany(appid) {
  */
 export function HttpRequest(obj) {
   return initCookie().then((res) => {
-    // obj['url'] = 'https://192.168.1.8' + obj.url;
+    obj.url = obj.url.indexOf(window.api) == -1 ? (window.api + obj.url) : obj.url;
     obj.header = obj.header || {};
     obj.header['Cookie'] = res;
     wx.request(obj)

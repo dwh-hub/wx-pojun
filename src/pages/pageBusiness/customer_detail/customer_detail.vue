@@ -403,7 +403,11 @@ export default {
   onLoad(options) {
     this.id = options.id;
   },
+  onShow() {
+    console.log("tabIndex:"+this.tabIndex)
+  },
   onHide() {
+    console.log("tabIndex:"+this.tabIndex)
     console.log("customer_detail_onHide");
   },
   onUnload() {
@@ -444,7 +448,8 @@ export default {
       this.userInfo = {};
       this.isAppointLoading = true;
       this.isFollowUpLoading = true;
-      (this.isCheckInLoading = true), (this.isCardLoading = true);
+      this.isCheckInLoading = true;
+      this.isCardLoading = true;
     },
     computedScrollHeight() {
       let that = this;
@@ -670,7 +675,7 @@ export default {
       });
     },
     changeTab(e) {
-      this.changeTab.tabIndex = e.mp.detail.index;
+      this.tabIndex = e.mp.detail.index;
     },
     // 通过回传的iconText来获取对应的列表
     getOperate(param) {},
@@ -918,6 +923,7 @@ page {
           width: 100%;
           height: 100%;
           border-radius: 50%;
+          background-color: #eee;
         }
       }
       .store {

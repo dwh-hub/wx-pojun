@@ -1,15 +1,17 @@
 <template>
   <div class="public-sea">
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav :nav="nav"></filter-nav>
+    <div class="list-header">
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav :nav="nav"></filter-nav>
+    </div>
     <div class="customer-list">
-      <div class="customer-item" v-for="(item,index) in customerList" :key="index">
+      <div class="customer-item" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">
             <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
@@ -18,7 +20,8 @@
         <staff-coach-item @clickIcon="call(item)" @clickItem="toDetail(item,index)" :info="item"></staff-coach-item>
       </div>
       <van-loading :color="themeColor" v-if="isLoading"/>
-      <none-result text="暂无客户" v-if="!customerList.length && !isLoading"></none-result>
+      <none-result text="暂无客户" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
 
     <div class="operate-bottom" v-if="isOperate">
@@ -48,11 +51,13 @@ import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import suspensionWindow from "../components/suspension-window.vue";
 import noneResult from "COMPS/noneResult.vue";
+import listPageMinxi from "../components/list-page-mixin.vue";
+import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 
 export default {
   data() {
     return {
-      page: 1,
+      // page: 1,
       nav: [
         {
           navTitle: "今日",
@@ -141,8 +146,8 @@ export default {
           iconUrl: "/static/images/staff/close.svg"
         }
       ],
-      customerList: [{}, {}, {}, {}],
-      isLoading: false,
+      // list: [{}, {}, {}, {}],
+      // isLoading: false,
       isOperate: false,
       isAllSelect: false,
       showStoreList: false,
@@ -158,19 +163,9 @@ export default {
     };
   },
   mounted() {
-    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    // this.getCustomerList();
-    this.filterDate();
-  },
-  onReachBottom() {
-    this.getCustomerList();
-  },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
+    this.getList();
   },
   components: {
     headerData,
@@ -180,11 +175,11 @@ export default {
     headerSearch,
     noneResult
   },
-  mixins: [colorMixin],
+  mixins: [colorMixin, listPageMinxi],
   computed: {
     selectNum() {
       let _num = 0;
-      this.customerList.forEach(e => {
+      this.list.forEach(e => {
         if (e.isSelect) {
           _num++;
         }
@@ -195,13 +190,10 @@ export default {
   methods: {
     searchChange(event) {
       this.filter.nameOrPhone = event;
-      this.page = 1;
-      this.getCustomerList();
     },
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.getCustomerList();
+      this.refreshList();
     },
     toDetail(item, index) {
       if (this.isOperate) {
@@ -219,8 +211,8 @@ export default {
       if (!this.isOperate) {
         return;
       }
-      this.customerList[index].isSelect = !item.isSelect;
-      if (this.customerList.filter(e => true !== e.isSelect).length > 0) {
+      this.list[index].isSelect = !item.isSelect;
+      if (this.list.filter(e => true !== e.isSelect).length > 0) {
         this.isAllSelect = false;
       } else {
         this.isAllSelect = true;
@@ -230,45 +222,49 @@ export default {
       let that = this;
       if (that.isAllSelect) {
         that.isAllSelect = false;
-        this.customerList = this.customerList.map(e => {
+        this.list = this.list.map(e => {
           e.isSelect = false;
           return e;
         });
       } else {
         that.isAllSelect = true;
-        this.customerList = this.customerList.map(e => {
+        this.list = this.list.map(e => {
           e.isSelect = true;
           return e;
         });
       }
     },
-    getCustomerList() {
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          page: that.page,
-          storeId: that.selectedStore.storeId
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + "/customer/public/pages",
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
+      return new Promise(function(resolve) {
+        var _data = Object.assign(
+          {},
+          {
+            page: that.page,
+            storeId: that.selectedStore.storeId
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: window.api + "/customer/public/pages",
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              return (that.list = []);
+            }
             let _res = res.data.data;
             let _data;
-            if (!_res.result.length && that.page == 1) {
-              return (that.customerList = []);
-            }
-            that.page++;
-            // if (that.headerData[0].dataNum == "0") {
             that.headerData[0].dataNum = _res.recCount;
-            // }
-            _data = _res.result.map(e => {
+            _data = _res.result.map(async e => {
+              if (e.headImgPath) {
+                if (e.headImgPath.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.headImgPath).then(res => {
+                    e.headImgPath = res;
+                  });
+                } else {
+                  e.headImgPath = window.api + e.headImgPath;
+                }
+              }
               return {
                 isSelect: false,
                 id: e.customerId,
@@ -282,37 +278,20 @@ export default {
                 third_tip_1: "最后签到时间："
               };
             });
-            if (that.page == 2 || that.page == 1) {
-              that.customerList = _data;
-            } else {
-              that.customerList = that.customerList.concat(_data);
-            }
-          } else {
-            that.customerList = [];
+            Promise.all(_data).then(result => {
+              resolve(result);
+            });
           }
-        }
+        });
       });
     },
     filterDate(day) {
-      if (!day || day == 0) {
-        this.filter.addTimeEnd = "";
-        this.filter.addTimeStart = "";
-      } else {
-        const DAY = 24 * 60 * 60 * 1000;
-        let stamp = new Date().getTime();
-        let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        let startTime =
-          formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        this.filter.addTimeStart = startTime;
-        this.filter.addTimeEnd = endTime;
-      }
-      this.page = 1;
-      this.getCustomerList();
+      let obj = this.filterDateMethod(day);
+      this.filter.addTimeStart = obj.statrTime;
+      this.filter.addTimeEnd = obj.endTime;
     },
     filterType(type) {
       this.filter.customerClass = type || "";
-      this.page = 1;
-      this.getCustomerList();
     },
     getOperate() {
       this.isOperate = true;
@@ -320,7 +299,7 @@ export default {
     cancelOperate() {
       this.isOperate = false;
       this.isAllSelect = false;
-      this.customerList = this.customerList.map(e => {
+      this.list = this.list.map(e => {
         e.isSelect = false;
         return e;
       });
@@ -341,7 +320,7 @@ export default {
           if (res.confirm) {
             wx.showLoading();
             let _customerIdStr = "";
-            that.customerList.forEach(e => {
+            that.list.forEach(e => {
               if (e.isSelect) {
                 _customerIdStr = _customerIdStr + e.id + ",";
               }
@@ -363,7 +342,7 @@ export default {
                   that.headerData[0].dataNum = 0;
                   that.cancelOperate();
                   that.page = 1;
-                  that.getCustomerList();
+                  that.getList();
                 }
               }
             });

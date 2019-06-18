@@ -18,7 +18,7 @@
       <van-cell title="专属二维码" is-link @click="showStore = true"/>
     </van-cell-group>
 
-    <!-- <button @click="login">登录</button> -->
+    <button @click="login">登录</button>
 
     <van-tabbar active="4" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
@@ -90,9 +90,9 @@ export default {
       wx.request({
         url: window.api + "/user/login",
         data: {
-          phone: "18000241486",
+          phone: "18888888881",
           password: "2131",
-          companyId: "55"
+          companyId: "53"
         },
         success(res) {
           if (res.data.code == 200) {
@@ -205,6 +205,7 @@ page {
       width: 100%;
       height: 100%;
       border-radius: 50%;
+      background-color: #eee;
     }
   }
   .name {

@@ -1,22 +1,25 @@
 <template>
   <div class="contract-list">
-    <header-search
-      :storeList="storeList"
-      :color="themeColor"
-      :search="searchChange"
-      @selectStore="selectStore"
-    ></header-search>
-    <header-data :headerData="headerData"></header-data>
-    <filter-nav :nav="nav"></filter-nav>
+    <div class="list-header">
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :search="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav :nav="nav"></filter-nav>
+    </div>
     <div class="card-list">
       <staff-coach-item
-        v-for="(item, index) in cardList"
+        v-for="(item, index) in list"
         :key="index"
         :info="item"
         @clickItem="toCardDetail(item)"
       ></staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading"/>
-      <none-result text="暂无合同" v-if="!cardList.length && !isLoading"></none-result>
+      <none-result text="暂无合同" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
 
     <van-popup
@@ -64,11 +67,15 @@ import {
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
+import listPageMixin from "../components/list-page-mixin.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import noneResult from "COMPS/noneResult.vue";
+import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
+import { setTimeout } from "timers";
+
 export default {
   data() {
     return {
@@ -154,11 +161,11 @@ export default {
         }
       ],
       cardstatuslist: [],
-      page: 1,
-      cardList: [{}, {}, {}, {}],
+      // page: 1,
+      // list: [{}, {}, {}, {}],
       selectedStore: {},
       storeList: [],
-      isLoading: true,
+      // isLoading: true,
       filter: {
         nameOrPhone: "",
         transactTimeEnd: "",
@@ -178,22 +185,13 @@ export default {
     if (options.type) {
       this.type = options.type;
       this.venueId = options.venueId;
-      this.teamScheduleId = options.teamScheduleId
+      this.teamScheduleId = options.teamScheduleId;
     }
   },
   mounted() {
-    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.filterDate(1)
-  },
-  onReachBottom() {
-    this.getCardPage();
-  },
-  onPullDownRefresh() {
-    setTimeout(() => {
-      wx.stopPullDownRefresh();
-    }, 2000);
+    this.filterDate(1);
   },
   components: {
     headerSearch,
@@ -202,60 +200,61 @@ export default {
     staffCoachItem,
     noneResult
   },
-  mixins: [colorMixin],
+  mixins: [colorMixin, listPageMixin],
   methods: {
     searchChange(event) {
       this.filter.nameOrPhone = event;
-      this.page = 1;
-      this.getCardPage();
     },
     selectStore(item) {
       this.selectedStore = item;
-      this.page = 1;
-      this.getCardPage();
+      this.refreshList();
     },
     toCardDetail(item) {
       if (this.type == "addStudent") {
-        this.selectedCard = item
+        this.selectedCard = item;
         // 新增上课学员
-        this.getProject()
-        return
+        this.getProject();
+        return;
       }
       wx.navigateTo({
         url: `../../cardDetail/main?id=${item.id}&type=staff`
       });
     },
-    getCardPage() {
-      this.isLoading = true;
+    loadData() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          page: that.page,
-          storeId: that.selectedStore.storeId
-        },
-        that.filter
-      );
-      HttpRequest({
-        url: window.api + "/customer/card/pages",
-        data: _data,
-        success(res) {
-          that.isLoading = false;
-          if (res.data.code == 200) {
-            if (!res.data.data.result.length && that.page == 1) {
-              that.cardList = []
-              that.headerData[0].dataNum = 0
-              return
+      return new Promise(function(resolve) {
+        var _data = Object.assign(
+          {},
+          {
+            page: that.page,
+            storeId: that.selectedStore.storeId
+          },
+          that.filter
+        );
+        HttpRequest({
+          url: window.api + "/customer/card/pages",
+          data: _data,
+          success(res) {
+            if (res.data.code !== 200) {
+              that.list = [];
             }
-            that.page++;
-            // if (that.headerData[0].dataNum == "0") {
-              that.headerData[0].dataNum = res.data.data.recCount;
-            // }
-            let _data = res.data.data.result.map(e => {
+            that.headerData[0].dataNum = res.data.data.recCount;
+            let _data = res.data.data.result.map(async e => {
+              if (e.headImgPath) {
+                if (e.headImgPath.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.headImgPath).then(res => {
+                    e.headImgPath = res;
+                  });
+                } else {
+                  e.headImgPath = window.api + e.headImgPath;
+                }
+              }
               return {
                 id: e.id,
                 pactId: e.pactId,
-                cover: window.api + e.headImgPath,
+                cover: e.headImgPath
+                  ? e.headImgPath
+                  : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: `${e.name}(${e.pactId})`,
                 second_1: e.secondCardClass,
                 rightText: e.cardStatusChar,
@@ -263,13 +262,11 @@ export default {
                 storeId: e.storeId
               };
             });
-            if (that.page == 2 || that.page == 1) {
-              that.cardList = _data;
-            } else {
-              that.cardList = that.cardList.concat(_data);
-            }
+            Promise.all(_data).then(result => {
+              resolve(result);
+            });
           }
-        }
+        });
       });
     },
     getCardstatuslist() {
@@ -289,55 +286,22 @@ export default {
       });
     },
     filterDate(day) {
-      if (!day) {
-        this.filter.transactTimeEnd = "";
-        this.filter.transactTimeStart = "";
-        this.page = 1;
-        this.getCardPage();
-        return
-      }
-        // const DAY = 24 * 60 * 60 * 1000;
-        // let stamp = new Date().getTime();
-        // let endTime = formatDate(new Date(stamp), "yyyy-MM-dd") + " 23:59:59";
-        // let startTime =
-        //   formatDate(new Date(stamp - DAY * day), "yyyy-MM-dd") + " 23:59:59";
-        // this.filter.transactTimeStart = startTime;
-        // this.filter.transactTimeEnd = endTime;
-        let date = new Date();
-        const DAY = 24 * 60 * 60 * 1000;
-        const HOUR8 = 8 * 60 * 60 *1000;
-        let nowStamp = date.getTime();
-        let today = date.getDate() - 1;
-        let weekday = date.getDay() - 1;
-        if (day == 1) {
-          this.filter.transactTimeStart = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8), 'yyyy-MM-dd hh:mm:ss');
-          this.filter.transactTimeEnd = formatDate(new Date(parseInt(nowStamp / DAY) * DAY  + DAY - HOUR8 - 1), 'yyyy-MM-dd hh:mm:ss');
-        }
-        if(day == 7) {
-          this.filter.transactTimeStart = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - weekday*DAY), 'yyyy-MM-dd hh:mm:ss');
-          this.filter.transactTimeEnd = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 + (7-weekday)*DAY-1), 'yyyy-MM-dd hh:mm:ss');
-        }
-        if(day == 30) {
-          this.filter.transactTimeStart = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - today*DAY), 'yyyy-MM-dd hh:mm:ss');
-          this.filter.transactTimeEnd = formatDate(new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 + (30-today)*DAY-1), 'yyyy-MM-dd hh:mm:ss');
-        }
-      this.page = 1;
-      this.getCardPage();
+      let obj = this.filterDateMethod(day);
+      this.filter.transactTimeStart = obj.statrTime;
+      this.filter.transactTimeEnd = obj.endTime;
     },
     filterType(type) {
       this.filter.cardType = type || "";
-      this.page = 1;
-      this.getCardPage();
     },
     selectProject(item) {
-      this.selectedProject = item
-      this.showProjectPopup = false
-      this.getUserp()
+      this.selectedProject = item;
+      this.showProjectPopup = false;
+      this.getUserp();
     },
     selectUser(item) {
-      this.selectedUser = item
-      this.showUserPopup = false
-      this.addAttend()
+      this.selectedUser = item;
+      this.showUserPopup = false;
+      this.addAttend();
     },
     /* 上课流程 - 开始 */
     // 获取项目
@@ -354,7 +318,7 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
-              that.selectedProject = res.data.data[0]
+              that.selectedProject = res.data.data[0];
               that.getUserp();
             } else {
               that.showProjectPopup = true;
@@ -375,8 +339,8 @@ export default {
         success(res) {
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
-              that.selectedUser = res.data.data[0]
-              that.addAttend()
+              that.selectedUser = res.data.data[0];
+              that.addAttend();
             } else {
               that.showUserPopup = true;
               that.userpList = res.data.data;

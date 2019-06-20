@@ -39,7 +39,7 @@
         >{{item.text}}</div>
       </div>
     </van-popup>
-
+    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
     <!-- <suspension-window v-if="!isOperate" :operateList="operateList"></suspension-window> -->
   </div>
 </template>
@@ -67,6 +67,12 @@ export default {
           navTitle: "今日",
           children: [
             {
+              sonText: "全部",
+              action: () => {
+                this.filterDate(0);
+              }
+            },
+            {
               sonText: "今日",
               action: () => {
                 this.filterDate(1);
@@ -82,6 +88,12 @@ export default {
               sonText: "本月",
               action: () => {
                 this.filterDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.showPicker()
               }
             }
           ]
@@ -194,7 +206,8 @@ export default {
           {},
           {
             pageNo: that.page,
-            page: that.page
+            page: that.page,
+            storeId: that.selectedStore.storeId
           },
           that.filter
         );
@@ -223,7 +236,10 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.calendarStart = obj.statrTime;
+      this.setDate(obj)
+    },      
+    setDate(obj) {
+      this.filter.calendarStart = obj.startTime;
       this.filter.calendarEnd = obj.endTime;
     },
     selectClass(item) {

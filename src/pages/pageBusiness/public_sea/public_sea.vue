@@ -37,6 +37,12 @@
         <div class="btn" @click="claim" :style="{background: themeColor}">认领</div>
       </div>
     </div>
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
     <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
   </div>
 </template>
@@ -71,19 +77,25 @@ export default {
             {
               sonText: "今日",
               action: () => {
-                this.filterDate();
+                this.filterDate(1);
               }
             },
             {
               sonText: "本周",
               action: () => {
-                this.filterDate();
+                this.filterDate(7);
               }
             },
             {
               sonText: "本月",
               action: () => {
-                this.filterDate();
+                this.filterDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.showPicker();
               }
             }
           ]
@@ -268,7 +280,10 @@ export default {
               return {
                 isSelect: false,
                 id: e.customerId,
-                cover: window.api + e.headImgPath,
+                sex: e.sex,
+                cover: e.headImgPath
+                  ? e.headImgPath
+                  : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.customerName,
                 first_2: e.customerClass,
                 second_1: e.totalCardCount || 0,
@@ -287,7 +302,10 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.addTimeStart = obj.statrTime;
+      this.setDate(obj);
+    },
+    setDate(obj) {
+      this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
     },
     filterType(type) {

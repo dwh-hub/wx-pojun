@@ -303,9 +303,9 @@ function getUseServiceList() {
   let storageList = wx.getStorageSync('serviceList') || []
   let usedList = []
 
-  service.forEach((e, index) => {
-    e.list.forEach((item, key) => {
-      if (item.isOpen) {
+  service.forEach((e) => {
+    e.list.forEach((item) => {
+      if (item.isOpen && !storageList.includes(item.text)) {
         useServiceList.push(item)
       }
       if(storageList.includes(item.text)) {

@@ -17,6 +17,9 @@ export default {
       list: []
     };
   },
+  components: {
+    listDayItem
+  },
   mounted() {
     setNavTab();
   },
@@ -26,9 +29,8 @@ export default {
     }, 2000);
   },
   onLoad(options) {
-    console.log(options)
     if (options.list) {
-      this.list = options.list;
+      this.list = JSON.parse(options.list);
       wx.setNavigationBarTitle({
         title: options.title
       });
@@ -37,5 +39,8 @@ export default {
 };
 </script>
 
-<style>
+<style lang="less">
+.common-list {
+  border-bottom: 1rpx solid #eee;
+}
 </style>

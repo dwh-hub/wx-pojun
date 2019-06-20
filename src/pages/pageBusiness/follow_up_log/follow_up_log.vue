@@ -27,6 +27,12 @@
       <none-result text="暂无合同" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
   </div>
 </template>
 
@@ -75,6 +81,12 @@ export default {
               sonText: "本月",
               action: () => {
                 this.filterDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.showPicker();
               }
             }
           ]
@@ -125,9 +137,9 @@ export default {
       this.trackUserType = options.trackUserType;
     }
   },
-  onUnload() {
-    this.clearData();
-  },
+  // onUnload() {
+  //   this.clearData();
+  // },
   mounted() {
     let _title = this.trackUserType == 1 ? "销售跟进日志" : "教练跟进日志";
     setNavTab(_title);
@@ -200,6 +212,7 @@ export default {
               }
               return {
                 id: e.customerId,
+                sex: e.sex,
                 cover: e.headImgPath
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
@@ -218,7 +231,10 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.searchTrackTimeStart = obj.statrTime;
+      this.setDate(obj);
+    },
+    setDate(obj) {
+      this.filter.searchTrackTimeStart = obj.startTime;
       this.filter.searchTrackTimeEnd = obj.endTime;
     }
   }

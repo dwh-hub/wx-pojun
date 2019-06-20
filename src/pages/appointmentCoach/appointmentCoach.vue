@@ -186,8 +186,9 @@
               <span
                 v-if="curSecondIndex == index"
                 :style="{'background-color':themeColor,color:'#fff'}"
+                :class="{bold: item.second % 15 == 0}"
               >{{item.second}}</span>
-              <span v-else>{{item.second}}</span>
+              <span :class="{bold: item.second % 15 == 0}" v-else>{{item.second}}</span>
             </div>
           </div>
         </div>
@@ -605,6 +606,12 @@ export default {
         }
       }
       this.dayTime = target;
+      for (let k in target) {
+        if (!target[k].disable) {
+          this.selectHour(target[k], k);
+          return;
+        }
+      }
     },
     // 选择门店
     selectStore(item) {
@@ -1133,10 +1140,11 @@ page {
             display: inline-block;
             line-height: 42px;
             width: 100%;
-            &:nth-child(3n + 1) {
-              font-size: 14px;
-              color: #333;
-            }
+          }
+          .bold {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
           }
           &.active {
             background-color: #43cf7c;

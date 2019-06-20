@@ -13,11 +13,17 @@
       </div>
     </div>
     <div class="card-list">
-      <staff-coach-item v-for="(item, index) in list" :key="index" :info="item"></staff-coach-item>
+      <staff-coach-item v-for="(item, index) in list" @clickItem="toDetail(item)" :key="index" :info="item"></staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading"/>
       <none-result text="暂无约访记录" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
   </div>
 </template>
 
@@ -66,6 +72,12 @@ export default {
               sonText: "本月",
               action: () => {
                 this.filterDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.showPicker();
               }
             }
           ]
@@ -176,9 +188,17 @@ export default {
         });
       });
     },
+    toDetail(item) {
+      wx.navigateTo({
+        url: "../customer_detail/main?id=" + item.id
+      });
+    },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.appointmentTimeStart = obj.statrTime;
+      this.setDate(obj)
+    },
+    setDate(obj) {
+      this.filter.appointmentTimeStart = obj.startTime;
       this.filter.appointmentTimeEnd = obj.endTime;
     }
   }

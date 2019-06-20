@@ -1,10 +1,12 @@
 <template>
   <div class="operation_chart">
-    <filter-nav :nav="nav"></filter-nav>
-    <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
-      <van-tab title="运营报表"></van-tab>
-      <van-tab title="课程报表"></van-tab>
-    </van-tabs>
+    <div class="list-header">
+      <filter-nav :nav="nav"></filter-nav>
+      <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
+        <van-tab title="运营报表"></van-tab>
+        <van-tab title="课程报表"></van-tab>
+      </van-tabs>
+    </div>
     <div class="operation" v-show="navIndex == 0">
       <div class="sub-tab">
         <div

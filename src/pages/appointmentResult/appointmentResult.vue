@@ -65,7 +65,7 @@ export default {
   computed: {
     timeStart() {
       if (this.detail.timeStart) {
-        return formatDate(new Date(this.detail.timeStart), "yyyy-MM-dd");
+        return formatDate(new Date(this.detail.timeStart), "yyyy-MM-dd hh:mm:ss");
       } else {
         return "";
       }
@@ -287,7 +287,7 @@ export default {
       if (this.coachAppointId) {
         if (this.type == "staff") {
           return wx.redirectTo({
-            url: "../appoint_coach/main?coachId=" + this.detail.coachId
+            url: "../../appoint_coach/main?coachId=" + this.detail.coachId
           });
         }
         wx.redirectTo({

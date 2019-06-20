@@ -1,6 +1,6 @@
 <template>
   <div class="staff_message">
-    <div class="header-search">
+    <!-- <div class="header-search">
       <div class="search-wrapper">
         <van-search
           :value="searchText"
@@ -9,7 +9,11 @@
           placeholder="请输入搜索内容"
         ></van-search>
       </div>
-    </div>
+    </div> -->
+    <header-search
+      :color="themeColor"
+      :search="searchChange"
+    ></header-search>
     <div class="header">
       <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
         <van-tab title="未读">
@@ -78,6 +82,7 @@ import {
 } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import headerSearch from "../components/header-search.vue";
 export default {
   data() {
     return {
@@ -91,6 +96,7 @@ export default {
       messageYList: [],
       curMessage: {},
       showMessageBox: false,
+      searchText: "",
       // 未读信息id数组
       arrId: []
     };
@@ -101,7 +107,8 @@ export default {
     this.getMessage(1, 1);
   },
   components: {
-    noneResult
+    noneResult,
+    headerSearch
   },
   mixins: [colorMixin],
   onReachBottom() {
@@ -120,6 +127,11 @@ export default {
   methods: {
     onChange(e) {
       this.navIndex = e.mp.detail.index;
+    },
+    searchChange(e) {
+      console.log(e)
+      this.searchText = e;
+      this.getMessage(this.navIndex, 1);
     },
     changeTabbar(e) {
       if (e.mp.detail == 0) {
@@ -150,7 +162,8 @@ export default {
         url: window.api + "/home/wechat/message/pages",
         data: {
           status: status,
-          pageNo: page
+          pageNo: page,
+          msgContent: that.searchText
         },
         success(res) {
           if (res.data.code === 200) {

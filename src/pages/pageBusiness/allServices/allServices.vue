@@ -6,6 +6,7 @@
         <div
           class="services-item icon-item"
           @click="toNav(item2)"
+          @longpress="edit"
           v-for="(item2,index2) in item.list"
           :key="index2"
         >
@@ -36,11 +37,15 @@ export default {
       if (!item.navUrl) {
         return;
       }
-      this.serviceList.unshift(item.text)
-      wx.setStorageSync('serviceList', this.serviceList)
+      if(!this.serviceList.includes(item.text)) {
+        this.serviceList.unshift(item.text)
+        wx.setStorageSync('serviceList', this.serviceList)
+      }
       wx.navigateTo({
         url: item.navUrl
       });
+    },
+    edit() {
     }
   }
 };

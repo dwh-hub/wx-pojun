@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "跟进日志",
   "usingComponents": {
-    "van-loading": "../../../../static/vant/loading/index"
+    "van-loading": "../../../../static/vant/loading/index",
+    "time-picker": "/static/timePicker/timePicker"
   }
 }

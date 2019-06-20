@@ -10,7 +10,7 @@
       <!-- <image @click="toggleOperate" mode="aspectFit" src="/static/images/staff/suspension.svg"></image> -->
       <i class="icon-suspension" @click="toggleOperate" :style="{'color': themeColor}"></i>
     </div>
-    <div class="mask-all" v-show="showOperate" @click="showOperate = false"></div>
+    <div class="mask-all" v-show="showOperate" @click.prevent="showOperate = false"></div>
   </div>
 </template>
 

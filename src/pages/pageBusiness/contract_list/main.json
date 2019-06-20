@@ -2,6 +2,7 @@
   "navigationBarTitleText": "合同列表",
   "usingComponents": {
     "van-loading": "../../../../static/vant/loading/index",
-    "van-popup": "../../../../static/vant/popup/index"
+    "van-popup": "../../../../static/vant/popup/index",
+    "time-picker": "/static/timePicker/timePicker"
   }
 }

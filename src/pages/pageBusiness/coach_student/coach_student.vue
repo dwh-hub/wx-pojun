@@ -77,7 +77,7 @@
           <div class="phone"></div>
         </div>
       </div>
-    </van-popup>
+    </van-popup><timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
     <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
   </div>
 </template>
@@ -133,21 +133,18 @@ export default {
               action: () => {
                 this.filterDate(30);
               }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.showPicker()
+              }
             }
           ]
         },
         {
-          navTitle: "未维护时间",
+          navTitle: "筛选条件二",
           children: [
-            {
-              sonText: "今日"
-            },
-            {
-              sonText: "本周"
-            },
-            {
-              sonText: "本月"
-            }
           ]
         },
         {
@@ -195,14 +192,14 @@ export default {
         }
       ],
       operateList: [
-        {
-          text: "分配销售",
-          iconUrl: "/static/images/staff/close.svg"
-        }
         // {
-        //   text: "分配教练",
-        //   iconUrl: "/static/images/staff/calendar.svg"
+        //   text: "分配销售",
+        //   iconUrl: "/static/images/staff/close.svg"
         // }
+        {
+          text: "分配教练",
+          iconUrl: "/static/images/staff/calendar.svg"
+        }
         // {
         //   text: "发送手机短信",
         //   iconUrl: "/static/images/staff/calendar.svg"
@@ -227,7 +224,7 @@ export default {
       operateText: "",
       filter: {
         nameOrPhone: "",
-        trainerStatus: "",
+        trainerStatusClass: "",
         addTimeStart: "",
         addTimeEnd: ""
       }
@@ -310,6 +307,7 @@ export default {
               return {
                 isSelect: false,
                 id: e.customerId,
+                sex: e.sex,
                 cover: e.headImgPath
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
@@ -520,11 +518,14 @@ export default {
     },
     // 学员状态 1未办理，2已办理，3已失效
     toggleState(state) {
-      this.filter.trainerStatus = state || "";
+      this.filter.trainerStatusClass = state || "";
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.addTimeStart = obj.statrTime;
+      this.setDate(obj)
+    },
+    setDate(obj) {
+      this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
     }
   }

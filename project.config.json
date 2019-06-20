@@ -4,7 +4,7 @@
 		"urlCheck": false,
 		"es6": true,
 		"postcss": true,
-		"minified": false,
+		"minified": true,
 		"newFeature": true,
 		"nodeModules": true,
 		"autoAudits": false,
@@ -34,7 +34,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 7,
+			"current": 3,
 			"list": [
 				{
 					"id": 0,
@@ -59,9 +59,9 @@
 				},
 				{
 					"id": 3,
-					"name": "商户端",
-					"pathName": "pages/pageBusiness/customer_detail/main",
-					"query": "",
+					"name": "私教预约",
+					"pathName": "pages/pageBusiness/appoint_coach/main",
+					"query": "id=144951&type=预约",
 					"scene": null
 				},
 				{

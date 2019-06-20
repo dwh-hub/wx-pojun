@@ -18,6 +18,7 @@
         <input
           class="search-input"
           type="text"
+          :value="text"
           placeholder="请输入搜索内容"
           placeholder-style="color:#999;"
           @input="_search"
@@ -43,6 +44,10 @@ export default {
     },
     search: {
       type: Function
+    },
+    searchText: {
+      type: String,
+      default: ""
     }
   },
   data() {
@@ -50,14 +55,18 @@ export default {
       showStoreList: false,
       showMask: false,
       selectedStore: {},
-      _storeList: []
+      _storeList: [],
+      text: ""
     };
+  },
+  mounted() {
+    this.text = this.searchText
   },
   watch: {
     storeList(val, oldVal) {
       this.selectedStore = val[0]
       this._storeList = val
-    }  
+    }
   },
   methods: {
     toggleStore() {
@@ -74,6 +83,7 @@ export default {
       this.$emit("selectStore", item)
     },
     _search: debounce(function(e){
+      this.text = e.mp.detail.value
       this.search(e.mp.detail.value)
     },200)
   }

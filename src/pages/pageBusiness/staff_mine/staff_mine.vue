@@ -1,6 +1,12 @@
 <template>
   <div class="staff_mine">
-    <van-cell value="基本信息" custom-class="lg-cell" value-class="cell-right" is-link @click="baseInfoCell">
+    <van-cell
+      value="基本信息"
+      custom-class="lg-cell"
+      value-class="cell-right"
+      is-link
+      @click="baseInfoCell"
+    >
       <view slot="title">
         <!-- <div class="avatar">
           <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
@@ -18,7 +24,8 @@
       <van-cell title="专属二维码" is-link @click="showStore = true"/>
     </van-cell-group>
 
-    <button @click="login">登录</button>
+    <!-- <button @click="login">登录</button> -->
+    <div class="mineExit" :style="{'background-color': window.color}" @click="signOut">退出登录</div>
 
     <van-tabbar active="4" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
@@ -75,6 +82,11 @@ export default {
       userInfo: {}
     };
   },
+  computed: {
+    window() {
+      return window;
+    }
+  },
   mounted() {
     setNavTab();
     this.storeList = store.state.allStore.map(e => {
@@ -97,9 +109,25 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+            wx.setStorageSync("companyId", "53");
             wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
             wx.setStorageSync("staff_info", res.data.data);
             // that.getStaffInfo();
+          }
+        }
+      });
+    },
+    signOut() {
+      wx.showModal({
+        title: "提示",
+        content: "是否退出登录？",
+        success(res) {
+          if (res.confirm) {
+            wx.removeStorageSync("instMsgSubKey");
+            wx.removeStorageSync("phone");
+            wx.switchTab({
+              url: "../../homepage/main"
+            });
           }
         }
       });
@@ -250,6 +278,20 @@ page {
       margin: 15px 0;
       font-size: 12px;
       color: #999;
+    }
+  }
+  .mineExit {
+    position: absolute;
+    bottom: 65px;
+    left: 5%;
+    width: 90%;
+    height: 40px;
+    line-height: 40px;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    &:active {
+      opacity: 0.8;
     }
   }
 }

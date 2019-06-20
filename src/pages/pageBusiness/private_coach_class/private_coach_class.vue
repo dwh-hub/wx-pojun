@@ -38,6 +38,12 @@
         >{{item.text}}</div>
       </div>
     </van-popup>
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
   </div>
 </template>
 
@@ -87,6 +93,12 @@ export default {
               sonText: "本月",
               action: () => {
                 this.filterDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.showPicker();
               }
             }
           ]
@@ -185,6 +197,7 @@ export default {
         }
       ],
       filter: {
+        nameOrPhone: "",
         coachId: "",
         calendarEnd: "",
         calendarStart: "",
@@ -206,9 +219,6 @@ export default {
       deep: true
     }
   },
-  onUnload() {
-    Object.assign(this.$data, this.$options.data());
-  },
   mixins: [colorMixin, listPageMinxi],
   components: {
     headerData,
@@ -223,7 +233,7 @@ export default {
       this.refreshList();
     },
     searchChange(event) {
-      this.filter.namePhone = event;
+      this.filter.nameOrPhone = event;
     },
     toDetail() {
       wx.navigateTo({
@@ -267,11 +277,15 @@ export default {
               }
               return {
                 id: e.customerId,
+                storeId: e.storeId,
+                sex: e.sex,
                 coachAppointId: e.coachAppointId,
                 coachId: e.coachId,
                 coachName: e.coachName,
                 studentName: e.name,
-                cover: window.api + e.coachHeadImg,
+                cover: e.coachHeadImg
+                  ? e.coachHeadImg
+                  : "http://pojun-tech.cn/assets/img/morenTo.png",
                 status: e.status,
                 color: that.transformColor(e.status),
                 first_1: e.name,
@@ -439,7 +453,7 @@ export default {
       HttpRequest({
         url: window.api + "/coach/private/eliminateclass/way",
         data: {
-          storeId: that.selectedStore.storeId
+          storeId: that.curSelectClass.storeId
         },
         success(res) {
           if (res.data.code == 200) {
@@ -472,7 +486,7 @@ export default {
         url: window.api + "/mobile/coach/appoint/attendclass",
         data: {
           coachAppointId: that.curSelectClass.coachAppointId,
-          coachId: that.curSelectClass.coachId
+          realTimeStart: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
         },
         success(res) {
           if (res.data.code == 200) {
@@ -493,7 +507,10 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.calendarStart = obj.statrTime;
+      this.setDate(obj);
+    },
+    setDate(obj) {
+      this.filter.calendarStart = obj.startTime;
       this.filter.calendarEnd = obj.endTime;
     },
     filterStatus(status) {

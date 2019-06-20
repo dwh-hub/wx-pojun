@@ -16,10 +16,10 @@
             :key="indexS"
             @click.stop="clickSonNav(index,itemS)"
           >
-            <span v-if="!item.isDiyDate">{{itemS.sonText}}</span>
-            <picker v-else mode="date" :value="date" @change="dateChange($event, item)">
+            <span>{{itemS.sonText}}</span>
+            <!-- <picker v-else mode="date" :value="date" @change="dateChange($event, item)">
               <view class="picker">{{itemS.sonText}}</view>
-            </picker>
+            </picker> -->
           </div>
         </div>
       </div>
@@ -107,14 +107,14 @@ export default {
     this._nav = this.nav;
   },
   methods: {
-    dateChange(e, item) {
-      console.log(e);
-      console.log(e.mp.detail);
-      console.log(item)
-    },
-    search(e) {
-      console.log(e);
-    },
+    // dateChange(e, item) {
+    //   console.log(e);
+    //   console.log(e.mp.detail);
+    //   console.log(item)
+    // },
+    // search(e) {
+    //   console.log(e);
+    // },
     selectNav(index) {
       if (index == this.currentNav && this.showSlideList) {
         this.maskShow = false;
@@ -130,9 +130,7 @@ export default {
       this.maskShow = false;
       this.showSlideList = false;
       // this.$emit("selectFilter", item);
-      if (item.isDiyDate) {
-      }
-      if (item.action && !item.isDiyDate) {
+      if (item.action) {
         item.action();
       }
     },

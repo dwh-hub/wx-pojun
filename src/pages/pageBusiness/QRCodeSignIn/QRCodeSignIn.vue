@@ -37,6 +37,16 @@ import {
 } from "COMMON/js/common.js";
 import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
+
+var normalCoachCourse = new GoEasy({
+  appkey: wx.getStorageSync("instMsgSubKey"),
+  onConnected: function() {
+    console.log("on connected...");
+  },
+  onDisconnected: function() {
+    console.log("on disconnected...");
+  }
+});
 export default {
   data() {
     return {
@@ -53,44 +63,46 @@ export default {
       studentText: "正在等待学员确认...",
       receptionText: "正在等待前台确认...",
       timer: null,
-      normalCoachCourse: null,
+      // normalCoachCourse: null,
       checkQRStatus: null
     };
   },
   onLoad(options) {
-    if (options.params) {
-      this.params = JSON.parse(options.params);
-      this.getQrCode();
-    }
     wx.setNavigationBarColor({
       backgroundColor: "#43424d",
       frontColor: "#ffffff"
     });
+    if (options.params) {
+      this.params = JSON.parse(options.params);
+      console.log(this.params);
+    }
   },
   mounted() {
     this.timer = setInterval(() => {
       this.getNowTime();
     }, 60000);
     this.timer;
-    this.checkQRStatus = setInterval(() => {
-      this.getQRCodeResult();
-    }, 1000);
-    this.checkQRStatus;
+    if (this.params.way == 2 || this.params.way == 3) {
+      this.getQrCode();
+      this.checkQRStatus = setInterval(() => {
+        this.getQRCodeResult();
+      }, 1000);
+      this.checkQRStatus;
+    }
     if (this.params.way == 3 || this.params.way == 4) {
       this.pushMsg();
     }
-    this.normalCoachCourse = new GoEasy({
-      appkey: wx.getStorageSync("instMsgSubKey")
-    });
     this.addHit();
   },
   onUnload() {
-    this.cancelHit()
+    this.cancelHit();
+    this.studentText = "正在等待学员确认...";
+    this.receptionText = "正在等待前台确认...";
     clearInterval(this.timer);
     clearInterval(this.checkQRStatus);
   },
   onHide() {
-    this.cancelHit()
+    this.cancelHit();
     clearInterval(this.timer);
     clearInterval(this.checkQRStatus);
   },
@@ -108,6 +120,7 @@ export default {
   },
   methods: {
     getNowTime() {
+      console.log("=======getNowTime======");
       this.nowTime = formatDate(new Date(), "hh:mm");
     },
     drawImg(url) {
@@ -145,8 +158,10 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             that.studentText = "学员已确认";
-            console.log(that.studentText);
             clearInterval(that.checkQRStatus);
+            if (that.params.way == 2) {
+              that.attendclassMethod();
+            }
           }
         }
       });
@@ -163,7 +178,7 @@ export default {
     },
     addHit() {
       let that = this;
-      this.normalCoachCourse.subscribe({
+      normalCoachCourse.subscribe({
         channel:
           "channel_" +
           wx.getStorageSync("companyId") +
@@ -183,7 +198,7 @@ export default {
     },
     cancelHit() {
       let that = this;
-      this.normalCoachCourse.unsubscribe({
+      normalCoachCourse.unsubscribe({
         channel:
           "channel_" +
           wx.getStorageSync("companyId") +
@@ -212,20 +227,7 @@ export default {
         valueType.status == 200
       ) {
         this.receptionText = "前台已确认";
-        wx.showModal({
-          title: "提示",
-          content: "上课成功",
-          showCancel: false
-        });
-        setTimeout(() => {
-          this.cancelHit();
-          wx.redirectTo({
-            // url: `../appoint_result/main?coachAppointId=${
-            //   this.params.appointId
-            // }&type=attend`
-            url: `../../appointmentResult/main?coachAppointId=${res.data.data.coachAppointId}&type=staff`
-          });
-        }, 500);
+        this.attendSuccess();
       } else if (
         valueType.message &&
         valueType.message != "已确认上课，请等待系统核对"
@@ -288,9 +290,10 @@ export default {
         valueType.status &&
         valueType.status == 200
       ) {
-        if (privateSignWay == 4) {
+        if (this.params.way == 4) {
           if (frontSures.coachSubscribeId == this.params.appointId) {
             this.receptionText = "前台已确认";
+            this.attendSuccess();
           }
         }
       } else if (valueType.status) {
@@ -318,6 +321,46 @@ export default {
           });
         }
       }
+    },
+    // 上课
+    attendclassMethod() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/attendclass",
+        data: {
+          coachAppointId: that.params.appointId,
+          realTimeStart: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            that.attendSuccess()
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
+    },
+    attendSuccess() {
+      // wx.showModal({
+      //   title: "提示",
+      //   content: "上课成功",
+      //   showCancel: false
+      // });
+      // setTimeout(() => {
+        this.cancelHit();
+        wx.redirectTo({
+          // url: `../appoint_result/main?coachAppointId=${
+          //   this.params.appointId
+          // }&type=attend`
+          url: `../../appointmentResult/main?coachAppointId=${
+            this.params.appointId
+          }&type=staff`
+        });
+      // }, 500);
     }
   }
 };

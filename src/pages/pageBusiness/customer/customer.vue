@@ -10,6 +10,7 @@
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        :searchText="filter.namePhone"
         @selectStore="selectStore"
       ></header-search>
       <header-data :headerData="headerData"></header-data>
@@ -79,6 +80,8 @@
         </div>
       </div>
     </van-popup>
+
+    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
     <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
   </div>
 </template>
@@ -134,14 +137,14 @@ export default {
               action: () => {
                 this.filterDate(30);
               }
+            },
+            {
+              sonText: "自定义",
+              isDiyDate: true,
+              action: () => {
+                this.showPicker()
+              }
             }
-            // {
-            //   sonText: "自定义",
-            //   isDiyDate: true,
-            //   action: (date) => {
-            //     this.filterDate(date);
-            //   }
-            // }
           ]
         },
         {
@@ -209,14 +212,14 @@ export default {
         }
       ],
       operateList: [
-        // {
-        //   text: "分配销售",
-        //   iconUrl: "/static/images/staff/close.svg"
-        // },
         {
-          text: "分配教练",
-          iconUrl: "/static/images/staff/calendar.svg"
-        }
+          text: "分配销售",
+          iconUrl: "/static/images/staff/close.svg"
+        },
+        // {
+        //   text: "分配教练",
+        //   iconUrl: "/static/images/staff/calendar.svg"
+        // }
         // {
         //   text: "发送手机短信",
         //   iconUrl: "/static/images/staff/calendar.svg"
@@ -245,14 +248,15 @@ export default {
     };
   },
   mounted() {
+  },
+  onLoad(options) {
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
+    if(options.searchText) {
+      this.filter.namePhone = options.searchText
+      console.log(this.filter.namePhone)
+    }
     this.getList();
-  },
-  onHide() {
-    // this.clearFilter();
-  },
-  onUnload() {
   },
   mixins: [colorMixin,listPageMixin],
   components: {
@@ -551,7 +555,10 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.addTimeStart = obj.statrTime;
+      this.setDate(obj)
+    },
+    setDate(obj) {
+      this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
     }
   }

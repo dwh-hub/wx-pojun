@@ -11,7 +11,7 @@
         <van-search
           :value="searchText"
           :background="themeColor"
-          @change="searchChange"
+          @search="searchChange"
           placeholder="请输入搜索内容"
         ></van-search>
       </div>
@@ -40,7 +40,7 @@
       <van-tabbar-item icon="question-o">帮助</van-tabbar-item>
       <!-- <van-tabbar-item icon="desktop-o">工作台</van-tabbar-item> -->
       <div class="index-tab">
-        <img src="https://pojun-tech.cn/assets/img/avatars/bing.png" alt="">
+        <img src="https://pojun-tech.cn/assets/img/loginlogo.png" alt="">
         <!-- <div class="text">工作台</div> -->
       </div>
       <van-tabbar-item icon="chat-o">消息</van-tabbar-item>
@@ -109,7 +109,9 @@ export default {
       }
     },
     searchChange(e) {
-      console.log(e);
+      wx.navigateTo({
+        url: '../customer/main?searchText=' + e.mp.detail
+      })
     },
     getLineView() {
       let that = this;
@@ -117,7 +119,7 @@ export default {
       HttpRequest({
         url: window.api + "/finance/statement/lineView",
         data: {
-          timeStart: formatDate(new Date(now_time-(7*24*60*60*1000)), 'yyyy-MM-dd') + ' 00:00:00',
+          timeStart: formatDate(new Date(now_time-(6*24*60*60*1000)), 'yyyy-MM-dd') + ' 00:00:00',
           timeEnd: formatDate(new Date(now_time), 'yyyy-MM-dd') + ' 23:59:59'
         },
         success(res) {

@@ -2,7 +2,8 @@
   <div class="customer">
     <div class="customer-base-info">
       <div class="cover">
-        <div class="avatar"></div>
+        <!-- <div class="avatar"></div> -->
+        <image :src="userInfo.headImgPath" mode="aspectFill"></image>
       </div>
       <div class="coach-info">
         <div class="coach-name">{{userInfo.name}}</div>
@@ -15,7 +16,7 @@
     <van-tabs :active="tabIndex" @change="changeTab" :color="themeColor" swipeable>
       <van-tab title="出勤信息">
         <header-data :headerData="checkInData"></header-data>
-        <filter-nav></filter-nav>
+        <!-- <filter-nav></filter-nav> -->
         <scroll-view
           scroll-y
           :style="{height: scrollViewHeight + 'px'}"
@@ -28,7 +29,7 @@
       </van-tab>
       <van-tab title="跟进回访">
         <header-data :headerData="FollowUpData"></header-data>
-        <filter-nav></filter-nav>
+        <!-- <filter-nav></filter-nav> -->
         <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
           <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item>
           <none-result text="暂无跟进回访" v-if="!followUpList.length && !isFollowUpLoading"></none-result>
@@ -37,7 +38,7 @@
       </van-tab>
       <van-tab title="合同">
         <header-data :headerData="cardData"></header-data>
-        <filter-nav></filter-nav>
+        <!-- <filter-nav></filter-nav> -->
         <scroll-view
           scroll-y
           :style="{height: scrollViewHeight + 'px'}"
@@ -73,7 +74,7 @@
             <van-cell title="性别" :value="userInfo.sexChar"/>
             <van-cell title="手机号" :value="userInfo.phone"/>
             <van-cell title="出生日期" :value="userInfo.birthTime || '未填写'"/>
-            <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/> -->
+            <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/>-->
           </van-cell-group>
           <van-cell title="服务教练" @click="showCoachList()">
             <div slot="right-icon">
@@ -404,15 +405,15 @@ export default {
     this.id = options.id;
   },
   onShow() {
-    console.log("tabIndex:"+this.tabIndex)
+    // console.log("tabIndex:"+this.tabIndex)
   },
   onHide() {
-    console.log("tabIndex:"+this.tabIndex)
-    console.log("customer_detail_onHide");
+    // console.log("tabIndex:"+this.tabIndex)
+    // console.log("customer_detail_onHide");
   },
   onUnload() {
     this.clearData();
-    console.log("customer_detail_onUnload");
+    // console.log("customer_detail_onUnload");
   },
   methods: {
     toCardDetail(item) {
@@ -424,7 +425,7 @@ export default {
     toUserInfo(item) {
       wx.navigateTo({
         url: "../staff_base_info/main?id=" + this.userInfo.id
-      })
+      });
     },
     attendClass() {
       let that = this;
@@ -461,11 +462,11 @@ export default {
 
       let query = wx.createSelectorQuery();
       query.select(".customer-base-info").boundingClientRect();
-      let tabsFixedHeight = 164;
+      let tabsFixedHeight = 110; //164;
 
       query.exec(res => {
         let infoHeight = res[0].height;
-        let scrollViewHeight = this.windowHeight - infoHeight - 164;
+        let scrollViewHeight = this.windowHeight - infoHeight - tabsFixedHeight;
         this.scrollViewHeight = scrollViewHeight;
       });
     },
@@ -499,6 +500,9 @@ export default {
             let _serviceSaleList = [];
 
             _data.starLevel = _data.starLevel ? _data.starLevel + "星" : "暂无";
+            _data.headImgPath = _data.headImgPath
+              ? window.api + _data.headImgPath
+              : "http://pojun-tech.cn/assets/img/morenTo.png";
             that.userInfo = _data;
             that.storeId = _data.storeId;
             that.getTrackusertype();
@@ -638,7 +642,9 @@ export default {
         });
       }
       wx.navigateTo({
-        url: `../common_list/main?list=${this.appointList}&title=预约记录`
+        url: `../common_list/main?list=${JSON.stringify(
+          this.appointList
+        )}&title=预约记录`
       });
     },
     // 签到/出勤/消费 列表
@@ -720,7 +726,7 @@ export default {
           content: that.trackContent,
           storeId: that.storeId,
           customerClass: that.userInfo.customerClass,
-          TrackUserType: that.selectedTrackType.id
+          TrackUserType: that.selectedTrackType.id || "1"
         },
         success(res) {
           if (res.data.code == 200) {
@@ -813,6 +819,7 @@ export default {
               content: res.data.message,
               success(modal_res) {
                 if (modal_res.confirm) {
+                  wx.showLoading();
                   HttpRequest({
                     url: window.api + "/mobile/coach/appoint/finishclass",
                     data: {
@@ -821,8 +828,10 @@ export default {
                     },
                     success(finish_res) {
                       if (finish_res.data.code == 200) {
+                        wx.hideLoading();
                         that.attendClass();
                       } else {
+                        wx.hideLoading();
                         wx.showModal({
                           title: "提示",
                           content: finish_res.data.message || finish_res.data,
@@ -866,14 +875,20 @@ page {
       width: 52px;
       height: 52px;
       padding-left: 12px;
-      .avatar {
+      // .avatar {
+      //   width: 100%;
+      //   height: 100%;
+      //   border-radius: 12px;
+      //   background-color: #eee;
+      //   background-size: 100% auto;
+      //   background-repeat: no-repeat;
+      //   background-position: 50% 50%;
+      // }
+      >image {
         width: 100%;
         height: 100%;
         border-radius: 12px;
         background-color: #eee;
-        background-size: 100% auto;
-        background-repeat: no-repeat;
-        background-position: 50% 50%;
       }
     }
     .coach-info {
@@ -900,6 +915,7 @@ page {
   }
   .card-list {
     padding: 0 20px;
+    padding-bottom: 15px;
     .card {
       margin-top: 15px;
     }

@@ -12,11 +12,26 @@ export default {
       isLoading: false,
       isNoMore: false,
       page: 1,
-      filter: {
-        addTimeStart: "",
-        addTimeEnd: ""
-      }
+      isPickerShow: false,
+      // isPickerRender: false,
+      pickerConfig: {
+        endDate: true,
+        column: "day",
+        dateLimit: true,
+        initStartTime: "2019-01-01",
+        initEndTime: "2019-12-01",
+        limitStartTime: "2015-05-06",
+        limitEndTime: "2055-05-06"
+      },
+      unLoading: false,
     };
+  },
+  onUnload() {
+    Object.assign(this.$data, this.$options.data());
+    this.unLoading = true
+  },
+  onLoad() {
+    this.unLoading = false
   },
   mounted() {
     setNavTab();
@@ -44,7 +59,7 @@ export default {
   },
   methods: {
     getList() {
-      if (this.isLoading || this.isNoMore) {
+      if (this.isLoading || this.isNoMore || this.unLoading) {
         return;
       }
       this.isLoading = true;
@@ -84,7 +99,7 @@ export default {
     },
     filterDateMethod(day) {
       let obj = {
-        statrTime: "",
+        startTime: "",
         endTime: ""
       };
       if (!day) {
@@ -97,7 +112,7 @@ export default {
       let today = date.getDate() - 1;
       let weekday = date.getDay() - 1;
       if (day == 1) {
-        obj.statrTime = formatDate(
+        obj.startTime = formatDate(
           new Date(parseInt(nowStamp / DAY) * DAY - HOUR8),
           "yyyy-MM-dd hh:mm:ss"
         );
@@ -107,7 +122,7 @@ export default {
         );
       }
       if (day == 7) {
-        obj.statrTime = formatDate(
+        obj.startTime = formatDate(
           new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - weekday * DAY),
           "yyyy-MM-dd hh:mm:ss"
         );
@@ -119,7 +134,7 @@ export default {
         );
       }
       if (day == 30) {
-        obj.statrTime = formatDate(
+        obj.startTime = formatDate(
           new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - today * DAY),
           "yyyy-MM-dd hh:mm:ss"
         );
@@ -131,6 +146,16 @@ export default {
         );
       }
       return obj;
+    },
+    showPicker() {
+      this.isPickerShow = true;
+    },
+    hidePicker() {
+      this.isPickerShow = false;
+    },
+    setPickerTime(val) {
+      let data = val.mp.detail;
+      this.setDate(data)
     }
   }
 };

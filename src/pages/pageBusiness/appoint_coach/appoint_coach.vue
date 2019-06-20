@@ -173,8 +173,9 @@
               <span
                 v-if="curSecondIndex == index"
                 :style="{'background-color':themeColor,color:'#fff'}"
+                :class="{bold: item.second % 15 == 0}"
               >{{item.second}}</span>
-              <span v-else>{{item.second}}</span>
+              <span v-else :class="{bold: item.second % 15 == 0}">{{item.second}}</span>
             </div>
           </div>
         </div>
@@ -385,11 +386,11 @@ export default {
     }
   },
   methods: {
-    // 时间
+    // 显示时间弹窗
     showTimePopup() {
       this.isTimePopup = true;
     },
-    // 合同
+    // 显示合同弹窗
     showCardPopop() {
       if (!this.cardList.length) {
         return wx.showModal({
@@ -400,7 +401,7 @@ export default {
       }
       this.isCardPopup = true;
     },
-    // 门店
+    // 显示门店弹窗
     showStorePopup() {
       if (!this.selectCardId) {
         return wx.showModal({
@@ -411,7 +412,7 @@ export default {
       }
       this.isStorePopup = true;
     },
-    // 场馆
+    // 显示场馆弹窗
     showVenuePopup() {
       if (!this.selectStoreId || !this.selectCardId) {
         return wx.showModal({
@@ -429,7 +430,7 @@ export default {
       }
       this.isVenuePopup = true;
     },
-    // 项目
+    // 显示项目弹窗
     showProjectPopup() {
       if (!this.venueId) {
         return wx.showModal({
@@ -472,6 +473,7 @@ export default {
         this.curEndTime = _curEndtime;
       }
     },
+    // 选择分钟
     selectSecond(item, index) {
       if (item.disable) {
         return;
@@ -589,6 +591,12 @@ export default {
         }
       }
       this.dayTime = target;
+      for (let k in target) {
+        if (!target[k].disable) {
+          this.selectHour(target[k], k);
+          return;
+        }
+      }
     },
     // 组件select-date返回的日期
     onDate(date) {
@@ -598,8 +606,8 @@ export default {
     // 选择合同
     selectCard(item) {
       // 先清空一次
-      this.selectCardId = "";
-      this.cardClassId = "";
+      this.venueId = "";
+      this.projectId = "";
       this.venueCellText = "请选择";
       this.projectCellText = "请选择";
 
@@ -613,6 +621,11 @@ export default {
     },
     // 选择门店
     selectStore(item) {
+      this.venueId = "";
+      this.projectId = "";
+      this.venueCellText = "请选择";
+      this.projectCellText = "请选择";
+
       this.isStorePopup = false;
       this.storeCellText = item.storeName;
       this.selectStoreId = item.storeId;
@@ -627,9 +640,9 @@ export default {
       this.venueId = item.venueId;
       this.venueCellText = item.venueName;
       this.getProList();
-      if (!this.projectId) {
-        this.isProjectPopup = true;
-      }
+      // if (!this.projectId) {
+      //   this.isProjectPopup = true;
+      // }
     },
     // 选择项目
     selectProject(item) {
@@ -743,7 +756,8 @@ export default {
             if (that.venueList.length == 1) {
               that.selectVenue(that.venueList[0]);
             } else {
-              that.isVenuePopup = true;
+              // that.isVenuePopup = true;
+              that.showVenuePopup();
             }
           } else {
             that.venueList = [];
@@ -766,6 +780,8 @@ export default {
             that.projectList = res.data.data;
             if (that.projectList.length == 1) {
               that.selectProject(that.projectList[0]);
+            } else {
+              that.showProjectPopup();
             }
           } else {
             that.projectList = [];
@@ -875,6 +891,7 @@ export default {
         name: that.studentInfo.name,
         phone: that.studentInfo.phone
       };
+      wx.hideLoading();
       if (this.appointType == "预约") {
         this.confirmAppoint(params);
       } else if (this.appointType == "一键上课") {
@@ -913,8 +930,9 @@ export default {
           wx.hideLoading();
           if (res.data.code == 200) {
             wx.redirectTo({
-              url:
-                `../../appointmentResult/main?coachAppointId=${res.data.data.coachAppointId}&type=staff`
+              url: `../../appointmentResult/main?coachAppointId=${
+                res.data.data.coachAppointId
+              }&type=staff`
             });
             // wx.showModal({
             //   title: "提示",
@@ -983,14 +1001,19 @@ export default {
         url: window.api + "/mobile/coach/appoint/attendclass",
         data: {
           coachAppointId: appointId,
-          coachId: that.userInfo.userId
+          realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
         },
         success(res) {
           if (res.data.code == 200) {
-            wx.showModal({
-              title: "提示",
-              content: res.data.message,
-              showCancel: false
+            // wx.showModal({
+            //   title: "提示",
+            //   content: res.data.message,
+            //   showCancel: false
+            // });
+            wx.redirectTo({
+              url: `../../appointmentResult/main?coachAppointId=${
+                appointId
+              }&type=staff`
             });
           } else {
             wx.showModal({
@@ -1001,7 +1024,7 @@ export default {
           }
         }
       });
-    },
+    }
     // 上课校验
     // checkStatus() {
     //   let that = this
@@ -1192,10 +1215,11 @@ page {
             display: inline-block;
             line-height: 42px;
             width: 100%;
-            &:nth-child(3n + 1) {
-              font-size: 14px;
-              color: #333;
-            }
+          }
+          .bold {
+            font-size: 14px;
+            font-weight: bold;
+            color: #333;
           }
           &.active {
             background-color: #43cf7c;

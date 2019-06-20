@@ -5,6 +5,7 @@
       "van-search": "../../../../static/vant/search/index",
       "van-tabbar": "../../../../static/vant/tabbar/index",
       "van-tabbar-item": "../../../../static/vant/tabbar-item/index",
-      "van-loading": "../../../../static/vant/loading/index"
+      "van-loading": "../../../../static/vant/loading/index",
+      "time-picker": "/static/timePicker/timePicker"
     }
   }

@@ -55,6 +55,7 @@
         >{{item.customerName}}</div>
       </div>
     </van-popup>
+    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
   </div>
 </template>
 
@@ -108,6 +109,12 @@ export default {
               sonText: "本月",
               action: () => {
                 this.filterDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.showPicker()
               }
             }
           ]
@@ -231,8 +238,14 @@ export default {
           },
           that.filter
         );
+        let url = ''
+        if(that.type == "addStudent") {
+          url = '/customer/card/pages_nolimit'
+        } else {
+          url = '/customer/card/pages'
+        }
         HttpRequest({
-          url: window.api + "/customer/card/pages",
+          url: url,
           data: _data,
           success(res) {
             if (res.data.code !== 200) {
@@ -252,13 +265,14 @@ export default {
               return {
                 id: e.id,
                 pactId: e.pactId,
+                sex: e.sex,
                 cover: e.headImgPath
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: `${e.name}(${e.pactId})`,
                 second_1: e.secondCardClass,
                 rightText: e.cardStatusChar,
-                cardClassId: e.cardClassId,
+                cardClassId: e.cardClassId || '',
                 storeId: e.storeId
               };
             });
@@ -287,7 +301,10 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.filter.transactTimeStart = obj.statrTime;
+      this.setDate(obj)
+    },
+    setDate(obj) {
+      this.filter.transactTimeStart = obj.startTime;
       this.filter.transactTimeEnd = obj.endTime;
     },
     filterType(type) {
@@ -316,6 +333,13 @@ export default {
           teamScheduleId: that.teamScheduleId
         },
         success(res) {
+          if(res.data.code !== 200) {
+            return wx.showModal({
+              title: "错误",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
               that.selectedProject = res.data.data[0];

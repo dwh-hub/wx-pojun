@@ -45,7 +45,7 @@ export default {
       curWeek: "",
       curDay: "",
       // 选择的日期index
-      windowWidth: '',
+      windowWidth: "",
       selectDateIndex: 0,
       startX: "", // 触摸开始时 X坐标
       startY: "", // 触摸开始时 Y坐标
@@ -55,8 +55,8 @@ export default {
     };
   },
   mounted() {
-    this.getDateArray(new Date());
-    this.windowWidth = wx.getSystemInfoSync().windowWidth
+    this.getDateArray(new Date(), 14);
+    this.windowWidth = wx.getSystemInfoSync().windowWidth;
   },
   computed: {
     themeColor() {
@@ -64,7 +64,13 @@ export default {
     }
   },
   methods: {
-    getDateArray(weekDate) {
+    selectWeek(index) {
+      this.selectDateIndex = index;
+      formatDate(new Date(), "yyyy-MM");
+      let date = this.dateArray[index];
+      this.$emit("selectWeek", date);
+    },
+    computedDate(weekDate, dayNum) {
       let date = weekDate;
       let week = [
         "周日",
@@ -91,28 +97,24 @@ export default {
       this.curWeek = week[weekIndex];
       this.curDay = day;
 
-      for (let i = 0; i < 7; i++) {
-        _weekArray.push(week[weekIndex + i]);
-        _dayArray.push(
-          new Date(timesStamp + 24 * 60 * 60 * 1000 * i).getDate()
-        );
-        _dateArray.push(
-          formatDate(
-            new Date(timesStamp + 24 * 60 * 60 * 1000 * i),
-            "yyyy-MM-dd"
-          )
-        );
+      for (let i = 0; i < dayNum; i++) {
+        let date_tem = new Date(timesStamp + 24 * 60 * 60 * 1000 * i);
+        _weekArray.push(week[date_tem.getDay()]);
+        _dayArray.push(date_tem.getDate());
+        _dateArray.push(formatDate(date_tem, "yyyy-MM-dd"));
       }
-      this.weekArray = _weekArray;
-      this.dayArray = _dayArray;
-      this.dateArray = _dateArray;
-      console.log(_dateArray);
+      let obj = {
+        _weekArray,
+        _dayArray,
+        _dateArray
+      }
+      return obj
     },
-    selectWeek(index) {
-      this.selectDateIndex = index;
-      formatDate(new Date(), "yyyy-MM");
-      let date = this.dateArray[index];
-      this.$emit("selectWeek", date);
+    getDateArray(weekDate, dayNum) {
+      let obj = this.computedDate(weekDate, dayNum)
+      this.weekArray = obj._weekArray;
+      this.dayArray = obj._dayArray;
+      this.dateArray = obj._dateArray;
     },
     onTouchstart(e) {
       this.startX = e.pageX;
@@ -120,14 +122,12 @@ export default {
     },
     onTouchmove(e) {
       this.endX = e.pageX;
-      let translate = Math.abs(this.endX - this.startX);
-      this.move(translate)
+      this.move();
     },
     onTouchend(e) {
       this.endX = e.mp.changedTouches[0].pageX;
       this.endY = e.mp.changedTouches[0].pageY;
-      let offset = this.windowWidth - Math.abs(this.endX - this.startX)
-      this.move(offset)
+      this.move();
       // // let endX = e.touches[0].pageX;
       // if (this.endX - this.startX > 50) {
       //   this.move(windowWidth);
@@ -136,13 +136,13 @@ export default {
       //   this.move(-windowWidth);
       // }
     },
-    move(translate) {
-      let _translate = ''
+    move() {
+      let _translate = "";
       if (this.endX > this.startX) {
-        _translate = translate
+        _translate = this.windowWidth;
       }
       if (this.startX > this.endX) {
-        _translate = -translate
+        _translate = -this.windowWidth;
       }
       // console.log(translate)
       let animation = wx.createAnimation({
@@ -168,6 +168,7 @@ export default {
   .date-month,
   .date-week {
     // display: flex;
+    white-space: nowrap;
     > div {
       display: inline-block;
       // flex: 1;

@@ -34,7 +34,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 3,
+			"current": 6,
 			"list": [
 				{
 					"id": 0,
@@ -81,8 +81,8 @@
 				{
 					"id": 6,
 					"name": "demo",
-					"pathName": "pages/pageBusiness/customer_detail/main",
-					"query": "id=144899",
+					"pathName": "pages/pageBusiness/allServices/main",
+					"query": "",
 					"scene": null
 				},
 				{

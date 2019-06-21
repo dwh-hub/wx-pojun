@@ -121,7 +121,12 @@ export default {
         })
       }
       if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
+        wx.showLoading()
         staff_login().then((staff_res) => {
+          wx.hideLoading()
+          if(!staff_res) {
+            return
+          }
           enterStaff(staff_res)
         })
       }

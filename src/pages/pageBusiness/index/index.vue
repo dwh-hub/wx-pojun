@@ -1,6 +1,6 @@
 <template>
   <div class="index">
-    <div class="header-search">
+    <!-- <div class="header-search">
       <div class="search-wrapper">
         <van-search
           :value="searchText"
@@ -33,7 +33,7 @@
       </div>
       <staff-coach-item></staff-coach-item>
       <div class="see-more" :style="{color: themeColor}">查看更多</div>
-    </div>
+    </div> -->
 
     <van-tabbar active="0" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>

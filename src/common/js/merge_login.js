@@ -180,8 +180,27 @@ export function enterStaff(res) {
   wx.setStorageSync("staff_info", res.data.data);
   wx.setStorageSync("companyId", res.data.data.companyId);
   wx.setStorageSync("companyName", res.data.data.companyName);
-  wx.reLaunch({
-    url: "../pageBusiness/workbench/main"
+  // wx.reLaunch({
+  //   url: "../pageBusiness/workbench/main"
+  // })
+  getAuthList().then((data) => {
+    let authList = []
+    data.forEach((store) => {
+      let authStr
+      store.authList.forEach((e) => {
+        authStr += (e.authorityId+',')
+      })
+      authList.push({
+        departmentIdArray: store.departmentIdArray,
+        customerFilterLevel: store.customerFilterLevel,
+        positionType: store.positionType,
+        authStr: authStr
+      })
+    })
+    wx.setStorageSync("authInto", authList);
+    wx.reLaunch({
+      url: "../pageBusiness/workbench/main"
+    })
   })
   // })
   // if (res.header["Set-Cookie"]) {
@@ -202,6 +221,20 @@ export function enterStaff(res) {
 // 随机4位数
 function rand(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function getAuthList() {
+  return new Promise(function (resolve) {
+    HttpRequest({
+      url: '/user/authInto',
+      success(res) {
+        if (res.data.code == 200) {
+          // store.state.authInto = res.data.data
+          resolve(res.data.data)
+        }
+      }
+    })
+  })
 }
 
 // 绑定方法

@@ -483,6 +483,7 @@ export default {
               title: "请稍后..."
             });
             _method.then(res => {
+              wx.hideLoading();
               if (res.data.code === 200) {
                 wx.showToast({
                   title: "分配成功",
@@ -497,7 +498,6 @@ export default {
                 });
               }
               that.cancelOperate();
-              wx.hideLoading();
             });
           }
         }

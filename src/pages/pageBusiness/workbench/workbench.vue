@@ -17,11 +17,11 @@
       </div>
     </div>
     <!-- <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="demo-canvas"/> -->
-    <div class="subtitle">
+    <div class="subtitle" v-if="noAuthLineView">
       <img class="screening-icon" src="/static/images/staff/title-icon.svg">
       <span class="subtitle-text">经营分析</span>
     </div>
-    <div class="line-view-wrapper">
+    <div class="line-view-wrapper" v-if="noAuthLineView">
       <ff-canvas id="line-view" canvas-id="line-view" :opts="opts"/>
     </div>
     <div class="subtitle" style="padding-bottom: 0px;">
@@ -51,6 +51,7 @@
 
 <script>
 import { setNavTab, window, formatDate, HttpRequest } from "COMMON/js/common.js";
+// import getauthList from "COMMON/js/authInto.config.js"
 import colorMixin from "COMPS/colorMixin.vue"
 import {getUseServiceList} from "../common/js/service_config.js"
 import F2 from "../../../../static/f2-canvas/lib/f2";
@@ -61,6 +62,7 @@ export default {
       activeIndex: 2,
       searchText: "",
       services: [],
+      noAuthLineView: true,
       opts: {
         lazyLoad: true
       },
@@ -73,6 +75,10 @@ export default {
     this.services = getUseServiceList()
     this.getLineView()
     this.name = wx.getStorageSync('staff_info').userName
+
+    // getauthList().then((data) => {
+      // console.log(data)
+    // })
   },
   onShow() {
     this.services = getUseServiceList()
@@ -123,6 +129,9 @@ export default {
           timeEnd: formatDate(new Date(now_time), 'yyyy-MM-dd') + ' 23:59:59'
         },
         success(res) {
+          if(res.data.code == 500) {
+            return that.noAuthLineView = false
+          }
           let data = res.data.data.map(e => {
             return {
               time: e.date,

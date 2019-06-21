@@ -38,15 +38,7 @@ import {
 import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 
-var normalCoachCourse = new GoEasy({
-  appkey: wx.getStorageSync("instMsgSubKey"),
-  onConnected: function() {
-    console.log("on connected...");
-  },
-  onDisconnected: function() {
-    console.log("on disconnected...");
-  }
-});
+var normalCoachCourse = null;
 export default {
   data() {
     return {
@@ -78,6 +70,15 @@ export default {
     }
   },
   mounted() {
+    normalCoachCourse = new GoEasy({
+      appkey: wx.getStorageSync("instMsgSubKey"),
+      onConnected: function() {
+        console.log("on connected...");
+      },
+      onDisconnected: function() {
+        console.log("on disconnected...");
+      }
+    });
     this.timer = setInterval(() => {
       this.getNowTime();
     }, 60000);
@@ -329,11 +330,11 @@ export default {
         url: window.api + "/mobile/coach/appoint/attendclass",
         data: {
           coachAppointId: that.params.appointId,
-          realTimeStart: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
+          realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
         },
         success(res) {
           if (res.data.code == 200) {
-            that.attendSuccess()
+            that.attendSuccess();
           } else {
             wx.showModal({
               title: "提示",
@@ -351,15 +352,15 @@ export default {
       //   showCancel: false
       // });
       // setTimeout(() => {
-        this.cancelHit();
-        wx.redirectTo({
-          // url: `../appoint_result/main?coachAppointId=${
-          //   this.params.appointId
-          // }&type=attend`
-          url: `../../appointmentResult/main?coachAppointId=${
-            this.params.appointId
-          }&type=staff`
-        });
+      this.cancelHit();
+      wx.redirectTo({
+        // url: `../appoint_result/main?coachAppointId=${
+        //   this.params.appointId
+        // }&type=attend`
+        url: `../../appointmentResult/main?coachAppointId=${
+          this.params.appointId
+        }&type=staff`
+      });
       // }, 500);
     }
   }

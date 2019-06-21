@@ -4,7 +4,7 @@
       <div class="icon-title">{{item.title}}</div>
       <div class="common-services icon-wrapper">
         <div
-          class="services-item icon-item"
+          class="services-item icon-item hidden"
           @click="toNav(item2)"
           @longpress="edit"
           v-for="(item2,index2) in item.list"
@@ -86,6 +86,9 @@ export default {
         font-size: 12px;
       }
     }
+  }
+  .hidden {
+    display: none;
   }
 }
 </style>

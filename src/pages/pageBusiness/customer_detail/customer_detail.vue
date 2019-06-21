@@ -717,6 +717,7 @@ export default {
         });
       }
       let that = this;
+      wx.showLoading()
       HttpRequest({
         url: window.api + "/customer/track/inserttrack",
         data: {
@@ -729,6 +730,7 @@ export default {
           TrackUserType: that.selectedTrackType.id || "1"
         },
         success(res) {
+          wx.hideLoading()
           if (res.data.code == 200) {
             wx.showToast({
               title: res.data.message || "跟进成功",
@@ -804,6 +806,7 @@ export default {
     },
     checkAttendStatus() {
       let that = this;
+      wx.showLoading()
       HttpRequest({
         url: window.api + "/coach/private/appoint/verifycoachId",
         data: {
@@ -827,11 +830,10 @@ export default {
                       realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
                     },
                     success(finish_res) {
+                      wx.hideLoading();
                       if (finish_res.data.code == 200) {
-                        wx.hideLoading();
                         that.attendClass();
                       } else {
-                        wx.hideLoading();
                         wx.showModal({
                           title: "提示",
                           content: finish_res.data.message || finish_res.data,

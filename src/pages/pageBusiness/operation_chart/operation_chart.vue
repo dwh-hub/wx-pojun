@@ -1,12 +1,12 @@
 <template>
   <div class="operation_chart">
-    <div class="list-header">
-      <filter-nav :nav="nav"></filter-nav>
-      <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
-        <van-tab title="运营报表"></van-tab>
-        <van-tab title="课程报表"></van-tab>
-      </van-tabs>
-    </div>
+    <!-- <div class="list-header"> -->
+    <filter-nav :nav="nav"></filter-nav>
+    <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
+      <van-tab title="运营报表"></van-tab>
+      <van-tab title="课程报表"></van-tab>
+    </van-tabs>
+    <!-- </div> -->
     <div class="operation" v-show="navIndex == 0">
       <div class="sub-tab">
         <div
@@ -20,88 +20,95 @@
           @click="operationNavIndex = 2;renderChart()"
         >明细</div>
       </div>
-      <div v-show="operationNavIndex == 1">
-        <div class="chart-title">门店排行</div>
-        <div style="height: 40vh">
-          <ff-canvas id="store" canvas-id="store" :opts="opts"/>
+      <!-- <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}"> -->
+        <div v-show="operationNavIndex == 1">
+          <div class="chart-title">门店排行</div>
+          <div style="height: 40vh">
+            <ff-canvas id="store" canvas-id="store" :opts="opts"/>
+          </div>
+          <div class="chart-title">业绩排行</div>
+          <div style="height: 40vh">
+            <ff-canvas id="card" canvas-id="card" :opts="opts"/>
+          </div>
+          <div class="chart-title">销售排行</div>
+          <div style="height: 40vh">
+            <ff-canvas id="sale" canvas-id="sale" :opts="opts"/>
+          </div>
+          <div class="chart-title">客户构成</div>
+          <div style="height: 40vh">
+            <ff-canvas id="customer" canvas-id="customer" :opts="opts"/>
+          </div>
+          <div class="chart-title">客流量</div>
+          <div style="height: 40vh">
+            <ff-canvas id="customer-line" canvas-id="customer-line" :opts="opts"/>
+          </div>
         </div>
-        <div class="chart-title">业绩排行</div>
-        <div style="height: 40vh">
-          <ff-canvas id="card" canvas-id="card" :opts="opts"/>
+        <div v-if="operationNavIndex == 2" class="operation-detail-wrapper">
+          <div class="tabel-wrapper">
+            <table>
+              <tr>
+                <td>交易类型</td>
+                <td>交易笔数</td>
+                <td>实际收入</td>
+              </tr>
+              <tr>
+                <td>新购</td>
+                <td class="blus">{{sellInfo.newPurchasedCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.newPurchasedMoney}}</td>
+              </tr>
+              <tr>
+                <td>转卡</td>
+                <td class="blus">{{sellInfo.trancCardCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.trancCardMoney}}</td>
+              </tr>
+              <tr>
+                <td>请假</td>
+                <td class="blus">{{sellInfo.stopCardCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.stopCardMoney}}</td>
+              </tr>
+              <tr>
+                <td>转让</td>
+                <td class="blus">{{sellInfo.transferCardCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.transferCardMoney}}</td>
+              </tr>
+              <tr>
+                <td>补办</td>
+                <td class="blus">{{sellInfo.lossmakeCardCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.lossmakeCardMoney}}</td>
+              </tr>
+              <tr>
+                <td>补余</td>
+                <td class="blus">{{sellInfo.spareMoneyCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.spareMoneyMoney}}</td>
+              </tr>
+              <tr>
+                <td>订金</td>
+                <td class="blus">{{sellInfo.subscriptionpactCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.subscriptionpactMoney}}</td>
+              </tr>
+              <tr>
+                <td>退款</td>
+                <td class="blus">{{sellInfo.reimburseCount}}笔</td>
+                <td class="oranges">¥{{sellInfo.reimburseMoney}}</td>
+              </tr>
+              <tr>
+                <td>合计</td>
+                <td>{{sellInfo.totalCount}}笔</td>
+                <td>¥{{sellInfo.totalMoney}}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="operation-detail">
+            <div class="title">/报表明细/</div>
+            <list-day-item
+              v-for="(item, index) in sellList"
+              :hasTag="true"
+              :key="index"
+              :info="item"
+            ></list-day-item>
+          </div>
         </div>
-        <div class="chart-title">销售排行</div>
-        <div style="height: 40vh">
-          <ff-canvas id="sale" canvas-id="sale" :opts="opts"/>
-        </div>
-        <div class="chart-title">客户构成</div>
-        <div style="height: 40vh">
-          <ff-canvas id="customer" canvas-id="customer" :opts="opts"/>
-        </div>
-        <div class="chart-title">客流量</div>
-        <div style="height: 40vh">
-          <ff-canvas id="customer-line" canvas-id="customer-line" :opts="opts"/>
-        </div>
-      </div>
-      <div v-if="operationNavIndex == 2" class="operation-detail-wrapper">
-        <div class="tabel-wrapper">
-          <table>
-            <tr>
-              <td>交易类型</td>
-              <td>交易笔数</td>
-              <td>实际收入</td>
-            </tr>
-            <tr>
-              <td>新购</td>
-              <td class="blus">{{sellInfo.newPurchasedCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.newPurchasedMoney}}</td>
-            </tr>
-            <tr>
-              <td>转卡</td>
-              <td class="blus">{{sellInfo.trancCardCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.trancCardMoney}}</td>
-            </tr>
-            <tr>
-              <td>请假</td>
-              <td class="blus">{{sellInfo.stopCardCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.stopCardMoney}}</td>
-            </tr>
-            <tr>
-              <td>转让</td>
-              <td class="blus">{{sellInfo.transferCardCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.transferCardMoney}}</td>
-            </tr>
-            <tr>
-              <td>补办</td>
-              <td class="blus">{{sellInfo.lossmakeCardCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.lossmakeCardMoney}}</td>
-            </tr>
-            <tr>
-              <td>补余</td>
-              <td class="blus">{{sellInfo.spareMoneyCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.spareMoneyMoney}}</td>
-            </tr>
-            <tr>
-              <td>订金</td>
-              <td class="blus">{{sellInfo.subscriptionpactCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.subscriptionpactMoney}}</td>
-            </tr>
-            <tr>
-              <td>退款</td>
-              <td class="blus">{{sellInfo.reimburseCount}}笔</td>
-              <td class="oranges">¥{{sellInfo.reimburseMoney}}</td>
-            </tr>
-            <tr>
-              <td>合计</td>
-              <td>{{sellInfo.totalCount}}笔</td>
-              <td>¥{{sellInfo.totalMoney}}</td>
-            </tr>
-          </table>
-        </div>
-        <div class="operation-detail">
-          <div class="title">/报表明细/</div>
-          <list-day-item v-for="(item, index) in sellList" :hasTag="true" :key="index" :info="item"></list-day-item>
-        </div>
-      </div>
+      <!-- </scroll-view> -->
     </div>
     <div class="store_chart" v-show="navIndex == 1">
       <div class="sub-tab">
@@ -158,7 +165,7 @@ export default {
           children: []
         },
         {
-          navTitle: "选择时间",
+          navTitle: "本月",
           children: [
             {
               sonText: "全部",
@@ -196,9 +203,9 @@ export default {
       saleChartData: [],
       customerLineData: [], // 客流量
       filter: {
-        timeStart: "2019-05-04 00:00:00",
-        timeEnd: "2019-06-04 23:59:59",
-        storeId: "126"
+        timeStart: "",
+        timeEnd: "",
+        storeId: ""
       },
       sellInfo: {},
       sellList: [],
@@ -206,7 +213,8 @@ export default {
       sellPage: 1,
       coachPage: 1,
       storeList: [],
-      selectedStore: {}
+      selectedStore: {},
+      scrollViewHeight: ""
     };
   },
   mixins: [colorMixin],
@@ -232,6 +240,7 @@ export default {
   },
   mounted() {
     setNavTab();
+    // this.computedScrollHeight();
 
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
@@ -245,11 +254,12 @@ export default {
         }
       };
     });
-
-    this.getSellInfo();
-    this.getSellList();
-    this.getCoachList();
-    this.renderChart();
+    
+    this.filterDate(30)
+    // this.getSellInfo();
+    // this.getSellList();
+    // this.getCoachList();
+    // this.renderChart();
   },
   methods: {
     onChange(e) {
@@ -293,6 +303,24 @@ export default {
         }
       }
     },
+    // computedScrollHeight() {
+    //   let that = this;
+    //   let windowHeight;
+    //   wx.getSystemInfo({
+    //     success: function(res) {
+    //       windowHeight = res.windowHeight;
+
+    //       let query = wx.createSelectorQuery();
+    //       query.select(".list-header").boundingClientRect();
+
+    //       query.exec(res => {
+    //         let infoHeight = res[0].height;
+    //         let scrollViewHeight = windowHeight - infoHeight;
+    //         that.scrollViewHeight = scrollViewHeight;
+    //       });
+    //     }
+    //   });
+    // },
     getStoreChartData() {
       let that = this;
       HttpRequest({

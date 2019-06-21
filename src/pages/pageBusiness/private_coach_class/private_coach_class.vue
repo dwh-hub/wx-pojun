@@ -471,6 +471,7 @@ export default {
                 studentId: that.curSelectClass.id,
                 appointId: that.curSelectClass.coachAppointId
               };
+              that.showOperate = false;
               wx.navigateTo({
                 url: "../QRCodeSignIn/main?params=" + JSON.stringify(params)
               });

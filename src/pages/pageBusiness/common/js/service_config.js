@@ -1,10 +1,11 @@
-const service = [{
+let service = [{
     title: "工作台",
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
         text: "业务",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-workbench_icon_2"
       },
       {
@@ -12,6 +13,7 @@ const service = [{
         text: "签到",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-workbench_icon_1"
       },
       {
@@ -19,6 +21,7 @@ const service = [{
         text: "确认信息",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-workbench_icon_4"
       },
       {
@@ -26,6 +29,7 @@ const service = [{
         text: "商品",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-workbench_icon_3"
       },
       {
@@ -33,11 +37,13 @@ const service = [{
         text: "营销",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-operation_report_icon_2"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_6.jpg",
         text: "客户约访",
+        authorityId: 184,
         navUrl: "../customer_interview/main",
         isOpen: true,
         class: "iconfont icon-workbench_icon_6"
@@ -49,6 +55,7 @@ const service = [{
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/member_service_icon_1.svg",
         text: "客户",
+        authorityId: 28,
         navUrl: "../customer/main",
         isOpen: true,
         class: "iconfont icon-member_service_icon_1"
@@ -56,6 +63,7 @@ const service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/member_service_icon_2.svg",
         text: "学员",
+        authorityId: 64,
         navUrl: "../coach_student/main",
         isOpen: true,
         class: "iconfont icon-member_service_icon_2"
@@ -74,6 +82,7 @@ const service = [{
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/class_icon_1.svg",
         text: "团课",
+        authorityId: 275,
         navUrl: "../staff_team_class/main",
         isOpen: true,
         class: "iconfont icon-class_icon_1"
@@ -81,6 +90,7 @@ const service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
         text: "私教",
+        authorityId: 152,
         navUrl: "../private_coach_class/main",
         isOpen: true,
         class: "iconfont icon-class_icon_2"
@@ -94,6 +104,7 @@ const service = [{
         text: "销售CRM",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-sale_manage_icon_1"
       },
       {
@@ -106,6 +117,7 @@ const service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/sale_manage_icon_3.svg",
         text: "销售分配",
+        authorityId: 58,
         navUrl: "../customer/main",
         isOpen: true,
         class: "iconfont icon-sale_manage_icon_3"
@@ -115,11 +127,13 @@ const service = [{
         text: "销售工作分析表",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-sale_manage_icon_4"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/sale_manage_icon_6.jpg",
         text: "跟进日志",
+        authorityId: 27,
         navUrl: "../follow_up_log/main?trackUserType=1",
         isOpen: true,
         class: "iconfont icon-sale_manage_icon_6"
@@ -138,6 +152,7 @@ const service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_2.svg",
         text: "教练分配",
+        authorityId: 162,
         navUrl: "../coach_student/main",
         isOpen: true,
         class: "iconfont icon-coach_service_icon_2"
@@ -147,6 +162,7 @@ const service = [{
         text: "教练跟进表",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-coach_service_icon_2"
       },
       {
@@ -154,6 +170,7 @@ const service = [{
         text: "课时统计报表",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-coach_service_icon_4"
       },
       {
@@ -161,6 +178,7 @@ const service = [{
         text: "上课统计报表",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-coach_service_icon_1"
       },
       {
@@ -168,11 +186,13 @@ const service = [{
         text: "教练CRM",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-coach_service_icon_"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_7.jpg",
         text: "跟进日志",
+        authorityId: 69,
         navUrl: "../follow_up_log/main?trackUserType=2",
         isOpen: true,
         class: "iconfont icon-coach_service_icon_7"
@@ -184,6 +204,7 @@ const service = [{
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_1.svg",
         text: "运营报表",
+        authorityId: 89,
         navUrl: "../operation_chart/main",
         isOpen: true,
         class: "iconfont icon-operation_report_icon_1"
@@ -193,6 +214,7 @@ const service = [{
         text: "业绩报表",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-operation_report_icon_2"
       },
       {
@@ -207,6 +229,7 @@ const service = [{
         text: "评分报表",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-operation_report_icon_1"
       },
       {
@@ -214,6 +237,7 @@ const service = [{
         text: "签到报表",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-operation_report_icon_4"
       }
     ]
@@ -225,6 +249,7 @@ const service = [{
         text: "门店",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-field_manage_icon_"
       },
       {
@@ -232,6 +257,7 @@ const service = [{
         text: "手牌",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-field_manage_icon_5"
       },
       {
@@ -239,6 +265,7 @@ const service = [{
         text: "短信",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-field_manage_icon_4"
       },
       {
@@ -246,6 +273,7 @@ const service = [{
         text: "标签",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-field_manage_icon_1"
       },
       {
@@ -253,6 +281,7 @@ const service = [{
         text: "设备管理",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-field_manage_icon_3"
       },
       {
@@ -260,6 +289,7 @@ const service = [{
         text: "公告",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-field_manage_icon_2"
       }
     ]
@@ -271,6 +301,7 @@ const service = [{
         text: "待入职人员",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-staff_manage_icon_1"
       },
       {
@@ -278,6 +309,7 @@ const service = [{
         text: "人事",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-staff_manage_icon_2"
       },
       {
@@ -285,6 +317,7 @@ const service = [{
         text: "组织架构",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-staff_manage_icon_"
       },
       {
@@ -292,11 +325,29 @@ const service = [{
         text: "公告",
         navUrl: "",
         isOpen: false,
+        hasAuth: true,
         class: "iconfont icon-staff_manage_icon_3"
       }
     ]
   }
 ]
+
+const authInto = wx.getStorageSync("authInto")
+let authStr = ''
+authInto.forEach(e => {
+  authStr += e.authStr
+})
+
+service.forEach((group) => {
+  group.list.forEach(item => {
+    if(item.authorityId) {
+      if(authStr.indexOf(item.authorityId) == -1) {
+        console.log(item.text)
+        item.hasAuth = false
+      }
+    }
+  })
+})
 
 function getUseServiceList() {
   let useServiceList = []
@@ -308,7 +359,7 @@ function getUseServiceList() {
       if (item.isOpen && !storageList.includes(item.text)) {
         useServiceList.push(item)
       }
-      if(storageList.includes(item.text)) {
+      if (storageList.includes(item.text)) {
         usedList.push(item)
       }
     })

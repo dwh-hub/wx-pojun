@@ -102,7 +102,7 @@ export default {
       wx.request({
         url: window.api + "/user/login",
         data: {
-          phone: "18888888881",
+          phone: "18259260871",
           password: "2131",
           companyId: "53"
         },
@@ -125,6 +125,8 @@ export default {
           if (res.confirm) {
             wx.removeStorageSync("instMsgSubKey");
             wx.removeStorageSync("phone");
+            wx.removeStorageSync("authInto")
+            wx.removeStorageSync("staff_info")
             wx.switchTab({
               url: "../../homepage/main"
             });

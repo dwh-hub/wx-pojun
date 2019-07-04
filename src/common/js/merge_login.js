@@ -46,9 +46,10 @@ export function getPhoneNumber(e, url, isTab) {
         //   }
         // });
       } else {
+        // TODO:
         // wx.setStorage({
         //   key: "phone",
-        //   data: "12345678910",
+        //   data: "18888888881",
         //   success: function () {
         //     login(url, isTab);
         //   }
@@ -186,15 +187,17 @@ export function enterStaff(res) {
   getAuthList().then((data) => {
     let authList = []
     data.forEach((store) => {
-      let authStr
+      let authArr = []
       store.authList.forEach((e) => {
-        authStr += (e.authorityId+',')
+        if(e) {
+          authArr.push(e.authorityId)
+        }
       })
       authList.push({
         departmentIdArray: store.departmentIdArray,
         customerFilterLevel: store.customerFilterLevel,
         positionType: store.positionType,
-        authStr: authStr
+        authArr: authArr
       })
     })
     wx.setStorageSync("authInto", authList);
@@ -231,6 +234,12 @@ function getAuthList() {
         if (res.data.code == 200) {
           // store.state.authInto = res.data.data
           resolve(res.data.data)
+        } else {
+          wx.showModal({
+            title: "提示",
+            content: res.data.message,
+            showCancel: false
+          });
         }
       }
     })

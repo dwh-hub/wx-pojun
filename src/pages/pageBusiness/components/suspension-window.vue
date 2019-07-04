@@ -1,16 +1,17 @@
 <template>
-  <div class="suspension_window">
+  <div class="suspension_window" v-if="operateList.length || operateList.length > 0">
     <div class="suspension">
       <div class="operate-wrapper" v-show="showOperate">
-        <div class="operate-item" v-for="(item, index) in operateList" :key="index" @click.stop="operate(item)">
+        <div class="operate-item" v-for="(item, index) in operateList" :key="index" :class="{hidden: item.hasAuth == undefined ? false : !item.hasAuth}" @click.stop="operate(item)">
           <span>{{item.text}}</span>
-          <image mode="aspectFit" :src="item.iconUrl"></image>
+          <i :class="item.class" v-if="item.class" :style="{'color': themeColor}"></i>
+          <image mode="aspectFit" v-else :src="item.iconUrl"></image>
         </div>
       </div>
       <!-- <image @click="toggleOperate" mode="aspectFit" src="/static/images/staff/suspension.svg"></image> -->
       <i class="icon-suspension" @click="toggleOperate" :style="{'color': themeColor}"></i>
     </div>
-    <div class="mask-all" v-show="showOperate" @click.prevent="showOperate = false"></div>
+    <div class="mask-all" v-show="showOperate" @click.stop="showOperate = false" @touchmove.stop="preventTouchMove"></div>
   </div>
 </template>
 
@@ -39,6 +40,9 @@ export default {
     }
   },
   methods: {
+    preventTouchMove() {
+      // wx.stopPullDownRefresh()
+    },
     toggleOperate() {
       this.showOperate = !this.showOperate;
     },
@@ -93,8 +97,16 @@ export default {
           width: 30px;
           height: 30px;
         }
+        >i {
+          display: inline-block;
+          vertical-align: middle;
+          font-size: 25px;
+        }
       }
     }
+  }
+  .hidden {
+    display: none;
   }
 }
 </style>

@@ -4,11 +4,11 @@
     <div class="moneyRecode">
       <div class="spend">
         <div class="spend-text">消费</div>
-        <div class="spend-num">{{customer.recCount}}次</div>
+        <div class="spend-num">{{customer.recCount || '--'}}次</div>
       </div>
       <div class="balance">
         <div class="balance-text">剩余</div>
-        <div class="balance-num">{{cardInfo.periodOfValidity}}{{cardInfo.authorityUnitChar}}</div>
+        <div class="balance-num">{{cardInfo.periodOfValidity || '--'}}{{cardInfo.authorityUnitChar || ''}}</div>
       </div>
     </div>
     <div class="card-info">
@@ -18,19 +18,19 @@
       </div>
       <div class="carad-info-item">
         <span class="item-title">联系方式</span>
-        <span class="item-content">{{cardInfo.phone}}</span>
+        <span class="item-content">{{cardInfo.phone || '--'}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">办理销售</span>
-        <span class="item-content">{{cardInfo.transactUserName}}</span>
+        <span class="item-content">{{cardInfo.transactUserName || '--'}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">办理时间</span>
-        <span class="item-content">{{activateDate}}</span>
+        <span class="item-content">{{activateDate || '--'}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">合同编号</span>
-        <span class="item-content">{{cardInfo.pactId}}</span>
+        <span class="item-content">{{cardInfo.pactId || '--'}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">上课教练</span>
@@ -38,7 +38,7 @@
       </div>
       <div class="carad-info-item">
         <span class="item-title">有效期</span>
-        <span class="item-content">{{activateDate}}~{{doomsday}}</span>
+        <span class="item-content">{{activateDate || '--'}}~{{doomsday || '--'}}</span>
       </div>
     </div>
     <page-footer></page-footer>
@@ -101,7 +101,6 @@ export default {
         url: window.api + '/customer/card/detail/' + that.cardId,
         success(res) {
           that.cardInfo = res.data.data
-          console.log(that.cardInfo)
           that.getCustomer(res.data.data.pactId)
         }
       })

@@ -1,12 +1,6 @@
 <template>
   <div class="workbench">
-    <!-- <div class="top-quick" v-for="(item,index) in quickEnter" :key="index">
-      <div class="quick">
-        <image mode="aspectFit" :src="item.iconUrl"></image>
-        <div class="quick-text">{{item.text}}</div>
-      </div>
-    </div>-->
-    <div class="header-search">
+    <div class="header-search list-header">
       <div class="search-wrapper">
         <van-search
           :value="searchText"
@@ -16,7 +10,6 @@
         ></van-search>
       </div>
     </div>
-    <!-- <mpvue-echarts :echarts="echarts" :onInit="onInit" canvasId="demo-canvas"/> -->
     <div class="subtitle" v-if="noAuthLineView">
       <img class="screening-icon" src="/static/images/staff/title-icon.svg">
       <span class="subtitle-text">经营分析</span>
@@ -27,6 +20,7 @@
     <div class="subtitle" style="padding-bottom: 0px;">
       <img class="screening-icon" src="/static/images/staff/title-icon.svg">
       <span class="subtitle-text">常用服务</span>
+      <span class="edit-service" @click="editService">编辑</span>
     </div>
     <div class="common-services icon-wrapper">
       <div class="services-item icon-item" @click="toNav(item.navUrl)" v-for="(item,index) in services" :key="index">
@@ -51,10 +45,10 @@
 
 <script>
 import { setNavTab, window, formatDate, HttpRequest } from "COMMON/js/common.js";
-// import getauthList from "COMMON/js/authInto.config.js"
 import colorMixin from "COMPS/colorMixin.vue"
-import {getUseServiceList} from "../common/js/service_config.js"
-import F2 from "../../../../static/f2-canvas/lib/f2";
+import { getUseServiceList } from "../common/js/http.js";
+import { serviceList } from "../common/js/service_config.js";
+import F2 from '@antv/wx-f2';
 
 export default {
   data() {
@@ -72,16 +66,21 @@ export default {
   mixins:[colorMixin],
   mounted() {
     setNavTab();
-    this.services = getUseServiceList()
     this.getLineView()
     this.name = wx.getStorageSync('staff_info').userName
-
-    // getauthList().then((data) => {
-      // console.log(data)
-    // })
   },
   onShow() {
-    this.services = getUseServiceList()
+    getUseServiceList().then((data) => {
+      if(!data.length) {
+        data = serviceList.slice(0,7)
+      }
+      data.push({
+        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_4.svg",
+        text: "全部服务",
+        navUrl: "../allServices/main"
+      })
+      this.services = data
+    })
   },
   methods: {
     toNav(url) {
@@ -175,9 +174,31 @@ export default {
         }
       };
       chart.source(data, defs);
+      // chart.tooltip({
+      //   showXTip: true,
+      //   onChange(e) {
+      //     console.log(e)
+      //   },
+      //   onShow(ev) {
+      //     console.log(ev)
+      //     const { items } = ev;
+      //     // items[0].name = null;
+      //     // items[0].name = items[0].title;
+      //     // items[0].value = '¥ ' + items[0].value;
+      //   }
+      // });
       chart.tooltip({
-        showCrosshairs: true
+        custom: true,
+        showXTip: true,
+        showYTip: true,
+        showCrosshairs: true,
+        snap: true,
+        crosshairsType: 'xy',
+        crosshairsStyle: {
+          lineDash: [2]
+        }
       });
+
       chart
         .line()
         .position("time*tem")
@@ -192,6 +213,11 @@ export default {
         });
       chart.render();
     },
+    editService() {
+      wx.navigateTo({
+        url: '../allServices/main?type=edit'
+      })
+    }
   }
 };
 </script>
@@ -205,6 +231,7 @@ page {
   background-color: #f6f6f6;
 }
 .workbench {
+  padding-bottom: 60px;
   .line-view-wrapper {
     box-sizing: border-box;
     height: 40vh;
@@ -245,6 +272,17 @@ page {
     text-align: center;
     margin: 15px 0;
     color: #999;
+  }
+  .subtitle {
+    .edit-service {
+      float: right;
+      margin-top:-4px;
+      margin-right: 5px;
+      padding:2px 10px;
+      border-radius:3px;
+      color:#fff;
+      background-color:#01c8d1;
+    }
   }
 }
 </style>

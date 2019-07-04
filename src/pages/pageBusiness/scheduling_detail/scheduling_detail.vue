@@ -6,7 +6,7 @@
         <div class="name">{{classDetail.anotherName}}</div>
         <div class="duration">时长：{{classDetail.timeSpan}}分钟</div>
       </div>
-      <div @click="toModify">修改团课</div>
+      <div @click="toModify" v-if="canModify" class="modify" :style="{'background-color':themeColor}">修改团课</div>
     </div>
     <van-cell-group custom-class="van-cell-group">
       <van-cell title="门店" :value="classDetail.storeName" />
@@ -49,6 +49,7 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
+import {checkAuth} from "../common/js/service_config.js";
 import colorMixin from "COMPS/colorMixin.vue";
 export default {
   data() {
@@ -56,7 +57,8 @@ export default {
       classDetail: {},
       studentPage: 0,
       studentList: [],
-      teamScheduleId: 0
+      teamScheduleId: 0,
+      canModify: checkAuth(294)
     };
   },
   onLoad(options) {
@@ -151,10 +153,9 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             that.studentList = res.data.data.result.map(e => {
-              // TODO:
-              // if(!e.masterImg) {
+              if(!e.masterImg) {
               e.masterImg = window.api + "/assets/img/morenTo.png";
-              // }
+              }
               return e;
             });
           }
@@ -202,6 +203,14 @@ page {
       border-radius: 3px;
       background-color: #eee;
     }
+    .modify {
+      line-height:26px;
+      height:26px;
+      color:#fff;
+      border-radius:3px;
+      padding:0 5px;
+      margin-top:14px;
+    }
     .class-info {
       > div {
         line-height: 22px;
@@ -222,7 +231,7 @@ page {
       flex: 1;
       margin-left: 15px;
       > div {
-        line-height: 20px;
+        line-height: 30px;
       }
     }
     .class-over {

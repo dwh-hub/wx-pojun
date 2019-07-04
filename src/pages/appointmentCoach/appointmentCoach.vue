@@ -813,14 +813,21 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            let _list = [];
-            res.data.data.result.forEach(e => {
-              if (e.teachCardType == 2 && e.cardStatus == 2) {
+            let _list = res.data.data.result;
+
+            // res.data.data.result.forEach(e => {
+            //   if (e.teachCardType == 2 && e.cardStatus == 2) {
+            //     e.doomsday = e.doomsday.split(" ")[0];
+            //     _list.push(e);
+            //   }
+            // });
+            that.cardList = _list.filter(e => {
+              if(e.doomsday) {
                 e.doomsday = e.doomsday.split(" ")[0];
-                _list.push(e);
               }
+              return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
             });
-            that.cardList = _list;
+
             if (that.cardList.length == 1) {
               that.selectCard(that.cardList[0]);
             }

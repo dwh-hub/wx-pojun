@@ -7,7 +7,7 @@
         is-link
         @click="toInfoCell('userName',userInfo.userName)"
       />
-      <van-cell title="性别" :value="userInfo.sex" is-link @click="showSex = true"/>
+      <van-cell title="性别" :value="userInfo.sex" is-link @click="type == 'oneself' ? showSex = true : ''"/>
       <!-- @click="toInfoCell('sex',userInfo.sex)" -->
       <van-cell
         title="手机号"
@@ -75,7 +75,7 @@ export default {
       }
     },
     toInfoCell(type, text) {
-      if (this.type == "oneself") {
+      if (this.type !== "oneself") {
         return;
       }
       wx.navigateTo({

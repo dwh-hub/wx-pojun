@@ -252,7 +252,11 @@ export default {
               that.list = [];
             }
             that.headerData[0].dataNum = res.data.data.recCount;
-            let _data = res.data.data.result.map(async e => {
+            let list = res.data.data.result
+            list = list.filter(e => {
+              return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
+            });
+            let _data = list.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {
                   await that.getAvatar(e.headImgPath).then(res => {

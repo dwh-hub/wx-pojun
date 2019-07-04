@@ -1,5 +1,5 @@
 const window = {}
-window.DEBUGGING = true
+window.DEBUGGING = false
 window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
 // 获取 ext.json 配置信息

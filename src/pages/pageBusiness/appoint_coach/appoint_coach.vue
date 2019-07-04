@@ -224,8 +224,8 @@
               {{item.cardClassName}}
               <span>{{item.masterClassName}}</span>
             </div>
-            <div class="times">使用权益：{{item.balanceAuthority}}{{item.authorityUnit}}</div>
-            <div class="date">结束日期：{{item.doomsday}}</div>
+            <div class="times">使用权益：{{item.balanceAuthority || '--'}}{{item.authorityUnit || ''}}</div>
+            <div class="date">结束日期：{{item.doomsday || '--'}}</div>
           </div>
         </div>
       </div>
@@ -332,7 +332,8 @@ export default {
       // 学员信息
       studentInfo: {},
       // 不能预约的时间
-      todayPeriodTime: []
+      todayPeriodTime: [],
+      isRevision: false
     };
   },
   components: {
@@ -340,10 +341,21 @@ export default {
     selectDate
   },
   onLoad(options) {
+    setNavTab();
     this.id = options.id;
     this.appointType = options.type;
     this.userInfo = wx.getStorageSync("staff_info");
-    setNavTab();
+    this.curDate = formatDate(new Date(), "yyyy-MM-dd");
+    if (this.appointType == "改约") {
+      this.isRevision = true
+      this.revision();
+    } else {
+      this.isRevision = false
+      // this.computedTime();
+      this.getStudentDetail();
+      this.getCardList();
+      this.getPeriodTime();
+    }
   },
   onUnload() {
     Object.assign(this.$data, this.$options.data());
@@ -352,13 +364,6 @@ export default {
     setTimeout(() => {
       wx.stopPullDownRefresh();
     }, 1000);
-  },
-  mounted() {
-    this.curDate = formatDate(new Date(), "yyyy-MM-dd");
-    // this.computedTime();
-    this.getStudentDetail();
-    this.getCardList();
-    this.getPeriodTime();
   },
   computed: {
     isPhoneX() {
@@ -392,6 +397,9 @@ export default {
     },
     // 显示合同弹窗
     showCardPopop() {
+      if(this.isRevision) {
+        return
+      }
       if (!this.cardList.length) {
         return wx.showModal({
           title: "提示",
@@ -403,6 +411,9 @@ export default {
     },
     // 显示门店弹窗
     showStorePopup() {
+      if(this.isRevision) {
+        return
+      }
       if (!this.selectCardId) {
         return wx.showModal({
           title: "提示",
@@ -414,6 +425,9 @@ export default {
     },
     // 显示场馆弹窗
     showVenuePopup() {
+      if(this.isRevision) {
+        return
+      }
       if (!this.selectStoreId || !this.selectCardId) {
         return wx.showModal({
           title: "提示",
@@ -432,6 +446,9 @@ export default {
     },
     // 显示项目弹窗
     showProjectPopup() {
+      if(this.isRevision) {
+        return
+      }
       if (!this.venueId) {
         return wx.showModal({
           title: "提示",
@@ -695,26 +712,32 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            let _list = [];
-            if (!res.data.data.result.length) {
+            let _list = res.data.data.result;
+            if (!_list.length) {
               return wx.showModal({
                 title: "提示",
                 content: "未找到可消费合同",
                 showCancel: false
               });
             }
-            _list = res.data.data.result.map(e => {
-              if (e.teachCardType == 2 && e.cardStatus == 2) {
+            // _list = _list.map(e => {
+            //   if (e.teachCardType == 2 && e.cardStatus == 2 && e.canTeachCard == 1) {
+            //     e.doomsday = e.doomsday.split(" ")[0];
+            //   }
+            //   return e
+            // });
+            that.cardList = _list.filter(e => {
+              if(e.doomsday) {
                 e.doomsday = e.doomsday.split(" ")[0];
-                // _list.push(e);
               }
-              return e;
+              return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
             });
-            that.cardList = _list;
+            console.log(that.cardList)
             if (that.cardList.length == 1) {
               that.selectCard(that.cardList[0]);
             } else {
-              that.isCardPopup = true;
+              // that.isCardPopup = true;
+              that.showCardPopop()
             }
           }
         }
@@ -896,6 +919,8 @@ export default {
         this.confirmAppoint(params);
       } else if (this.appointType == "一键上课") {
         this.confirmAttendClass(params);
+      } else if(this.appointType == "改约") {
+        this.revisionClass()
       }
     },
     // 上课 确认按钮 点击上课 -> 获取设置的上课方式 -> 走对应的上课流程
@@ -1011,9 +1036,7 @@ export default {
             //   showCancel: false
             // });
             wx.redirectTo({
-              url: `../../appointmentResult/main?coachAppointId=${
-                appointId
-              }&type=staff`
+              url: `../../appointmentResult/main?coachAppointId=${appointId}&type=staff`
             });
           } else {
             wx.showModal({
@@ -1021,6 +1044,68 @@ export default {
               content: res.data.message,
               showCancel: false
             });
+          }
+        }
+      });
+    },
+    // 改约
+    revision() {
+      this.getCoachDetail().then(res => {
+        this.storeCellText = res.storeName;
+        this.selectStoreId = res.storeId;
+        this.cardCellText = res.cardClassName;
+        this.selectCardId = res.cardId;
+        this.venueCellText = res.venueName;
+        this.venueId = res.venueId;
+        this.projectCellText = res.projectName;
+        this.projectId = res.projectId;
+        this.cardClassId = res.secondCardClassId;
+
+        this.getStoreQuery().then(() => {
+          this.getPeriodTime();
+          this.isTimePopup = true;
+        });
+      });
+    },
+    // 私教课
+    getCoachDetail() {
+      let that = this;
+      return new Promise(resolve => {
+        HttpRequest({
+          url: window.api + "/mobile/coach/appoint/detail",
+          data: {
+            coachAppointId: that.id
+          },
+          success(res) {
+            if (res.data.code === 200) {
+              resolve(res.data.data);
+            }
+          }
+        });
+      });
+    },
+    revisionClass() {
+      let that = this;
+      HttpRequest({
+        url: "/mobile/coach/appoint/amendtreaty",
+        data: {
+          coachAppointId: that.id,
+          calendar: that.curDate + " " + "00:00:00",
+          timeStart: that.curDate + " " + that.curTime + ":00",
+          timeEnd: that.curDate + " " + that.curEndTime + ":00"
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            wx.showToast({
+              title: "改约成功",
+              icon: "success",
+              duration: 1000
+            });
+            setTimeout(() => {
+              wx.navigateBack({
+                delta: 1
+              });
+            }, 1000)
           }
         }
       });

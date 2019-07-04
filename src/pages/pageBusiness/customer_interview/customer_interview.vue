@@ -174,9 +174,9 @@ export default {
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.visitorName,
-                second_1: e.appointmentPurposeChar,
+                second_1: e.appointmentPurposeChar || '无',
                 second_tip_1: "预约目的：",
-                third_1: e.appointmentTime,
+                third_1: e.appointmentTime || '--',
                 third_tip_1: "最后签到时间：",
                 rightText: e.isVisitChar
               };

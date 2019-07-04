@@ -54,7 +54,8 @@
       "operation_chart/main",
       "select_scheduling_date/main",
       "service_web/main",
-      "common_list/main"
+      "common_list/main",
+      "handwrite_board/main"
     ]
   }],
   "permission": {

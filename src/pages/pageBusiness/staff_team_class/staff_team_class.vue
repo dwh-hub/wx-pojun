@@ -33,6 +33,7 @@
       <div class="operate-list">
         <div
           class="operate-item"
+          :class="{hidden: !item.hasAuth}"
           v-for="(item, index) in actionList"
           :key="index"
           @click="item.action"
@@ -51,6 +52,7 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
+import {checkAuth} from "../common/js/service_config.js";
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -129,24 +131,25 @@ export default {
           dataNum: "0"
         }
       ],
-      operateList: [
-        {
-          text: "单日排期",
-          iconUrl: "/static/images/staff/close.svg",
-          action: () => {}
-        },
-        {
-          text: "批量排期",
-          iconUrl: "/static/images/staff/calendar.svg",
-          action: () => {
-            console.log("批量排期");
-          }
-        }
-      ],
+      // operateList: [
+      //   {
+      //     text: "单日排期",
+      //     iconUrl: "/static/images/staff/close.svg",
+      //     action: () => {}
+      //   },
+      //   {
+      //     text: "批量排期",
+      //     iconUrl: "/static/images/staff/calendar.svg",
+      //     action: () => {
+      //       console.log("批量排期");
+      //     }
+      //   }
+      // ],
       storeList: [],
       actionList: [
         {
           text: "查看详情",
+          hasAuth: true,
           action: () => {
             this.showOperatePopup = false;
             wx.navigateTo({
@@ -158,12 +161,14 @@ export default {
         },
         {
           text: "单日排期",
+          hasAuth: checkAuth(292),
           action: () => {
             this.toScheduling("single");
           }
         },
         {
           text: "批量排期",
+          hasAuth: checkAuth(292),
           action: () => {
             this.toScheduling("batch");
           }
@@ -184,6 +189,11 @@ export default {
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     this.filterDate(1);
+  },
+  onShow() {
+    if (this.selectedStore.storeId) {
+      this.refreshList(1);
+    }
   },
   mixins: [colorMixin, listPageMixin],
   components: {
@@ -291,6 +301,9 @@ page {
       line-height: 48px;
       text-align: center;
     }
+  }
+  .hidden {
+    display: none;
   }
 }
 </style>

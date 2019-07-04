@@ -61,6 +61,10 @@ export default {
   },
   mounted() {
     this.text = this.searchText
+    if(this.storeList.length) {
+      this._storeList = this.storeList
+      this.selectedStore = this.storeList[0]
+    }
   },
   watch: {
     storeList(val, oldVal) {
@@ -75,7 +79,7 @@ export default {
     },
     selectStore(item) {
       if (this.selectedStore.storeId == item.storeId) {
-        return;
+        return this.showMask = false;
       }
       this.selectedStore = item;
       this.showMask = false;

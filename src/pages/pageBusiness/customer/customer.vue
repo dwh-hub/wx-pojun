@@ -94,6 +94,7 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
+import {checkAuth} from "../common/js/service_config.js";
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -214,6 +215,8 @@ export default {
       operateList: [
         {
           text: "分配销售",
+          hasAuth: checkAuth(58),
+          class: 'operate icon-fenpei',
           iconUrl: "/static/images/staff/close.svg"
         },
         // {
@@ -339,7 +342,7 @@ export default {
                 second_1: e.cardNum || 0,
                 second_tip_1: "合同数：",
                 second_2: "",
-                third_1: e.lastTrackTime || "暂无",
+                third_1: e.lastTrackTime || "--",
                 third_tip_1: "最后签到时间："
               };
             });
@@ -485,6 +488,7 @@ export default {
             _method.then(res => {
               wx.hideLoading();
               if (res.data.code === 200) {
+                that.refreshList();
                 wx.showToast({
                   title: "分配成功",
                   icon: "success",

@@ -224,7 +224,10 @@ export default {
         success(res) {
           that.isLoading = false;
           if (res.data.code == 200) {
-            that.cardInfoList = res.data.data;
+            let list = res.data.data;
+            that.cardInfoList = list.filter(e => {
+              return e.canTeachCard == 1 && e.teachCardType == 1 && e.cardStatus == 2
+            });;
           }
           if (!that.cardInfoList.length) {
             that.isNoneResult = true;

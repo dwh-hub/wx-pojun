@@ -1,10 +1,10 @@
 {
   "extEnable": true,
-  "extAppid": "wxf88e780a44d47beb",
+  "extAppid": "wx8a6408ab22fdeea4",
   "directCommit": false,
   "extPages": {
     "pages/homepage/main": {
-      "navigationBarTitleText": "前锋体育"
+      "navigationBarTitleText": "首页"
     }
   },
   "networkTimeout": {

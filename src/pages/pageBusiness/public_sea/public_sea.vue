@@ -49,6 +49,7 @@
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import {checkAuth} from "../common/js/service_config.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import headerSearch from "../components/header-search.vue";
@@ -155,6 +156,8 @@ export default {
       operateList: [
         {
           text: "认领",
+          hasAuth: checkAuth(55),
+          class: 'operate icon-renling',
           iconUrl: "/static/images/staff/close.svg"
         }
       ],
@@ -289,7 +292,7 @@ export default {
                 second_1: e.totalCardCount || 0,
                 second_tip_1: "合同数：",
                 second_2: "",
-                third_1: e.lastTrackTime,
+                third_1: e.lastTrackTime || '--',
                 third_tip_1: "最后签到时间："
               };
             });

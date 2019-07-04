@@ -12,7 +12,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wxf88e780a44d47beb",
+	"appid": "wx8a6408ab22fdeea4",
 	"projectname": "wx-pojun",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
@@ -82,7 +82,7 @@
 					"id": 6,
 					"name": "demo",
 					"pathName": "pages/pageBusiness/allServices/main",
-					"query": "",
+					"query": "id=6828",
 					"scene": null
 				},
 				{

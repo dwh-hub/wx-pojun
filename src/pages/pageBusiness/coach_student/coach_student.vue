@@ -90,6 +90,7 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
+import {checkAuth} from "../common/js/service_config.js";
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -198,6 +199,8 @@ export default {
         // }
         {
           text: "分配教练",
+          hasAuth: checkAuth(69),
+          class: 'operate icon-fenpei',
           iconUrl: "/static/images/staff/calendar.svg"
         }
         // {
@@ -224,7 +227,7 @@ export default {
       operateText: "",
       filter: {
         nameOrPhone: "",
-        trainerStatusClass: "",
+        trainerStatus: "",
         addTimeStart: "",
         addTimeEnd: ""
       }
@@ -312,9 +315,9 @@ export default {
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.name,
-                second_1: e.serviceCoachName,
+                second_1: e.serviceCoachName || '--',
                 second_tip_1: "服务教练：",
-                third_1: e.lastTrackTime || "暂无",
+                third_1: e.lastTrackTime || "--",
                 third_tip_1: "最后签到时间："
               };
             });
@@ -336,12 +339,15 @@ export default {
             positionType: type
           },
           success(res) {
+            res.data.data.forEach((e) => {
+              e.headImgPath = e.headImgPath ? window.api + e.headImgPath : 'https://pojun-tech.cn/assets/img/morenTo.png'
+            })
             resolve(res);
           }
         });
       });
     },
-    // 分配销售
+    // 分配教练
     allotCoach() {
       let _customerIdStr = "";
       this.list.forEach(e => {
@@ -452,6 +458,7 @@ export default {
             _method.then(res => {
               wx.hideLoading();
               if (res.data.code === 200) {
+                that.refreshList();
                 wx.showToast({
                   title: "分配成功",
                   icon: "success",
@@ -518,7 +525,7 @@ export default {
     },
     // 学员状态 1未办理，2已办理，3已失效
     toggleState(state) {
-      this.filter.trainerStatusClass = state || "";
+      this.filter.trainerStatus = state || "";
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);

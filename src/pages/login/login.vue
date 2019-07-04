@@ -54,8 +54,7 @@ export default {
       phone: "18259260870", // 15159125113
       // 验证码
       vCode: "",
-      // TODO: 短信验证码id
-      smsSendLogId: 15679,
+      // smsSendLogId: 15679,
       userInfo: {},
       CDTime: 0,
       showBindBox: false,
@@ -89,7 +88,6 @@ export default {
             },
             success(res) {
               console.log(res);
-              // TODO: smsSendLogId
               that.smsSendLogId = res.data.data;
             }
           });
@@ -143,7 +141,6 @@ export default {
       //     code: that.vCode
       //   },
       //   success(data) {
-      // TODO: 获取sessionKey和openid
       // wx.login({
       //   success(res) {
       //     if(res.code) {

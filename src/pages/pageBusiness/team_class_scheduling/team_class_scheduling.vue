@@ -335,10 +335,9 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            // TODO:
-            // if(!res.data.data.masterImg) {
+            if(!res.data.data.masterImg) {
             res.data.data.masterImg = window.api + "/assets/img/morenImg.png";
-            // }
+            }
             res.data.data.venueId = res.data.data.venueIdIntArray[0];
             that.isAppoint = res.data.data.isNeedAppoint == 0 ? "2" : "1";
             that.isAppointAttend = res.data.data.isNeedAppoint == 1 ? "1" : "2";
@@ -356,10 +355,9 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            // TODO:
-            // if(!res.data.data.masterImg) {
+            if(!res.data.data.masterImg) {
             res.data.data.masterImg = window.api + "/assets/img/morenImg.png";
-            // }
+            }
             that.isAppoint = res.data.data.isNeedAppoint == 0 ? "2" : "1";
             that.isAppointAttend = res.data.data.isNeedAppoint == 1 ? "1" : "2";
             that.classDate = formatDate(new Date(res.data.data.timeStart), "yyyy-MM-dd")

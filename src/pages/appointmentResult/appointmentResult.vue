@@ -12,9 +12,21 @@
           class="assess"
           :style="{'background-color': themeColor}"
           @click="assess"
-          v-if="(!detail.evaluateId || !detail.teamClassEvaluteId) && detail.status == 3"
+          v-if="(!detail.evaluateId || !detail.teamClassEvaluteId) && detail.status == 3 && type !== 'staff'"
         >评价</span>
         <span class="again" :style="{'background-color': themeColor}" @click="again">再约一节</span>
+        <span
+          class="write"
+          v-if="!detail.handwrittenImgPath && isOpenHandwrittenBoard && coachAppointId && type == 'staff'&& detail.status == 2"
+          :style="{'background-color': themeColor}"
+          @click="handwrite"
+        >手写确认</span>
+        <span
+          class="see-board"
+          v-if="detail.handwrittenImgPath"
+          :style="{'background-color': themeColor}"
+          @click="showImg = true"
+        >查看签名</span>
       </div>
     </div>
     <div class="class-info">
@@ -27,6 +39,19 @@
       <div class="title">门店信息</div>
       <store-item :info="storeInfo"></store-item>
     </div>
+
+    <van-popup
+      :show="showImg"
+      @close="showImg = false"
+      :duration="200"
+      custom-style="border-radius: 4px; max-widht: 80vw;"
+    >
+      <div class="img-popup-wrapper">
+        <!-- <img :src="detail.handwrittenImgPath"> -->
+        <image :src="detail.handwrittenImgPath" mode="aspectFit"></image>
+      </div>
+    </van-popup>
+
     <page-footer></page-footer>
   </div>
 </template>
@@ -54,7 +79,9 @@ export default {
       teamAttendId: null,
       coachAppointId: null,
       longitude: "", // 经度
-      latitude: "" // 纬度
+      latitude: "", // 纬度
+      isOpenHandwrittenBoard: null,
+      showImg: false
     };
   },
   components: {
@@ -65,7 +92,10 @@ export default {
   computed: {
     timeStart() {
       if (this.detail.timeStart) {
-        return formatDate(new Date(this.detail.timeStart), "yyyy-MM-dd hh:mm:ss");
+        return formatDate(
+          new Date(this.detail.timeStart),
+          "yyyy-MM-dd hh:mm:ss"
+        );
       } else {
         return "";
       }
@@ -138,6 +168,7 @@ export default {
           if (res.data.code === 200) {
             that.detail = res.data.data;
             that.getStoreDetail();
+            that.getSetting();
           }
         }
       });
@@ -152,8 +183,11 @@ export default {
         },
         success(res) {
           if (res.data.code === 200) {
-            that.detail = res.data.data;
+            let data = res.data.data
+            data.handwrittenImgPath = data.handwrittenImgPath ? window.api + data.handwrittenImgPath : data.handwrittenImgPath
+            that.detail = data;
             that.getStoreDetail();
+            that.getSetting();
           }
         }
       });
@@ -287,11 +321,31 @@ export default {
       if (this.coachAppointId) {
         if (this.type == "staff") {
           return wx.redirectTo({
-            url: "../../appoint_coach/main?coachId=" + this.detail.coachId
+            url:
+              "../pageBusiness/appoint_coach/main?id=" + this.detail.customerId
           });
         }
         wx.redirectTo({
           url: "../appointmentCoach/main?coachId=" + this.detail.coachId
+        });
+      }
+    },
+    getSetting() {
+      let that = this;
+      HttpRequest({
+        url: "/system/setup/store/query",
+        data: {
+          storeId: that.detail.storeId
+        },
+        success(res) {
+          that.isOpenHandwrittenBoard = res.data.data.isOpenHandwrittenBoard;
+        }
+      });
+    },
+    handwrite() {
+      if (this.coachAppointId) {
+        wx.navigateTo({
+          url: "../pageBusiness/handwrite_board/main?id=" + this.coachAppointId
         });
       }
     }
@@ -340,7 +394,9 @@ export default {
         border: 1rpx solid #e2e2e2;
       }
       .assess,
-      .again {
+      .again,
+      .write,
+      .see-board {
         color: #fff;
       }
     }

@@ -207,16 +207,16 @@ export default {
     };
   },
   mounted() {
+    console.log("mounted");
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     // this.getList();
     this.filterDate(1);
     this.getCoachList();
   },
-  watch: {
-    filter: {
-      handler() {},
-      deep: true
+  onShow() {
+    if (this.selectedStore.storeId) {
+      this.refreshList(1);
     }
   },
   mixins: [colorMixin, listPageMinxi],
@@ -406,7 +406,13 @@ export default {
       });
     },
     // 改约
-    anotherTime() {},
+    anotherTime() {
+      wx.navigateTo({
+        url: `../appoint_coach/main?type=改约&id=${
+          this.curSelectClass.coachAppointId
+        }`
+      });
+    },
     // 下课
     classOver() {
       let that = this;
@@ -426,6 +432,7 @@ export default {
               success(res) {
                 wx.hideLoading();
                 if (res.data.code == 200) {
+                  that.refreshList();
                   wx.showModal({
                     title: "提示",
                     content: "下课成功",
@@ -487,22 +494,23 @@ export default {
         url: window.api + "/mobile/coach/appoint/attendclass",
         data: {
           coachAppointId: that.curSelectClass.coachAppointId,
-          realTimeStart: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
+          realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
         },
         success(res) {
-          if (res.data.code == 200) {
-            wx.showModal({
-              title: "提示",
-              content: res.data.message,
-              showCancel: false
-            });
-          } else {
-            wx.showModal({
-              title: "提示",
-              content: res.data.message,
-              showCancel: false
-            });
-          }
+          wx.showModal({
+            title: "提示",
+            content: res.data.message,
+            showCancel: false,
+            success(model_res) {
+              if (model_res.confirm && res.data.code == 200) {
+                wx.navigateTo({
+                  url: `../../appointmentResult/main?coachAppointId=${
+                    this.curSelectClass.coachAppointId
+                  }&type=staff`
+                });
+              }
+            }
+          });
         }
       });
     },

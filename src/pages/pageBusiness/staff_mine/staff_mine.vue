@@ -24,7 +24,7 @@
       <van-cell title="专属二维码" is-link @click="showStore = true"/>
     </van-cell-group>
 
-    <!-- <button @click="login">登录</button> -->
+    <button @click="login">登录</button>
     <div class="mineExit" :style="{'background-color': window.color}" @click="signOut">退出登录</div>
 
     <van-tabbar active="4" @change="changeTabbar">
@@ -70,6 +70,7 @@
 
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import {staff_login,enterStaff} from "COMMON/js/merge_login.js";
 import store from "@/utils/store.js";
 export default {
   data() {
@@ -98,24 +99,27 @@ export default {
   },
   methods: {
     login() {
-      let that = this;
-      wx.request({
-        url: window.api + "/user/login",
-        data: {
-          phone: "18259260871",
-          password: "2131",
-          companyId: "53"
-        },
-        success(res) {
-          if (res.data.code == 200) {
-            wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
-            wx.setStorageSync("companyId", "53");
-            wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
-            wx.setStorageSync("staff_info", res.data.data);
-            // that.getStaffInfo();
-          }
-        }
-      });
+      staff_login().then((res) => {
+        enterStaff()
+      })
+      // let that = this;
+      // wx.request({
+      //   url: window.api + "/user/login",
+      //   data: {
+      //     phone: "18888888881",
+      //     password: "2131",
+      //     companyId: "53"
+      //   },
+      //   success(res) {
+      //     if (res.data.code == 200) {
+      //       wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+      //       wx.setStorageSync("companyId", "53");
+      //       wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
+      //       wx.setStorageSync("staff_info", res.data.data);
+      //       // that.getStaffInfo();
+      //     }
+      //   }
+      // });
     },
     signOut() {
       wx.showModal({
@@ -123,6 +127,9 @@ export default {
         content: "是否退出登录？",
         success(res) {
           if (res.confirm) {
+            wx.request({
+              url: window.api + '/user/cancelbind'
+            })
             wx.removeStorageSync("instMsgSubKey");
             wx.removeStorageSync("phone");
             wx.removeStorageSync("authInto")

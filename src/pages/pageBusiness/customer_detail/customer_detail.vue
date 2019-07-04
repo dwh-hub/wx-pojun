@@ -222,6 +222,7 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
+import {checkAuth} from "../common/js/service_config.js";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import listDayItem from "../components/list-day-item.vue";
@@ -229,6 +230,7 @@ import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import card from "COMPS/card";
 import noneResult from "COMPS/noneResult.vue";
+
 export default {
   data() {
     return {
@@ -271,7 +273,7 @@ export default {
       cardData: [
         {
           dataText: "合同数",
-          dataNum: "12"
+          dataNum: "0"
         },
         {
           dataText: "数据一",
@@ -308,6 +310,8 @@ export default {
         {
           text: "一键上课",
           iconUrl: "/static/images/staff/close.svg",
+          class: 'operate icon-yijian',
+          hasAuth: checkAuth(168),
           action: () => {
             this.checkAttendStatus();
           }
@@ -315,6 +319,8 @@ export default {
         {
           text: "客户跟进",
           iconUrl: "/static/images/staff/close.svg",
+          class: 'operate icon-genjin',
+          hasAuth: checkAuth(27),
           action: () => {
             this.followUp();
           }
@@ -322,6 +328,8 @@ export default {
         {
           text: "来访预约",
           iconUrl: "/static/images/staff/close.svg",
+          class: 'operate icon-yuyue',
+          hasAuth: checkAuth(207),
           action: () => {
             this.appoint();
           }
@@ -329,6 +337,8 @@ export default {
         {
           text: "预约上课",
           iconUrl: "/static/images/staff/close.svg",
+          class: 'operate icon-shangke',
+          hasAuth: checkAuth(168),
           action: () => {
             this.toAppoint();
           }
@@ -403,13 +413,6 @@ export default {
   },
   onLoad(options) {
     this.id = options.id;
-  },
-  onShow() {
-    // console.log("tabIndex:"+this.tabIndex)
-  },
-  onHide() {
-    // console.log("tabIndex:"+this.tabIndex)
-    // console.log("customer_detail_onHide");
   },
   onUnload() {
     this.clearData();
@@ -813,6 +816,7 @@ export default {
           coachId: wx.getStorageSync("staff_info").userId
         },
         success(res) {
+          wx.hideLoading();
           if (res.data.code == 200) {
             that.attendClass();
           }
@@ -822,7 +826,6 @@ export default {
               content: res.data.message,
               success(modal_res) {
                 if (modal_res.confirm) {
-                  wx.showLoading();
                   HttpRequest({
                     url: window.api + "/mobile/coach/appoint/finishclass",
                     data: {
@@ -830,7 +833,6 @@ export default {
                       realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
                     },
                     success(finish_res) {
-                      wx.hideLoading();
                       if (finish_res.data.code == 200) {
                         that.attendClass();
                       } else {
@@ -996,11 +998,16 @@ page {
     vertical-align: middle;
     width: 25px;
     height: 25px;
-    margin-right: 5px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: -10px;
+    border: 3px solid #fff;
+    &:nth-last-of-type(1) {
+      margin-right: 0px;
+    }
     > img {
       width: 100%;
       height: 100%;
-      border-radius: 50%;
     }
   }
   .van-icon {

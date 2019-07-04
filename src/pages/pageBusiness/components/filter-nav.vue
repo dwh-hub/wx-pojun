@@ -1,6 +1,6 @@
 <template>
   <div class="filter-nav">
-    <div class="nav-item" v-for="(item,index) in nav" :key="index" @click="selectNav(index)">
+    <div class="nav-item" v-for="(item,index) in _nav" :key="index" @click="selectNav(index)">
       <span v-show="currentNav!=index">{{item.navTitle}}</span>
       <span v-show="currentNav==index" :style="{color: window.color}">{{item.navTitle}}</span>
       <i class="triangle-icon"></i>
@@ -129,7 +129,6 @@ export default {
       this._nav[index].navTitle = item.sonText;
       this.maskShow = false;
       this.showSlideList = false;
-      // this.$emit("selectFilter", item);
       if (item.action) {
         item.action();
       }

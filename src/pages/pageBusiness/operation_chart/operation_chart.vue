@@ -7,133 +7,108 @@
       <van-tab title="课程报表"></van-tab>
     </van-tabs>
     <!-- </div> -->
+    <div class="sub-tab">
+      <div class="chart-list" :class="{active: subNavIndex==1}" @click="changeSubNavIndex(1)">汇总</div>
+      <div class="total-detail" :class="{active: subNavIndex==2}" @click="changeSubNavIndex(2)">明细</div>
+    </div>
     <div class="operation" v-show="navIndex == 0">
-      <div class="sub-tab">
-        <div
-          class="chart-list"
-          :class="{active: operationNavIndex==1}"
-          @click="operationNavIndex = 1;renderChart()"
-        >汇总</div>
-        <div
-          class="total-detail"
-          :class="{active: operationNavIndex==2}"
-          @click="operationNavIndex = 2;renderChart()"
-        >明细</div>
-      </div>
       <!-- <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}"> -->
-        <div v-show="operationNavIndex == 1">
-          <div class="chart-title">门店排行</div>
-          <div style="height: 40vh">
-            <ff-canvas id="store" canvas-id="store" :opts="opts"/>
-          </div>
-          <div class="chart-title">业绩排行</div>
-          <div style="height: 40vh">
-            <ff-canvas id="card" canvas-id="card" :opts="opts"/>
-          </div>
-          <div class="chart-title">销售排行</div>
-          <div style="height: 40vh">
-            <ff-canvas id="sale" canvas-id="sale" :opts="opts"/>
-          </div>
-          <div class="chart-title">客户构成</div>
-          <div style="height: 40vh">
-            <ff-canvas id="customer" canvas-id="customer" :opts="opts"/>
-          </div>
-          <div class="chart-title">客流量</div>
-          <div style="height: 40vh">
-            <ff-canvas id="customer-line" canvas-id="customer-line" :opts="opts"/>
-          </div>
+      <div v-show="subNavIndex == 1">
+        <div class="chart-title">门店排行</div>
+        <div style="height: 40vh">
+          <ff-canvas id="store" canvas-id="store" :opts="opts" />
         </div>
-        <div v-if="operationNavIndex == 2" class="operation-detail-wrapper">
-          <div class="tabel-wrapper">
-            <table>
-              <tr>
-                <td>交易类型</td>
-                <td>交易笔数</td>
-                <td>实际收入</td>
-              </tr>
-              <tr>
-                <td>新购</td>
-                <td class="blus">{{sellInfo.newPurchasedCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.newPurchasedMoney}}</td>
-              </tr>
-              <tr>
-                <td>转卡</td>
-                <td class="blus">{{sellInfo.trancCardCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.trancCardMoney}}</td>
-              </tr>
-              <tr>
-                <td>请假</td>
-                <td class="blus">{{sellInfo.stopCardCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.stopCardMoney}}</td>
-              </tr>
-              <tr>
-                <td>转让</td>
-                <td class="blus">{{sellInfo.transferCardCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.transferCardMoney}}</td>
-              </tr>
-              <tr>
-                <td>补办</td>
-                <td class="blus">{{sellInfo.lossmakeCardCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.lossmakeCardMoney}}</td>
-              </tr>
-              <tr>
-                <td>补余</td>
-                <td class="blus">{{sellInfo.spareMoneyCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.spareMoneyMoney}}</td>
-              </tr>
-              <tr>
-                <td>订金</td>
-                <td class="blus">{{sellInfo.subscriptionpactCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.subscriptionpactMoney}}</td>
-              </tr>
-              <tr>
-                <td>退款</td>
-                <td class="blus">{{sellInfo.reimburseCount}}笔</td>
-                <td class="oranges">¥{{sellInfo.reimburseMoney}}</td>
-              </tr>
-              <tr>
-                <td>合计</td>
-                <td>{{sellInfo.totalCount}}笔</td>
-                <td>¥{{sellInfo.totalMoney}}</td>
-              </tr>
-            </table>
-          </div>
-          <div class="operation-detail">
-            <div class="title">/报表明细/</div>
-            <list-day-item
-              v-for="(item, index) in sellList"
-              :hasTag="true"
-              :key="index"
-              :info="item"
-            ></list-day-item>
-          </div>
+        <div class="chart-title">业绩排行</div>
+        <div style="height: 40vh">
+          <ff-canvas id="card" canvas-id="card" :opts="opts" />
         </div>
+        <div class="chart-title">销售排行</div>
+        <div style="height: 40vh">
+          <ff-canvas id="sale" canvas-id="sale" :opts="opts" />
+        </div>
+        <div class="chart-title">客户构成</div>
+        <div style="height: 40vh">
+          <ff-canvas id="customer" canvas-id="customer" :opts="opts" />
+        </div>
+        <div class="chart-title">客流量</div>
+        <div style="height: 40vh">
+          <ff-canvas id="customer-line" canvas-id="customer-line" :opts="opts" />
+        </div>
+      </div>
+      <div v-if="subNavIndex == 2" class="operation-detail-wrapper">
+        <div class="tabel-wrapper">
+          <table>
+            <tr>
+              <td>交易类型</td>
+              <td>交易笔数</td>
+              <td>实际收入</td>
+            </tr>
+            <tr>
+              <td>新购</td>
+              <td class="blus">{{sellInfo.newPurchasedCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.newPurchasedMoney}}</td>
+            </tr>
+            <tr>
+              <td>转卡</td>
+              <td class="blus">{{sellInfo.trancCardCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.trancCardMoney}}</td>
+            </tr>
+            <tr>
+              <td>请假</td>
+              <td class="blus">{{sellInfo.stopCardCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.stopCardMoney}}</td>
+            </tr>
+            <tr>
+              <td>转让</td>
+              <td class="blus">{{sellInfo.transferCardCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.transferCardMoney}}</td>
+            </tr>
+            <tr>
+              <td>补办</td>
+              <td class="blus">{{sellInfo.lossmakeCardCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.lossmakeCardMoney}}</td>
+            </tr>
+            <tr>
+              <td>补余</td>
+              <td class="blus">{{sellInfo.spareMoneyCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.spareMoneyMoney}}</td>
+            </tr>
+            <tr>
+              <td>订金</td>
+              <td class="blus">{{sellInfo.subscriptionpactCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.subscriptionpactMoney}}</td>
+            </tr>
+            <tr>
+              <td>退款</td>
+              <td class="blus">{{sellInfo.reimburseCount}}笔</td>
+              <td class="oranges">¥{{sellInfo.reimburseMoney}}</td>
+            </tr>
+            <tr>
+              <td>合计</td>
+              <td>{{sellInfo.totalCount}}笔</td>
+              <td>¥{{sellInfo.totalMoney}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="operation-detail">
+          <div class="title">/报表明细/</div>
+          <list-day-item v-for="(item, index) in sellList" :hasTag="true" :key="index" :info="item"></list-day-item>
+        </div>
+      </div>
       <!-- </scroll-view> -->
     </div>
     <div class="store_chart" v-show="navIndex == 1">
-      <div class="sub-tab">
-        <div
-          class="chart-list"
-          :class="{active: classNavIndex==1}"
-          @click="classNavIndex = 1;renderChart()"
-        >汇总</div>
-        <div
-          class="total-detail"
-          :class="{active: classNavIndex==2}"
-          @click="classNavIndex = 2;renderChart()"
-        >明细</div>
-      </div>
-      <div v-show="classNavIndex == 1">
+      <div v-show="subNavIndex == 1">
         <div class="chart-title">门店授课排行</div>
         <div style="height: 40vh">
-          <ff-canvas id="store-class" canvas-id="store-class" :opts="opts"/>
+          <ff-canvas id="store-class" canvas-id="store-class" :opts="opts" />
         </div>
         <div class="chart-title">教练授课排行</div>
         <div style="height: 40vh">
-          <ff-canvas id="coach-class" canvas-id="coach-class" :opts="opts"/>
+          <ff-canvas id="coach-class" canvas-id="coach-class" :opts="opts" />
         </div>
       </div>
-      <div v-show="classNavIndex == 2">
+      <div v-show="subNavIndex == 2">
         <staff-coach-item v-for="(item, index) in coachList" :key="index" :info="item"></staff-coach-item>
       </div>
     </div>
@@ -149,7 +124,7 @@ import {
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
-import F2 from "../../../../static/f2-canvas/lib/f2";
+import F2 from "@antv/wx-f2";
 import listDayItem from "../components/list-day-item";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
@@ -157,15 +132,14 @@ export default {
   data() {
     return {
       navIndex: 0,
-      operationNavIndex: 1,
-      classNavIndex: 1,
+      subNavIndex: 1,
       nav: [
         {
           navTitle: "",
           children: []
         },
         {
-          navTitle: "本月",
+          navTitle: "今日",
           children: [
             {
               sonText: "全部",
@@ -213,8 +187,8 @@ export default {
       sellPage: 1,
       coachPage: 1,
       storeList: [],
-      selectedStore: {},
-      scrollViewHeight: ""
+      selectedStore: {}
+      // scrollViewHeight: ""
     };
   },
   mixins: [colorMixin],
@@ -229,7 +203,7 @@ export default {
     }
   },
   onReachBottom() {
-    if (this.navIndex == 0 && this.operationNavIndex == 2) {
+    if (this.navIndex == 0 && this.subNavIndex == 2) {
       this.getSellList();
     }
   },
@@ -254,8 +228,8 @@ export default {
         }
       };
     });
-    
-    this.filterDate(30)
+
+    this.filterDate(1);
     // this.getSellInfo();
     // this.getSellList();
     // this.getCoachList();
@@ -264,44 +238,51 @@ export default {
   methods: {
     onChange(e) {
       this.navIndex = e.mp.detail.index;
-      this.renderChart();
+      this.changeFilter();
     },
-    renderChart() {
-      if (this.navIndex == 0 && this.operationNavIndex == 1) {
-        this.getStoreChartData();
-        this.getCardChartData();
-        this.getSaleChartData();
-        this.getCustomerChartData();
-        this.getLineData();
-      }
-      if (this.navIndex == 1 && this.classNavIndex == 1) {
-        this.getStoreClassData();
-        this.getCoachClassData();
-      }
-    },
+    // renderChart() {
+    //   if (this.navIndex == 0 && this.subNavIndex == 1) {
+    //     this.getStoreChartData();
+    //     this.getCardChartData();
+    //     this.getSaleChartData();
+    //     this.getCustomerChartData();
+    //     this.getLineData();
+    //   }
+    //   if (this.navIndex == 1 && this.subNavIndex == 1) {
+    //     this.getStoreClassData();
+    //     this.getCoachClassData();
+    //   }
+    // },
     changeFilter() {
       if (this.navIndex == 0) {
-        if (this.operationNavIndex == 1) {
+        if (this.subNavIndex == 1) {
           this.getStoreChartData();
           this.getCardChartData();
           this.getSaleChartData();
           this.getCustomerChartData();
           this.getLineData();
         }
-        if (this.operationNavIndex == 2) {
+        if (this.subNavIndex == 2) {
           this.getSellInfo();
           this.getSellList();
         }
       }
       if (this.navIndex == 1) {
-        if (this.classNavIndex == 1) {
+        if (this.subNavIndex == 1) {
           this.getStoreClassData();
           this.getCoachClassData();
         }
-        if (this.operationNavIndex == 2) {
+        if (this.subNavIndex == 2) {
           this.getCoachList();
         }
       }
+    },
+    changeSubNavIndex(index) {
+      if (this.subNavIndex == index) {
+        return;
+      }
+      this.subNavIndex = index;
+      this.changeFilter();
     },
     // computedScrollHeight() {
     //   let that = this;
@@ -492,6 +473,7 @@ export default {
           otherObj.percent += e.percent;
           otherObj.cost += e.cost;
         });
+        otherObj.percent = Number(otherObj.percent.toFixed(2));
         data = data.slice(0, 4);
         data.push(otherObj);
       }
@@ -533,7 +515,14 @@ export default {
         "#8543E0"
       ];
       if (data.length < 6) {
-        colorArr.slice(0, data.length.length);
+        // let hasCostLength = data.filter(e => e.cost > 0).length;
+        // if (hasCostLength >= 1) {
+        //   colorArr = colorArr.slice(0, hasCostLength);
+        // } else {
+        //   colorArr = colorArr.slice(0, data.length.length);
+        // }
+        colorArr = colorArr.slice(0, data.length.length);
+        // console.log(colorArr)
       }
       chart
         .interval()
@@ -568,8 +557,8 @@ export default {
       HttpRequest({
         url: window.api + "/survey/signlineview",
         data: {
-          timeStart: "2019-05-04 00:00:00",
-          timeEnd: "2019-06-04 23:59:59"
+          timeStart: that.filter.timeStart,
+          timeEnd: that.filter.timeEnd
         },
         success(res) {
           that.customerLineData = res.data.data.map(e => {
@@ -616,7 +605,15 @@ export default {
       };
       chart.source(data, defs);
       chart.tooltip({
-        showCrosshairs: true
+        custom: true,
+        showXTip: true,
+        showYTip: true,
+        showCrosshairs: true,
+        snap: true,
+        crosshairsType: "xy",
+        crosshairsStyle: {
+          lineDash: [2]
+        }
       });
       chart
         .line()
@@ -683,6 +680,7 @@ export default {
       });
     },
     getCoachList() {
+      console.log("=====getCoachList=====");
       let that = this;
       HttpRequest({
         url: window.api + "/mobile/coach/getcoach",
@@ -781,7 +779,7 @@ export default {
     padding-left: 15px;
     border-bottom: 1px solid #dedede;
     color: #666;
-    border-top: 10px solid #f3f4f8;
+    border-top: 1px solid #dedede;
   }
   .sub-tab {
     > div {
@@ -827,6 +825,7 @@ export default {
     }
   }
   .staff-coach-item {
+    border-top: 1rpx solid #eee;
     .avatar {
       border-radius: 0px;
     }
@@ -838,6 +837,9 @@ export default {
       color: #b2b4bd;
       margin-right: 15px;
     }
+  }
+  .mask {
+    top: 48px;
   }
 }
 </style>

@@ -167,9 +167,9 @@ export default {
           dataNum: "0"
         }
       ],
-      cardstatuslist: [],
+      // cardstatuslist: [],
       // page: 1,
-      // list: [{}, {}, {}, {}],
+      list: [{}, {}, {}, {}],
       selectedStore: {},
       storeList: [],
       // isLoading: true,
@@ -253,9 +253,9 @@ export default {
             }
             that.headerData[0].dataNum = res.data.data.recCount;
             let list = res.data.data.result
-            list = list.filter(e => {
-              return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
-            });
+            // list = list.filter(e => {
+            //   return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
+            // });
             let _data = list.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {
@@ -287,22 +287,22 @@ export default {
         });
       });
     },
-    getCardstatuslist() {
-      let that = this;
-      HttpRequest({
-        url: window.api + "/customer/card/cardstatuslist",
-        success(res) {
-          that.cardstatuslist = res.data.data;
-        }
-      });
-    },
-    transformCardStatus(status) {
-      this.cardstatuslist.forEach(e => {
-        if (e.cardStatus == status) {
-          return e.cardStatusChar;
-        }
-      });
-    },
+    // getCardstatuslist() {
+    //   let that = this;
+    //   HttpRequest({
+    //     url: window.api + "/customer/card/cardstatuslist",
+    //     success(res) {
+    //       that.cardstatuslist = res.data.data;
+    //     }
+    //   });
+    // },
+    // transformCardStatus(status) {
+    //   this.cardstatuslist.forEach(e => {
+    //     if (e.cardStatus == status) {
+    //       return e.cardStatusChar;
+    //     }
+    //   });
+    // },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
       this.setDate(obj)

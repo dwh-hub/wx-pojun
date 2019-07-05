@@ -26,14 +26,17 @@ export default {
       unLoading: false,
     };
   },
-  onUnload() {
-    Object.assign(this.$data, this.$options.data());
+  created() {
+    // Object.assign(this.$data, this.$options.data());
+    // this.list = [{}, {}, {}, {}]
+  },
+  destroyed() {
+    // console.log('beforeDestroy')
+    // this.list = [{}, {}, {}, {}]
     this.unLoading = true
   },
-  onLoad() {
-    this.unLoading = false
-  },
   mounted() {
+    this.unLoading = false
     setNavTab();
   },
   onReachBottom() {

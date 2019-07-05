@@ -47,13 +47,13 @@ export function getPhoneNumber(e, url, isTab) {
         // });
       } else {
         // TODO:
-        // wx.setStorage({
-        //   key: "phone",
-        //   data: "18888888881",
-        //   success: function () {
-        //     login(url, isTab);
-        //   }
-        // });
+        wx.setStorage({
+          key: "phone",
+          data: "18888888881",
+          success: function () {
+            login(url, isTab);
+          }
+        });
         wx.hideLoading();
         wx.showModal({
           title: "提示",

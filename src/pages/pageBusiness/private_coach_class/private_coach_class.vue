@@ -207,7 +207,7 @@ export default {
     };
   },
   mounted() {
-    console.log("mounted");
+    this.nav[0].navTitle = '今日'
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     // this.getList();

@@ -55,7 +55,8 @@
       "select_scheduling_date/main",
       "service_web/main",
       "common_list/main",
-      "handwrite_board/main"
+      "handwrite_board/main",
+      "staff_team_class_kind/main"
     ]
   }],
   "permission": {

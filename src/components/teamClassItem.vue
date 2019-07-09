@@ -116,7 +116,10 @@ export default {
       if (this.info.coachNameArrayStr) {
         return this.info.coachNameArrayStr.replace(/null/g,'');
       }
-      return this.info.coachNameArray.toString(" ").replace(/null/g,'');
+      if(this.info.coachNameArray) {
+        return this.info.coachNameArray.toString(" ").replace(/null/g,'');
+      }
+      return ''
     },
     window() {
       return window;

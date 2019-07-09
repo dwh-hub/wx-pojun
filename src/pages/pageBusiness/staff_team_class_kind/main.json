@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "团课种类",
+  "usingComponents": {
+    "van-loading": "../../../../static/vant/loading/index"
+  }
+}

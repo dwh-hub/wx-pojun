@@ -19,7 +19,7 @@
             <span>{{itemS.sonText}}</span>
             <!-- <picker v-else mode="date" :value="date" @change="dateChange($event, item)">
               <view class="picker">{{itemS.sonText}}</view>
-            </picker> -->
+            </picker>-->
           </div>
         </div>
       </div>
@@ -32,12 +32,13 @@
 
     <!-- <picker mode="date" :value="date" @change="dateChange">
       <view class="picker">当前选择: {{date}}</view>
-    </picker> -->
+    </picker>-->
   </div>
 </template>
 
 <script>
 import { window } from "COMMON/js/common.js";
+import { EventBus } from "../common/js/eventBus.js";
 export default {
   props: {
     nav: {
@@ -104,6 +105,10 @@ export default {
     }
   },
   mounted() {
+    EventBus.$on("showStoreMask", () => {
+      this.maskShow = false;
+      this.showSlideList = false;
+    });
     this._nav = this.nav;
   },
   methods: {
@@ -136,6 +141,7 @@ export default {
     clickMask() {
       this.maskShow = false;
       this.showSlideList = false;
+      EventBus.$emit('showFilterMask')
     },
     allFilter() {
       this.maskShow = false;
@@ -173,12 +179,12 @@ export default {
     text-align: center;
   }
   // .nav-item {
-    // border-top: 1rpx solid #eee;
-    // border-bottom: 1rpx solid #eee;
-    // border-right: 1rpx solid #eee;
-    // &:nth-last-of-type(1) {
-    //   border-right: none;
-    // }
+  // border-top: 1rpx solid #eee;
+  // border-bottom: 1rpx solid #eee;
+  // border-right: 1rpx solid #eee;
+  // &:nth-last-of-type(1) {
+  //   border-right: none;
+  // }
   // }
   .all-filter {
     // flex: 1;

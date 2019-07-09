@@ -31,6 +31,7 @@
 
 <script>
 import { debounce } from "COMMON/js/common.js";
+import {EventBus} from '../common/js/eventBus.js'
 export default {
   props: {
     storeList: {
@@ -60,6 +61,10 @@ export default {
     };
   },
   mounted() {
+    EventBus.$on('showFilterMask', () => {
+      this.showMask = false;
+      this.showStoreList = false;
+    })
     this.text = this.searchText
     if(this.storeList.length) {
       this._storeList = this.storeList
@@ -76,10 +81,13 @@ export default {
     toggleStore() {
       this.showMask = !this.showMask;
       this.showStoreList = !this.showStoreList;
+      EventBus.$emit('showStoreMask')
     },
     selectStore(item) {
       if (this.selectedStore.storeId == item.storeId) {
-        return this.showMask = false;
+        this.showStoreList = false;
+        this.showMask = false;
+        return
       }
       this.selectedStore = item;
       this.showMask = false;

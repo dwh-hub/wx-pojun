@@ -19,11 +19,11 @@
         :key="index"
       ></team-class-item>
     </div>
-    <van-loading :color="themeColor" v-if="isLoading"/>
+    <van-loading :color="themeColor" v-if="isLoading" />
     <none-result text="暂无课程" v-if="!list.length && !isLoading"></none-result>
     <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
 
-    <van-popup
+    <!-- <van-popup
       :show="showOperatePopup"
       @close="showOperatePopup = false"
       :duration="200"
@@ -39,9 +39,14 @@
           @click="item.action"
         >{{item.text}}</div>
       </div>
-    </van-popup>
-    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
-    <!-- <suspension-window v-if="!isOperate" :operateList="operateList"></suspension-window> -->
+    </van-popup> -->
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
+    <suspension-window v-if="!isOperate" :operateList="operateList"></suspension-window>
   </div>
 </template>
 
@@ -52,7 +57,7 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
-import {checkAuth} from "../common/js/service_config.js";
+import { checkAuth } from "../common/js/service_config.js";
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -61,6 +66,7 @@ import teamClassItem from "COMPS/teamClassItem.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import suspensionWindow from "../components/suspension-window.vue";
 export default {
   data() {
     return {
@@ -95,7 +101,7 @@ export default {
             {
               sonText: "自定义",
               action: () => {
-                this.showPicker()
+                this.showPicker();
               }
             }
           ]
@@ -131,49 +137,52 @@ export default {
           dataNum: "0"
         }
       ],
-      // operateList: [
-      //   {
-      //     text: "单日排期",
-      //     iconUrl: "/static/images/staff/close.svg",
-      //     action: () => {}
-      //   },
-      //   {
-      //     text: "批量排期",
-      //     iconUrl: "/static/images/staff/calendar.svg",
-      //     action: () => {
-      //       console.log("批量排期");
-      //     }
-      //   }
-      // ],
-      storeList: [],
-      actionList: [
-        {
-          text: "查看详情",
-          hasAuth: true,
-          action: () => {
-            this.showOperatePopup = false;
-            wx.navigateTo({
-              url:
-                "../scheduling_detail/main?teamScheduleId=" +
-                this.selectedClass.teamScheduleId
-            });
-          }
-        },
+      operateList: [
         {
           text: "单日排期",
-          hasAuth: checkAuth(292),
+          iconUrl: "/static/images/staff/close.svg",
           action: () => {
-            this.toScheduling("single");
-          }
+            wx.navigateTo({
+              url: "../staff_team_class_kind/main?type=single"
+            });}
         },
         {
           text: "批量排期",
-          hasAuth: checkAuth(292),
+          iconUrl: "/static/images/staff/calendar.svg",
           action: () => {
-            this.toScheduling("batch");
-          }
+            wx.navigateTo({
+              url: "../staff_team_class_kind/main?type=batch"
+            });}
         }
       ],
+      storeList: [],
+      isLoading: false,
+      // actionList: [
+      //   {
+      //     text: "查看详情",
+      //     hasAuth: true,
+      //     action: () => {
+      //       this.showOperatePopup = false;
+      //       wx.navigateTo({
+      //         url:
+      //           "../scheduling_detail/main?teamScheduleId=" +
+      //           this.selectedClass.teamScheduleId
+      //       });
+      //     }
+      //   },
+      //   {
+      //     text: "单日排期",
+      //     hasAuth: checkAuth(292),
+      //     action: () => {
+      //     }
+      //   },
+      //   {
+      //     text: "批量排期",
+      //     hasAuth: checkAuth(292),
+      //     action: () => {
+      //     }
+      //   }
+      // ],
       selectedStore: {},
       selectedClass: {},
       showOperatePopup: false,
@@ -201,8 +210,8 @@ export default {
     filterNav,
     teamClassItem,
     headerSearch,
-    noneResult
-    // suspensionWindo
+    noneResult,
+    suspensionWindow
   },
   methods: {
     selectStore(item) {
@@ -246,24 +255,30 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.setDate(obj)
-    },      
+      this.setDate(obj);
+    },
     setDate(obj) {
       this.filter.calendarStart = obj.startTime;
       this.filter.calendarEnd = obj.endTime;
     },
     selectClass(item) {
-      this.showOperatePopup = true;
-      this.selectedClass = item;
-    },
-    toScheduling(type) {
       this.showOperatePopup = false;
       wx.navigateTo({
-        url: `../team_class_scheduling/main?teamTempStoreId=${
-          this.selectedClass.teamTempStoreId
-        }&storeId=${this.selectedClass.storeId}&type=${type}`
+        url:
+          "../scheduling_detail/main?teamScheduleId=" +
+          this.selectedClass.teamScheduleId
       });
-    }
+      // this.showOperatePopup = true;
+      // this.selectedClass = item;
+    },
+    // toScheduling(type) {
+    //   this.showOperatePopup = false;
+    //   wx.navigateTo({
+    //     url: `../team_class_scheduling/main?teamTempStoreId=${
+    //       this.selectedClass.teamTempStoreId
+    //     }&storeId=${this.selectedClass.storeId}&type=${type}`
+    //   });
+    // }
   }
 };
 </script>

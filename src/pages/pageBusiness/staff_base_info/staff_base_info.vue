@@ -130,20 +130,24 @@ export default {
       // });
     },
     selectSex(event) {
-      if (this.type == "oneself") {
+      if (this.type != "oneself") {
         return;
       }
-      this.userInfo.sex = event.mp.detail.id == 1 ? "男" : "女";
       this.showSex = false;
       let that = this;
+      wx.showLoading({
+        title: '正在修改...'
+      })
       HttpRequest({
         url: "/employee/file/modify/userInfo",
         data: {
           userId: that.userInfo.userId,
-          sex: that.userInfo.sex
+          sex: event.mp.detail.id
         },
         success(res) {
+          wx.hideLoading()
           if (res.data.code === 200) {
+            that.userInfo.sex = event.mp.detail.id == 1 ? "男" : "女";
             wx.showToast({
               title: "修改成功",
               icon: "none",

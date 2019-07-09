@@ -81,7 +81,7 @@
 				{
 					"id": 6,
 					"name": "demo",
-					"pathName": "pages/pageBusiness/allServices/main",
+					"pathName": "pages/pageBusiness/staff_team_class/main",
 					"query": "id=6828",
 					"scene": null
 				},

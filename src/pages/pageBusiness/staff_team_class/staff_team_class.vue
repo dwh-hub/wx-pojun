@@ -141,6 +141,7 @@ export default {
         {
           text: "单日排期",
           iconUrl: "/static/images/staff/close.svg",
+          hasAuth: true,
           action: () => {
             wx.navigateTo({
               url: "../staff_team_class_kind/main?type=single"
@@ -149,6 +150,7 @@ export default {
         {
           text: "批量排期",
           iconUrl: "/static/images/staff/calendar.svg",
+          hasAuth: true,
           action: () => {
             wx.navigateTo({
               url: "../staff_team_class_kind/main?type=batch"
@@ -239,7 +241,7 @@ export default {
             }
             let _res = res.data.data;
             let _data;
-            that.headerData[0].dataNum = _res.recCount;
+            that.headerData[0].dataNum = _res.recCount || 0;
             res.data.data.result.forEach(e => {
               if (!e.masterImg) {
                 e.masterImg = "/assets/img/morenImg.png";
@@ -266,7 +268,7 @@ export default {
       wx.navigateTo({
         url:
           "../scheduling_detail/main?teamScheduleId=" +
-          this.selectedClass.teamScheduleId
+          item.teamScheduleId
       });
       // this.showOperatePopup = true;
       // this.selectedClass = item;

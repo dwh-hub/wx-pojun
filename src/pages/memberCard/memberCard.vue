@@ -11,17 +11,20 @@
             v-for="(item, index) in pojectList"
             :key="index"
             :class="{active: selectProIndex == index}"
-            @click="selectProIndex = index"
+            @click="selectProject(item, index)"
           >{{item.projectName}}</div>
+        </div>
+        <div class="modify-middle" v-if="showModifyPrice">
+          <van-stepper :value="modifyPrice" @change="changePrice" />
         </div>
         <div class="btn-wrapper">
           <span class="cancel" @click="closePopup">取消</span>
-          <span class="confirm" @click="selectPro">确认</span>
+          <span class="confirm" @click="selectProSure">确认</span>
         </div>
       </div>
     </van-popup>
     <div class="loading" v-show="isLoading">
-      <van-loading color="#999" custom-class="loading"/>
+      <van-loading color="#999" custom-class="loading" />
     </div>
     <none-result v-if="isNoneResult" text="暂无可用合同"></none-result>
     <page-footer v-if="!isNoneResult"></page-footer>
@@ -33,7 +36,7 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import card from "COMPS/card";
 import store from "../../utils/store";
 import noneResult from "COMPS/noneResult.vue";
-import pageFooter from "COMPS/pageFooter.vue"
+import pageFooter from "COMPS/pageFooter.vue";
 
 export default {
   data() {
@@ -48,10 +51,13 @@ export default {
       showPopup: false,
       // 选择的项目
       selectProIndex: 0,
+      selectedProject: {},
       selectCardInfo: {},
       isLoading: false,
       isNoneResult: false,
-      page: 1
+      page: 1,
+      modifyPrice: 0,
+      showModifyPrice: false
     };
   },
   components: {
@@ -102,7 +108,7 @@ export default {
     toCardDetail(item) {
       let that = this;
       this.selectCardInfo = item;
-      console.log("this.teamScheduleId:"+this.teamScheduleId)
+      console.log("this.teamScheduleId:" + this.teamScheduleId);
       if (this.teamScheduleId) {
         wx.showLoading({
           title: "获取可消费项目..."
@@ -113,14 +119,17 @@ export default {
             cardClassId: item.cardClassId,
             storeId: that.storeId,
             venueId: that.venueId,
-            teamScheduleId: that.teamScheduleId
+            teamScheduleId: that.teamScheduleId,
+            valueCardType: that.selectCardInfo.teachCardType ? 3 : '' // 2 私教
           },
           success(res) {
             wx.hideLoading();
             if (res.data.code === 200) {
               that.pojectList = res.data.data;
+              if(res.data.data.length == 1) {
+                that.selectProject(res.data.data[0])
+              }
               that.showPopup = true;
-              console.log(that.pojectList);
             } else {
               wx.showModal({
                 title: "提示",
@@ -136,10 +145,20 @@ export default {
         });
       }
     },
+    selectProject(item, index) {
+      this.selectedProject = item
+      this.selectProIndex = index || 0
+      this.modifyPrice = ""
+      if (item.isCanModifyFee) {
+        this.modifyPrice = item.projectPrice
+        this.showModifyPrice = true
+      }
+    },
     // 选择项目 确认预约
-    selectPro() {
+    selectProSure() {
       let that = this;
       let projectId = this.pojectList[this.selectProIndex].projectId;
+      // let projectId = this.selectedProject.projectId;
       wx.showLoading({
         title: "确认预约..."
       });
@@ -157,6 +176,12 @@ export default {
           wx.hideLoading();
           that.showPopup = false;
           if (data.data.code === 200) {
+            let msgData = data.data.data
+            msgData.storeId = that.storeId
+            HttpRequest({
+              url: '/sendmsg/user/allotsCoachMsg',
+              data: msgData
+            })
             wx.showModal({
               title: "提示",
               content: data.data.message,
@@ -202,11 +227,11 @@ export default {
               return;
             }
             that.cardInfoList = that.cardInfoList.concat(res.data.data.result);
-            that.page++
+            that.page++;
           } else {
             that.isNoneResult = true;
           }
-          console.log(that.cardInfoList)
+          console.log(that.cardInfoList);
         }
       });
     },
@@ -226,14 +251,22 @@ export default {
           if (res.data.code == 200) {
             let list = res.data.data;
             that.cardInfoList = list.filter(e => {
-              return e.canTeachCard == 1 && e.teachCardType == 1 && e.cardStatus == 2
-            });;
+              return (
+                e.teachCardType == 3 ||
+                (e.canTeachCard == 1 &&
+                  e.teachCardType == 1 &&
+                  e.cardStatus == 2)
+              );
+            });
           }
           if (!that.cardInfoList.length) {
             that.isNoneResult = true;
           }
         }
       });
+    },
+    changePrice(e) {
+      this.modifyPrice = e.mp.detail
     }
   }
 };
@@ -284,6 +317,17 @@ export default {
         margin-right: 10%;
       }
     }
+  }
+
+  .van-stepper {
+    display: flex;
+    .van-stepper__input-wrapper {
+      flex: 1;
+    }
+  }
+  .modify-middle {
+    margin-bottom: 15px;
+    padding: 0 10px;
   }
 }
 </style>

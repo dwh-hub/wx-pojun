@@ -244,6 +244,24 @@
       </div>
     </van-popup>
 
+    <van-popup
+      :show="showModifyPrice"
+      @close="showModifyPrice = false"
+      :duration="200"
+      custom-style="width:85%;border-radius: 5px;"
+    >
+      <div class="modify-price">
+        <div class="modify-title">请输入扣费金额</div>
+        <div class="modify-middle">
+          <van-stepper :value="modifyPrice" @change="changePrice"/>
+        </div>
+        <div class="modify-btn">
+          <div class="modify-cancel" :style="{background: themeColor}" @click="showModifyPrice = false">取消</div>
+          <div class="modify-confirm" :style="{background: themeColor}" @click="showModifyPrice = false">确认</div>
+        </div>
+      </div>
+    </van-popup>
+
     <div
       class="bottom-btn appoint-coach"
       @click="appointCoach"
@@ -345,7 +363,11 @@ export default {
       // 教练信息
       coachInfo: {},
       // 不能预约的时间
-      todayPeriodTime: []
+      todayPeriodTime: [],
+      showModifyPrice: false,
+      modifyPrice: 0,
+      // 是否是储值卡
+      isStoredValueCard: false
     };
   },
   components: {
@@ -637,6 +659,7 @@ export default {
       this.cardCellText = item.cardClassName;
       this.selectCardId = item.id;
       this.cardClassId = item.cardClassId;
+      this.isStoredValueCard = item.teachCardType == 3 ? true : false
       if (this.selectStoreId && this.selectCardId) {
         this.getVenueList();
       }
@@ -679,6 +702,12 @@ export default {
       this.isProjectPopup = false;
       this.projectId = item.projectId;
       this.projectCellText = item.projectName;
+      
+      this.modifyPrice = ""
+      if (item.isCanModifyFee) {
+        this.modifyPrice = item.projectPrice
+        this.showModifyPrice = true
+      }
     },
     // 确认预约
     appointCoach() {
@@ -736,6 +765,7 @@ export default {
           customerId: that.userInfo.id,
           phone: that.userInfo.phone,
           projectId: that.projectId,
+          valueCardFee: that.modifyPrice,
           status: 0
         },
         success(res) {
@@ -825,7 +855,7 @@ export default {
               if(e.doomsday) {
                 e.doomsday = e.doomsday.split(" ")[0];
               }
-              return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
+              return e.teachCardType == 3 || (e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2)
             });
 
             if (that.cardList.length == 1) {
@@ -864,7 +894,8 @@ export default {
         data: {
           storeId: that.selectStoreId,
           cardClassId: that.cardClassId,
-          venueId: that.venueId
+          venueId: that.venueId,
+          valueCardType: that.isStoredValueCard ? 2 : '' // 2 私教
         },
         success(res) {
           if (res.data.code === 200) {
@@ -924,6 +955,9 @@ export default {
           }
         });
       });
+    },
+    changePrice(e) {
+      this.modifyPrice = e.mp.detail
     }
   }
 };

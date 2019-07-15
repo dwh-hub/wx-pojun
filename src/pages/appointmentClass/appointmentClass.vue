@@ -226,11 +226,11 @@ export default {
             this.teamClassList = this.teamClass_2;
           });
         } else if (index == 3) {
-          // 3 已完成
-          this.getOwnCoachClassList(3).then(() => {
+          // 3 已评价
+          this.getOwnCoachClassList(3, 0).then(() => {
             this.coachList = this.coachList_3;
           });
-          this.getOwnTeamClassList(3).then(() => {
+          this.getOwnTeamClassList(3, 0).then(() => {
             this.teamClassList = this.teamClass_3;
           });
         }
@@ -314,7 +314,7 @@ export default {
         _data = {
           customerId: that.customerId,
           status: status,
-          waitEvaluate: waitEvaluate || ""
+          waitEvaluate: waitEvaluate == 0 ? 0 : (waitEvaluate || '')
         };
       }
       return new Promise(function(resolve, reject) {
@@ -365,7 +365,7 @@ export default {
         _data = {
           customerId: that.customerId,
           status: status,
-          waitEvaluate: waitEvaluate || ""
+          waitEvaluate: waitEvaluate || waitEvaluate == 0 ? 0 : (waitEvaluate || '')
         };
       }
       return new Promise(function(resolve, reject) {
@@ -377,6 +377,7 @@ export default {
               let _data = res.data.data.result.map(e => {
                 return {
                   anotherName: e.projectName,
+                  masterImg: e.coachHeadImg,
                   userId: e.coachId,
                   coachAppointId: e.coachAppointId,
                   timeStart: e.timeStart,
@@ -419,7 +420,10 @@ export default {
           },
           success(res) {
             if (res.data.code === 200) {
-              that.coachList_2 = res.data.data.result.slice(0, 2);
+              let _data = res.data.data.result.forEach(e => {
+                  e['masterImg'] = e.coachHeadImg
+              });
+              that.coachList_2 = _data.slice(0, 2);
               resolve();
             }
             // wx.hideLoading();

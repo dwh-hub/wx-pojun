@@ -18,7 +18,7 @@
         :key="index"
       ></staff-coach-item>
     </div>
-    <van-loading :color="themeColor" v-if="isLoading"/>
+    <van-loading :color="themeColor" v-if="isLoading" />
     <none-result text="暂无课程" v-if="!list.length && !isLoading"></none-result>
     <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
 
@@ -117,6 +117,12 @@ export default {
               }
             },
             {
+              sonText: "待确认",
+              action: () => {
+                this.filterStatus(0);
+              }
+            },
+            {
               sonText: "可上课",
               action: () => {
                 this.filterStatus(1);
@@ -156,6 +162,19 @@ export default {
       selectedStore: {},
       actionList: [],
       showOperate: false,
+      actionList_0: [
+        {
+          text: "确认预约",
+          action: () => {
+            this.confirmAppoint();
+          }
+        },{
+          text: "取消预约",
+          action: () => {
+            this.cancelClass();
+          }
+        }
+      ],
       actionList_1: [
         {
           text: "查看详情",
@@ -196,6 +215,18 @@ export default {
           }
         }
       ],
+      actionList_9: [
+        {
+          text: "上课",
+          action: () => {
+          }
+        },
+        {
+          text: "取消预约",
+          action: () => {
+          }
+        }
+      ],
       filter: {
         nameOrPhone: "",
         coachId: "",
@@ -207,7 +238,7 @@ export default {
     };
   },
   mounted() {
-    this.nav[0].navTitle = '今日'
+    this.nav[0].navTitle = "今日";
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     // this.getList();
@@ -336,9 +367,12 @@ export default {
     },
     selectClass(item) {
       this.curSelectClass = item;
-      if (item.status != 1 && item.status != 2) {
+      if (item.status != 1 && item.status != 2 && item.status != 0) {
         this.toDetail();
         return;
+      }
+      if (item.status == 0) {
+        this.actionList = this.actionList_0;
       }
       if (item.status == 1) {
         this.actionList = this.actionList_1;
@@ -351,6 +385,8 @@ export default {
     transformColor(status) {
       // 1 预约成功 2 上课中 3 已下课 7 已撤销
       switch (status) {
+        case 0:
+          return "#ff9800";
         case 1:
           return "#70b624";
         case 2:
@@ -361,6 +397,8 @@ export default {
           return "#ef4f4f";
         case 7:
           return "#ef4f4f";
+        case 9:
+          return "#ffcccc";
       }
     },
     // 上课
@@ -373,17 +411,24 @@ export default {
       wx.showModal({
         title: "提示",
         content: "是否取消预约？",
-        success: function success(res) {
-          if (res.confirm) {
+        success: function success(model_res) {
+          if (model_res.confirm) {
             wx.showLoading();
             HttpRequest({
               url: window.api + "/coach/private/appoint/cancelClass",
               data: {
-                coachAppointId: that.curSelectClass.coachAppointId
+                coachAppointId: that.curSelectClass.coachAppointId,
+                storeId: that.curSelectClass.storeId
               },
               success(res) {
                 wx.hideLoading();
                 if (res.data.code == 200) {
+                  HttpRequest({
+                    url: '/sendmsg/customer/cancelappointmsg',
+                    data: {
+                      coachAppointId: that.curSelectClass.coachAppointId
+                    }
+                  })
                   wx.showModal({
                     title: "提示",
                     content: "取消成功",
@@ -503,6 +548,10 @@ export default {
             showCancel: false,
             success(model_res) {
               if (model_res.confirm && res.data.code == 200) {
+                HttpRequest({
+                  url: '/sendmsg/customer/consumemsg',
+                  data: res.data.data
+                })
                 wx.navigateTo({
                   url: `../../appointmentResult/main?coachAppointId=${
                     this.curSelectClass.coachAppointId
@@ -523,7 +572,7 @@ export default {
       this.filter.calendarEnd = obj.endTime;
     },
     filterStatus(status) {
-      this.filter.status = status || "";
+      this.filter.status = status == 0 ? 0 : (status || '');
     },
     filterCoach(id) {
       this.filter.coachId = id || "";
@@ -548,7 +597,7 @@ export default {
                   HttpRequest({
                     url: window.api + "/mobile/coach/appoint/finishclass",
                     data: {
-                      coachAppointId: that.curSelectClass.coachAppointId,
+                      coachAppointId: res.data.data[0].coachAppointId,
                       realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
                     },
                     success(finish_res) {
@@ -576,6 +625,34 @@ export default {
           }
         }
       });
+    },
+    // 确认预约 - 确认会员的预约
+    confirmAppoint() {
+      let that = this
+      HttpRequest({
+        url: '/mobile/coach/appoint/affirmappoint',
+        data: {
+          coachAppointId: that.curSelectClass.coachAppointId
+        },
+        success(res) {
+          if(res.data.code == 200) {
+            HttpRequest({
+              url: '/sendmsg/customer/affirmAppointMsg',
+              data: {
+                coachAppointId: that.curSelectClass.coachAppointId,
+                storeId: that.curSelectClass.storeId
+              }
+            })
+            wx.showModal({
+              title: "提示",
+              content: res.data.data,
+              showCancel: false
+            });
+            that.showOperate = false
+            that.refreshList()
+          }
+        }
+      })
     }
   }
 };

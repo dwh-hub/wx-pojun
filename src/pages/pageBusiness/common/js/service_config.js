@@ -369,7 +369,7 @@ authInto.forEach(e => {
 console.group("权限过滤的项")
 service.forEach((group) => {
   if(group.title == "销售管理" && !authArr.includes(40)) {
-      console.log("销售管理")
+    console.log("销售管理")
     group.hasAuth = false
   }
   if(group.title == "教练服务" && !authArr.includes(63)) {

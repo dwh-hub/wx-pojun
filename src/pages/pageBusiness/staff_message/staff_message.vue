@@ -1,19 +1,6 @@
 <template>
   <div class="staff_message">
-    <!-- <div class="header-search">
-      <div class="search-wrapper">
-        <van-search
-          :value="searchText"
-          :background="themeColor"
-          @change="searchChange"
-          placeholder="请输入搜索内容"
-        ></van-search>
-      </div>
-    </div> -->
-    <header-search
-      :color="themeColor"
-      :search="searchChange"
-    ></header-search>
+    <header-search :color="themeColor" :search="searchChange"></header-search>
     <div class="header">
       <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
         <van-tab title="未读">
@@ -24,15 +11,14 @@
               :key="index"
               @click="showDetail(item)"
             >
-              <div class="img-wrapper">
-                <img src="https://www.pojun-tech.com/assets/img/messageDetailIcon.png">
-              </div>
               <div class="message-info">
                 <div class="message-content">
                   <div class="title">{{item.userMessageTemplateTitle}}</div>
                   <div class="message-date">{{item.addTime}}</div>
                 </div>
-                <div class="message-text">{{item.userMessageParam}}</div>
+                <p class="message-text">
+                  <wxParse :content="item.userMessageTemplateContent" />
+                </p>
               </div>
             </div>
             <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
@@ -47,15 +33,14 @@
               :key="index"
               @click="showDetail(item)"
             >
-              <div class="img-wrapper">
-                <img src="https://www.pojun-tech.com/assets/img/messageDetailIcon.png">
-              </div>
               <div class="message-info">
                 <div class="message-content">
                   <div class="title">{{item.userMessageTemplateTitle}}</div>
                   <div class="message-date">{{item.addTime}}</div>
                 </div>
-                <div class="message-text">{{item.userMessageParam}}</div>
+                <p class="message-text">
+                  <wxParse :content="item.userMessageTemplateContent" />
+                </p>
               </div>
             </div>
             <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
@@ -82,6 +67,7 @@ import {
 } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import wxParse from "mpvue-wxparse";
 import headerSearch from "../components/header-search.vue";
 export default {
   data() {
@@ -108,7 +94,8 @@ export default {
   },
   components: {
     noneResult,
-    headerSearch
+    headerSearch,
+    wxParse
   },
   mixins: [colorMixin],
   onReachBottom() {
@@ -129,7 +116,6 @@ export default {
       this.navIndex = e.mp.detail.index;
     },
     searchChange(e) {
-      console.log(e)
       this.searchText = e;
       this.getMessage(this.navIndex, 1);
     },
@@ -167,23 +153,35 @@ export default {
         },
         success(res) {
           if (res.data.code === 200) {
-            if (!res.data.data.result.length) {
+            let resData = res.data.data.result;
+            if (!resData.length) {
               return;
             }
             let _arrId = [];
-            res.data.data.result.map(e => {
+            resData.forEach(e => {
+              e.userMessageParam = e.userMessageParam
+                .replace(/(")/g, "")
+                .replace(/(null|undefined)/g, "--");
               e.addTime = formatDate(new Date(e.addTime), "yyyy-MM-dd hh:mm");
               _arrId.push(e.userMessageId);
+              let _userMessageParam = e.userMessageParam.split(",");
+              for (let key in _userMessageParam) {
+                e.userMessageTemplateContent = e.userMessageTemplateContent.replace(
+                  "%s",
+                  _userMessageParam[key]
+                );
+              }
+              e.userMessageTemplateContent = e.userMessageTemplateContent
+                .replace(/(")/g, "")
+                .replace(/(null|undefined)/g, "--");
             });
             that.arrId = _arrId;
             if (status == 0) {
-              that.messageNList = res.data.data.result;
+              that.messageNList = resData;
               that.mulitpleMessage();
               // that.messageNPage++
             } else if (status == 1) {
-              that.messageYList = that.messageYList.concat(
-                res.data.data.result
-              );
+              that.messageYList = that.messageYList.concat(resData);
               that.messageYPage++;
             }
           }
@@ -210,4 +208,38 @@ export default {
 
 <style lang="less">
 @import "../common/less/staff_common.less";
+@import url("~mpvue-wxparse/src/wxParse.css");
+
+.staff_message {
+  .readContent {
+    padding-bottom: 50px;
+    .message-item {
+      border-bottom: 1rpx solid #eee;
+      .message-info {
+        padding: 10px 15px;
+        .message-content {
+          display: flex;
+          justify-content: space-between;
+          > div {
+            flex: 1;
+            flex-grow: 1;
+            line-height: 30px;
+          }
+          .title {
+            font-size: 15px;
+            font-weight: bold;
+          }
+          .message-date {
+            text-align: right;
+            font-size: 14px;
+          }
+        }
+        .message-text {
+          font-size: 14px;
+          line-height: 22px;
+        }
+      }
+    }
+  }
+}
 </style>

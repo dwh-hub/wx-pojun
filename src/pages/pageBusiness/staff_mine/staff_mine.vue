@@ -24,7 +24,7 @@
       <van-cell title="专属二维码" is-link @click="showStore = true"/>
     </van-cell-group>
 
-    <button @click="login">登录</button>
+    <!-- <button @click="login">登录</button> -->
     <div class="mineExit" :style="{'background-color': window.color}" @click="signOut">退出登录</div>
 
     <van-tabbar active="4" @change="changeTabbar">

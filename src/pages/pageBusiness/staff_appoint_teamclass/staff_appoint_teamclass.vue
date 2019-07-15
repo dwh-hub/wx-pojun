@@ -1,4 +1,5 @@
 <template>
+<!-- 废弃页面 -->
   <div class="staff_appoint_teamclass">
     <div class="header-search">
       <div class="search-wrapper">
@@ -106,10 +107,12 @@ export default {
       operateList: [
         {
           text: "批量取消课程",
+          hasAuth: true,
           iconUrl: "/static/images/staff/close.svg"
         },
         {
           text: "排课",
+          hasAuth: true,
           iconUrl: "/static/images/staff/calendar.svg"
         }
       ],

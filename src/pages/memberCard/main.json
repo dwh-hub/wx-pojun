@@ -2,6 +2,7 @@
     "navigationBarTitleText": "合同",
     "usingComponents": {
       "van-popup": "../../../static/vant/popup/index",
-      "van-loading": "../../../static/vant/loading/index"
+      "van-loading": "../../../static/vant/loading/index",
+      "van-stepper": "/static/vant/stepper/index"
     }
   }

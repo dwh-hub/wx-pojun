@@ -174,11 +174,11 @@ export default {
       this.themeColor = window.color;
       setNavTab(wx.getStorageSync("companyName"));
     }
+    this.userInfo = wx.getStorageSync("userInfo");
+    store.commit("saveUserInfo", this.userInfo);
   },
   mounted() {
     setNavTab();
-    this.userInfo = wx.getStorageSync("userInfo");
-    store.commit("saveUserInfo", this.userInfo);
     // this.isLogin = store.state.isLogin;
     this.themeColor = window.color
   },

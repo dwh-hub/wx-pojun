@@ -269,7 +269,7 @@ export default {
             }
             let _res = res.data.data;
             let _data;
-            that.headerData[0].dataNum = _res.recCount;
+            that.headerData[0].dataNum = _res.recCount || 0;
             _data = _res.result.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {

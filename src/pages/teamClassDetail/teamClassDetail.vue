@@ -273,7 +273,7 @@ export default {
         methods: "POST",
         success(res) {
           if (res.data.code === 200) {
-            if (new Date().getTime() > res.data.data.timeStart) {
+            if (new Date().getTime() > res.data.data.timeEnd) {
               that.canAppoint = false;
             }
             res.data.data.masterImg = res.data.data.masterImg.split(",");
@@ -296,6 +296,11 @@ export default {
         methods: "POST",
         success(res) {
           if (res.data.code) {
+            res.data.data.forEach(e => {
+              if(!e.coachHeadImg) {
+                e.coachHeadImg = "/assets/img/morenTo.png"
+              }
+            });
             that.coachList = res.data.data;
           }
           that.loadCount++

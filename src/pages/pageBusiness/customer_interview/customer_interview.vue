@@ -156,7 +156,7 @@ export default {
               that.list = [];
               return;
             }
-            that.headerData[0].dataNum = res.data.data.recCount;
+            that.headerData[0].dataNum = res.data.data.recCount || 0;
             let _data = res.data.data.result.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {

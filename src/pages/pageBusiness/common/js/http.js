@@ -14,6 +14,10 @@ function getUseServiceList() {
       success(res) {
         let data = JSON.parse(res.data.data)
         let list = []
+        if(!data || !data.length) {
+          list = serviceList.slice(0,7)
+          return resolve(list)
+        }
         serviceList.forEach((item, index) => {
           if (data.filter(e => e.authorityId == item.authorityId).length) {
             list.push(item)

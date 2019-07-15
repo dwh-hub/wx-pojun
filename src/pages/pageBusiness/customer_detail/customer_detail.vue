@@ -780,6 +780,17 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            HttpRequest({
+              url: '/sendmsg/customer/normalReservedMsg',
+              data: {
+                customerId: that.id,
+                appointmentPurpose: that.selectObjective.id,
+                appointmentTime: that.currentDate,
+                remarks: that.trackContent,
+                content: that.selectObjective.text,
+                storeId: that.storeId
+              }
+            })
             wx.showToast({
               title: res.data.message || "预约成功",
               icon: "success",

@@ -90,22 +90,16 @@ export default {
       }, 1000);
       this.checkQRStatus;
     }
-    if (this.params.way == 3 || this.params.way == 4) {
+    if (this.params.way == 4) {
       this.pushMsg();
     }
     this.addHit();
   },
   onUnload() {
-    this.cancelHit();
-    this.studentText = "正在等待学员确认...";
-    this.receptionText = "正在等待前台确认...";
-    clearInterval(this.timer);
-    clearInterval(this.checkQRStatus);
+    this.clear()
   },
   onHide() {
-    this.cancelHit();
-    clearInterval(this.timer);
-    clearInterval(this.checkQRStatus);
+    this.clear()
   },
   computed: {
     tip() {
@@ -120,8 +114,14 @@ export default {
     }
   },
   methods: {
+    clear() {
+      this.cancelHit();
+      this.studentText = "正在等待学员确认...";
+      this.receptionText = "正在等待前台确认...";
+      clearInterval(this.timer);
+      clearInterval(this.checkQRStatus);
+    },
     getNowTime() {
-      console.log("=======getNowTime======");
       this.nowTime = formatDate(new Date(), "hh:mm");
     },
     drawImg(url) {
@@ -208,6 +208,7 @@ export default {
       });
     },
     addHits(valueType) {
+      debugger
       var frontSures = valueType.data;
       if (!frontSures) {
         if (valueType.message) {
@@ -269,7 +270,7 @@ export default {
           if (
             frontSures.coachAppointOut.coachAppointId == this.params.appointId
           ) {
-            // TODO: 上课
+            this.attendSuccess()
             // addclassport(frontSures.coachAppointOut.coachAppointId);
             // messageOnClass = false;
           }
@@ -278,6 +279,7 @@ export default {
             frontSures.coachAppointOut.coachAppointId == this.params.appointId
           ) {
             this.studentText = "学员已确认";
+            this.pushMsg();
           }
         }
         // qrCodes = false;
@@ -334,6 +336,10 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            HttpRequest({
+              url: '/sendmsg/customer/consumemsg',
+              data: res.data.data
+            })
             that.attendSuccess();
           } else {
             wx.showModal({

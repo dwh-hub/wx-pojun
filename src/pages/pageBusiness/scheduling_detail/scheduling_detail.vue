@@ -2,7 +2,7 @@
   <div class="scheduling_detail">
     <div class="class-info-wrapper block-wrapper">
       <img :src="classDetail.masterImg" alt>
-      <div class="class-info block-info">
+      <div class="class-info header-info">
         <div class="name">{{classDetail.anotherName}}</div>
         <div class="duration">时长：{{classDetail.timeSpan}}分钟</div>
       </div>
@@ -64,6 +64,12 @@ export default {
   onLoad(options) {
     if (options.teamScheduleId) {
       this.teamScheduleId = options.teamScheduleId;
+      this.getClassDetail();
+      this.getStudentList();
+    }
+  },
+  onShow() {
+    if(this.teamScheduleId) {
       this.getClassDetail();
       this.getStudentList();
     }
@@ -154,7 +160,9 @@ export default {
           if (res.data.code == 200) {
             that.studentList = res.data.data.result.map(e => {
               if(!e.masterImg) {
-              e.masterImg = window.api + "/assets/img/morenTo.png";
+                e.masterImg = window.api + "/assets/img/morenTo.png";
+              } else {
+                e.masterImg = window.api + e.masterImg
               }
               return e;
             });
@@ -212,6 +220,8 @@ page {
       margin-top:14px;
     }
     .class-info {
+      flex: 1;
+      margin-left: 15px;
       > div {
         line-height: 22px;
         color: #333;
@@ -227,9 +237,7 @@ page {
         font-size: 12px;
       }
     }
-    .block-info {
-      flex: 1;
-      margin-left: 15px;
+    .header-info {
       > div {
         line-height: 30px;
       }

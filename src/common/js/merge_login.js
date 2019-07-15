@@ -40,20 +40,20 @@ export function getPhoneNumber(e, url, isTab) {
         });
         // wx.setStorage({
         //   key: "phone",
-        //   data: "15080132345",
+        //   data: "13285923990",
         //   success: function () {
         //     login(url, isTab);
         //   }
         // });
       } else {
-        // TODO:
-        wx.setStorage({
-          key: "phone",
-          data: "18888888881",
-          success: function () {
-            login(url, isTab);
-          }
-        });
+        // // TODO:
+        // wx.setStorage({
+        //   key: "phone",
+        //   data: "18888888881", // "13285923990",
+        //   success: function () {
+        //     login(url, isTab);
+        //   }
+        // });
         wx.hideLoading();
         wx.showModal({
           title: "提示",

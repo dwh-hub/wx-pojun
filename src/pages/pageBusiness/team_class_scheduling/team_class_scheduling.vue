@@ -161,10 +161,9 @@
       position="bottom"
       custom-style="width:100%"
       :z-index="101"
-      @click="selectVenue"
     >
       <div class="action-list">
-        <div class="action-item" v-for="(item, index) in venueList" :key="index">
+        <div class="action-item" @click="selectVenue(item)" v-for="(item, index) in venueList" :key="index">
           <div class="text">{{item.venueName}}</div>
         </div>
       </div>

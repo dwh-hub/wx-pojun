@@ -318,7 +318,7 @@ export default {
             }
             let _res = res.data.data;
             let _data;
-            that.headerData[0].dataNum = _res.recCount;
+            that.headerData[0].dataNum = _res.recCount || 0;
             _data = _res.result.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {
@@ -392,6 +392,13 @@ export default {
             storeId: that.selectedStore.storeId
           },
           success(res) {
+            HttpRequest({
+              url: '/sendmsg/user/allotsCoachMsg',
+              data: {
+                allotRandom: res.data.data,
+                storeId: that.selectedStore.storeId
+              }
+            })
             resolve(res);
           }
         });
@@ -416,6 +423,14 @@ export default {
             storeId: that.selectedStore.storeId
           },
           success(res) {
+            // 推送消息
+            HttpRequest({
+              url: '/sendmsg/user/allotsCustomerMsg',
+              data: {
+                allotRandom: res.data.data,
+                storeId: that.selectedStore.storeId
+              }
+            })
             resolve(res);
           }
         });

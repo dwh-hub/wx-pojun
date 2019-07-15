@@ -1,5 +1,5 @@
 <template>
-  <div class="suspension_window" v-if="operateList.length || operateList.length > 0">
+  <div class="suspension_window" v-if="operateListLength || operateListLength > 0">
     <div class="suspension">
       <div class="operate-wrapper" v-show="showOperate">
         <div class="operate-item" v-for="(item, index) in operateList" :key="index" :class="{hidden: item.hasAuth == undefined ? false : !item.hasAuth}" @click.stop="operate(item)">
@@ -21,12 +21,7 @@ export default {
   props: {
     operateList: {
       type: Array,
-      default: [
-        {
-          text: '',
-          iconUrl: ''
-        }
-      ]
+      default: []
     }
   },
   data() {
@@ -37,6 +32,9 @@ export default {
   computed: {
     themeColor() {
       return window.color
+    },
+    operateListLength() {
+      return this.operateList.filter(e => e.hasAuth).length
     }
   },
   methods: {

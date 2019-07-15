@@ -23,6 +23,24 @@
     </div>
 
     <van-popup
+      :show="showModifyPrice"
+      @close="showModifyPrice = false"
+      :duration="200"
+      custom-style="width:85%;border-radius: 5px;"
+    >
+      <div class="modify-price">
+        <div class="modify-title">请输入扣费金额</div>
+        <div class="modify-middle">
+          <van-stepper :value="modifyPrice" @change="changePrice"/>
+        </div>
+        <div class="modify-btn">
+          <div class="modify-cancel" :style="{background: themeColor}" @click="showModifyPrice = false">取消</div>
+          <div class="modify-confirm" :style="{background: themeColor}" @click="getUserp">确认</div>
+        </div>
+      </div>
+    </van-popup>
+
+    <van-popup
       :show="showProjectPopup"
       @close="showProjectPopup = false"
       :duration="200"
@@ -182,6 +200,8 @@ export default {
       selectedCard: {},
       showProjectPopup: false,
       showUserPopup: false,
+      showModifyPrice: false,
+      modifyPrice: 0,
       projectList: [],
       selectedProject: {},
       userpList: [],
@@ -252,7 +272,7 @@ export default {
             if (res.data.code !== 200) {
               that.list = [];
             }
-            that.headerData[0].dataNum = res.data.data.recCount;
+            that.headerData[0].dataNum = res.data.data.recCount || 0;
             let list = res.data.data.result
             // list = list.filter(e => {
             //   return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
@@ -318,6 +338,12 @@ export default {
     selectProject(item) {
       this.selectedProject = item;
       this.showProjectPopup = false;
+      this.modifyPrice = ""
+      if (item.isCanModifyFee) {
+        this.modifyPrice = item.projectPrice
+        this.showModifyPrice = true
+        return
+      }
       this.getUserp();
     },
     selectUser(item) {
@@ -335,7 +361,8 @@ export default {
           cardClassId: that.selectedCard.cardClassId,
           storeId: that.selectedCard.storeId,
           venueId: that.venueId,
-          teamScheduleId: that.teamScheduleId
+          teamScheduleId: that.teamScheduleId,
+          valueCardType: that.selectedCard.teachCardType ? 3 : '' // 2 私教
         },
         success(res) {
           if(res.data.code !== 200) {
@@ -348,7 +375,8 @@ export default {
           if (res.data.code == 200 && res.data.data.length) {
             if (res.data.data.length == 1) {
               that.selectedProject = res.data.data[0];
-              that.getUserp();
+              that.selectProject(that.selectedProject)
+              // that.getUserp();
             } else {
               that.showProjectPopup = true;
               that.projectList = res.data.data;
@@ -360,6 +388,7 @@ export default {
     // 获取使用人
     getUserp() {
       let that = this;
+      this.showModifyPrice = false
       HttpRequest({
         url: window.api + "/card/relevance/user/get",
         data: {
@@ -379,6 +408,9 @@ export default {
       });
     },
     addAttend() {
+      wx.showLoading({
+        title: '上课中...'
+      })
       let that = this;
       HttpRequest({
         url: window.api + "/teamClass/teamAttend/attend",
@@ -388,9 +420,22 @@ export default {
           venueId: that.venueId,
           physicsCardNo: that.selectedUser.physicsCardNo,
           passMode: 10, // 教练点名上课
-          teamScheduleId: that.teamScheduleId
+          teamScheduleId: that.teamScheduleId,
+          valueCardFee: that.modifyPrice
         },
         success(res) {
+          wx.hideLoading()
+          if(res.data.code == 200) {
+            let msgData = res.data.data
+            for(let k in msgData) {
+              msgData[k] = msgData[k] ? msgData[k] : ""
+            }
+            msgData.storeId = that.selectedCard.storeId
+            HttpRequest({
+              url: '/sendmsg/customer/teamconsumemsg',
+              data: msgData
+            })
+          }
           wx.showModal({
             title: "提示",
             content: res.data.message,
@@ -398,7 +443,10 @@ export default {
           });
         }
       });
-    }
+    },
+    changePrice(e) {
+      this.modifyPrice = e.mp.detail
+    },
     /* 上课流程-结束 */
   }
 };

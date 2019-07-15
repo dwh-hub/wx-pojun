@@ -231,6 +231,24 @@
       </div>
     </van-popup>
 
+    <van-popup
+      :show="showModifyPrice"
+      @close="showModifyPrice = false"
+      :duration="200"
+      custom-style="width:85%;border-radius: 5px;"
+    >
+      <div class="modify-price">
+        <div class="modify-title">请输入扣费金额</div>
+        <div class="modify-middle">
+          <van-stepper :value="modifyPrice" @change="changePrice"/>
+        </div>
+        <div class="modify-btn">
+          <div class="modify-cancel" :style="{background: themeColor}" @click="showModifyPrice = false">取消</div>
+          <div class="modify-confirm" :style="{background: themeColor}" @click="modifyPriceSure">确认</div>
+        </div>
+      </div>
+    </van-popup>
+
     <div
       class="bottom-btn appoint-coach"
       @click="appointCoach"
@@ -333,7 +351,11 @@ export default {
       studentInfo: {},
       // 不能预约的时间
       todayPeriodTime: [],
-      isRevision: false
+      isRevision: false,
+      modifyPrice: 0,
+      showModifyPrice: false,
+      // 是否是储值卡
+      isStoredValueCard: false
     };
   },
   components: {
@@ -421,6 +443,13 @@ export default {
           showCancel: false
         });
       }
+      if(!this.storeList.length) {
+        return wx.showModal({
+          title: "提示",
+          content: "该教练暂无可授课门店",
+          showCancel: false
+        });
+      }
       this.isStorePopup = true;
     },
     // 显示场馆弹窗
@@ -460,7 +489,7 @@ export default {
         this.selectStoreId &&
         this.selectCardId &&
         this.venueId &&
-        !this.venueList.length
+        !this.projectList.length
       ) {
         return wx.showModal({
           title: "提示",
@@ -631,6 +660,7 @@ export default {
       this.isCardPopup = false;
       this.cardCellText = item.cardClassName;
       this.selectCardId = item.id;
+      this.isStoredValueCard = item.teachCardType == 3 ? true : false
       this.cardClassId = item.cardClassId;
       if (this.selectCardId) {
         this.getStoreList();
@@ -666,6 +696,12 @@ export default {
       this.isProjectPopup = false;
       this.projectId = item.projectId;
       this.projectCellText = item.projectName;
+      this.modifyPrice = ""
+      if (item.isCanModifyFee) {
+        this.modifyPrice = item.projectPrice
+        this.showModifyPrice = true
+        return
+      }
       this.isTimePopup = true;
     },
     // 确认选择时间
@@ -730,7 +766,7 @@ export default {
               if(e.doomsday) {
                 e.doomsday = e.doomsday.split(" ")[0];
               }
-              return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
+              return e.teachCardType == 3 || (e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2)
             });
             console.log(that.cardList)
             if (that.cardList.length == 1) {
@@ -757,7 +793,8 @@ export default {
             if (that.storeList.length == 1) {
               that.selectStore(that.storeList[0]);
             } else {
-              that.isStorePopup = true;
+              // that.isStorePopup = true;
+              that.showStorePopup()
             }
           }
           wx.hideLoading();
@@ -796,7 +833,8 @@ export default {
         data: {
           storeId: that.selectStoreId,
           cardClassId: that.cardClassId,
-          venueId: that.venueId
+          venueId: that.venueId,
+          valueCardType: that.isStoredValueCard ? 2 : '' // 2 私教
         },
         success(res) {
           if (res.data.code === 200) {
@@ -902,17 +940,18 @@ export default {
       });
       let params = {
         status: 1,
-        customerId: that.id,
-        coachId: that.userInfo.userId,
-        cardId: that.selectCardId,
-        storeId: that.selectStoreId,
-        venueId: that.venueId,
-        projectId: that.projectId,
-        calendar: that.curDate + " " + "00:00:00",
-        timeStart: that.curDate + " " + that.curTime + ":00",
-        timeEnd: that.curDate + " " + that.curEndTime + ":00",
-        name: that.studentInfo.name,
-        phone: that.studentInfo.phone
+        customerId: this.id,
+        coachId: this.userInfo.userId,
+        cardId: this.selectCardId,
+        storeId: this.selectStoreId,
+        venueId: this.venueId,
+        projectId: this.projectId,
+        calendar: this.curDate + " " + "00:00:00",
+        timeStart: this.curDate + " " + this.curTime + ":00",
+        timeEnd: this.curDate + " " + this.curEndTime + ":00",
+        name: this.studentInfo.name,
+        phone: this.studentInfo.phone,
+        valueCardFee: this.modifyPrice
       };
       wx.hideLoading();
       if (this.appointType == "预约") {
@@ -954,6 +993,14 @@ export default {
         success(res) {
           wx.hideLoading();
           if (res.data.code == 200) {
+            let msgData = res.data.data
+            for(let k in msgData) {
+              msgData[k] = msgData[k] ? msgData[k] : ""
+            }
+            HttpRequest({
+              url: '/sendmsg/customer/appointmsg',
+              data: msgData
+            })
             wx.redirectTo({
               url: `../../appointmentResult/main?coachAppointId=${
                 res.data.data.coachAppointId
@@ -1035,6 +1082,10 @@ export default {
             //   content: res.data.message,
             //   showCancel: false
             // });
+            HttpRequest({
+              url: '/sendmsg/customer/consumemsg',
+              data: res.data.data
+            })
             wx.redirectTo({
               url: `../../appointmentResult/main?coachAppointId=${appointId}&type=staff`
             });
@@ -1096,6 +1147,10 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            HttpRequest({
+              url: '/sendmsg/user/allotsCoachMsg',
+              data: res.data.data
+            })
             wx.showToast({
               title: "改约成功",
               icon: "success",
@@ -1109,6 +1164,13 @@ export default {
           }
         }
       });
+    },
+    changePrice(e) {
+      this.modifyPrice = e.mp.detail
+    },
+    modifyPriceSure() {
+      this.showModifyPrice = false;
+      this.isTimePopup = true;
     }
     // 上课校验
     // checkStatus() {
@@ -1124,6 +1186,7 @@ export default {
 
 <style lang="less">
 @import "~COMMON/less/common.less";
+@import "../common/less/staff_common.less";
 page {
   background-color: #f6f6f6;
 }

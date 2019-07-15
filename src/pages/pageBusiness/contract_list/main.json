@@ -3,6 +3,7 @@
   "usingComponents": {
     "van-loading": "../../../../static/vant/loading/index",
     "van-popup": "../../../../static/vant/popup/index",
-    "time-picker": "/static/timePicker/timePicker"
+    "time-picker": "/static/timePicker/timePicker",
+    "van-stepper": "/static/vant/stepper/index"
   }
 }

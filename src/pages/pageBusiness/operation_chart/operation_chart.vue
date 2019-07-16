@@ -216,6 +216,7 @@ export default {
     setNavTab();
     // this.computedScrollHeight();
 
+    this.nav[0].navTitle = "今日";
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     this.nav[0].navTitle = this.selectedStore.storeName;
@@ -515,14 +516,17 @@ export default {
         "#8543E0"
       ];
       if (data.length < 6) {
-        // let hasCostLength = data.filter(e => e.cost > 0).length;
-        // if (hasCostLength >= 1) {
-        //   colorArr = colorArr.slice(0, hasCostLength);
-        // } else {
-        //   colorArr = colorArr.slice(0, data.length.length);
-        // }
-        colorArr = colorArr.slice(0, data.length.length);
-        // console.log(colorArr)
+        // 兼容手机端 圆环内显示0%的颜色BUG
+        let hasCostLength = data.filter(e => e.cost > 0).length;
+        if (hasCostLength >= 1) {
+          colorArr = colorArr.slice(0, hasCostLength);
+          for (let i=0; i < (data.length - hasCostLength); i++) {
+            colorArr.push('#FFFFFF')
+          }
+        } else {
+          colorArr = colorArr.slice(0, data.length.length);
+        }
+        // colorArr = colorArr.slice(0, data.length.length);
       }
       chart
         .interval()
@@ -666,7 +670,7 @@ export default {
                 day: e.addTime.substring(8, 10),
                 month: e.addTime.substring(5, 7),
                 topText: `${e.customerName}(${e.pactId})`,
-                bottomText: `${e.secondCardClassName}（${e.cardPay}元）`,
+                bottomText: `${e.secondCardClassName}（${e.cost}元）`,
                 tagText: e.purchasePatternChar
               };
             });
@@ -696,7 +700,7 @@ export default {
               id: e.userId,
               cover: window.api + "/assets/img/morenm.png",
               first_1: e.userName,
-              rightText: e.attendNumber + "节课"
+              rightText: e.appointNumber + "节课"
             };
           });
         }

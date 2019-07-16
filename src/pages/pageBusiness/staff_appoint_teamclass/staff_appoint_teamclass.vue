@@ -130,6 +130,7 @@ export default {
     this.isOperate = false
   },
   mounted() {
+    this.nav[0].navTitle = "今日";
     setNavTab();
   },
   components: {

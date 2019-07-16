@@ -110,7 +110,7 @@ export default {
           navTitle: "筛选条件二",
           children: [
             {
-              sonText: "全部"
+              sonText: "无"
             }
           ]
         },
@@ -118,7 +118,7 @@ export default {
           navTitle: "筛选条件三",
           children: [
             {
-              sonText: "全部"
+              sonText: "无"
             }
           ]
         }
@@ -197,6 +197,7 @@ export default {
     };
   },
   mounted() {
+    this.nav[0].navTitle = "今日";
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     this.filterDate(1);

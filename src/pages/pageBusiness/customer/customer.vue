@@ -149,16 +149,10 @@ export default {
           ]
         },
         {
-          navTitle: "未维护时间",
+          navTitle: "筛选条件",
           children: [
             {
-              sonText: "今日"
-            },
-            {
-              sonText: "本周"
-            },
-            {
-              sonText: "本月"
+              sonText: "无"
             }
           ]
         },

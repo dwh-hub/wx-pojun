@@ -108,7 +108,7 @@ export default {
         getThemeColor();
         this.login();
       } else {
-        // 直接进入小程序时，设置默认公司id
+        // 直接进入小程序时，设置默认公司id 
         getCompanyColor().then(() => {
           this.login();
         });

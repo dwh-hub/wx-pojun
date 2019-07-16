@@ -84,11 +84,17 @@ export default {
         },
         {
           navTitle: "筛选条件二",
-          children: []
+          children: [
+            {
+              sonText: "无"
+            }]
         },
         {
           navTitle: "筛选条件三",
-          children: []
+          children: [
+            {
+              sonText: "无"
+            }]
         }
       ],
       headerData: [
@@ -124,6 +130,7 @@ export default {
   },
   mixins: [colorMixin, listPageMixin],
   mounted() {
+    this.nav[0].navTitle = "今日";
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     this.filterDate(1);
@@ -144,7 +151,7 @@ export default {
           {
             page: that.page,
             pageNo: that.page,
-            searchStore: that.selectedStore.storeId
+            storeId: that.selectedStore.storeId
           },
           that.filter
         );

@@ -1,11 +1,12 @@
 <template>
   <div class="team_class_scheduling">
     <div class="class-info-wrapper">
-      <img src alt>
+      <img :src="schedulingDetail.masterImg" alt>
       <div class="class-info">
         <div class="name">{{schedulingDetail.anotherName}}</div>
         <div class="duration">时长：{{schedulingDetail.timeSpan || ''}}分钟</div>
       </div>
+      <div v-if="type == 'modify'" class="delete-class" @click="deleteClass">删除</div>
     </div>
     <van-cell-group custom-class="van-cell-group">
       <van-cell
@@ -150,6 +151,7 @@
             <van-icon name="checked" :color="themeColor" size="2em"/>
           </div>
         </div>
+        <div class="action-sure" :style="{'background-color': themeColor}" @click="showCoachPopup = false">确认</div>
       </div>
     </van-popup>
 
@@ -181,6 +183,7 @@ import {
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
+import { setTimeout } from 'timers';
 export default {
   data() {
     return {
@@ -232,6 +235,9 @@ export default {
       this.storeId = options.storeId;
     }
     this.type = options.type
+    if (this.type == "modify"){
+      setNavTab('修改团课')
+    }
   },
   onUnload() {
     Object.assign(this.$data, this.$options.data());
@@ -271,8 +277,8 @@ export default {
     } else {
       this.getSchedulingDetail();
       this.getVenueList();
+      this.getCoachList();
     }
-    this.getCoachList();
   },
   mixins: [colorMixin],
   methods: {
@@ -334,12 +340,15 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            if(!res.data.data.masterImg) {
-            res.data.data.masterImg = window.api + "/assets/img/morenImg.png";
+            let data = res.data.data
+            if(!data.masterImg) {
+              data.masterImg = window.api + "/assets/img/morenImg.png";
+            } else {
+              data.masterImg = window.api + data.masterImg
             }
-            res.data.data.venueId = res.data.data.venueIdIntArray[0];
-            that.isAppoint = res.data.data.isNeedAppoint == 0 ? "2" : "1";
-            that.isAppointAttend = res.data.data.isNeedAppoint == 1 ? "1" : "2";
+            data.venueId = data.venueIdIntArray[0];
+            that.isAppoint = data.isNeedAppoint == 0 ? "2" : "1";
+            that.isAppointAttend = data.isNeedAppoint == 1 ? "1" : "2";
             that.schedulingDetail = res.data.data;
           }
         }
@@ -354,18 +363,23 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            if(!res.data.data.masterImg) {
-            res.data.data.masterImg = window.api + "/assets/img/morenImg.png";
+            let data = res.data.data
+            if(!data.masterImg) {
+              data.masterImg = window.api + "/assets/img/morenImg.png";
+            } else {
+              data.masterImg = window.api + data.masterImg
             }
-            that.isAppoint = res.data.data.isNeedAppoint == 0 ? "2" : "1";
-            that.isAppointAttend = res.data.data.isNeedAppoint == 1 ? "1" : "2";
-            that.classDate = formatDate(new Date(res.data.data.timeStart), "yyyy-MM-dd")
-            that.classStartTime = formatDate(new Date(res.data.data.timeStart), "hh:mm")
-            that.classEndTime = formatDate(new Date(res.data.data.timeEnd), "hh:mm")
-            that.selectedCoachStr = res.data.data.coachNameArray.join(',')
-            that.selectedCoachIdStr = res.data.data.coachIdIntArray.join(',')
+            that.isAppoint = data.isNeedAppoint == 0 ? "2" : "1";
+            that.isAppointAttend = data.isNeedAppoint == 1 ? "1" : "2";
+            that.classDate = formatDate(new Date(data.timeStart), "yyyy-MM-dd")
+            that.classStartTime = formatDate(new Date(data.timeStart), "hh:mm")
+            that.classEndTime = formatDate(new Date(data.timeEnd), "hh:mm")
+            that.selectedCoachStr = data.coachNameArray.join(',')
+            that.selectedCoachIdStr = data.coachIdIntArray.join(',')
             
-            that.schedulingDetail = res.data.data;
+            that.schedulingDetail = data;
+
+            that.getCoachList()
           }
         }
       });
@@ -386,7 +400,7 @@ export default {
               } else {
                 e.headImgPath = window.api + "/assets/img/morenTo.png";
               }
-              e["isSelect"] = false;
+              that.selectedCoachStr.indexOf(e.userName) > -1 ? e["isSelect"] = true:e["isSelect"] = false 
               return e;
             });
           }
@@ -556,6 +570,45 @@ export default {
         }
       })
     },
+    deleteClass() {
+      let that = this
+      wx.showModal({
+        title: "提示",
+        content: "是否确认删除该团课？",
+        success(res) {
+          if (res.confirm) {
+            wx.showLoading()
+            HttpRequest({
+              url: '/teamClass/teamSchedule/delete',
+              data: {
+                teamScheduleIdArray: that.schedulingDetail.teamScheduleId
+              },
+              success(res) {
+                wx.hideLoading()
+                if(res.data.code == 200) {
+                  wx.showToast({
+                    title: res.data.message,
+                    icon: "success",
+                    duration: 1000
+                  });
+                  setTimeout(() => {
+                    wx.navigateBack({
+                      delta: 1
+                    })
+                  }, 500)
+                } else {
+                  wx.showModal({
+                    title: "提示",
+                    content: res.data.message,
+                    showCancel: false
+                  });
+                }
+              }
+            })
+          }
+        }
+      });
+    },
     addSchedulingTime() {
       if(this.classStartDate == "") {
         return wx.showModal({
@@ -621,6 +674,15 @@ page {
         line-height: 30px;
       }
     }
+    .delete-class {
+      line-height:26px;
+      height:26px;
+      color:#fff;
+      border-radius:3px;
+      padding: 0 10px;
+      margin-top:14px;
+      background-color: #ec6c62;
+    }
   }
   .item-cell {
     background-color: #fff;
@@ -643,7 +705,9 @@ page {
     z-index: 5;
   }
   .action-list {
-    max-height: 50vh;
+    position: relative;
+    max-height: 60vh;
+    padding-bottom: 48px;
     .action-item {
       border-top: 1rpx solid #eee;
       line-height: 48px;
@@ -669,13 +733,21 @@ page {
       }
       > div {
         display: inline-block;
-
         vertical-align: middle;
       }
     }
     .coach-popup-item {
       text-align: left;
       padding: 5px 0;
+    }
+    .action-sure {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      line-height: 46px;
+      text-align: center;
+      color: #fff;
     }
   }
   .item-cell {

@@ -363,9 +363,9 @@ export default {
     selectDate
   },
   onLoad(options) {
-    setNavTab();
     this.id = options.id;
     this.appointType = options.type;
+    setNavTab(this.appointType);
     this.userInfo = wx.getStorageSync("staff_info");
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
     if (this.appointType == "改约") {
@@ -1082,9 +1082,16 @@ export default {
             //   content: res.data.message,
             //   showCancel: false
             // });
+            let msgData = res.data.data;
+            for (let k in msgData) {
+              msgData[k] = msgData[k] ? msgData[k] : "";
+              if(k == "cardCustomerInfoArray") {
+                msgData[k] = null
+              }
+            }
             HttpRequest({
               url: '/sendmsg/customer/consumemsg',
-              data: res.data.data
+              data: msgData
             })
             wx.redirectTo({
               url: `../../appointmentResult/main?coachAppointId=${appointId}&type=staff`

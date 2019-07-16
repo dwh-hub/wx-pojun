@@ -13,10 +13,77 @@
         <img src="/static/images/staff/phone.svg" alt>
       </div>
     </div>
-    <van-tabs :active="tabIndex" @change="changeTab" :color="themeColor" swipeable>
+    <van-tabs :active="tabIndex" @change="changeTab" :color="themeColor">
       <van-tab title="出勤信息">
+        <!-- <header-data :headerData="checkInData"></header-data>
+        <scroll-view
+          scroll-y
+          :style="{height: scrollViewHeight + 'px'}"
+          @scrolltolower="getCheckInList()"
+        >
+          <list-day-item :info="item" v-for="(item,index) in checkInList" :key="index"></list-day-item>
+          <none-result text="暂无出勤记录" v-if="!checkInList.length && !isCheckInLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isCheckInLoading"/>
+        </scroll-view> -->
+      </van-tab>
+      <van-tab title="跟进回访">
+        <!-- <header-data :headerData="FollowUpData"></header-data>
+        <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
+          <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item>
+          <none-result text="暂无跟进回访" v-if="!followUpList.length && !isFollowUpLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isFollowUpLoading"/>
+        </scroll-view> -->
+      </van-tab>
+      <van-tab title="合同">
+        <!-- <header-data :headerData="cardData"></header-data>
+        <scroll-view
+          scroll-y
+          :style="{height: scrollViewHeight + 'px'}"
+          @scrolltolower="getCardList()"
+        >
+          <div class="card-list">
+            <card
+              v-for="(item,index) in cardList"
+              :info="item"
+              :key="index"
+              @hasClick="toCardDetail(item)"
+            ></card>
+          </div>
+          <none-result text="暂无合同" v-if="!cardList.length && !isCardLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isCardLoading"/>
+        </scroll-view> -->
+      </van-tab>
+      <van-tab title="更多信息">
+        <!-- <div class="info">
+          <van-cell-group custom-class="van-cell-group">
+            <van-cell title="基本信息" is-link @click="toUserInfo"/>
+          </van-cell-group>
+          <van-cell title="服务教练" @click="showCoachList()">
+            <div slot="right-icon">
+              <div class="tab-cover" v-for="(item, index) in serviceCoachList" :key="index">
+                <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+              </div>
+              <van-icon name="arrow" color="#999"/>
+            </div>
+          </van-cell>
+          <van-cell title="服务销售" @click="showSaleList()">
+            <div slot="right-icon">
+              <div class="tab-cover" v-for="(item, index) in serviceSaleList" :key="index">
+                <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
+              </div>
+              <van-icon name="arrow" color="#999"/>
+            </div>
+          </van-cell>
+          <van-cell title="预约记录" is-link @click="toAppointList"/>
+          <van-cell title="健身目的" is-link value="未填写"/>
+          <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
+        </div> -->
+      </van-tab>
+    </van-tabs>
+    
+    <swiper :indicator-dots="false" duration="500" :style="{height: scrollViewHeight+68+'px'}" :current="tabIndex" @change="swiperTab">
+      <swiper-item>
         <header-data :headerData="checkInData"></header-data>
-        <!-- <filter-nav></filter-nav> -->
         <scroll-view
           scroll-y
           :style="{height: scrollViewHeight + 'px'}"
@@ -26,19 +93,17 @@
           <none-result text="暂无出勤记录" v-if="!checkInList.length && !isCheckInLoading"></none-result>
           <van-loading :color="themeColor" v-if="isCheckInLoading"/>
         </scroll-view>
-      </van-tab>
-      <van-tab title="跟进回访">
+      </swiper-item>
+      <swiper-item>
         <header-data :headerData="FollowUpData"></header-data>
-        <!-- <filter-nav></filter-nav> -->
         <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
           <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item>
           <none-result text="暂无跟进回访" v-if="!followUpList.length && !isFollowUpLoading"></none-result>
           <van-loading :color="themeColor" v-if="isFollowUpLoading"/>
         </scroll-view>
-      </van-tab>
-      <van-tab title="合同">
+      </swiper-item>
+      <swiper-item>
         <header-data :headerData="cardData"></header-data>
-        <!-- <filter-nav></filter-nav> -->
         <scroll-view
           scroll-y
           :style="{height: scrollViewHeight + 'px'}"
@@ -55,26 +120,11 @@
           <none-result text="暂无合同" v-if="!cardList.length && !isCardLoading"></none-result>
           <van-loading :color="themeColor" v-if="isCardLoading"/>
         </scroll-view>
-      </van-tab>
-      <!-- <van-tab title="预约记录">
-        <header-data :headerData="appointData"></header-data>
-        <filter-nav></filter-nav>
-        <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
-          <list-day-item :info="item" v-for="(item,index) in appointList" :key="index"></list-day-item>
-          <none-result text="预约记录" v-if="!appointList.length && !isAppointLoading"></none-result>
-          <van-loading :color="themeColor" v-if="isAppointLoading"/>
-        </scroll-view>
-      </van-tab>-->
-      <!-- <van-tab title="订单信息"></van-tab> -->
-      <van-tab title="更多信息">
+      </swiper-item>
+      <swiper-item>
         <div class="info">
           <van-cell-group custom-class="van-cell-group">
             <van-cell title="基本信息" is-link @click="toUserInfo"/>
-            <!-- <van-cell title="姓名" :value="userInfo.name"/>
-            <van-cell title="性别" :value="userInfo.sexChar"/>
-            <van-cell title="手机号" :value="userInfo.phone"/>
-            <van-cell title="出生日期" :value="userInfo.birthTime || '未填写'"/>
-            <van-cell title="身份证号" :value="userInfo.idCardNum || '未填写'"/>-->
           </van-cell-group>
           <van-cell title="服务教练" @click="showCoachList()">
             <div slot="right-icon">
@@ -96,8 +146,8 @@
           <van-cell title="健身目的" is-link value="未填写"/>
           <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
         </div>
-      </van-tab>
-    </van-tabs>
+      </swiper-item>
+    </swiper>
 
     <!-- 服务销售、服务教练列表 -->
     <van-popup
@@ -441,6 +491,9 @@ export default {
       wx.navigateTo({
         url: `../appoint_coach/main?id=${that.id}&type=预约`
       });
+    },
+    swiperTab(e) {
+      this.tabIndex = e.mp.detail.current
     },
     clearData() {
       this.checkInPage = 1;
@@ -837,6 +890,7 @@ export default {
               content: res.data.message,
               success(modal_res) {
                 if (modal_res.confirm) {
+                  wx.showLoading()
                   HttpRequest({
                     url: window.api + "/mobile/coach/appoint/finishclass",
                     data: {
@@ -844,6 +898,7 @@ export default {
                       realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
                     },
                     success(finish_res) {
+                      wx.hideLoading()
                       if (finish_res.data.code == 200) {
                         that.attendClass();
                       } else {

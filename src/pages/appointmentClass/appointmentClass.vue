@@ -272,7 +272,7 @@ export default {
         status = 2;
       }
       wx.navigateTo({
-        url: `../myClassList/main?type=${type}&status=${status}&waitEvaluate=${waitEvaluate}`
+        url: `../myClassList/main?type=${type}&status=${status}&waitEvaluate=${waitEvaluate || ''}`
       });
     },
     selectCur(event) {
@@ -420,10 +420,11 @@ export default {
           },
           success(res) {
             if (res.data.code === 200) {
-              let _data = res.data.data.result.forEach(e => {
+              let _data = res.data.data.result
+              _data.forEach(e => {
                   e['masterImg'] = e.coachHeadImg
               });
-              that.coachList_2 = _data.slice(0, 2);
+              that.coachList_2 = _data || [];
               resolve();
             }
             // wx.hideLoading();

@@ -35,10 +35,23 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
+import Vue from 'vue'
 import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 
-var normalCoachCourse = null;
+Vue.prototype.globalData.normalCoachCourse = new GoEasy({
+  appkey: wx.getStorageSync("instMsgSubKey"),
+  onConnected: function() {
+    console.log("on connected...");
+  },
+  onDisconnected: function() {
+    console.log("on disconnected...");
+  },
+  onConnectFailed: function (error) {
+    console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
+  }
+});
+
 export default {
   data() {
     return {
@@ -68,17 +81,6 @@ export default {
       this.params = JSON.parse(options.params);
       console.log(this.params);
     }
-  },
-  mounted() {
-    normalCoachCourse = new GoEasy({
-      appkey: wx.getStorageSync("instMsgSubKey"),
-      onConnected: function() {
-        console.log("on connected...");
-      },
-      onDisconnected: function() {
-        console.log("on disconnected...");
-      }
-    });
     this.timer = setInterval(() => {
       this.getNowTime();
     }, 60000);
@@ -179,7 +181,7 @@ export default {
     },
     addHit() {
       let that = this;
-      normalCoachCourse.subscribe({
+      this.globalData.normalCoachCourse.subscribe({
         channel:
           "channel_" +
           wx.getStorageSync("companyId") +
@@ -199,7 +201,7 @@ export default {
     },
     cancelHit() {
       let that = this;
-      normalCoachCourse.unsubscribe({
+      this.globalData.normalCoachCourse.unsubscribe({
         channel:
           "channel_" +
           wx.getStorageSync("companyId") +
@@ -208,7 +210,6 @@ export default {
       });
     },
     addHits(valueType) {
-      debugger
       var frontSures = valueType.data;
       if (!frontSures) {
         if (valueType.message) {
@@ -336,9 +337,16 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            let msgData = res.data.data;
+            for (let k in msgData) {
+              msgData[k] = msgData[k] ? msgData[k] : "";
+              if(k == "cardCustomerInfoArray") {
+                msgData[k] = null
+              }
+            }
             HttpRequest({
               url: '/sendmsg/customer/consumemsg',
-              data: res.data.data
+              data: msgData
             })
             that.attendSuccess();
           } else {

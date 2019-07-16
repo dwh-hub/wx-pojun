@@ -17,7 +17,7 @@
         :info="item"
         @clickItem="toCardDetail(item)"
       ></staff-coach-item>
-      <van-loading :color="themeColor" v-if="isLoading"/>
+      <van-loading :color="themeColor" v-if="isLoading" />
       <none-result text="暂无合同" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
@@ -31,10 +31,14 @@
       <div class="modify-price">
         <div class="modify-title">请输入扣费金额</div>
         <div class="modify-middle">
-          <van-stepper :value="modifyPrice" @change="changePrice"/>
+          <van-stepper :value="modifyPrice" @change="changePrice" />
         </div>
         <div class="modify-btn">
-          <div class="modify-cancel" :style="{background: themeColor}" @click="showModifyPrice = false">取消</div>
+          <div
+            class="modify-cancel"
+            :style="{background: themeColor}"
+            @click="showModifyPrice = false"
+          >取消</div>
           <div class="modify-confirm" :style="{background: themeColor}" @click="getUserp">确认</div>
         </div>
       </div>
@@ -73,7 +77,12 @@
         >{{item.customerName}}</div>
       </div>
     </van-popup>
-    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
   </div>
 </template>
 
@@ -132,14 +141,18 @@ export default {
             {
               sonText: "自定义",
               action: () => {
-                this.showPicker()
+                this.showPicker();
               }
             }
           ]
         },
         {
           navTitle: "筛选条件二",
-          children: []
+          children: [
+            {
+              sonText: "无"
+            }
+          ]
         },
         {
           navTitle: "卡类型",
@@ -166,6 +179,12 @@ export default {
               sonText: "团课卡",
               action: () => {
                 this.filterType(3);
+              }
+            },
+            {
+              sonText: "订金",
+              action: () => {
+                this.filterType(2);
               }
             }
           ]
@@ -216,7 +235,7 @@ export default {
     }
   },
   mounted() {
-    this.nav[0].navTitle = '今日'
+    this.nav[0].navTitle = "今日";
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
     this.filterDate(1);
@@ -259,11 +278,11 @@ export default {
           },
           that.filter
         );
-        let url = ''
-        if(that.type == "addStudent") {
-          url = '/customer/card/pages_nolimit'
+        let url = "";
+        if (that.type == "addStudent") {
+          url = "/customer/card/pages_nolimit";
         } else {
-          url = '/customer/card/pages'
+          url = "/customer/card/pages";
         }
         HttpRequest({
           url: url,
@@ -273,7 +292,7 @@ export default {
               that.list = [];
             }
             that.headerData[0].dataNum = res.data.data.recCount || 0;
-            let list = res.data.data.result
+            let list = res.data.data.result;
             // list = list.filter(e => {
             //   return e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2
             // });
@@ -297,7 +316,7 @@ export default {
                 first_1: `${e.name}(${e.pactId})`,
                 second_1: e.secondCardClass,
                 rightText: e.cardStatusChar,
-                cardClassId: e.cardClassId || '',
+                cardClassId: e.cardClassId || "",
                 storeId: e.storeId
               };
             });
@@ -326,7 +345,7 @@ export default {
     // },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.setDate(obj)
+      this.setDate(obj);
     },
     setDate(obj) {
       this.filter.transactTimeStart = obj.startTime;
@@ -338,11 +357,11 @@ export default {
     selectProject(item) {
       this.selectedProject = item;
       this.showProjectPopup = false;
-      this.modifyPrice = ""
+      this.modifyPrice = "";
       if (item.isCanModifyFee) {
-        this.modifyPrice = item.projectPrice
-        this.showModifyPrice = true
-        return
+        this.modifyPrice = item.projectPrice;
+        this.showModifyPrice = true;
+        return;
       }
       this.getUserp();
     },
@@ -362,10 +381,10 @@ export default {
           storeId: that.selectedCard.storeId,
           venueId: that.venueId,
           teamScheduleId: that.teamScheduleId,
-          valueCardType: that.selectedCard.teachCardType ? 3 : '' // 2 私教
+          valueCardType: that.selectedCard.teachCardType ? 3 : "" // 2 私教
         },
         success(res) {
-          if(res.data.code !== 200) {
+          if (res.data.code !== 200) {
             return wx.showModal({
               title: "错误",
               content: res.data.message,
@@ -373,13 +392,17 @@ export default {
             });
           }
           if (res.data.code == 200 && res.data.data.length) {
-            if (res.data.data.length == 1) {
-              that.selectedProject = res.data.data[0];
-              that.selectProject(that.selectedProject)
+            let data = res.data.data
+            if(that.selectedCard.teachCardType == 3) {
+              data = data.filter(e => e.projectType == 3)
+            }
+            if (data.length == 1) {
+              that.selectedProject = data[0];
+              that.selectProject(that.selectedProject);
               // that.getUserp();
             } else {
               that.showProjectPopup = true;
-              that.projectList = res.data.data;
+              that.projectList = data;
             }
           }
         }
@@ -388,7 +411,7 @@ export default {
     // 获取使用人
     getUserp() {
       let that = this;
-      this.showModifyPrice = false
+      this.showModifyPrice = false;
       HttpRequest({
         url: window.api + "/card/relevance/user/get",
         data: {
@@ -409,8 +432,8 @@ export default {
     },
     addAttend() {
       wx.showLoading({
-        title: '上课中...'
-      })
+        title: "上课中..."
+      });
       let that = this;
       HttpRequest({
         url: window.api + "/teamClass/teamAttend/attend",
@@ -424,17 +447,17 @@ export default {
           valueCardFee: that.modifyPrice
         },
         success(res) {
-          wx.hideLoading()
-          if(res.data.code == 200) {
-            let msgData = res.data.data
-            for(let k in msgData) {
-              msgData[k] = msgData[k] ? msgData[k] : ""
+          wx.hideLoading();
+          if (res.data.code == 200) {
+            let msgData = res.data.data;
+            for (let k in msgData) {
+              msgData[k] = msgData[k] ? msgData[k] : "";
             }
-            msgData.storeId = that.selectedCard.storeId
+            msgData.storeId = that.selectedCard.storeId;
             HttpRequest({
-              url: '/sendmsg/customer/teamconsumemsg',
+              url: "/sendmsg/customer/teamconsumemsg",
               data: msgData
-            })
+            });
           }
           wx.showModal({
             title: "提示",
@@ -445,8 +468,8 @@ export default {
       });
     },
     changePrice(e) {
-      this.modifyPrice = e.mp.detail
-    },
+      this.modifyPrice = e.mp.detail;
+    }
     /* 上课流程-结束 */
   }
 };

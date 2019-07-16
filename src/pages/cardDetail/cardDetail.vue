@@ -4,11 +4,11 @@
     <div class="moneyRecode">
       <div class="spend">
         <div class="spend-text">消费</div>
-        <div class="spend-num">{{customer.recCount || '--'}}次</div>
+        <div class="spend-num">{{cardInfo.usedAuthority || '--'}}{{cardInfo.authorityUnitChar || ''}}</div>
       </div>
       <div class="balance">
         <div class="balance-text">剩余</div>
-        <div class="balance-num">{{cardInfo.periodOfValidity || '--'}}{{cardInfo.authorityUnitChar || ''}}</div>
+        <div class="balance-num">{{cardInfo.balanceAuthority || '--'}}{{cardInfo.authorityUnitChar || ''}}</div>
       </div>
     </div>
     <div class="card-info">

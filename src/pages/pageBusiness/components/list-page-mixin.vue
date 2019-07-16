@@ -31,7 +31,6 @@ export default {
     // this.list = [{}, {}, {}, {}]
   },
   destroyed() {
-    // console.log('beforeDestroy')
     // this.list = [{}, {}, {}, {}]
     this.unLoading = true
   },
@@ -158,6 +157,8 @@ export default {
     },
     setPickerTime(val) {
       let data = val.mp.detail;
+      let date = data.endTime.split(' ')[0]
+      data.endTime = date + " 23:59:59"
       this.setDate(data)
     }
   }

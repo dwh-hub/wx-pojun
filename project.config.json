@@ -81,8 +81,8 @@
 				{
 					"id": 6,
 					"name": "demo",
-					"pathName": "pages/pageBusiness/staff_appoint_teamclass/main",
-					"query": "",
+					"pathName": "pages/pageBusiness/customer_detail/main",
+					"query": "id=144956",
 					"scene": null
 				},
 				{

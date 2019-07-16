@@ -61,6 +61,7 @@ export default {
     }
   },
   onShow() {
+    this.userInfo = {}
     this.mergeDetail();
   },
   mounted() {

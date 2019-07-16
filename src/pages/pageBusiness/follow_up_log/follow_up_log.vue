@@ -93,11 +93,17 @@ export default {
         },
         {
           navTitle: "筛选条件二",
-          children: []
+          children: [
+            {
+              sonText: "无"
+            }]
         },
         {
           navTitle: "筛选条件三",
-          children: []
+          children: [
+            {
+              sonText: "无"
+            }]
         }
       ],
       headerData: [
@@ -118,8 +124,8 @@ export default {
       storeList: [],
       filter: {
         nameOrPhone: "",
-        searchTrackTimeEnd: "",
-        searchTrackTimeStart: ""
+        trackTimeEnd: "",
+        trackTimeStart: ""
       },
       trackUserType: 1 // 1 销售 2 教练
     };
@@ -141,6 +147,7 @@ export default {
   //   this.clearData();
   // },
   mounted() {
+    this.nav[0].navTitle = "今日";
     let _title = this.trackUserType == 1 ? "销售跟进日志" : "教练跟进日志";
     setNavTab(_title);
     this.storeList = store.state.allStore;
@@ -234,8 +241,8 @@ export default {
       this.setDate(obj);
     },
     setDate(obj) {
-      this.filter.searchTrackTimeStart = obj.startTime;
-      this.filter.searchTrackTimeEnd = obj.endTime;
+      this.filter.trackTimeStart = obj.startTime;
+      this.filter.trackTimeEnd = obj.endTime;
     }
   }
 };

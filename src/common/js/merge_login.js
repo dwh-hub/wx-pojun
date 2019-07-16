@@ -40,7 +40,7 @@ export function getPhoneNumber(e, url, isTab) {
         });
         // wx.setStorage({
         //   key: "phone",
-        //   data: "13285923990",
+        //   data: "18259260870",
         //   success: function () {
         //     login(url, isTab);
         //   }

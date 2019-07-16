@@ -22,7 +22,7 @@
               </div>
             </div>
             <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
-            <page-footer v-if="messageNList.length"></page-footer>
+            <div class="no-more" v-if="messageNList.length > 3">暂无更多</div>
           </div>
         </van-tab>
         <van-tab title="已读">
@@ -44,9 +44,66 @@
               </div>
             </div>
             <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
+            <div class="no-more" v-if="messageYList.length > 3">暂无更多</div>
           </div>
         </van-tab>
       </van-tabs>
+      <!-- <swiper
+        :indicator-dots="false"
+        duration="500"
+        :current="navIndex"
+        @change="swiperTab"
+        :style="{height: scrollViewHeight+'px'}"
+      >
+        <swiper-item>
+          <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}" @scrolltolower="getMessage(0, 1)">
+            <div class="readContent">
+              <div
+                class="message-item"
+                v-for="(item, index) in messageNList"
+                :key="index"
+                @click="showDetail(item)"
+              >
+                <div class="message-info">
+                  <div class="message-content">
+                    <div class="title">{{item.userMessageTemplateTitle}}</div>
+                    <div class="message-date">{{item.addTime}}</div>
+                  </div>
+                  <p class="message-text">
+                    <wxParse :content="item.userMessageTemplateContent" />
+                  </p>
+                </div>
+              </div>
+              <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
+              <div class="no-more" v-if="messageNList.length > 3">暂无更多</div>
+            </div>
+          </scroll-view>
+        </swiper-item>
+        <swiper-item>
+          <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}" @scrolltolower="getMessageY()">
+            <div class="readContent">
+              <div
+                class="message-item"
+                v-for="(item, index) in messageYList"
+                :key="index"
+                @click="showDetail(item)"
+              >
+                <div class="message-info">
+                  <div class="message-content">
+                    <div class="title">{{item.userMessageTemplateTitle}}</div>
+                    <div class="message-date">{{item.addTime}}</div>
+                  </div>
+                  <p class="message-text">
+                    <wxParse :content="item.userMessageTemplateContent" />
+                  </p>
+                </div>
+              </div>
+              <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
+              <div class="no-more" v-if="messageYList.length > 3">暂无更多</div>
+            </div>
+          </scroll-view>
+        </swiper-item>
+      </swiper> -->
     </div>
     <van-tabbar active="3" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
@@ -84,11 +141,13 @@ export default {
       showMessageBox: false,
       searchText: "",
       // 未读信息id数组
-      arrId: []
+      arrId: [],
+      scrollViewHeight: 0
     };
   },
   mounted() {
     setNavTab();
+    this.scrollHeight();
     this.getMessage(0, 1);
     this.getMessage(1, 1);
   },
@@ -98,26 +157,42 @@ export default {
     wxParse
   },
   mixins: [colorMixin],
-  onReachBottom() {
+  onPullDownRefresh() {
     if (this.navIndex == 0) {
       this.getMessage(0, 1);
     }
     if (this.navIndex == 1) {
       this.getMessage(1, this.messageYPage);
     }
-  },
-  onPullDownRefresh() {
     setTimeout(() => {
       wx.stopPullDownRefresh();
     }, 2000);
   },
   methods: {
+    scrollHeight() {
+      let windowHeight;
+      wx.getSystemInfo({
+        success: function(res) {
+          windowHeight = res.windowHeight;
+        }
+      });
+
+      const vanTabH = 44;
+      const searchH = 44;
+      const bottomH = 50;
+
+      let scrollViewHeight = windowHeight - vanTabH - searchH - bottomH;
+      this.scrollViewHeight = scrollViewHeight;
+    },
     onChange(e) {
       this.navIndex = e.mp.detail.index;
     },
     searchChange(e) {
       this.searchText = e;
       this.getMessage(this.navIndex, 1);
+    },
+    swiperTab(e) {
+      this.navIndex = e.mp.detail.current;
     },
     changeTabbar(e) {
       if (e.mp.detail == 0) {
@@ -140,6 +215,9 @@ export default {
           url: "../staff_mine/main"
         });
       }
+    },
+    getMessageY() {
+      this.getMessage(1, this.messageYPage);
     },
     // status 0 未读 1 已读
     getMessage(status, page) {
@@ -212,7 +290,6 @@ export default {
 
 .staff_message {
   .readContent {
-    padding-bottom: 50px;
     .message-item {
       border-bottom: 1rpx solid #eee;
       .message-info {

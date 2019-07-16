@@ -1,12 +1,18 @@
 <template>
   <div class="scheduling_detail">
     <div class="class-info-wrapper block-wrapper">
-      <img :src="classDetail.masterImg" alt>
+      <img :src="classDetail.masterImg" alt />
       <div class="class-info header-info">
         <div class="name">{{classDetail.anotherName}}</div>
         <div class="duration">时长：{{classDetail.timeSpan}}分钟</div>
       </div>
-      <div @click="toModify" v-if="canModify" class="modify" :style="{'background-color':themeColor}">修改团课</div>
+      <div class="info-btn ahead" v-if="canAhead" :style="{'background-color':themeColor}" @click="aheadClassOver">提前下课</div>
+      <div
+        @click="toModify"
+        v-if="canModify"
+        class="info-btn modfiy"
+        :style="{'background-color':themeColor}"
+      >修改团课</div>
     </div>
     <van-cell-group custom-class="van-cell-group">
       <van-cell title="门店" :value="classDetail.storeName" />
@@ -24,7 +30,7 @@
     <div class="cell-title">上课列表</div>
     <div class="student-list">
       <div class="student-item block-wrapper" v-for="(item, index) in studentList" :key="index">
-        <img :src="item.masterImg" alt>
+        <img :src="item.masterImg" alt />
         <div class="class-info block-info">
           <div class="first">{{item.name}}</div>
           <div class="second">{{item.secondCardClassName}}</div>
@@ -49,16 +55,18 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
-import {checkAuth} from "../common/js/service_config.js";
+import { checkAuth } from "../common/js/service_config.js";
 import colorMixin from "COMPS/colorMixin.vue";
 export default {
   data() {
     return {
       classDetail: {},
-      studentPage: 0,
+      studentPage: 1,
       studentList: [],
       teamScheduleId: 0,
-      canModify: checkAuth(294)
+      canModify: checkAuth(294),
+      // 可以提前下课
+      canAhead: false
     };
   },
   onLoad(options) {
@@ -69,7 +77,7 @@ export default {
     }
   },
   onShow() {
-    if(this.teamScheduleId) {
+    if (this.teamScheduleId) {
       this.getClassDetail();
       this.getStudentList();
     }
@@ -86,11 +94,13 @@ export default {
   methods: {
     toModify() {
       wx.navigateTo({
-        url: `../team_class_scheduling/main?teamScheduleId=${this.classDetail.teamScheduleId}&type=modify&storeId=${this.classDetail.storeId}`
-      })
+        url: `../team_class_scheduling/main?teamScheduleId=${
+          this.classDetail.teamScheduleId
+        }&type=modify&storeId=${this.classDetail.storeId}`
+      });
     },
     addStudent() {
-      if(this.classDetail.timeEnd < new Date().getTime()) {
+      if (this.classDetail.timeEnd < new Date().getTime()) {
         return wx.showModal({
           title: "提示",
           content: "该团课已结束",
@@ -121,7 +131,7 @@ export default {
           if (res.data.code == 200) {
             let _res = res.data.data;
             _res.coachStr = String(_res.coachNameArray);
-            _res.masterImg = window.api + _res.masterImg
+            _res.masterImg = window.api + _res.masterImg;
             _res.classStartTime =
               formatDate(new Date(_res.timeStart), "hh:mm") +
               "-" +
@@ -158,11 +168,12 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            that.canAhead = res.data.data.result.filter(e => e.status == 2).length > 0
             that.studentList = res.data.data.result.map(e => {
-              if(!e.masterImg) {
+              if (!e.masterImg) {
                 e.masterImg = window.api + "/assets/img/morenTo.png";
               } else {
-                e.masterImg = window.api + e.masterImg
+                e.masterImg = window.api + e.masterImg;
               }
               return e;
             });
@@ -185,6 +196,43 @@ export default {
           });
           if (res.data.code == 200) {
             that.getStudentList();
+          }
+        }
+      });
+    },
+    // 提前下课
+    aheadClassOver() {
+      let that = this;
+      wx.showModal({
+        title: "提示",
+        content: "是否提前下课该团课",
+        success(res) {
+          if (res.confirm) {
+            wx.showLoading()
+            HttpRequest({
+              url: "/teamClass/finish/schedule",
+              data: {
+                teamScheduleId: that.classDetail.teamScheduleId
+              },
+              success(res) {
+                wx.hideLoading()
+                if (res.data.code == 200) {
+                  wx.showToast({
+                    title: res.data.message,
+                    icon: "success",
+                    duration: 1000
+                  });
+                  that.getClassDetail();
+                  that.getStudentList();
+                } else {
+                  wx.showModal({
+                    title: "提示",
+                    content: res.data.message,
+                    showCancel: false
+                  });
+                }
+              }
+            });
           }
         }
       });
@@ -211,13 +259,16 @@ page {
       border-radius: 3px;
       background-color: #eee;
     }
-    .modify {
-      line-height:26px;
-      height:26px;
-      color:#fff;
-      border-radius:3px;
-      padding:0 5px;
-      margin-top:14px;
+    .ahead {
+      margin-right: 5px;
+    }
+    .info-btn {
+      line-height: 26px;
+      height: 26px;
+      color: #fff;
+      border-radius: 3px;
+      padding: 0 5px;
+      margin-top: 14px;
     }
     .class-info {
       flex: 1;

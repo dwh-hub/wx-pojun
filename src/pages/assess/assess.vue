@@ -67,6 +67,12 @@ export default {
     this.teamClasVaule = 5
     this.remarks = ""
   },
+  onHide() {
+    this.clearId()
+  },
+  onUnload() {
+    this.clearId()
+  },
   onLoad(options) {
     this.detail = JSON.parse(options.detail);
     this.detail["masterImg"] = window.api + this.detail.headImgPath;
@@ -103,6 +109,10 @@ export default {
     }
   },
   methods: {
+    clearId() {
+      this.teamAttendId = null
+      this.coachAppointId = null
+    },
     assess() {
       console.log("assess")
       let url;
@@ -139,9 +149,12 @@ export default {
               url: window.api + url,
               data: data,
               method: "POST",
+              header: {
+                'content-type': 'application/x-www-form-urlencoded'
+              },
               success(res) {
-                if (res.data.code == 200) {
                   wx.hideLoading();
+                if (res.data.code == 200) {
                   wx.showToast({
                     title: res.data.message,
                     icon: "success",
@@ -152,6 +165,12 @@ export default {
                       url: "/pages/appointmentClass/main"
                     });
                   }, 500);
+                } else {
+                  wx.showModal({
+                    title: "提示",
+                    content: res.data.message,
+                    showCancel: false
+                  });
                 }
               }
             });

@@ -219,11 +219,13 @@ export default {
         {
           text: "上课",
           action: () => {
+            this.attendClass()
           }
         },
         {
           text: "取消预约",
           action: () => {
+            this.cancelClass();
           }
         }
       ],
@@ -380,6 +382,9 @@ export default {
       if (item.status == 2) {
         this.actionList = this.actionList_2;
       }
+      if(item.status == 9){
+        this.actionList = this.actionList_9;
+      }
       this.showOperate = true;
     },
     transformColor(status) {
@@ -524,6 +529,7 @@ export default {
                 appointId: that.curSelectClass.coachAppointId
               };
               that.showOperate = false;
+              wx.hideLoading()
               wx.navigateTo({
                 url: "../QRCodeSignIn/main?params=" + JSON.stringify(params)
               });
@@ -542,15 +548,23 @@ export default {
           realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
         },
         success(res) {
+          wx.hideLoading()
           wx.showModal({
             title: "提示",
             content: res.data.message,
             showCancel: false,
             success(model_res) {
               if (model_res.confirm && res.data.code == 200) {
+                let msgData = res.data.data;
+                for (let k in msgData) {
+                  msgData[k] = msgData[k] ? msgData[k] : "";
+                  if(k == "cardCustomerInfoArray") {
+                    msgData[k] = null
+                  }
+                }
                 HttpRequest({
                   url: '/sendmsg/customer/consumemsg',
-                  data: res.data.data
+                  data: msgData
                 })
                 wx.navigateTo({
                   url: `../../appointmentResult/main?coachAppointId=${
@@ -579,6 +593,7 @@ export default {
     },
     checkAttendStatus() {
       let that = this;
+      wx.showLoading()
       HttpRequest({
         url: window.api + "/coach/private/appoint/verify",
         data: {
@@ -589,11 +604,13 @@ export default {
             that.getAttendClassWay();
           }
           if (res.data.code == 300) {
+            wx.hideLoading()
             wx.showModal({
               title: "提示",
               content: res.data.message,
               success(modal_res) {
                 if (modal_res.confirm) {
+                  wx.showLoading()
                   HttpRequest({
                     url: window.api + "/mobile/coach/appoint/finishclass",
                     data: {
@@ -601,6 +618,7 @@ export default {
                       realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
                     },
                     success(finish_res) {
+                      wx.hideLoading()
                       if (finish_res.data.code == 200) {
                         that.getAttendClassWay();
                       } else {
@@ -617,6 +635,7 @@ export default {
             });
           }
           if (res.data.code == 405) {
+            wx.hideLoading()
             wx.showModal({
               title: "提示",
               content: res.data.message,

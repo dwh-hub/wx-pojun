@@ -129,7 +129,7 @@ export default {
           status: status,
           pageNo: that.page,
           pageSize: 10,
-          waitEvaluate: waitEvaluate || ""
+          waitEvaluate: waitEvaluate == 0 ? 0 : (waitEvaluate || '')
         };
       }
       HttpRequest({
@@ -168,7 +168,7 @@ export default {
           status: status,
           pageNo: that.page,
           pageSize: 10,
-          waitEvaluate: waitEvaluate || ""
+          waitEvaluate: waitEvaluate == 0 ? 0 : (waitEvaluate || '')
         };
       }
       HttpRequest({

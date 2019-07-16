@@ -103,7 +103,8 @@ import {
   getRange,
   formatDate,
   getWXCompany,
-  getCompanyColor
+  getCompanyColor,
+  wxLogin
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
@@ -112,6 +113,14 @@ import pageFooter from "COMPS/pageFooter.vue"
 import loginPopup from "COMPS/loginPopup.vue"
 import colorMixin from "COMPS/colorMixin.vue"
 import store from "../../utils/store";
+import {
+  getPhoneNumber,
+  getMessage,
+  staff_login,
+  getUserInfo,
+  enterMember,
+  enterStaff
+} from "COMMON/js/merge_login.js";
 
 export default {
   data() {
@@ -141,7 +150,14 @@ export default {
   mounted() {
   },
   onShow() {
+    wxLogin();
     let that = this;
+    // 场景值为公众号自定义菜单进入时，无法触发组件的mounted钩子，在这里自动登录
+    if (wx.getLaunchOptionsSync().scene == 1035) {
+      getCompanyColor().then(() => {
+        this.login();
+      });
+    }
     wx.getLocation({
       type: "wgs84",
       success(res) {
@@ -162,7 +178,7 @@ export default {
     }
     wx.getSetting({
       success(res) {
-        if (!res.authSetting['scope.userLocation']) {
+        if (!res.authSetting['scope.userLocation'] && JSON.stringify(res.authSetting).length > 2) {
           wx.showModal({
             title: "授权",
             content: "部分功能需要地理位置，是否授权？",
@@ -206,6 +222,24 @@ export default {
     }, 1000);
   },
   methods: {
+    // 自动登录的逻辑
+    login() {
+      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey")) {
+        getUserInfo().then((member_res) => {
+          enterMember(member_res)
+        })
+      }
+      if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
+        wx.showLoading()
+        staff_login().then((staff_res) => {
+          wx.hideLoading()
+          if(!staff_res) {
+            return
+          }
+          enterStaff(staff_res)
+        })
+      }
+    },
     _mounted() {
       this.companyId = wx.getStorageSync("companyId");
       console.log(this.companyId)

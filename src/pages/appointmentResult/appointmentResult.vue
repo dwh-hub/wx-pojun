@@ -7,12 +7,12 @@
         <span v-if="detail.status == 1">，请耐心等待开课</span>
       </p>
       <div class="btn-group">
-        <span class="cancel" @click="cancel" v-if="detail.status == 1">取消预约</span>
+        <span class="cancel" @click="cancel" v-if="detail.status == 1 && type == 'staff'">取消预约</span>
         <span
           class="assess"
           :style="{'background-color': themeColor}"
           @click="assess"
-          v-if="(!detail.evaluateId || !detail.teamClassEvaluteId) && detail.status == 3 && type !== 'staff'"
+          v-if="(!detail.evaluateId && !detail.teamClassEvaluteId) && detail.status == 3 && type !== 'staff'"
         >评价</span>
         <span class="again" :style="{'background-color': themeColor}" @click="again">再约一节</span>
         <span
@@ -321,8 +321,7 @@ export default {
       if (this.coachAppointId) {
         if (this.type == "staff") {
           return wx.redirectTo({
-            url:
-              "../pageBusiness/appoint_coach/main?id=" + this.detail.customerId
+            url: `../pageBusiness/appoint_coach/main?id=${this.detail.customerId}&type=预约`
           });
         }
         wx.redirectTo({

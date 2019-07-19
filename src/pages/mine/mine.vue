@@ -33,7 +33,7 @@
         </div>
         <div class="block-flex" @click="navTo('../classTimes/main')">
           <div class="count">{{FreeCount || 0}}</div>
-          <div class="count-text">消费次数</div>
+          <div class="count-text">消费记录</div>
         </div>
       </div>
       <div

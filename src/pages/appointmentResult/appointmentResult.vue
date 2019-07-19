@@ -343,7 +343,7 @@ export default {
     },
     handwrite() {
       if (this.coachAppointId) {
-        wx.navigateTo({
+        wx.redirectTo({
           url: "../pageBusiness/handwrite_board/main?id=" + this.coachAppointId
         });
       }

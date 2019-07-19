@@ -39,18 +39,19 @@ import Vue from 'vue'
 import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 
-Vue.prototype.globalData.normalCoachCourse = new GoEasy({
-  appkey: wx.getStorageSync("instMsgSubKey"),
-  onConnected: function() {
-    console.log("on connected...");
-  },
-  onDisconnected: function() {
-    console.log("on disconnected...");
-  },
-  onConnectFailed: function (error) {
-    console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
-  }
-});
+// TODO:
+// Vue.prototype.globalData.normalCoachCourse = new GoEasy({
+//   appkey: wx.getStorageSync("instMsgSubKey"),
+//   onConnected: function() {
+//     console.log("on connected...");
+//   },
+//   onDisconnected: function() {
+//     console.log("on disconnected...");
+//   },
+//   onConnectFailed: function (error) {
+//     console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
+//   }
+// });
 
 export default {
   data() {
@@ -341,7 +342,7 @@ export default {
             for (let k in msgData) {
               msgData[k] = msgData[k] ? msgData[k] : "";
               if(k == "cardCustomerInfoArray") {
-                msgData[k] = null
+                delete msgData[k]
               }
             }
             HttpRequest({

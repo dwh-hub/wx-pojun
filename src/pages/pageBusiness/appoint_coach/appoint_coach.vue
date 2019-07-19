@@ -1086,7 +1086,7 @@ export default {
             for (let k in msgData) {
               msgData[k] = msgData[k] ? msgData[k] : "";
               if(k == "cardCustomerInfoArray") {
-                msgData[k] = null
+                delete msgData[k]
               }
             }
             HttpRequest({

@@ -4,7 +4,7 @@
     <div class="header">
       <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated sticky>
         <van-tab title="未读">
-          <div class="readContent">
+          <!-- <div class="readContent" :style="{'height':scrollViewHeight+'px'}" @scrolltolower="bottomLoad()">
             <div
               class="message-item"
               v-for="(item, index) in messageNList"
@@ -17,16 +17,16 @@
                   <div class="message-date">{{item.addTime}}</div>
                 </div>
                 <p class="message-text">
-                  <wxParse :content="item.userMessageTemplateContent" />
+                  <rich-text :nodes="item.userMessageTemplateContent"></rich-text>
                 </p>
               </div>
             </div>
             <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
-            <div class="no-more" v-if="messageNList.length > 3">暂无更多</div>
-          </div>
+            <div class="no-more" v-if="messageNList.length && isNomore">暂无更多</div>
+          </div> -->
         </van-tab>
         <van-tab title="已读">
-          <div class="readContent">
+          <!-- <div class="readContent" :style="{'height':scrollViewHeight+'px'}" @scrolltolower="bottomLoad()">
             <div
               class="message-item"
               v-for="(item, index) in messageYList"
@@ -39,16 +39,17 @@
                   <div class="message-date">{{item.addTime}}</div>
                 </div>
                 <p class="message-text">
-                  <wxParse :content="item.userMessageTemplateContent" />
+                  <rich-text :nodes="item.userMessageTemplateContent"></rich-text>
                 </p>
               </div>
             </div>
             <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
-            <div class="no-more" v-if="messageYList.length > 3">暂无更多</div>
-          </div>
+            <div class="no-more" v-if="messageYList.length && isNomore">暂无更多</div>
+          </div> -->
         </van-tab>
       </van-tabs>
-      <!-- <swiper
+
+      <swiper
         :indicator-dots="false"
         duration="500"
         :current="navIndex"
@@ -70,12 +71,12 @@
                     <div class="message-date">{{item.addTime}}</div>
                   </div>
                   <p class="message-text">
-                    <wxParse :content="item.userMessageTemplateContent" />
+                    <rich-text :nodes="item.userMessageTemplateContent"></rich-text>
                   </p>
                 </div>
               </div>
               <none-result v-if="!messageNList.length" text="暂无未读消息"></none-result>
-              <div class="no-more" v-if="messageNList.length > 3">暂无更多</div>
+              <div class="no-more" v-if="messageNList.length > 3 && isNomore">暂无更多</div>
             </div>
           </scroll-view>
         </swiper-item>
@@ -94,16 +95,16 @@
                     <div class="message-date">{{item.addTime}}</div>
                   </div>
                   <p class="message-text">
-                    <wxParse :content="item.userMessageTemplateContent" />
+                    <rich-text :nodes="item.userMessageTemplateContent"></rich-text>
                   </p>
                 </div>
               </div>
               <none-result v-if="!messageYList.length" text="暂无消息"></none-result>
-              <div class="no-more" v-if="messageYList.length > 3">暂无更多</div>
+              <div class="no-more" v-if="messageYList.length > 3 && isNomore">暂无更多</div>
             </div>
           </scroll-view>
         </swiper-item>
-      </swiper> -->
+      </swiper>
     </div>
     <van-tabbar active="3" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
@@ -124,7 +125,6 @@ import {
 } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
-import wxParse from "mpvue-wxparse";
 import headerSearch from "../components/header-search.vue";
 export default {
   data() {
@@ -142,7 +142,8 @@ export default {
       searchText: "",
       // 未读信息id数组
       arrId: [],
-      scrollViewHeight: 0
+      scrollViewHeight: 0,
+      isNomore: false
     };
   },
   mounted() {
@@ -153,17 +154,16 @@ export default {
   },
   components: {
     noneResult,
-    headerSearch,
-    wxParse
+    headerSearch
   },
   mixins: [colorMixin],
   onPullDownRefresh() {
-    if (this.navIndex == 0) {
-      this.getMessage(0, 1);
-    }
-    if (this.navIndex == 1) {
-      this.getMessage(1, this.messageYPage);
-    }
+      if (this.navIndex == 0) {
+        this.getMessage(0, 1);
+      }
+      if (this.navIndex == 1) {
+        this.getMessage(1, 1);
+      }
     setTimeout(() => {
       wx.stopPullDownRefresh();
     }, 2000);
@@ -233,6 +233,9 @@ export default {
           if (res.data.code === 200) {
             let resData = res.data.data.result;
             if (!resData.length) {
+              if (page > 1 ) {
+                that.isNomore = true
+              }
               return;
             }
             let _arrId = [];
@@ -286,7 +289,6 @@ export default {
 
 <style lang="less">
 @import "../common/less/staff_common.less";
-@import url("~mpvue-wxparse/src/wxParse.css");
 
 .staff_message {
   .readContent {

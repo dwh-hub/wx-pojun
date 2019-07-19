@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "业务清单",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "van-action-sheet": "../../../../static/vant/action-sheet/index",
+    "van-popup": "../../../../static/vant/popup/index",
+    "van-loading": "../../../../static/vant/loading/index"
+  }
+}

@@ -173,8 +173,8 @@ export default {
                       duration: 1000
                     });
                     setTimeout(() => {
-                      wx.navigateBack({
-                        delta: 1
+                      wx.redirectTo({
+                        url: "../../appointmentResult/main?coachAppointId=" + that.id
                       });
                     }, 1000);
                   }

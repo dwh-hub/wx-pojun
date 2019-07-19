@@ -7,8 +7,10 @@
         <div class="month">{{info.month}}月</div>
       </div>
       <div class="flex-middle">
-        <wxParse :content="info.topText||'<p></p>'"/>
-        <wxParse :content="info.bottomText||'<p></p>'"/>
+        <!-- <wxParse :content="info.topText||'<p></p>'"/>
+        <wxParse :content="info.bottomText||'<p></p>'"/> -->
+        <rich-text :nodes="info.topText||'<p></p>'"></rich-text>
+        <rich-text :nodes="info.bottomText||'<p></p>'"></rich-text>
         <!-- <div class="flex-middle-item">{{info.topText}}</div> -->
         <!-- <div class="flex-middle-item">{{info.bottomText}}</div> -->
       </div>
@@ -18,7 +20,7 @@
 </template>
 
 <script>
-import wxParse from "mpvue-wxparse";
+// import wxParse from "mpvue-wxparse";
 export default {
   props: {
     info: {
@@ -38,7 +40,7 @@ export default {
     }
   },
   components: {
-    wxParse
+    // wxParse
   }
 };
 </script>
@@ -74,6 +76,10 @@ export default {
       border-left: 1rpx solid #eee;
       padding: 10px 0;
       padding-left: 15px;
+      >rich-text {
+        line-height: 30px;
+        .Mult-line(3);
+      }
       > div {
         .Mult-line(3);
       }

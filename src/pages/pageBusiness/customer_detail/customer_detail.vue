@@ -496,6 +496,7 @@ export default {
       this.tabIndex = e.mp.detail.current
     },
     clearData() {
+      this.tabIndex = 0
       this.checkInPage = 1;
       this.cardpage = 1;
       this.appointList = [];
@@ -564,11 +565,13 @@ export default {
             that.getTrackusertype();
 
             _data.customerStoreArrays.forEach(e => {
+              console.log(e.headImgPath)
               if (e.serviceCoachId) {
                 _serviceCoachList.push({
                   storeId: e.storeId,
                   storeName: e.storeName,
                   name: e.serviceCoachName,
+                  // cover: e.headImgPath ? window.api + e.headImgPath : "http://pojun-tech.cn/assets/img/manimg.jpg",
                   id: e.serviceCoachId
                 });
               }
@@ -577,6 +580,7 @@ export default {
                   storeId: e.storeId,
                   storeName: e.storeName,
                   name: e.serviceUserName,
+                  // cover: e.headImgPath ? window.api + e.headImgPath : "http://pojun-tech.cn/assets/img/manimg.jpg",
                   id: e.serviceUserId
                 });
               }

@@ -113,11 +113,8 @@
           <span class="title">{{curMessage.userMessageTemplateTitle}}</span>
           <span class="time">{{curMessage.addTime}}</span>
         </div>
-        <!-- <p>
-          <wxParse :content="curMessage.userMessageParam"/>
-        </p>-->
         <p>
-          <wxParse :content="curMessage.userMessageTemplateContent"/>
+          <rich-text :nodes="curMessage.userMessageTemplateContent"></rich-text>
         </p>
       </div>
     </van-popup>
@@ -132,7 +129,6 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import store from "../../utils/store";
-import wxParse from "mpvue-wxparse";
 import noneResult from "COMPS/noneResult.vue";
 import pageFooter from "COMPS/pageFooter.vue"
 import colorMixin from "COMPS/colorMixin.vue"
@@ -183,7 +179,7 @@ export default {
     }, 1000);
   },
   components: {
-    wxParse,
+    // wxParse,
     noneResult,
     pageFooter
   },
@@ -292,7 +288,6 @@ export default {
 <style lang="less">
 @import "~COMMON/less/reset";
 @import "~COMMON/less/common";
-@import url("~mpvue-wxparse/src/wxParse.css");
 
 #memberMessageTab {
   // padding-top: 44px;

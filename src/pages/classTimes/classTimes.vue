@@ -11,7 +11,7 @@
         <div class="title flex-middle-item">{{item.passModeValue}}</div>
         <!-- <div class="date flex-middle-item">{{item.startTime}}</div> -->
       </div>
-      <div class="tiems flex-right">{{item.consumeAuthority}}次</div>
+      <div class="tiems flex-right">{{item.consumeAuthority}}{{item.authorityUnitChar}}</div>
     </div>
     <div class="loading" v-show="isLoading">
       <van-loading color="#999" custom-class="loading"/>
@@ -77,12 +77,20 @@ export default {
             }
             let _list = res.data.data.result;
             _list = _list.map(e => {
+              if(e.authorityUnit == 0) {
+                e.authorityUnitChar = "元"
+              } else if (e.authorityUnit == 1) {
+                e.authorityUnitChar = "天"
+              } else if (e.authorityUnit == 2) {
+                e.authorityUnitChar = "次"
+              }
               return {
                 month: e.startTime.slice(5, 7),
                 day: e.startTime.slice(8, 10),
                 passModeValue: e.passModeValue,
                 secondCardClassName: e.secondCardClassName,
-                consumeAuthority: e.consumeAuthority
+                consumeAuthority: e.consumeAuthority,
+                authorityUnitChar: e.authorityUnitChar
               };
             });
             that.classRecord = that.classRecord.concat(_list);

@@ -81,8 +81,8 @@
 				{
 					"id": 6,
 					"name": "demo",
-					"pathName": "pages/pageBusiness/customer_detail/main",
-					"query": "id=144956",
+					"pathName": "pages/pageBusiness/billing/main",
+					"query": "",
 					"scene": null
 				},
 				{

@@ -140,7 +140,7 @@ export default {
       operateList: [
         {
           text: "单日排期",
-          iconUrl: "/static/images/staff/close.svg",
+          iconUrl: "/static/images/staff/single_calendar.svg",
           hasAuth: true,
           action: () => {
             wx.navigateTo({

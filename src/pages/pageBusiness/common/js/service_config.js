@@ -4,8 +4,8 @@ let service = [{
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
         text: "业务",
-        navUrl: "",
-        isOpen: false,
+        navUrl: "../billing/main",
+        isOpen: true,
         hasAuth: true,
         class: "iconfont icon-workbench_icon_2"
       },
@@ -19,9 +19,9 @@ let service = [{
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_3.svg",
-        text: "确认信息",
-        navUrl: "",
-        isOpen: false,
+        text: "客户登记",
+        navUrl: "../customer_register/main",
+        isOpen: true,
         hasAuth: true,
         class: "iconfont icon-workbench_icon_4"
       },

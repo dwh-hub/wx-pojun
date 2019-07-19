@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "客户登记",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "van-action-sheet": "../../../../static/vant/action-sheet/index",
+    "van-rate": "../../../../static/vant/rate/index",
+    "van-popup": "../../../../static/vant/popup/index"
+  }
+}

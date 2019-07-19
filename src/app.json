@@ -56,7 +56,9 @@
       "service_web/main",
       "common_list/main",
       "handwrite_board/main",
-      "staff_team_class_kind/main"
+      "staff_team_class_kind/main",
+      "customer_register/main",
+      "billing/main"
     ]
   }],
   "permission": {

@@ -549,26 +549,29 @@ export default {
         },
         success(res) {
           wx.hideLoading()
+          that.showOperate = false
+          if(res.data.code == 200) {
+            let msgData = res.data.data;
+            for (let k in msgData) {
+              msgData[k] = msgData[k] ? msgData[k] : "";
+              if(k == "cardCustomerInfoArray") {
+                delete msgData[k]
+              }
+            }
+            HttpRequest({
+              url: '/sendmsg/customer/consumemsg',
+              data: msgData
+            })
+          }
           wx.showModal({
             title: "提示",
             content: res.data.message,
             showCancel: false,
             success(model_res) {
               if (model_res.confirm && res.data.code == 200) {
-                let msgData = res.data.data;
-                for (let k in msgData) {
-                  msgData[k] = msgData[k] ? msgData[k] : "";
-                  if(k == "cardCustomerInfoArray") {
-                    msgData[k] = null
-                  }
-                }
-                HttpRequest({
-                  url: '/sendmsg/customer/consumemsg',
-                  data: msgData
-                })
                 wx.navigateTo({
                   url: `../../appointmentResult/main?coachAppointId=${
-                    this.curSelectClass.coachAppointId
+                    that.curSelectClass.coachAppointId
                   }&type=staff`
                 });
               }

@@ -32,7 +32,7 @@
     <div class="class-info">
       <title-cell title="课程信息" moreText :moreSize="14" :titleSize="16"></title-cell>
       <div class="class-date">上课日期：{{timeStart}}</div>
-      <div class="class-name">课程名称：{{detail.anotherName || detail.projectName}}</div>
+      <div class="class-name">课程名称：{{detail.anotherName || detail.projectName || ''}}</div>
       <div class="class-coach">上课教练：{{coachStr}}</div>
     </div>
     <div class="store" v-if="storeInfo.storeName">

@@ -48,9 +48,9 @@
         <div class="cell-value must-input">性别</div>
         <div class="cell-content">
           <radio-group class="radio-group" @change="onChangeSex">
-            <radio value="1"/>
+            <radio value="1" :color="themeColor"/>
             <span class="radio-span">男</span>
-            <radio value="2"/>
+            <radio value="2" :color="themeColor"/>
             <span class="radio-span">女</span>
           </radio-group>
         </div>
@@ -102,9 +102,9 @@
         <div class="cell-value">健身历史</div>
         <div class="cell-content">
           <radio-group class="radio-group" @change="onChangeFitness">
-            <radio value="1" />
+            <radio value="1" :color="themeColor" />
             <span class="radio-span">有</span>
-            <radio value="0" />
+            <radio value="0" :color="themeColor" />
             <span class="radio-span">无</span>
           </radio-group>
         </div>
@@ -141,7 +141,7 @@
       <div class="input-cell-wrapper">
         <radio-group class="radio-group" @change="selectSource">
           <label class="radio" v-for="(item, index) in sourceList" :key="index">
-            <radio :value="item.value" />
+            <radio :color="themeColor" :value="item.value" />
             <span class="radio-span">{{item.name}}</span>
           </label>
         </radio-group>
@@ -509,6 +509,7 @@ export default {
 </script>
 
 <style lang="less">
+@import "../common/less/form.less";
 page {
   background-color: #eeeeee;
 }

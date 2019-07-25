@@ -28,6 +28,7 @@
       </div>
       <div class="icon-right" @click.stop="clickIcon">
         <div v-if="info.rightText" :style="{color: info.color?info.color:'#333'}">{{info.rightText}}</div>
+        <div v-if="info.rightBlock" class="right-block" :style="{'background-color': info.color}">{{info.rightBlock}}</div>
         <slot></slot>
       </div>
     </div>
@@ -188,6 +189,15 @@ export default {
       color: #f17f55;
       background-color: #feeee9;
     }
+  }
+  .right-block {
+    line-height: 20px;
+    width: 50px;
+    text-align: center;
+    margin-top: 18px;
+    margin-right: 10px;
+    color: #fff;
+    border-radius: 2px;
   }
   // .icon-right {
   //   margin-top: 20px;

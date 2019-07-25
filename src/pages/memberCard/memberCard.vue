@@ -77,7 +77,7 @@ export default {
     this.teamScheduleId = "";
     setNavTab();
   },
-  onUnLoad() {
+  onUnload() {
     Object.assign(this.$data, this.$options.data());
   },
   onPullDownRefresh() {

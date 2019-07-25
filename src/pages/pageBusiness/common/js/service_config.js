@@ -4,7 +4,7 @@ let service = [{
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
         text: "业务",
-        navUrl: "../billing/main",
+        navUrl: "../pay_card/main",
         isOpen: true,
         hasAuth: true,
         class: "iconfont icon-workbench_icon_2"

@@ -58,7 +58,10 @@
       "handwrite_board/main",
       "staff_team_class_kind/main",
       "customer_register/main",
-      "billing/main"
+      "billing/main",
+      "billingMore/main",
+      "pay_card/main",
+      "receivable/main"
     ]
   }],
   "permission": {

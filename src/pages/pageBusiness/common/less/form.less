@@ -1,0 +1,58 @@
+.input-cell-wrapper {
+  padding-left: 20px;
+  padding-right: 15px;
+  display: flex;
+  line-height: 46px;
+  // height: 46px;
+  background-color: #fff;
+  border-bottom: 1rpx solid #eee;
+
+  .radio {
+    margin: 0;
+  }
+
+  .radio-group {
+    border: none;
+  }
+
+  .radio-span {
+    margin-right: 5px;
+  }
+
+  .cell-value {
+    flex: 1;
+    text-align: left;
+    font-size: 15px;
+  }
+
+  .must-input {
+    position: relative;
+
+    &:before {
+      content: "*";
+      position: absolute;
+      left: -10px;
+      color: red;
+      line-height: 48px;
+    }
+  }
+
+  .cell-content {
+    flex: 1;
+
+    .cell-input {
+      padding-left: 5px;
+      height: 46px;
+      line-height: 46px;
+    }
+
+    .radio-span {
+      margin-right: 15px;
+    }
+  }
+
+  .van-icon-star-o,
+  .van-icon-star {
+    margin-top: 12px;
+  }
+}

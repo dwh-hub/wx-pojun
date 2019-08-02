@@ -1,11 +1,10 @@
 <template>
   <div class="customer">
     <div class="list-header">
-      <div class="tabs" :style="{background: themeColor}">
+      <!-- <div class="tabs" :style="{background: themeColor}">
         <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
         <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
-        <!-- @click="tabIndex = 2" -->
-      </div>
+      </div> -->
       <header-search
         :storeList="storeList"
         :color="themeColor"
@@ -109,7 +108,7 @@ export default {
       tabIndex: 1,
       nav: [
         {
-          navTitle: "全部",
+          navTitle: "全部(登记时间)",
           children: [
             {
               sonText: "全部",
@@ -138,16 +137,45 @@ export default {
             {
               sonText: "自定义",
               action: () => {
+                this.timePickerType = ""
                 this.showPicker()
               }
             }
           ]
         },
         {
-          navTitle: "筛选条件二",
+          navTitle: "签到时间",
           children: [
             {
-              sonText: "无"
+              sonText: "全部(签到时间)",
+              action: () => {
+                this.filterConsumedDate(0);
+              }
+            },
+            {
+              sonText: "今日",
+              action: () => {
+                this.filterConsumedDate(1);
+              }
+            },
+            {
+              sonText: "本周",
+              action: () => {
+                this.filterConsumedDate(7);
+              }
+            },
+            {
+              sonText: "本月",
+              action: () => {
+                this.filterConsumedDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.timePickerType = "consumed"
+                this.showPicker()
+              }
             }
           ]
         },
@@ -187,11 +215,11 @@ export default {
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "已办理",
           dataNum: "0"
         },
         {
-          dataText: "数据三",
+          dataText: "未办理",
           dataNum: "0"
         }
       ],
@@ -228,11 +256,14 @@ export default {
       selectedRole: {},
       selectedStore: {},
       operateText: "",
+      timePickerType: "",
       filter: {
         nameOrPhone: "",
         trainerStatus: "",
         addTimeStart: "",
-        addTimeEnd: ""
+        addTimeEnd: "",
+        lastConsumedTimeStart: "",
+        lastConsumedTimeEnd: ""
       }
     };
   },
@@ -290,6 +321,14 @@ export default {
           },
           that.filter
         );
+        HttpRequest({
+          url: '/mobile/coach/static/count',
+          data: _data,
+          success(res) {            
+            that.headerData[1].dataNum = res.data.data.transactedCount
+            that.headerData[2].dataNum = res.data.data.noTransactCount
+          }
+        })
         HttpRequest({
           url: window.api + "/mobile/coach/resourcepool/pages",
           data: _data,
@@ -539,9 +578,20 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
+      this.timePickerType = ""
+      this.setDate(obj)
+    },
+    filterConsumedDate(day) {
+      let obj = this.filterDateMethod(day);
+      this.timePickerType = "consumed"
       this.setDate(obj)
     },
     setDate(obj) {
+      if(this.timePickerType == "consumed") {
+        this.filter.lastConsumedTimeStart = obj.startTime
+        this.filter.lastConsumedTimeEnd = obj.endTime
+        return
+      }
       this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
     }
@@ -574,7 +624,7 @@ page {
   }
   .filter-nav {
     .mask {
-      top: 205px;
+      top: 165px;
     }
   }
   .customer-list {

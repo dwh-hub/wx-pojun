@@ -107,18 +107,32 @@ export default {
           ]
         },
         {
-          navTitle: "筛选条件二",
+          navTitle: "课程状态",
           children: [
             {
-              sonText: "无"
+              sonText: "全部(课程状态)",
+              action: () => {
+                this.filter.scheduleldStatus = ""
+              }
+            },
+            {
+              sonText: "已上课",
+              action: () => {
+                this.filter.scheduleldStatus = 1
+              }
+            },{
+              sonText: "未上课",
+              action: () => {
+                this.filter.scheduleldStatus = 0
+              }
             }
           ]
         },
         {
-          navTitle: "筛选条件三",
+          navTitle: "场馆",
           children: [
             {
-              sonText: "无"
+              sonText: "全部场馆"
             }
           ]
         }
@@ -129,11 +143,11 @@ export default {
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "已开课",
           dataNum: "0"
         },
         {
-          dataText: "数据三",
+          dataText: "未开课",
           dataNum: "0"
         }
       ],
@@ -192,7 +206,9 @@ export default {
       filter: {
         namePhone: "",
         calendarStart: "",
-        calendarEnd: ""
+        calendarEnd: "",
+        scheduleldStatus: "",
+        venueId: ''
       }
     };
   },
@@ -200,6 +216,7 @@ export default {
     this.nav[0].navTitle = "今日";
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
+    this.getVenueList()
     this.filterDate(1);
   },
   onShow() {
@@ -219,6 +236,7 @@ export default {
   methods: {
     selectStore(item) {
       this.selectedStore = item;
+      this.getVenueList()
       this.refreshList();
     },
     loadData() {
@@ -233,6 +251,14 @@ export default {
           },
           that.filter
         );
+        HttpRequest({
+          url: '/teamClass/teamSchedule/static/count',
+          data: _data,
+          success(res) {            
+            that.headerData[1].dataNum = res.data.data.classedCount
+            that.headerData[2].dataNum = res.data.data.disClassCount
+          }
+        })
         HttpRequest({
           url: window.api + "/teamClass/teamSchedule/pages",
           data: _data,
@@ -274,6 +300,30 @@ export default {
       // this.showOperatePopup = true;
       // this.selectedClass = item;
     },
+    getVenueList() {
+      let that = this
+      HttpRequest({
+        url: '/venue/name/list',
+        data: {
+          storeId: that.selectedStore.storeId
+        },
+        success(res) {
+          let venueList = res.data.data.map(e => {
+            e.sonText = e.venueName
+            e.action = () => {
+              that.filter.venueId = e.venueId
+            }
+            return e
+          })
+          that.nav[2].children = [{
+              sonText: "全部场馆",
+              action: () => {
+                that.filter.venueId = ""
+              }
+            }].concat(venueList)
+        }
+      })
+    }
     // toScheduling(type) {
     //   this.showOperatePopup = false;
     //   wx.navigateTo({

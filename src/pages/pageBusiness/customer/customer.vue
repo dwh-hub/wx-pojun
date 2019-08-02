@@ -1,11 +1,10 @@
 <template>
   <div class="customer">
     <div class="list-header">
-      <div class="tabs" :style="{background: themeColor}">
+      <!-- <div class="tabs" :style="{background: themeColor}">
         <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
         <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
-        <!-- @click="tabIndex = 2" -->
-      </div>
+      </div> -->
       <header-search
         :storeList="storeList"
         :color="themeColor"
@@ -31,8 +30,9 @@
             <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
           </div>
         </div>
-        <staff-coach-item @clickIcon="call(item)" @clickItem="toDetail(item,index)" :info="item">
+        <staff-coach-item @clickIcon="clickIcon(...arguments,item)" @clickItem="toDetail(item,index)" :info="item">
           <div>
+            <img data-type="follow-up" class="follow-up" src="/static/images/staff/workbench_icon/coach_service_icon_7.jpg" alt="">
             <img src="/static/images/staff/phone.svg" alt>
             <img src="/static/images/staff/right-arrow.svg" alt>
           </div>
@@ -81,7 +81,39 @@
       </div>
     </van-popup>
 
+    <van-popup
+      :show="showFollowUpPopup"
+      @close="showFollowUpPopup = false;trackContent=''"
+      :duration="200"
+      custom-style="width:85vw;border-radius:5px;top: 40%;"
+    >
+      <div class="followUp-popup">
+        <div class="content">
+          <van-cell
+            title="跟进结果"
+            @click="showTrackResult = true"
+            :value="selectedResult.name"
+            is-link
+          />
+          <van-cell title="下次跟进时间" :value="trackTime" @click="isResultDateShow = true" is-link/>
+          <textarea class="textarea" v-model="trackContent" @focus="onFocus" placeholder="请输入跟进内容"/>
+        </div>
+        <div class="popup-bottom-btn">
+          <div class="cancel" :style="{color: themeColor}" @click="showFollowUpPopup = false">取消</div>
+          <div class="save" :style="{backgroundColor: themeColor}" @click="saveFollowUp">保存</div>
+        </div>
+      </div>
+    </van-popup>
+
+    <van-action-sheet
+      :show="showTrackResult"
+      :actions="trackResult"
+      @close="showTrackResult = false"
+      @select="selectResult"
+    />
+
     <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
+    <timePicker :pickerShow="isResultDateShow" :config="resultDateConfig" @hidePicker="isResultDateShow = false" @setPickerTime="setResultTime"></timePicker>
     <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
   </div>
 </template>
@@ -116,7 +148,7 @@ export default {
           navTitle: "全部",
           children: [
             {
-              sonText: "全部",
+              sonText: "全部(登记时间)",
               action: () => {
                 this.filterDate(0);
               }
@@ -143,16 +175,46 @@ export default {
               sonText: "自定义",
               isDiyDate: true,
               action: () => {
+                this.timePickerType = ""
                 this.showPicker()
               }
             }
           ]
         },
         {
-          navTitle: "筛选条件",
+          navTitle: "签到时间",
           children: [
             {
-              sonText: "无"
+              sonText: "全部(签到时间)",
+              action: () => {
+                this.filterConsumedDate(0);
+              }
+            },
+            {
+              sonText: "今日",
+              action: () => {
+                this.filterConsumedDate(1);
+              }
+            },
+            {
+              sonText: "本周",
+              action: () => {
+                this.filterConsumedDate(7);
+              }
+            },
+            {
+              sonText: "本月",
+              action: () => {
+                this.filterConsumedDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              isDiyDate: true,
+              action: () => {
+                this.timePickerType = "consumed"
+                this.showPicker()
+              }
             }
           ]
         },
@@ -194,15 +256,15 @@ export default {
       ],
       headerData: [
         {
-          dataText: "人数",
+          dataText: "总人数",
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "潜在客户",
           dataNum: "0"
         },
         {
-          dataText: "数据三",
+          dataText: "现有客户",
           dataNum: "0"
         }
       ],
@@ -229,18 +291,36 @@ export default {
       isOperate: false,
       isAllSelect: false,
       showSalesPopup: false,
+      showFollowUpPopup: false,
+      trackContent: "",
+      resultDateConfig: {
+        endDate: false,
+        column: "second",
+        dateLimit: true,
+        initStartTime: formatDate(new Date(),'yyyy-MM-dd hh:mm:ss'),
+        initEndTime: "2019-12-01",
+        limitStartTime: "2015-05-06",
+        limitEndTime: "2055-05-06"
+      },
+      curCustomer: {},
       storeList: [],
-      // coachList: [],
-      // saleList: [],
+      showTrackResult: false,
+      isResultDateShow: false,
+      trackTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+      selectedResult: { id: 1, name: "继续跟进" },
+      trackResult: [{ id: 1, name: "继续跟进" }, { id: 3, name: "不确定" }],
       actionList: [],
       selectedRole: {},
       selectedStore: {},
       operateText: "",
+      timePickerType: "",
       filter: {
         namePhone: "",
         customerClass: "",
         addTimeStart: "",
-        addTimeEnd: ""
+        addTimeEnd: "",
+        lastConsumedTimeStart: "",
+        lastConsumedTimeEnd: ""
       }
     };
   },
@@ -283,6 +363,10 @@ export default {
     this.showSalesPopup = false;
   },
   methods: {
+    selectResult(item) {
+      this.selectedResult = item.mp.detail
+      this.showTrackResult = false
+    },
     clearFilter() {
       for (let key in this.filter) {
         this.filter[key] = "";
@@ -291,6 +375,60 @@ export default {
     selectStore(item) {
       this.selectedStore = item;
       this.refreshList()
+    },
+    setResultTime(val) {
+      let data = val.mp.detail;
+      this.trackTime = data.startTime
+    },
+    saveFollowUp() {
+      if (!this.trackContent.length) {
+        return wx.showToast({
+          title: "请输入跟进内容",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (this.trackContent.length < 5) {
+        return wx.showModal({
+          title: "提示",
+          content: "跟进内容不能少于5个字",
+          showCancel: false
+        });
+      }
+      let that = this;
+      wx.showLoading()
+      HttpRequest({
+        url: window.api + "/customer/track/inserttrack",
+        data: {
+          customerId: that.curCustomer.id,
+          trackResult: that.selectedResult.id,
+          nextTrackTime: that.trackTime,
+          content: that.trackContent,
+          storeId: that.selectedStore.storeId,
+          customerClass: that.curCustomer.customerClass,
+          TrackUserType: "1"
+        },
+        success(res) {
+          wx.hideLoading()
+          if (res.data.code == 200) {
+            wx.showToast({
+              title: res.data.message || "跟进成功",
+              icon: "success",
+              duration: 1000
+            });
+            that.showFollowUpPopup = false;
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      });
+    },
+    onFocus(e) {
+      e.mp.detail.height
     },
     loadData() {
       let that = this;
@@ -303,6 +441,14 @@ export default {
           },
           that.filter
         );
+        HttpRequest({
+          url: '/customer/list/static/count',
+          data: _data,
+          success(res) {
+            that.headerData[1].dataNum = res.data.data.prospectiveCount;
+            that.headerData[2].dataNum = res.data.data.existingCount;
+          }
+        })
         HttpRequest({
           url: "/customer/list/search",
           data: _data,
@@ -337,7 +483,8 @@ export default {
                 second_tip_1: "合同数：",
                 second_2: "",
                 third_1: e.lastTrackTime || "--",
-                third_tip_1: "最后签到时间："
+                third_tip_1: "最后跟进时间：",
+                customerClass: e.customerClass
               };
             });
             Promise.all(_data).then(result => {
@@ -470,7 +617,13 @@ export default {
       if (param == "发送手机短信") {
       }
     },
-    call(item) {
+    clickIcon(event,item) {
+      console.log(item)
+      if (event.mp.target.dataset.type == 'follow-up') {
+        this.curCustomer = item
+        this.showFollowUpPopup = true
+        return
+      }
       wx.makePhoneCall({
         phoneNumber: item.phone
       });
@@ -568,9 +721,20 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
+      this.timePickerType = ""
+      this.setDate(obj)
+    },
+    filterConsumedDate(day) {
+      let obj = this.filterDateMethod(day);
+      this.timePickerType = "consumed"
       this.setDate(obj)
     },
     setDate(obj) {
+      if(this.timePickerType == "consumed") {
+        this.filter.lastConsumedTimeStart = obj.startTime
+        this.filter.lastConsumedTimeEnd = obj.endTime
+        return
+      }
       this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
     }
@@ -603,7 +767,7 @@ page {
   }
   .filter-nav {
     .mask {
-      top: 205px;
+      top: 165px;
     }
   }
   .customer-list {
@@ -624,10 +788,14 @@ page {
     border-top: 1rpx solid #eee;
     flex: 1;
     .icon-right {
-      margin-top: 20px;
       img {
+        margin-top: 10px;
         width: 18px;
         height: 18px;
+      }
+      .follow-up {
+        width: 50px;
+        height: 50px;
       }
     }
   }
@@ -702,6 +870,39 @@ page {
         border-top: 1rpx solid #eee;
       }
     }
+  }
+  .followUp-popup {
+    .content {
+      padding: 15px;
+      box-sizing: border-box;
+      .textarea {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 10px;
+        min-height: 75px;
+        font-size: 14px;
+        border: 1rpx solid #ccc;
+      }
+    }
+  }
+  .popup-bottom-btn {
+    display: flex;
+    border-top: 1rpx solid #eee;
+    > div {
+      flex: 1;
+      line-height: 36px;
+      text-align: center;
+    }
+    .save {
+      color: #fff;
+    }
+    .cancel {
+      background-color: #fff;
+    }
+  }
+  .van-cell__title,
+  .van-cell__value {
+    flex-basis: auto;
   }
 }
 </style>

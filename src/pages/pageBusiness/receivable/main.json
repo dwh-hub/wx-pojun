@@ -1,4 +1,8 @@
 {
   "navigationBarTitleText": "收款",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "van-popup": "../../../../static/vant/popup/index",
+    "van-icon": "../../../../static/vant/icon/index"
+  }
 }

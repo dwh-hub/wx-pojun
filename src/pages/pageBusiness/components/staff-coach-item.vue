@@ -90,8 +90,8 @@ export default {
     }
   },
   methods: {
-    clickIcon() {
-      this.$emit("clickIcon");
+    clickIcon(e) {
+      this.$emit("clickIcon", e);
     },
     clickItem() {
       this.$emit("clickItem");

@@ -1,6 +1,6 @@
 <template>
   <div class="suspension_window" v-if="operateListLength || operateListLength > 0">
-    <div class="suspension">
+    <div class="suspension" :style="{'right': right + 'px','bottom': bottom + 'px'}" @touchmove.stop="setTouchMove">
       <div class="operate-wrapper" v-show="showOperate">
         <div class="operate-item" v-for="(item, index) in operateList" :key="index" :class="{hidden: item.hasAuth == undefined ? false : !item.hasAuth}" @click.stop="operate(item)">
           <span>{{item.text}}</span>
@@ -26,7 +26,11 @@ export default {
   },
   data() {
     return {
-      showOperate: false
+      showOperate: false,
+      right: 20,
+      bottom: 20,
+      windowH: wx.getSystemInfoSync().windowHeight,
+      windowW: wx.getSystemInfoSync().windowWidth,
     };
   },
   computed: {
@@ -38,6 +42,18 @@ export default {
     }
   },
   methods: {
+    setTouchMove(e) {
+      let clientX = e.mp.touches[0].clientX
+      let clientY = e.mp.touches[0].clientY
+      //此处clientY与clientX为拖动悬浮窗超过设定的大小会返回默认显示位置
+      if (clientX < 350 && clientY < 550 && clientX > 0 && clientY > 0){
+        this.right = this.windowW - clientX
+        this.bottom = this.windowH - clientY
+      } else {
+        this.right = 20, //默认显示位置 left距离
+        this.bottom = 20  //默认显示位置 top距离
+      }
+    },
     preventTouchMove() {
       // wx.stopPullDownRefresh()
     },

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "人脸识别",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "van-toast": "../../../../static/vant/toast/index"
+  }
+}

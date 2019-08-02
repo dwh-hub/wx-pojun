@@ -48,9 +48,9 @@
         <div class="cell-value must-input">性别</div>
         <div class="cell-content">
           <radio-group class="radio-group" @change="onChangeSex">
-            <radio value="1" :color="themeColor"/>
+            <radio value="1" :color="themeColor" :checked="sex == 1"/>
             <span class="radio-span">男</span>
-            <radio value="2" :color="themeColor"/>
+            <radio value="2" :color="themeColor" :checked="sex == 2"/>
             <span class="radio-span">女</span>
           </radio-group>
         </div>
@@ -113,14 +113,14 @@
         <div class="cell-value">健身目的</div>
         <div class="cell-content">
           <checkbox-group @change="selectPurpose">
-            <checkbox value="1" />
-            <span>减肥</span>
-            <checkbox value="2" />
-            <span>塑性</span>
-            <checkbox value="3" />
-            <span>增肌</span>
-            <checkbox value="4" />
-            <span>其他</span>
+            <checkbox value="1" :color="themeColor"/>
+            <span class="check-span">减肥</span>
+            <checkbox value="2" :color="themeColor"/>
+            <span class="check-span">塑性</span>
+            <checkbox value="3" :color="themeColor"/>
+            <span class="check-span">增肌</span>
+            <checkbox value="4" :color="themeColor"/>
+            <span class="check-span">其他</span>
           </checkbox-group>
         </div>
       </div>
@@ -128,10 +128,10 @@
         <div class="cell-value">喜好</div>
         <div class="cell-content">
           <checkbox-group @change="selectInterest">
-            <checkbox value="1" />
-            <span>课程</span>
-            <checkbox value="2" />
-            <span>器械</span>
+            <checkbox value="1" :color="themeColor"/>
+            <span class="check-span">课程</span>
+            <checkbox value="2" :color="themeColor"/>
+            <span class="check-span">器械</span>
           </checkbox-group>
         </div>
       </div>
@@ -176,8 +176,8 @@
         <div class="btn-group">
           <div class="success-btn" @click="toCustomerDetail">查看客户</div>
           <div class="success-btn" @click="alignRegister">继续录入</div>
-          <div class="success-btn">前往开单</div>
-          <div class="success-btn" @click="toHome">返回首页</div>
+          <div class="success-btn" @click="toNav('../pay_card/main')">前往开单</div>
+          <div class="success-btn" @click="toNav('../workbench/main')">返回首页</div>
         </div>
       </div>
     </van-popup>
@@ -261,6 +261,7 @@ export default {
   },
   mixins: [colorMixin],
   onLoad() {
+    Object.assign(this.$data, this.$options.data());
     setNavTab()
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
@@ -275,6 +276,8 @@ export default {
   },
   methods: {
     selectStore(e) {
+      this.phone = ""
+      this.phoneType = 0
       if (e.mp.detail.storeName) {
         this.selectedStore = e.mp.detail;
       } else {
@@ -311,6 +314,7 @@ export default {
                 }登记过，是否继续添加到${that.selectedStore.storeName}？`,
                 success(res) {
                   if (res.confirm) {
+                    that.phoneType = 201
                     that.getServiceCoachList();
                   }
                 }
@@ -499,9 +503,9 @@ export default {
         url: "./main"
       });
     },
-    toHome() {
+    toNav(url) {
       wx.redirectTo({
-        url: "../workbench/main"
+        url: url
       });
     }
   }
@@ -593,6 +597,9 @@ page {
       }
       .radio-span {
         margin-right: 15px;
+      }
+      .check-span {
+        margin-right: 5px;
       }
     }
     .van-icon-star-o,

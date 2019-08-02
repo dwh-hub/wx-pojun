@@ -159,7 +159,7 @@ export default {
   height: 42px;
   background-color: #fff;
   position: relative;
-  border-top: 1px solid #eee;
+  border-bottom: 1rpx solid #eee;
   .triangle-icon {
     display: inline-block;
     width: 10px;

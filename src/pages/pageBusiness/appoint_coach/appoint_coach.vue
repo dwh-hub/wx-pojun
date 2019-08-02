@@ -270,6 +270,7 @@ import {
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 import store from "../../../utils/store";
+import { attendclass } from "../common/js/http.js";
 
 export default {
   name: "appointment-coach",
@@ -1035,21 +1036,27 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             let way = res.data.data.privateSignWay;
+            
+            let params;
+            params = {
+              way: way,
+              coachName: that.userInfo.userName,
+              coachId: that.userInfo.userId,
+              studentName: that.studentInfo.name,
+              studentId: that.studentInfo.id,
+              appointId: appointId,
+              storeId: that.selectStoreId,
+              venueId: that.venueId
+            };
+
             if (way == 1) {
               // 教练自签
               that.attendclass(appointId);
+            } if(way == 5) {
+              wx.redirectTo({
+                url: "../face/main?params=" + JSON.stringify(params)
+              });
             } else {
-              let params;
-              params = {
-                way: way,
-                coachName: that.userInfo.userName,
-                coachId: that.userInfo.userId,
-                studentName: that.studentInfo.name,
-                studentId: that.studentInfo.id,
-                appointId: appointId,
-                storeId: that.selectStoreId
-              };
-
               wx.redirectTo({
                 url: "../QRCodeSignIn/main?params=" + JSON.stringify(params)
               });
@@ -1068,43 +1075,11 @@ export default {
     },
     // 上课
     attendclass(appointId) {
-      let that = this;
-      HttpRequest({
-        url: window.api + "/mobile/coach/appoint/attendclass",
-        data: {
-          coachAppointId: appointId,
-          realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
-        },
-        success(res) {
-          if (res.data.code == 200) {
-            // wx.showModal({
-            //   title: "提示",
-            //   content: res.data.message,
-            //   showCancel: false
-            // });
-            let msgData = res.data.data;
-            for (let k in msgData) {
-              msgData[k] = msgData[k] ? msgData[k] : "";
-              if(k == "cardCustomerInfoArray") {
-                delete msgData[k]
-              }
-            }
-            HttpRequest({
-              url: '/sendmsg/customer/consumemsg',
-              data: msgData
-            })
-            wx.redirectTo({
-              url: `../../appointmentResult/main?coachAppointId=${appointId}&type=staff`
-            });
-          } else {
-            wx.showModal({
-              title: "提示",
-              content: res.data.message,
-              showCancel: false
-            });
-          }
-        }
-      });
+      attendclass(appointId).then(() => {
+        wx.redirectTo({
+          url: `../../appointmentResult/main?coachAppointId=${appointId}&type=staff`
+        });
+      })
     },
     // 改约
     revision() {

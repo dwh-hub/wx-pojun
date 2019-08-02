@@ -40,24 +40,24 @@ import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 
 // TODO:
-// Vue.prototype.globalData.normalCoachCourse = new GoEasy({
-//   appkey: wx.getStorageSync("instMsgSubKey"),
-//   onConnected: function() {
-//     console.log("on connected...");
-//   },
-//   onDisconnected: function() {
-//     console.log("on disconnected...");
-//   },
-//   onConnectFailed: function (error) {
-//     console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
-//   }
-// });
+Vue.prototype.globalData.normalCoachCourse = new GoEasy({
+  appkey: wx.getStorageSync("instMsgSubKey"),
+  onConnected: function() {
+    console.log("on connected...");
+  },
+  onDisconnected: function() {
+    console.log("on disconnected...");
+  },
+  onConnectFailed: function (error) {
+    console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
+  }
+});
 
 export default {
   data() {
     return {
       params: {
-        // way: '',(1,"教练自签"),_(2,"教练+会员"),(3,"教练+会员+前台"),(4,"教练+前台");
+        // way: '',(1,"教练自签"),_(2,"教练+会员"),(3,"教练+会员+前台"),(4,"教练+前台"),(5,"人脸识别");
         // coachName: '',
         // coachId: '',
         // studentName: '',
@@ -121,6 +121,7 @@ export default {
       this.cancelHit();
       this.studentText = "正在等待学员确认...";
       this.receptionText = "正在等待前台确认...";
+      this.nowTime = ""
       clearInterval(this.timer);
       clearInterval(this.checkQRStatus);
     },

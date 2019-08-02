@@ -40,13 +40,13 @@ export function getPhoneNumber(e, url, isTab) {
         });
         // wx.setStorage({
         //   key: "phone",
-        //   data: "18259260870",
+        //   data: "18259260870", //"18759888263",
         //   success: function () {
         //     login(url, isTab);
         //   }
         // });
       } else {
-        // // TODO:
+        // TODO:
         wx.setStorage({
           key: "phone",
           data: "18888888881", // "13285923990",
@@ -176,14 +176,32 @@ export function enterMember(res) {
 export function enterStaff(res) {
   // 调一次登录接口没法获取登录状态
   // staff_login().then((res) => {
+  wx.showLoading({
+    title: '正在进入..'
+  })
+  let staff_info = res.data.data
+  staff_info.authList = {}
   wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
-  wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
-  wx.setStorageSync("staff_info", res.data.data);
-  wx.setStorageSync("companyId", res.data.data.companyId);
-  wx.setStorageSync("companyName", res.data.data.companyName);
-  // wx.reLaunch({
-  //   url: "../pageBusiness/workbench/main"
-  // })
+  wx.setStorageSync("instMsgSubKey", staff_info.instMsgSubKey);
+  wx.setStorageSync("staff_info", staff_info);
+  wx.setStorageSync("companyId", staff_info.companyId);
+  wx.setStorageSync("companyName", staff_info.companyName);
+  
+  // 进入商户端时，门店权限过滤
+  console.log("getStorageSync:"+wx.getStorageSync("companyId"))
+  HttpRequest({
+    url: window.api + "/store/all-store-name-list",
+    data: {
+      companyId: wx.getStorageSync("companyId")
+    },
+    success(res) {
+      if (res.data.code === 200) {
+        store.commit("saveAllStore", res.data.data);
+        storeId = res.data.data[0].storeId
+      }
+    }
+  });
+
   getAuthList().then((data) => {
     let authList = []
     data.forEach((store) => {
@@ -201,24 +219,11 @@ export function enterStaff(res) {
       })
     })
     wx.setStorageSync("authInto", authList);
+    wx.hideLoading()
     wx.reLaunch({
       url: "../pageBusiness/workbench/main"
     })
   })
-  // })
-  // if (res.header["Set-Cookie"]) {
-  // wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
-  // wx.setStorageSync("instMsgSubKey", res.data.data.instMsgSubKey);
-  // wx.setStorageSync("staff_info", res.data.data);
-  // wx.navigateTo({
-  //   url: "../pageBusiness/workbench/main"
-  // })
-  // } else {
-  //   debugger
-  //   staff_login().then(res => {
-  //     enterStaff(res)
-  //   })
-  // }
 }
 
 // 随机4位数

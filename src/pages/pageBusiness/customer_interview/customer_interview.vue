@@ -13,8 +13,13 @@
       </div>
     </div>
     <div class="card-list">
-      <staff-coach-item v-for="(item, index) in list" @clickItem="toDetail(item)" :key="index" :info="item"></staff-coach-item>
-      <van-loading :color="themeColor" v-if="isLoading"/>
+      <staff-coach-item
+        @clickItem="toDetail(item)"
+        v-for="(item, index) in list"
+        :key="index"
+        :info="item"
+      ></staff-coach-item>
+      <van-loading :color="themeColor" v-if="isLoading" />
       <none-result text="暂无约访记录" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
@@ -51,7 +56,7 @@ export default {
           navTitle: "今日",
           children: [
             {
-              sonText: "全部",
+              sonText: "全部(预约时间)",
               action: () => {
                 this.filterDate(0);
               }
@@ -83,31 +88,89 @@ export default {
           ]
         },
         {
-          navTitle: "筛选条件二",
+          navTitle: "预约目的",
           children: [
             {
-              sonText: "无"
-            }]
+              sonText: "全部(预约目的)",
+              action: () => {
+                this.filter.appointmentPurpose = "";
+              }
+            },
+            {
+              sonText: "参观",
+              action: () => {
+                this.filter.appointmentPurpose = 1;
+              }
+            },
+            {
+              sonText: "办理",
+              action: () => {
+                this.filter.appointmentPurpose = 2;
+              }
+            },
+            {
+              sonText: "体验课",
+              action: () => {
+                this.filter.appointmentPurpose = 3;
+              }
+            },
+            {
+              sonText: "上课",
+              action: () => {
+                this.filter.appointmentPurpose = 4;
+              }
+            }
+          ]
         },
         {
-          navTitle: "筛选条件三",
+          navTitle: "客户状态",
           children: [
             {
-              sonText: "无"
-            }]
+              sonText: "全部(客户状态)",
+              action: () => {
+                this.filter.customerClass = "";
+              }
+            },
+            {
+              sonText: "潜在",
+              action: () => {
+                this.filter.customerClass = 1;
+              }
+            },
+            {
+              sonText: "现有",
+              action: () => {
+                this.filter.customerClass = 3;
+              }
+            },
+            {
+              sonText: "定金",
+              action: () => {
+                this.filter.customerClass = 4;
+              }
+            },
+            {
+              sonText: "失效",
+              action: () => {
+                this.filter.customerClass = 5;
+              }
+            }
+          ]
         }
       ],
+      purpose: 0, // 预约目的
+      customerType: 0, // 客户状态
       headerData: [
         {
           dataText: "总计",
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "潜在客户",
           dataNum: "0"
         },
         {
-          dataText: "数据三",
+          dataText: "现有客户",
           dataNum: "0"
         }
       ],
@@ -116,7 +179,9 @@ export default {
       filter: {
         nameOrPhone: "",
         appointmentTimeStart: "",
-        appointmentTimeEnd: ""
+        appointmentTimeEnd: "",
+        appointmentPurpose: "",
+        customerClass: ""
       },
       logType: ""
     };
@@ -156,6 +221,14 @@ export default {
           that.filter
         );
         HttpRequest({
+          url: "/customer/reserved/static/count",
+          data: _data,
+          success(res) {
+            that.headerData[1].dataNum = res.data.data.prospectiveCount;
+            that.headerData[2].dataNum = res.data.data.existingCount;
+          }
+        });
+        HttpRequest({
           url: "/user/work/customer/reserved/pages",
           data: _data,
           success(res) {
@@ -181,11 +254,13 @@ export default {
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.visitorName,
-                second_1: e.appointmentPurposeChar || '无',
+                second_1: e.appointmentPurposeChar || "无",
                 second_tip_1: "预约目的：",
-                third_1: e.appointmentTime || '--',
+                third_1: e.appointmentTime || "--",
                 third_tip_1: "最后签到时间：",
-                rightText: e.isVisitChar
+                rightText: e.isVisitChar,
+                appointmentPurpose: e.appointmentPurpose,
+                customerClass: e.customerClass
               };
             });
             Promise.all(_data).then(result => {
@@ -202,7 +277,7 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.setDate(obj)
+      this.setDate(obj);
     },
     setDate(obj) {
       this.filter.appointmentTimeStart = obj.startTime;
@@ -224,7 +299,7 @@ page {
     }
   }
   .staff-coach-item {
-    border-top: 1rpx solid #eee;
+    border-bottom: 1rpx solid #eee;
     .icon-right {
       line-height: 60px;
     }

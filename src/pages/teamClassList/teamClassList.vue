@@ -3,48 +3,23 @@
     <div class="header">
       <select-date @selectWeek="getClassList"></select-date>
       <div class="nav-tab">
-        <div class="store" @click="selectNav(1)">
-          <span v-show="currentNav!=1">{{curStore}}</span><span v-show="currentNav==1" :style="{color: themeColor}">{{curStore}}</span>
+        <div class="nav-item" v-for="(item,index) in nav" :key="index" @click="selectNav(index)">
+          <span v-show="currentNav!=index">{{item.navTitle}}</span>
+          <span v-show="currentNav==index" :style="{color: window.color}">{{item.navTitle}}</span>
           <i class="triangle-icon"></i>
-          <div class="list-warpper" :class="{slideWrap: showStoreNav}" @click.stop="clickMask">
-            <div class="store-nav-list" :class="{slide: showStoreNav}">
+          <div
+            class="list-warpper"
+            :class="{slideWrap: (showSlideList && currentNav==index)}"
+            @click.stop="clickMask"
+          >
+            <div class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
               <div
                 class="store-nav-item"
-                v-for="(item, index) in storeNav"
-                :key="index"
-                @click.stop="selectStore(item)"
-              >{{item.storeName}}</div>
-            </div>
-          </div>
-        </div>
-        <div class="class" @click="selectNav(2)">
-          <span v-show="currentNav!=2">{{curSchedule}}</span><span v-show="currentNav==2" :style="{color: themeColor}">{{curSchedule}}</span>
-          <i class="triangle-icon"></i>
-          <div class="list-warpper" :class="{slideWrap: showScheduleNav}" @click.stop="clickMask">
-            <div class="store-nav-list" :class="{slide: showScheduleNav}">
-              <div
-                class="store-nav-item"
-                v-for="(item, index) in scheduleNav"
-                :key="index"
-                @click.stop="selectSchedule(item)"
-              >{{item.courseTitle}}</div>
-            </div>
-          </div>
-        </div>
-        <!-- <div class="time" :class="{active: currentNav==3}" @click="selectNav(3)">全部时间</div> -->
-        <div class="coach" @click="selectNav(4)">
-          <span v-show="currentNav!=4">{{curCoach}}</span><span v-show="currentNav==4" :style="{color: themeColor}">{{curCoach}}</span>
-          <i class="triangle-icon"></i>
-          <div class="list-warpper" :class="{slideWrap: showCoachNav}" @click.stop="clickMask">
-            <div class="store-nav-list" :class="{slide: showCoachNav}">
-              <div
-                class="store-nav-item"
-                v-for="(item, index) in coachNav"
-                :key="index"
-                @click.stop="selectCoach(item)"
+                v-for="(itemS, indexS) in item.children"
+                :key="indexS"
+                @click.stop="clickSonNav(index,itemS,item)"
               >
-                <img :src="window.api +(item.headImgPath||'/assets/img/morenTo.png')">
-                <span>{{item.userName}}</span>
+                <span>{{itemS.sonText}}</span>
               </div>
             </div>
           </div>
@@ -75,16 +50,28 @@ import colorMixin from "COMPS/colorMixin.vue"
 export default {
   data() {
     return {
-      currentNav: 1,
-      showStoreNav: false,
-      showCoachNav: false,
-      showScheduleNav: false,
-      // nav门店列表
-      storeNav: [],
-      // nav教练列表
-      coachNav: [],
-      // nav课程列表
-      scheduleNav: [],
+      currentNav: 0,
+      nav: [{
+        navTitle: "全部门店",
+        children: [],
+        action: (item) => {
+          this.selectStore(item);
+        }
+      },{
+        navTitle: "全部教练",
+        children: [],
+        action: (item) => {
+          this.selectCoach(item);
+        }
+      },{
+        navTitle: "全部课程",
+        children: [],
+        action: (item) => {
+          this.selectSchedule(item);
+        }
+      }],
+      showSlideList: false,
+      maskShow: false,
       // 分页的团课
       classList: [{},{},{},{},{}],
       // 存储所有的团课
@@ -93,14 +80,8 @@ export default {
       curStoreId: "",
       // 当前选择的教练id
       curCoachId: "",
-      // // 当前选择的课程
-      // curSchedule: "",
       // 当前选择的日期
       curDate: "",
-      // 当前选择的门店
-      curStore: "全部门店",
-      curCoach: "全部教练",
-      curSchedule: "全部课程",
       companyId: ""
     };
   },
@@ -119,13 +100,6 @@ export default {
     this.getClassList();
   },
   computed: {
-    maskShow() {
-      if (this.showStoreNav || this.showCoachNav || this.showScheduleNav) {
-        return true;
-      } else {
-        return false;
-      }
-    },
     window() {
       return window;
     }
@@ -153,43 +127,43 @@ export default {
   },
   methods: {
     selectNav(index) {
-      this.currentNav = index;
-      if ((index == 4 || index == 2) && this.curStoreId == "") {
+      if(this.currentNav == index && this.showSlideList) {
+        this.maskShow = false
+        this.showSlideList = false
+        return;
+      }
+      if ((index == 2 || index == 1) && this.curStoreId == "") {
         return wx.showToast({
           title: "请先选择门店",
           icon: "none",
           duration: 1000
         });
       }
-      if(index == 2 && !this.scheduleNav.length) {
+      if(index == 2 && !this.nav[2].children.length) {
         return wx.showToast({
           title: "暂无课程类别",
           icon: "none",
           duration: 1000
         });
       }
-      if(index == 4 && !this.coachNav.length) {
+      if(index == 1 && !this.nav[1].children.length) {
         return wx.showToast({
           title: "暂无私教",
           icon: "none",
           duration: 1000
         });
       }
-      index == 2
-        ? (this.showScheduleNav = true)
-        : (this.showScheduleNav = false);
-      index == 1 ? (this.showStoreNav = true) : (this.showStoreNav = false);
-      index == 4 ? (this.showCoachNav = true) : (this.showCoachNav = false);
+      this.currentNav = index;
+      this.maskShow = true;
+      this.showSlideList = true;
     },
     // 选择门店
     selectStore(item) {
-      this.showStoreNav = false;
       this.curStoreId = item.storeId;
-      this.curStore = item.storeName || "全部门店";
       if (item.storeName == "全部门店") {
-        this.curCoach = "全部教练";
+        this.nav[1].navTitle = "全部教练"
         this.curCoachId = "";
-        this.curSchedule = "全部课程";
+        this.nav[2].navTitle = "全部课程";
       }
       this.getClassList();
       this.getCoachList();
@@ -197,21 +171,24 @@ export default {
     },
     // 选择教练
     selectCoach(item) {
-      this.showCoachNav = false;
       this.curCoachId = item.userId;
-      this.curCoach = item.userName;
       this.getClassList();
     },
     // 选择课程
     selectSchedule(item) {
-      this.showScheduleNav = false;
-      this.curSchedule = item.courseTitle;
       this.getClassList();
     },
+    clickSonNav(index, item, itemF) {
+      this.nav[index].navTitle = item.sonText;
+      this.maskShow = false;
+      this.showSlideList = false;
+      if (itemF.action) {
+        itemF.action(item);
+      }
+    },
     clickMask() {
-      this.showScheduleNav = false;
-      this.showStoreNav = false;
-      this.showCoachNav = false;
+      this.maskShow = false;
+      this.showSlideList = false;
     },
     // 获取全部门店
     getAllStore() {
@@ -225,16 +202,17 @@ export default {
           let _storeList = [];
           _storeList = res.data.data.map(e => {
             return {
+              sonText: e.storeName,
               storeName: e.storeName,
               storeId: e.storeId
             };
           });
           _storeList.unshift({
             storeName: "全部门店",
+            sonText: "全部门店",
             storeId: ""
           });
-          that.storeNav = _storeList;
-          console.log(that.storeNav);
+          that.nav[0].children = _storeList
         }
       });
     },
@@ -257,7 +235,7 @@ export default {
           storeId: that.curStoreId,
           calendarStart: that.curDate,
           calendarEnd: that.curDate,
-          courseTitle: that.curSchedule == "全部课程" ? "" : that.curSchedule
+          courseTitle: that.nav[2].navTitle == "全部课程" ? "" : that.nav[2].navTitle
         },
         success(res) {
           // wx.hideLoading();
@@ -292,14 +270,17 @@ export default {
               // return (that.coachNav = that.coachNav.concat({
               //   userName: "无"
               // }));
-              return that.coachNav = []
+              return that.nav[1].children = []
             }
             let _list = res.data.data;
             _list.unshift({
               userName: "全部教练",
               userId: ""
             });
-            that.coachNav = _list;
+            that.nav[1].children = _list.map(e => {
+              e.sonText = e.userName
+              return e
+            })
           }
         });
       });
@@ -327,7 +308,10 @@ export default {
             _classList.unshift({
               courseTitle: "全部课程"
             });
-            that.scheduleNav = _classList;
+            that.nav[2].children = _classList.map(e => {
+              e.sonText = e.courseTitle
+              return e
+            })
           }
         }
       });

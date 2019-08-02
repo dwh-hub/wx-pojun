@@ -1,6 +1,6 @@
 // 公共请求方法， 虽然有点晚，但还是提一下吧
 
-import { HttpRequest, window } from "COMMON/js/common.js";
+import { HttpRequest, window, formatDate } from "COMMON/js/common.js";
 import {
   serviceList
 } from "./service_config.js";
@@ -124,10 +124,47 @@ function qiniuUpload(tempFilePath, fileName) {
   })
 }
 
+
+// 手机端私教上课接口
+function attendclass(coachAppointId) {
+  return new Promise((resolve) => {
+    HttpRequest({
+      url: "/mobile/coach/appoint/attendclass",
+      data: {
+        coachAppointId: coachAppointId,
+        realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
+      },
+      success(res) {
+        if (res.data.code == 200) {
+          resolve()
+          let msgData = res.data.data;
+          for (let k in msgData) {
+            msgData[k] = msgData[k] ? msgData[k] : "";
+            if(k == "cardCustomerInfoArray") {
+              delete msgData[k]
+            }
+          }
+          HttpRequest({
+            url: '/sendmsg/customer/consumemsg',
+            data: msgData
+          })
+        } else {
+          wx.showModal({
+            title: "提示",
+            content: res.data.message,
+            showCancel: false
+          });
+        }
+      }
+    });
+  })
+}
+
 export {
   getUseServiceList,
   transformJspImg,
   getStoreSet,
   getUserofrole,
-  qiniuUpload
+  qiniuUpload,
+  attendclass
 }

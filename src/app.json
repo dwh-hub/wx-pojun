@@ -61,7 +61,9 @@
       "billing/main",
       "billingMore/main",
       "pay_card/main",
-      "receivable/main"
+      "receivable/main",
+      "face/main",
+      "my_private_class/main"
     ]
   }],
   "permission": {

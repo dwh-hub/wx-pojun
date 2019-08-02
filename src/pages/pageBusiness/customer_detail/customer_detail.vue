@@ -194,7 +194,7 @@
       :show="showFollowUpPopup"
       @close="showFollowUpPopup = false"
       :duration="200"
-      custom-style="width:85vw;border-radius:5px;"
+      custom-style="width:85vw;border-radius:5px;top: 40%;"
     >
       <div class="followUp-popup">
         <div class="content">
@@ -225,7 +225,7 @@
       :show="showAppointPopup"
       @close="showAppointPopup = false"
       :duration="200"
-      custom-style="width:85vw;border-radius:5px;"
+      custom-style="width:85vw;border-radius:5px;top: 40%;"
     >
       <div class="appoint-popup">
         <div class="content">
@@ -508,6 +508,7 @@ export default {
       this.isFollowUpLoading = true;
       this.isCheckInLoading = true;
       this.isCardLoading = true;
+      this.showFollowUpPopup = false
     },
     computedScrollHeight() {
       let that = this;

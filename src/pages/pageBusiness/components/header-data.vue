@@ -1,7 +1,7 @@
 <template>
   <div class="header-data">
     <div class="data-item" v-for="(item, index) in headerData" :key="index">
-      <div class="num">{{item.dataNum}}</div>
+      <div class="num">{{item.dataNum || '0'}}</div>
       <div class="text">{{item.dataText}}</div>
     </div>
   </div>
@@ -33,6 +33,7 @@ export default {
 <style lang="less">
 .header-data {
   display: flex;
+  border-bottom: 1rpx solid #eee;
   background-color: #fff;
   .data-item {
     flex: 1;

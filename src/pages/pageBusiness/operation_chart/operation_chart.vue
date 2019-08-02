@@ -1,16 +1,16 @@
 <template>
   <div class="operation_chart">
-    <!-- <div class="list-header"> -->
-    <filter-nav :nav="nav"></filter-nav>
-    <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
-      <van-tab title="运营报表"></van-tab>
-      <van-tab title="课程报表"></van-tab>
-    </van-tabs>
-    <!-- </div> -->
-    <div class="sub-tab">
-      <div class="chart-list" :class="{active: subNavIndex==1}" @click="changeSubNavIndex(1)">汇总</div>
-      <div class="total-detail" :class="{active: subNavIndex==2}" @click="changeSubNavIndex(2)">明细</div>
-    </div>
+    <!-- <cover-view class="list-header"> -->
+      <filter-nav :nav="nav"></filter-nav>
+      <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
+        <van-tab title="运营报表"></van-tab>
+        <van-tab title="课程报表"></van-tab>
+      </van-tabs>
+      <div class="sub-tab">
+        <div class="chart-list" :class="{active: subNavIndex==1}" @click="changeSubNavIndex(1)">汇总</div>
+        <div class="total-detail" :class="{active: subNavIndex==2}" @click="changeSubNavIndex(2)">明细</div>
+      </div>
+    <!-- </cover-view> -->
     <div class="operation" v-show="navIndex == 0">
       <!-- <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}"> -->
       <div v-show="subNavIndex == 1">
@@ -565,12 +565,19 @@ export default {
           timeEnd: that.filter.timeEnd
         },
         success(res) {
-          that.customerLineData = res.data.data.map(e => {
-            return {
-              time: formatDate(new Date(e.day), "yyyy-MM-dd"),
-              tem: e.count
-            };
-          });
+          if(null == res.data.data) {
+            that.customerLineData = [{
+              time:formatDate(new Date(), "yyyy-MM-dd"),
+              tem: 0
+            }]
+          } else {
+            that.customerLineData = res.data.data.map(e => {
+              return {
+                time: formatDate(new Date(e.day), "yyyy-MM-dd"),
+                tem: e.count
+              };
+            });
+          }
           that.$mp.page
             .selectComponent("#customer-line")
             .init(that.initDataLine, that.customerLineData);
@@ -786,6 +793,7 @@ export default {
     border-top: 1px solid #dedede;
   }
   .sub-tab {
+    background-color: #fff;
     > div {
       display: inline-block;
       width: 50%;

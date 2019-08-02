@@ -20,7 +20,8 @@
         <input type="text" placeholder="输入名字、手机号搜索" @input="searchInput" v-model="condition">
         <div class="add-customer" @click="toAddCustomer">添加会员</div>
       </div>
-      
+      <div class="tip">请选择需要办理的客户</div>
+      <!-- <filter-nav :nav="nav"></filter-nav> -->
       <div class="search-list">
         <staff-coach-item v-for="(item, index) in searchCustomerList" :key="index" :info="item" @clickItem="selectCustomer(item)"></staff-coach-item>
         <van-loading color="#999" custom-class="loading" v-if="searching"/>
@@ -33,7 +34,7 @@
         <div class="cover"><image mode="aspectFill" :src="selectedCustomer.headImgPath || ''"></image></div>
         <div class="customer-middle">
           <div><span>{{selectedCustomer.name}}</span><span class="verify" :class="selectedCustomer.colorClass">{{selectedCustomer.phoneVerifyText}}</span></div>
-          <div>合同数：{{selectedCustomer.customerPhone}}</div>
+          <div>性别：{{selectedCustomer.sex}}</div>
           <div>{{selectedCustomer.phone}}</div>
         </div>
         <img src="/static/images/staff/delete.png" class="del" @click="delCurSelect">
@@ -52,17 +53,13 @@
         </div>
       </div>
 
-      <div class="card-list">
-
-      </div>
-
       <div class="card-form" v-show="showCardForm">
         <div class="subtitle" style="border-bottom: 1rpx solid #eee;" v-if="billingType != 4">
           <img class="screening-icon" src="/static/images/staff/title-icon.svg">
           <span class="subtitle-text">选择要购买的卡种</span>
         </div>
         <div class="input-cell-wrapper" v-if="billingType != 4">
-          <div class="cell-value">办卡卡种</div>
+          <div class="cell-value must-input">办卡卡种</div>
           <div class="cell-content">
             <input
               class="cell-input"
@@ -82,7 +79,7 @@
             </div>
           </div>
           <div class="input-cell-wrapper">
-            <div class="cell-value">合同编号</div>
+            <div class="cell-value must-input">合同编号</div>
             <div class="cell-content">
               <input
                 class="cell-input"
@@ -95,12 +92,14 @@
           <div class="input-cell-wrapper" v-if="billingType != 4">
             <div class="cell-value">合同标签</div>
             <div class="cell-content">
+              
+                <!-- @click="actionsList = cardLabelList;showActionsList = true;actionType='label'" -->
               <input
                 class="cell-input"
                 disabled
-                :value="selectedLable.labelName"
-                @click="actionsList = cardLabelList;showActionsList = true;actionType='label'"
-                placeholder="请选择合同标签"
+                :value="selectedLableName"
+                @click="selectLabel"
+                :placeholder="cardLabelList.length? '请选择合同标签' : '无可用合同标签'"
                 placeholder-class="placeholder"
               />
             </div>
@@ -112,7 +111,7 @@
                 class="cell-input"
                 disabled
                 v-model="selectedSale.userName"
-                @click="actionsList = saleList;showActionsList = true;actionType='sale'"
+                @click="showSaleList = true;actionType='sale'"
                 placeholder="请选择办理销售"
                 placeholder-class="placeholder"
               />
@@ -125,7 +124,7 @@
                 class="cell-input"
                 disabled
                 v-model="selectedSource.name"
-                @click="actionsList = sourceList;showActionsList = true;actionType='source'"
+                @click="selectSource"
                 placeholder="请选择合同来源"
                 placeholder-class="placeholder"
               />
@@ -142,7 +141,7 @@
             </div>
           </div>
           <div class="input-cell-wrapper" v-if="billingType == 4">
-            <div class="cell-value">付款金额</div>
+            <div class="cell-value must-input">付款金额</div>
             <div class="cell-content">
               <input
                 class="cell-input"
@@ -246,7 +245,7 @@
             <div class="date-tip" v-if="payCardType == 2 || payCardType == 1">将于{{payCardStartDate}}自动激活,于{{payCardEndDate}}时结束</div>
           </div>
           <div class="input-cell-wrapper" v-if="billingType != 4"> 
-            <div class="cell-value">实体卡号</div>
+            <div class="cell-value must-input">实体卡号</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-lang"
@@ -273,18 +272,19 @@
           </div> 
           <div class="cell-subtitle">备注</div>
           <div class="carRemark">
-            <textarea v-model="remarks" maxlength="120" placeholder="备注不能超过120个字" placeholder-class="placeholder"></textarea>
+            <textarea v-model="remarks" maxlength="120" cursor-spacing="50" placeholder="备注不能超过120个字" placeholder-class="placeholder"></textarea>
           </div>
-          <div class="cell-subtitle" @click="toMore" v-if="billingType != 4">更多</div>
+          <div class="cell-subtitle" @click="toMore" v-if="billingType != 4">更多设置选项</div>
           <div class="submit-wrapper">
             <div class="clear" :style="{'color': themeColor}" @click="clearForm">清空</div>
-            <div class="submit" @click="checkCondition" :style="{'color': themeColor}">提交收银台</div>
-            <div class="collection" @click="toPay" :style="{'background-color': themeColor}">收款</div>
+            <div class="submit" @click="submitCashier" :style="{'color': themeColor}">提交收银台</div>
+            <div class="collection" v-if="isCanPay" @click="toPay" :style="{'background-color': themeColor}">收款</div>
           </div>
         </div>
       </div>
     </div>
     
+    <!-- 选择门店操作 -->
     <van-action-sheet
       :show="showStoreList"
       :actions="storeList"
@@ -302,17 +302,67 @@
       @select="selectAction"
     ></van-action-sheet>
 
+    <!-- 合同标签 -->
+    <van-popup
+      class="label-list-pop"
+      :show="showLabelList"
+      position="bottom"
+      @close="showLabelList = false"
+      custom-style="width:100%;max-height:60vh;min-height:30vh;"
+    >
+      <div class="label-list">
+        <checkbox-group class="radio-group">
+          <label class="radio" v-for="(item, index) in cardLabelList" :key="index" @click="selectAction(item)">
+            <checkbox :value="item.id" :color="themeColor" />
+            <span class="radio-span">{{item.name}}</span>
+          </label>
+        </checkbox-group>
+        <div class="fixed-bottom-btn" @click="showLabelList = false" :style="{'background-color': themeColor}">确认</div>
+      </div> 
+    </van-popup>
+
+    <!-- 办理销售 -->
+    <van-popup
+      class="sale-list-pop"
+      :show="showSaleList"
+      position="bottom"
+      @close="showSaleList = false"
+      custom-style="width:100%;height:60vh;"
+    >
+      <header-search :search="searchSale" placeholder="请输入办理销售的名字查询"></header-search>
+      <div class="sale-list">
+        <div v-for="(item, index) in filterSaleList" :key="index">
+          <div class="sale-item"  @click="selectAction(item)">
+            <img :src="item.cover">
+            <span>{{item.userName}}</span>
+            <span>{{item.sex}}</span>
+          </div>
+        </div>
+      </div> 
+    </van-popup>
+
+    <!-- 办卡列表 -->
     <van-popup
       class="card-list-pop"
       :show="showCardList"
       position="bottom"
-      @close="showCardList = false"
-      custom-style="width:100%;max-height:60vh;"
+      @close="showCardList = false;filterCardType = 3"
+      custom-style="width:100%;height:70vh;"
     >
-      <header-search></header-search>
+      <div class="card-fixed-header">
+        <div class="card-type-group">
+          <div class="card-type-item all" @click="filterCardType = 3" :class="{'active': filterCardType == 3}">全部</div>
+          <div class="card-type-item yuan" @click="filterCardType = 0" :class="{'active': filterCardType == 0}">储值卡</div>
+          <div class="card-type-item day"  @click="filterCardType = 1" :class="{'active': filterCardType == 1}">时期卡</div>
+          <div class="card-type-item unit" @click="filterCardType = 2" :class="{'active': filterCardType == 2}">次卡</div>
+        </div>
+        <header-search :search="searchCard" placeholder="请输入合同名称查询"></header-search>
+      </div>
       <div class="card-group">
-        <staff-coach-item v-for="(item, index) in cardList" :key="index" :info="item" @clickItem="selectCard(item)">
-        </staff-coach-item>
+        <div v-for="(item, index) in filterCardList" :key="index">
+          <staff-coach-item v-if="filterCardType == 3 ? true : (item.authorityUnit == filterCardType)" :info="item" @clickItem="selectCard(item)">
+          </staff-coach-item>
+        </div>
       </div> 
     </van-popup>
 
@@ -354,18 +404,22 @@ import store from "@/utils/store.js";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 import { transformJspImg,getStoreSet,getUserofrole,qiniuUpload } from "../common/js/http.js";
 import headerSearch from "../components/header-search.vue";
+import filterNav from "../components/filter-nav.vue";
 import billingData from "../common/js/billingData";
 import noneResult from "COMPS/noneResult.vue";
+import {checkAuth} from "../common/js/service_config.js";
 
 export default {
   data() {
+    billingData.isCanPay = checkAuth(346)
     return billingData
   },
   mixins: [colorMixin],
   components: {
     staffCoachItem,
     headerSearch,
-    noneResult
+    noneResult,
+    filterNav
   },
   onLoad(options) {
     this.isTeachingContract = options.isTeachingContract
@@ -382,6 +436,11 @@ export default {
     this.selectedStore = this.storeList[0];
     this.searchCustomer()
     this._mounted()
+  },
+  onReachBottom() {
+    if(this.showSearch) {
+      this.searchCustomer()
+    }
   },
   computed: {
     billingText() {
@@ -401,9 +460,8 @@ export default {
   },
   onUnload() {
     console.log("billing-onUnload")
-    this.showSearch = true
-    this.condition = ""
-    this.clearForm()
+    // Object.assign(this.$data, this.$options.data());
+    this.resetPage()
   },
   methods: {
     _mounted() {
@@ -417,6 +475,12 @@ export default {
         this.getCardSetList()
       }
     },
+    searchSale: debounce(function(text) {
+      this.filterSaleList = this.saleList.filter(e => e.userName.indexOf(text) > -1)
+    }, 100),
+    searchCard: debounce(function(text) {
+      this.filterCardList = this.cardList.filter(e => e.cardName.indexOf(text) > -1)
+    }, 100),
     // day 有效日期
     computedEndTime(day) {
       const DAY = 24 * 60 * 60 * 1000
@@ -429,6 +493,7 @@ export default {
       this.selectedStore = e.mp.detail;
       this.showStoreList = false;
       this._mounted()
+      this.resetPage()
     },
     toAddCustomer() {
       wx.navigateTo({
@@ -436,6 +501,7 @@ export default {
       });
     },
     searchInput: debounce(function(e){
+      this.customerPage = 1
       this.searchCustomer()
     },200),
     // 客户列表
@@ -444,33 +510,44 @@ export default {
       this.searching = true
       this.isNothingCustomer = false
       HttpRequest({
-        url: '/customer/archives/customertitlelist',
+        url: '/customer/list/allcustomer/addpact', // '/customer/archives/customertitlelist',
         data: {
-          condition: that.condition,
-          page: 1,
+          // condition: that.condition,
+          nameOrPhone: that.condition,
+          page: that.customerPage,
           pageSize: 10,
           storeId: that.selectedStore.storeId,
+          addTimeStart: '',
+          addTimeEnd: ''
         },
         success(res) {
           if(!res.data.data || !res.data.data.result.length) {
             that.isNothingCustomer = true
             that.searching = false
-            that.searchCustomerList = []
+            if(that.customerPage == 1) {
+              that.searchCustomerList = []
+            }
             return
           }
+          
           let _data = res.data.data.result.map(async e => {
             e.headImgPath = await transformJspImg(e.headImgPath)
             return {
               cover: e.headImgPath,
-              id: e.customerId,
-              first_1: e.customerName,
-              second_tip_1: "合同数：",
-              second_1: e.totalCardCount,
-              third_1: e.customerPhone
+              id: e.id,
+              first_1: e.name,
+              // second_tip_1: "合同数：",
+              second_1: e.sex,
+              third_1: e.phone
             }
           })
           Promise.all(_data).then(result => {
-            that.searchCustomerList = result
+            if(that.customerPage == 1) {
+              that.searchCustomerList = result
+            } else {
+              that.searchCustomerList = that.searchCustomerList.concat(result)
+            }
+            that.customerPage++
           });
           that.searching = false
         }
@@ -493,7 +570,8 @@ export default {
           let info = res.data
           if(info.code == 200) {
             info.data.headImgPath = item.cover
-            info.data.customerPhone = item.second_1
+            // info.data.customerPhone = item.second_1
+            info.data.sex = item.second_1
             if(info.data.phoneVerifyStatus == 0) {
               info.data.phoneVerifyText = '未验证'
               info.data.colorClass = 'gray'
@@ -558,13 +636,13 @@ export default {
               TermOfValidity_2 = " | 面议"
             } else {
               if(e.authorityUnit == 0) {
-                e.rightBlock = "元卡"
+                e.rightBlock = "储值卡"
                 e.color = "#22cab9"
                 e.unit = "元"
                 e.cellValue = "金额"
                 TermOfValidity_2 = ` | ${e.buyAuthority}元`
               } else if (e.authorityUnit == 1){
-                e.rightBlock = "天卡"
+                e.rightBlock = "时期卡"
                 e.color = "#ff9f56"
                 e.unit = "天"
                 e.cellValue = "天数"
@@ -585,6 +663,7 @@ export default {
             e.third_1 = e.salePrice == '-1' ? '￥ 面议' : '￥ '+e.salePrice
             return e
           })
+          that.filterCardList = that.cardList
         }
       })
     },
@@ -629,11 +708,20 @@ export default {
           phone: that.selectedCustomer.phone
         },
         success(res) {
-          that.saleList = res.data.data.map((e) => {
-            e.name = e.userName
-            return e
+           let _data = res.data.data.map(async (e) => {
+            e.headImgPath = await transformJspImg(e.headImgPath)
+            return {
+              userId: e.userId,
+              userName: e.userName,
+              sex: e.sex == 0 ? '' : (e.sex == 1 ? '男' : '女'),
+              cover: e.headImgPath
+            }
           })
-          that.selectedSale = that.saleList[0]
+          Promise.all(_data).then(result => {
+            that.saleList = result
+            that.filterSaleList = result
+            that.selectedSale = that.saleList[0]
+          });
         }
       })
     },
@@ -651,6 +739,30 @@ export default {
       getStoreSet(this.selectedStore.storeId).then((res) => {
         this.storeSetting = res
       })
+    },
+    // 选择合同标签 
+    selectLabel() {
+      if(!this.cardLabelList.length) {
+        return wx.showToast({
+          title: "无可用合同标签",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      this.actionType = 'label';
+      this.showLabelList = true
+    },
+    selectSource() {
+      if(!this.sourceList.length) {
+        return wx.showToast({
+          title: "无可用合同来源",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      this.actionsList = this.sourceList;
+      this.showActionsList = true;
+      this.actionType='source'
     },
     // 会员卡总价金额限制
     inputSalePrice(e) {
@@ -671,7 +783,6 @@ export default {
       }
       this.isShowGifTip = false
     },
-    
     // 发送短信
     sendCode() {
       let that = this
@@ -794,52 +905,77 @@ export default {
     },
     // 校验
     checkCondition() {
-      if (!this.pactId) {
-        return wx.showToast({
-          title: "请填写合同编号",
-          icon: "none",
-          duration: 1000
-        });
-      }
-      if (!this.cardNum && this.billingType != 4 && this.isNeedCardNum) {
-        return wx.showToast({
-          title: "请填写卡号",
-          icon: "none",
-          duration: 1000
-        });
-      }
-      if(this.isShowlimtDate) {
-        return wx.showToast({
-          title: "有效天数有误",
-          icon: "none",
-          duration: 1000
-        });
-      }
-      if(this.selectedCard.periodOfValidity < 1 && this.billingType != 4) {
-        return wx.showToast({
-          title: "有效天数需大于0",
-          icon: "none",
-          duration: 1000
-        });
-      }
-      if(this.isShowSalePriceTip) {
-        return wx.showToast({
-          title: "会员卡价格有误",
-          icon: "none",
-          duration: 1000
-        });
-      }
-      if(this.isShowGifTip) {
-        return wx.showToast({
-          title: "赠送权益有误",
-          icon: "none",
-          duration: 1000
-        });
-      }
       return new Promise((resolve) => {
+        if (!this.pactId) {
+          return wx.showToast({
+            title: "请填写合同编号",
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if (!this.cardNum && this.billingType != 4 && this.isNeedCardNum) {
+          return wx.showToast({
+            title: "请填写卡号",
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(this.isShowlimtDate) {
+          return wx.showToast({
+            title: "有效天数有误",
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(this.selectedCard.periodOfValidity < 1 && this.billingType != 4) {
+          return wx.showToast({
+            title: "有效天数需大于0",
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(!this.selectedCard.buyAuthority) {
+          return wx.showToast({
+            title: `请填写${this.selectedCard.cellValue}`,
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(!this.selectedCard.salePrice) {
+          return wx.showToast({
+            title: `请填写会员总价`,
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(!this.curCardSet.giveAwayAuthority) {
+          return wx.showToast({
+            title: `请填写赠送${this.selectedCard.cellValue}`,
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(this.isShowSalePriceTip) {
+          return wx.showToast({
+            title: "会员卡价格有误",
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(this.isShowGifTip) {
+          return wx.showToast({
+            title: "赠送权益有误",
+            icon: "none",
+            duration: 1000
+          });
+        }
         this.checkInPactId().then(res => {
+          if(this.billingType == 4 || !this.isNeedCardNum) {
+            return this.getToken().then(() => {
+              resolve()
+            })
+          }
           this.checkCardNum().then(res => {
-            this.showEntryBox = true
             this.getToken().then(() => {
               resolve()
             })
@@ -862,9 +998,22 @@ export default {
     // 选择action
     selectAction(e) {
       if(this.actionType=='label') {
-        this.selectedLable = e.mp.detail
+        if (this.selectedLableName.indexOf(e.labelName) > -1) {
+          this.selectedLableName = this.selectedLableName.replace(
+            new RegExp(e.labelName + ",", "g"),
+            ""
+          );
+          this.selectedLableId = this.selectedLableId.replace(
+            new RegExp(e.id + ",", "g"),
+            ""
+          );
+        } else {
+          this.selectedLableName += `${e.labelName},`
+          this.selectedLableId += `${e.id},`
+        }
       } else if(this.actionType =='sale') {
-        this.selectedSale = e.mp.detail
+        this.selectedSale = e
+        this.showSaleList = false
       } else if(this.actionType =='source') {
         this.selectedSource = e.mp.detail
       } else if(this.actionType =='coach') {
@@ -891,8 +1040,23 @@ export default {
       this.curCardSet = this.cardSetList.filter(e => id == e.cardClassId)[0]
       this.constGiveAwayAuthority = this.curCardSet.giveAwayAuthority
     },
-    // 清空
+    // 初始化页面
+    resetPage() {
+      this.showSearch = true
+      this.condition = ""
+      this.customerPage = 1
+      this.searchCustomer()
+      // this.searchCustomerList = []
+      this.clearForm()
+    },
+    // 清空表单
     clearForm() {
+      this.pactId = ""
+      this.cardNum = ""
+      this.selectedLableName = ""
+      this.selectedLableId = ""
+      this.showImgList = []
+      this.uploadImgList = []
       this.isSelectCard = false
       this.selectedCard = {}
       this.constCardInfo = {}
@@ -1014,12 +1178,12 @@ export default {
           sellingPrice: that.selectedCard.salePrice,
           buyAuthority: that.selectedCard.buyAuthority,
           periodOfValidity: that.selectedCard.periodOfValidity,
-          teachCardType: that.teachCardType,
+          teachCardType: that.selectedCard.teachCardType,
           canTeachCard: that.isTeachingContract,
           remarks: that.remarks,
           authorityUnit: that.selectedCard.authorityUnit,
           coachUserId: that.selectedCoach.userId,
-          labelIdsStr: that.selectedLable.cardLabelId,
+          labelIdsStr: that.selectedLableId,
           cardSource: that.selectedSource.value,
           isTimingOfActivation: that.payCardType,
           activateDate: that.payCardType == 1 ? that.payCardStartDate : '',
@@ -1033,7 +1197,7 @@ export default {
         }
         data = Object.assign(basaData, this.curCardSet);
         for(let k in data) {
-          if(!data[k] || data[k] == null) {
+          if(undefined == data[k] || data[k] == null) {
             data[k] = ""
           }
         }
@@ -1068,10 +1232,8 @@ export default {
               icon: "success",
               duration: 1000
             })
-            that.clearForm()
-            that.condition = ""
+            that.resetPage()
             that.showEntryBox = false
-            that.showSearch = true
           } else {
             wx.showModal({
               title: "提示",
@@ -1085,9 +1247,16 @@ export default {
     onCanpayment() {
       this.canpayment = e.mp.detail.value;
     },
+    submitCashier() {
+      this.checkCondition().then(() => {
+        this.showEntryBox = true
+      })
+    },
     toPay() {
-      wx.navigateTo({
-        url: '../receivable/main'
+      this.checkCondition().then(() => {
+        wx.navigateTo({
+          url: '../receivable/main'
+        })
       })
     },
     // 查看合同
@@ -1106,22 +1275,19 @@ export default {
 </script>
 
 <style lang="less">
+@import "../common/less/form.less";
 @import "../common/less/staff_common.less";
 .billing {
   .input-cell-wrapper {
-    padding: 0 15px;
-    display: flex;
     line-height: 42px;
-    border-bottom: 1rpx solid #eee;
     .cell-value {
-      width: 30%;
+      flex: 0 0 30%;
     }
     .cell-content {
-      flex: 1;
       display: flex;
       flex-wrap: wrap;
       .cell-input {
-        padding-left: 5px;
+        width: 100%;
         height: 42px;
         line-height: 42px;
       }
@@ -1281,7 +1447,15 @@ export default {
     }
   }
   .search-wrapper {
+    .tip {
+      line-height: 26px;
+      padding-left: 15px;
+      border-bottom: 1rpx solid #eee;
+    }
     .phone-search-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 99;
       >input {
         flex: 1;
         height: 46px;
@@ -1416,6 +1590,43 @@ export default {
     color: #999;
   }
   .card-list-pop {
+    .card-fixed-header {
+      position: sticky;
+      top: 0;
+      z-index: 99;
+      background-color: #fff;
+      border-bottom: 1rpx solid #eee;
+    }
+    .card-type-group {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      .card-type-item {
+        line-height: 28px;
+        padding: 0 10px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+        border-radius: 21px;
+        text-align: center;
+        color: #fff;
+        &.all {
+          background-color: #07c160;
+        }
+        &.yuan {
+          background-color: #13bfc4;
+        }
+        &.day {
+          background-color: #ff924f;
+        }
+        &.unit {
+          background-color: #58b4ff;
+        }
+        &.active {
+          box-shadow: 1px 2px 2px #929292;
+          transform: scale(1.1);
+        }
+      }
+    }
     .card-group {
       .staff-coach-item {
         border-top: 1rpx solid #eee;
@@ -1446,6 +1657,31 @@ export default {
       }
       .cancel {
         background-color: #fa8178;
+      }
+    }
+  }
+  .sale-list-pop {
+    position: relative;
+    .header-search {
+      position: sticky;
+      top: 0;
+      background-color: #fff;
+    }
+    .sale-list {
+      .sale-item {
+        display: flex;
+        align-items: center;
+        height: 42px;
+        padding-left: 15px;
+        border-bottom: 1rpx solid #eee;
+        >img {
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+        }
+        >span {
+          margin-left: 15px;
+        }
       }
     }
   }

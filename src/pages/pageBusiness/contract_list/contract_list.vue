@@ -196,11 +196,11 @@ export default {
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "有效合同",
           dataNum: "0"
         },
         {
-          dataText: "数据三",
+          dataText: "过期合同",
           dataNum: "0"
         }
       ],
@@ -284,6 +284,14 @@ export default {
         } else {
           url = "/customer/card/pages";
         }
+        HttpRequest({
+          url: '/customer/card/static/count',
+          data: _data,
+          success(res) {            
+            that.headerData[1].dataNum = res.data.data.useingCardCount
+            that.headerData[2].dataNum = res.data.data.dueCardCount
+          }
+        })
         HttpRequest({
           url: url,
           data: _data,

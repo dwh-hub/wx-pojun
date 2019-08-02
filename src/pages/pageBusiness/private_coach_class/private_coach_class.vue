@@ -34,7 +34,7 @@
           class="operate-item"
           v-for="(item, index) in actionList"
           :key="index"
-          @click="item.action(item)"
+          @click="clickOperate(item)"
         >{{item.text}}</div>
       </div>
     </van-popup>
@@ -63,6 +63,7 @@ import listPageMinxi from "../components/list-page-mixin.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
+import { attendclass } from "../common/js/http.js";
 
 export default {
   data() {
@@ -149,11 +150,11 @@ export default {
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "已完成课程",
           dataNum: "0"
         },
         {
-          dataText: "数据三",
+          dataText: "未完成课程",
           dataNum: "0"
         }
       ],
@@ -261,6 +262,10 @@ export default {
     noneResult
   },
   methods: {
+    clickOperate(item) {
+      this.showOperate = false
+      item.action(item)
+    },
     selectStore(item) {
       this.selectedStore = item;
       this.refreshList();
@@ -289,6 +294,14 @@ export default {
           that.filter
         );
         HttpRequest({
+          url: '/coach/private/appoint/static/count',
+          data: _data,
+          success(res) {
+            that.headerData[1].dataNum = res.data.data.classedCount
+            that.headerData[2].dataNum = res.data.data.disClassCount
+          }
+        })
+        HttpRequest({
           url: window.api + "/coach/private/appoint/pages",
           data: _data,
           success(res) {
@@ -311,6 +324,7 @@ export default {
               return {
                 id: e.customerId,
                 storeId: e.storeId,
+                venueId: e.venueId,
                 sex: e.sex,
                 coachAppointId: e.coachAppointId,
                 coachId: e.coachId,
@@ -515,21 +529,28 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             let way = res.data.data.privateSignWay;
+            let params;
+            params = {
+              way: way,
+              coachName: that.curSelectClass.coachName,
+              coachId: that.curSelectClass.coachId,
+              studentName: that.curSelectClass.studentName,
+              studentId: that.curSelectClass.id,
+              appointId: that.curSelectClass.coachAppointId,
+              storeId: that.curSelectClass.storeId,
+              venueId: that.curSelectClass.venueId
+            };
+            wx.hideLoading()
             if (way == 1) {
               // 教练自签
               that.attendclassMethod();
-            } else {
-              let params;
-              params = {
-                way: way,
-                coachName: that.curSelectClass.coachName,
-                coachId: that.curSelectClass.coachId,
-                studentName: that.curSelectClass.studentName,
-                studentId: that.curSelectClass.id,
-                appointId: that.curSelectClass.coachAppointId
-              };
+            } else if (way == 5) {
               that.showOperate = false;
-              wx.hideLoading()
+              wx.redirectTo({
+                url: "../face/main?params=" + JSON.stringify(params)
+              });
+            } else {
+              that.showOperate = false;
               wx.navigateTo({
                 url: "../QRCodeSignIn/main?params=" + JSON.stringify(params)
               });
@@ -541,44 +562,22 @@ export default {
     // 上课
     attendclassMethod() {
       let that = this;
-      HttpRequest({
-        url: window.api + "/mobile/coach/appoint/attendclass",
-        data: {
-          coachAppointId: that.curSelectClass.coachAppointId,
-          realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
-        },
-        success(res) {
-          wx.hideLoading()
-          that.showOperate = false
-          if(res.data.code == 200) {
-            let msgData = res.data.data;
-            for (let k in msgData) {
-              msgData[k] = msgData[k] ? msgData[k] : "";
-              if(k == "cardCustomerInfoArray") {
-                delete msgData[k]
-              }
+      attendclass(this.curSelectClass.coachAppointId).then(() => {
+        wx.showModal({
+          title: "提示",
+          content: "上课成功",
+          showCancel: false,
+          success(model_res) {
+            if (model_res.confirm) {
+              wx.navigateTo({
+                url: `../../appointmentResult/main?coachAppointId=${
+                  that.curSelectClass.coachAppointId
+                }&type=staff`
+              });
             }
-            HttpRequest({
-              url: '/sendmsg/customer/consumemsg',
-              data: msgData
-            })
           }
-          wx.showModal({
-            title: "提示",
-            content: res.data.message,
-            showCancel: false,
-            success(model_res) {
-              if (model_res.confirm && res.data.code == 200) {
-                wx.navigateTo({
-                  url: `../../appointmentResult/main?coachAppointId=${
-                    that.curSelectClass.coachAppointId
-                  }&type=staff`
-                });
-              }
-            }
-          });
-        }
-      });
+        });
+      })
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);

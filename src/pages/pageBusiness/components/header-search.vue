@@ -19,7 +19,7 @@
           class="search-input"
           type="text"
           v-model="text"
-          placeholder="请输入搜索内容"
+          :placeholder="placeholder"
           placeholder-style="color:#999;"
           @input="_search"
         >
@@ -49,6 +49,10 @@ export default {
     searchText: {
       type: String,
       default: ""
+    },
+    placeholder: {
+      type: String,
+      default: "请输入搜索内容"
     }
   },
   data() {

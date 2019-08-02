@@ -1,4 +1,5 @@
 <template>
+<!-- 废弃页面 -->
   <div class="authorize-login">
     <image src="https://pojun-tech.cn/assets/img/coordinates.png" mode="aspectFit"></image>
     <div class="authorize-bottom" v-if="isShow">

@@ -19,25 +19,21 @@ export default {
   data() {
     return {
       typeList: [{
-        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
+        iconUrl: "/static/images/staff/card_1.svg",
         text: "购买会籍卡",
-        navUrl: "../billing/main?isTeachingContract=0&billingType=1",
-        class: "iconfont icon-workbench_icon_2"
+        navUrl: "../billing/main?isTeachingContract=0&billingType=1"
       },{
-        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
+        iconUrl: "/static/images/staff/card_2.svg",
         text: "购买私教卡",
-        navUrl: "../billing/main?teachCardType=2&isTeachingContract=1&billingType=2",
-        class: "iconfont icon-workbench_icon_2"
+        navUrl: "../billing/main?teachCardType=2&isTeachingContract=1&billingType=2"
       },{
-        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
+        iconUrl: "/static/images/staff/card_3.svg",
         text: "购买团课卡",
-        navUrl: "../billing/main?teachCardType=1&isTeachingContract=1&billingType=3",
-        class: "iconfont icon-workbench_icon_2"
+        navUrl: "../billing/main?teachCardType=1&isTeachingContract=1&billingType=3"
       },{
-        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
+        iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_1.svg",
         text: "预交定金",
-        navUrl: "../billing/main?billingType=4",
-        class: "iconfont icon-workbench_icon_2"
+        navUrl: "../billing/main?billingType=4"
       }]
     }
   },

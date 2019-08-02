@@ -4,6 +4,7 @@ let service = [{
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_1.svg",
         text: "业务",
+        authorityId: 231,
         navUrl: "../pay_card/main",
         isOpen: true,
         hasAuth: true,
@@ -20,6 +21,7 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_3.svg",
         text: "客户登记",
+        authorityId: 26,
         navUrl: "../customer_register/main",
         isOpen: true,
         hasAuth: true,
@@ -49,6 +51,15 @@ let service = [{
         isOpen: true,
         hasAuth: true,
         class: "iconfont icon-workbench_icon_6"
+      },
+      {
+        iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
+        text: "我的私教",
+        authorityId: 63,
+        hasAuth: true,
+        navUrl: "../my_private_class/main",
+        isOpen: true,
+        class: "iconfont icon-class_icon_2"
       }
     ]
   },
@@ -80,7 +91,7 @@ let service = [{
         navUrl: "../contract_list/main",
         isOpen: true,
         hasAuth: true,
-        class: "iconfont icon-member_service_icon_3"
+        class: "iconfont icon-member_service_icon_2"
       }
     ]
   },
@@ -228,7 +239,7 @@ let service = [{
         hasAuth: true,
         navUrl: "../operation_chart/main",
         isOpen: true,
-        class: "iconfont icon-operation_report_icon_1"
+        class: "iconfont icon-operation_report_icon_"
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
@@ -382,11 +393,11 @@ service.forEach((group) => {
   }
   group.list.forEach(item => {
     if(item.authorityId) {
-      if(authArr.includes(item.authorityId) == -1) {
+      if(authArr.includes(item.authorityId)) {
+        serviceList.push(item)
+      } else {
         console.log(item.text)
         item.hasAuth = false
-      } else {
-        serviceList.push(item)
       }
     }
   })

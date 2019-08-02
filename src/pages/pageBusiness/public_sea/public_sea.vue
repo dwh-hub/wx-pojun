@@ -70,7 +70,7 @@ export default {
           navTitle: "今日",
           children: [
             {
-              sonText: "全部",
+              sonText: "全部(登记时间)",
               action: () => {
                 this.filterDate();
               }
@@ -96,16 +96,45 @@ export default {
             {
               sonText: "自定义",
               action: () => {
+                this.timePickerType = ""
                 this.showPicker();
               }
             }
           ]
         },
         {
-          navTitle: "筛选条件二",
+          navTitle: "签到时间",
           children: [
             {
-              sonText: "无"
+              sonText: "全部(签到时间)",
+              action: () => {
+                this.filterConsumedDate(0);
+              }
+            },
+            {
+              sonText: "今日",
+              action: () => {
+                this.filterConsumedDate(1);
+              }
+            },
+            {
+              sonText: "本周",
+              action: () => {
+                this.filterConsumedDate(7);
+              }
+            },
+            {
+              sonText: "本月",
+              action: () => {
+                this.filterConsumedDate(30);
+              }
+            },
+            {
+              sonText: "自定义",
+              action: () => {
+                this.timePickerType = "consumed"
+                this.showPicker()
+              }
             }
           ]
         },
@@ -141,15 +170,15 @@ export default {
       ],
       headerData: [
         {
-          dataText: "数据一",
+          dataText: "总计",
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "潜在客户",
           dataNum: "0"
         },
         {
-          dataText: "数据三",
+          dataText: "现有客户",
           dataNum: "0"
         }
       ],
@@ -169,11 +198,14 @@ export default {
       selectedStore: {},
       storeList: [],
       showMask: false,
+      timePickerType: "",
       filter: {
         nameOrPhone: "",
         addTimeEnd: "",
         addTimeStart: "",
-        customerClass: ""
+        customerClass: "",
+        lastConsumedTimeStart: "",
+        lastConsumedTimeEnd: ""
       }
     };
   },
@@ -262,7 +294,15 @@ export default {
           that.filter
         );
         HttpRequest({
-          url: window.api + "/customer/public/pages",
+          url: '/customer/public/static/count',
+          data: _data,
+          success(res) {
+            that.headerData[1].dataNum = res.data.data.existingCount
+            that.headerData[2].dataNum = res.data.data.prospectiveCount
+          }
+        })
+        HttpRequest({
+          url: "/customer/public/pages",
           data: _data,
           success(res) {
             if (res.data.code !== 200) {
@@ -306,9 +346,20 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
+      this.timePickerType = ""
       this.setDate(obj);
     },
+    filterConsumedDate(day) {
+      let obj = this.filterDateMethod(day);
+      this.timePickerType = "consumed"
+      this.setDate(obj)
+    },
     setDate(obj) {
+      if(this.timePickerType == "consumed") {
+        this.filter.lastConsumedTimeStart = obj.startTime
+        this.filter.lastConsumedTimeEnd = obj.endTime
+        return
+      }
       this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
     },

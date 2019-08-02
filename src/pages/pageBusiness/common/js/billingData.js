@@ -10,16 +10,23 @@ let billingData = {
   selectedStore: {},
   condition: "",
   searchCustomerList: [],
+  customerPage: 1,
+  customerNav: [],
   showStoreList: false,
   searching: false,
   showSearch: true,
   showVerify: false,
   showCustomerInfo: false,
   showCardList: false,
+  showSaleList: false,
+  showLabelList: false,
+  filterCardType: 3, // 筛选卡类型
   selectedCustomer: {}, // 选中的客户信息
   cardList: [],
+  filterCardList: [], // 手动筛选卡列表
   cardLabelList: [],
   saleList: [],
+  filterSaleList: [], // 手动筛选办理销售列表
   storeSetting: {}, // isAddCardCode 1 需要验证
   CDTime: 0, // 倒计时
   isSend: false,
@@ -46,7 +53,8 @@ let billingData = {
   showActionsList: false,
   actionType: '', // actionsheet 当前的类型
   actionsList: [],
-  selectedLable: {}, // 选择的合同标签
+  selectedLableName: "", // 选择的合同标签
+  selectedLableId: "",
   selectedSale: {}, // 选择的销售
   selectedSource: {}, // 合同来源
   selectedCoach: {}, // 教练

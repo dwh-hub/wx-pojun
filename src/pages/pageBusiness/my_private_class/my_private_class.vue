@@ -1,38 +1,35 @@
 <template>
-  <div class="follow_up_log">
+  <div class="my-private-class">
     <div class="list-header">
       <header-search
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        :searchText="filter.namePhone"
         @selectStore="selectStore"
       ></header-search>
       <header-data :headerData="headerData"></header-data>
       <filter-nav :nav="nav"></filter-nav>
     </div>
-    <div class="card-list">
+    <div class="class-list">
       <staff-coach-item
-        v-for="(item, index) in list"
-        :key="index"
         :info="item"
-        @clickItem="toCardDetail(item)"
-        @clickIcon="call(item)"
+        v-for="(item, index) in list"
+        @clickItem="toDetail(item)"
+        @clickIcon="clickIcon(item)"
+        :key="index"
       >
         <div>
           <img src="/static/images/staff/phone.svg" alt />
           <img src="/static/images/staff/right-arrow.svg" alt />
         </div>
       </staff-coach-item>
-      <van-loading :color="themeColor" v-if="isLoading" />
-      <none-result text="暂无合同" v-if="!list.length && !isLoading"></none-result>
+      <van-loading :color="themeColor" v-if="isLoading"/>
+      <none-result text="暂无客户" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
-    <timePicker
-      :pickerShow="isPickerShow"
-      :config="pickerConfig"
-      @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
-    ></timePicker>
+
+    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
   </div>
 </template>
 
@@ -41,23 +38,26 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  debounce
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
-import colorMixin from "COMPS/colorMixin.vue";
 import headerSearch from "../components/header-search.vue";
-import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
+import headerData from "../components/header-data.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
+import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 export default {
   data() {
     return {
+      storeList: [],
+      selectedStore: {},
       nav: [
         {
-          navTitle: "今日",
+          navTitle: "全部",
           children: [
             {
               sonText: "全部(登记时间)",
@@ -85,74 +85,73 @@ export default {
             },
             {
               sonText: "自定义",
+              isDiyDate: true,
               action: () => {
-                this.timePickerType = ""
-                this.showPicker();
+                this.showPicker()
               }
             }
           ]
         },
         {
-          navTitle: "跟进时间",
+          navTitle: "资料来源",
           children: [
             {
-              sonText: "全部(跟进时间)",
+              sonText: "全部(资料来源)",
               action: () => {
-                this.filterTrackDate(0);
+                this.filter.coachDataSource = ""
               }
             },
             {
-              sonText: "今日",
+              sonText: "录入",
               action: () => {
-                this.filterTrackDate(1);
+                this.filter.coachDataSource = 1
               }
             },
             {
-              sonText: "本周",
+              sonText: "到访",
               action: () => {
-                this.filterTrackDate(7);
+                this.filter.coachDataSource = 2
               }
             },
             {
-              sonText: "本月",
+              sonText: "分配",
               action: () => {
-                this.filterTrackDate(30);
+                this.filter.coachDataSource = 3
               }
             },
             {
-              sonText: "自定义",
+              sonText: "认领",
               action: () => {
-                this.timePickerType = "track"
-                this.showPicker();
+                this.filter.coachDataSource = 4
+              }
+            },
+            {
+              sonText: "导入",
+              action: () => {
+                this.filter.coachDataSource = 5
               }
             }
           ]
         },
         {
-          navTitle: "跟进结果",
+          navTitle: "私教状态",
           children: [
             {
-              sonText: "全部(跟进结果)",
+              sonText: "全部(私教状态)",
               action: () => {
-                this.filter.trackResult = "";
+                this.filter.isTrainer = ""
               }
             },
             {
-              sonText: "继续跟进",
+              sonText: "已办理",
               action: () => {
-                this.filter.trackResult = 1;
+                this.filter.isTrainer = 1
               }
             },
             {
-              sonText: "已预约",
+              sonText: "未办理",
               action: () => {
-                this.filter.trackResult = 2;
-              }
-            },
-            {
-              sonText: "不确定",
-              action: () => {
-                this.filter.trackResult = 3;
+                this.filter.isTrainer = 0
               }
             }
           ]
@@ -160,117 +159,74 @@ export default {
       ],
       headerData: [
         {
-          dataText: "总计",
+          dataText: "总人数",
           dataNum: "0"
         },
         {
-          dataText: "潜在客户",
+          dataText: "已办理",
           dataNum: "0"
         },
         {
-          dataText: "现有客户",
+          dataText: "未办理",
           dataNum: "0"
         }
       ],
-      selectedStore: {},
-      storeList: [],
       filter: {
-        nameOrPhone: "",
         addTimeStart: "",
         addTimeEnd: "",
-        trackTimeEnd: "",
-        trackTimeStart: "",
-        trackResult: ""
-      },
-      trackUserType: 1 // 1 销售 2 教练
+        namePhone: "",
+        coachDataSource: "",
+        isTrainer: ""
+      }
     };
   },
+  mixins: [colorMixin, listPageMixin],
   components: {
+    staffCoachItem,
     headerSearch,
     headerData,
     filterNav,
-    staffCoachItem,
     noneResult
   },
-  mixins: [colorMixin, listPageMixin],
-  onLoad(options) {
-    if (options.trackUserType) {
-      this.trackUserType = options.trackUserType;
-    }
-  },
-  // onUnload() {
-  //   this.clearData();
-  // },
   mounted() {
-    this.nav[0].navTitle = "今日";
-    let _title = this.trackUserType == 1 ? "销售跟进日志" : "教练跟进日志";
-    setNavTab(_title);
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList[0];
-    this.filterDate(1);
+    this.getList();
   },
   methods: {
-    clearData() {
-      this.page = 1;
-      // this.list = [{}, {}, {}, {}];
-      this.isLoading = true;
-      this.headerData[0].dataNum = 0;
-      for (let key in this.filter) {
-        this.filter[key] = "";
-      }
-    },
     searchChange(event) {
-      this.filter.nameOrPhone = event;
-    },
-    selectStore(item) {
-      this.selectedStore = item;
-    },
-    toCardDetail(item) {
-      wx.navigateTo({
-        url: `../customer_detail/main?id=${item.id}&type=staff`
-      });
-    },
-    call(item) {
-      wx.makePhoneCall({
-        phoneNumber: item.phone
-      });
+      this.filter.namePhone = event;
     },
     loadData() {
       let that = this;
       return new Promise(function(resolve) {
-        let _url = "";
-        if (that.trackUserType == 1) {
-          _url = "/user/work/trackrecoredpages";
-        } else if (that.trackUserType == 2) {
-          _url = "/customer/track/pages";
-        }
         var _data = Object.assign(
           {},
           {
-            page: that.page,
-            order: 1, // 1 id排序 2下次跟进排序
-            TrackUserType: that.trackUserType,
-            storeId: that.selectedStore.storeId
+            pageNo: that.page,
+            searchStore: that.selectedStore.storeId
           },
           that.filter
         );
         HttpRequest({
-          url: "/customer/track/static/count",
+          url: '/mobile/coach/static/count/student',
           data: _data,
           success(res) {
-            that.headerData[1].dataNum = res.data.data.existingCount;
-            that.headerData[2].dataNum = res.data.data.prospectiveCount;
+            that.headerData[1].dataNum = res.data.data.transactedCount
+            that.headerData[2].dataNum = res.data.data.noTransactCount
           }
-        });
+        })
         HttpRequest({
-          url: _url,
+          url: "/mobile/coach/student",
           data: _data,
           success(res) {
             if (res.data.code !== 200) {
               return (that.list = []);
             }
-            that.headerData[0].dataNum = res.data.data.recCount || 0;
-            let _data = res.data.data.result.map(async e => {
+            let _res = res.data.data;
+            let _data;
+            that.headerData[0].dataNum = _res.recCount || 0;
+            _data = _res.result.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {
                   await that.getAvatar(e.headImgPath).then(res => {
@@ -281,15 +237,16 @@ export default {
                 }
               }
               return {
+                isSelect: false,
                 id: e.customerId,
                 sex: e.sex,
+                phone: e.phone,
                 cover: e.headImgPath
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
-                first_1: e.customerName,
-                second_1: e.content,
-                second_tip_1: e.content ? "跟进内容：" : "--",
-                phone: e.phone
+                first_1: e.name,
+                second_1: e.lastTrackTime || "--",
+                second_tip_1: "最近维护时间："
               };
             });
             Promise.all(_data).then(result => {
@@ -299,22 +256,24 @@ export default {
         });
       });
     },
+    selectCustomer(item) {
+      console.log(item);
+    },
+    clickIcon(item) {
+      wx.makePhoneCall({
+        phoneNumber: item.phone
+      });
+    },
+    toDetail(item) {
+      wx.navigateTo({
+        url: "../customer_detail/main?id=" + item.id
+      });
+    },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.timePickerType == ""
-      this.setDate(obj);
-    },
-    filterTrackDate(day) {
-      let obj = this.filterDateMethod(day);
-      this.timePickerType == "track"
-      this.setDate(obj);
+      this.setDate(obj)
     },
     setDate(obj) {
-      if(this.timePickerType == "track") {
-        this.filter.trackTimeStart = obj.startTime
-        this.filter.trackTimeEnd = obj.endTime
-        return
-      }
       this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
     }
@@ -323,26 +282,23 @@ export default {
 </script>
 
 <style lang="less">
-page {
-  height: 100%;
-  background-color: #f6f6f6;
-}
-.follow_up_log {
-  .filter-nav {
-    .mask {
-      top: 165px;
-    }
-  }
-  .staff-coach-item {
-    border-top: 1rpx solid #eee;
-    .coach-info {
-      line-height: 26px;
-    }
-    .icon-right {
-      margin-top: 20px;
-      img {
-        width: 18px;
-        height: 18px;
+@import "../common/less/staff_common.less";
+.my-private-class {
+  .class-list {
+    .staff-coach-item {
+      border-top: 1rpx solid #eee;
+      flex: 1;
+      .coach-info {
+        >div {
+          line-height: 30px;
+        }
+      }
+      .icon-right {
+        img {
+          margin-top: 20px;
+          width: 18px;
+          height: 18px;
+        }
       }
     }
   }

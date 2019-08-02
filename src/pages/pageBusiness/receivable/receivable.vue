@@ -16,33 +16,47 @@
       <div class="input-cell-wrapper">
         <div class="cell-value">现金</div>
         <div class="cell-content">
-          <input class="cell-input" type="number" v-model="reqBaseData.cashPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.cashPay" />
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">银行卡</div>
         <div class="cell-content">
-          <input class="cell-input" type="number" v-model="reqBaseData.cardPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.cardPay" />
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">支付宝</div>
         <div class="cell-content">
-          <input class="cell-input" type="number" v-model="reqBaseData.aliPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.aliPay" />
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">微信</div>
         <div class="cell-content">
-          <input class="cell-input" type="number" v-model="reqBaseData.wechatPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.wechatPay" />
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">转账</div>
         <div class="cell-content">
-          <input class="cell-input" type="number" v-model="reqBaseData.transferAccounts" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.transferAccounts" />
         </div>
       </div>
+      <div class="input-cell-wrapper" v-if="TemplateBillingData.billingType != 4">
+        <div class="cell-value">抵扣金额</div>
+        <div class="cell-content">
+          <input
+            class="cell-input"
+            type="number"
+            v-model="deductionMoney"
+            :disabled="!deductionArray.length"
+            @click="clickDedInput"
+          />
+          <div class="add-ded" @click="addDed">+</div>
+        </div>
+      </div>
+      <div class="cell-tip" v-if="deductionArray.length">{{dedTip}}</div>
     </div>
     <div class="receivable-bottom">
       <div class="price">收款：{{payCost}}元</div>
@@ -52,6 +66,40 @@
         <div :style="{'background-color': themeColor}" class="confirm" @click="confirm">确认收款</div>
       </div>
     </div>
+
+    <van-popup
+      class="ded-list-pop"
+      :show="showCardList"
+      position="bottom"
+      @close="showCardList = false"
+      custom-style="width:100%;max-height:60vh;"
+    >
+      <header-search :search="searchDed" placeholder="请输入手机号搜索"></header-search>
+      <div class="ded-group">
+        <div
+          class="ded-item"
+          v-for="(item, index) in deductionlist"
+          :key="index"
+          @click="selectDed(item, index)"
+        >
+          <!-- <div> -->
+            <span>姓名：{{item.name}}</span>
+            <span>手机：{{item.phone}}</span>
+            <span>合同编号：{{item.pactId}}</span>
+            <span>购买金额：{{item.sellingPrice}}</span>
+            <span>办理时间：{{item.transactTimeFmt}}</span>
+          <!-- </div> -->
+          <!-- <div>
+            <span>购买金额:{{item.sellingPrice}}</span>
+            <span>办理时间:{{item.transactTimeFmt}}</span>
+          </div> -->
+          <div class="icon" v-if="item.isSelect">
+            <van-icon name="checked" :color="themeColor" size="2em" />
+          </div>
+        </div>
+      </div>
+      <div class="confirm-select" @click="confirmSelect" :style="{'background-color':themeColor}">确认</div>
+    </van-popup>
   </div>
 </template>
 
@@ -59,45 +107,55 @@
 import { setNavTab, HttpRequest, formatDate } from "COMMON/js/common.js";
 import billingData from "../common/js/billingData";
 import colorMixin from "COMPS/colorMixin.vue";
+import headerSearch from "../components/header-search.vue";
 export default {
   data() {
     return {
-      // cashPay: 0,
-      // cardPay: 0,
-      // aliPay: 0,
-      // wechatPay: 0,
-      // transferAccounts: 0,
-      // cost: "23879",
       deductionMoney: 0,
-      deduction: [],
-      reqBaseData: {
-        storeId: billingData.selectedStore.storeId,
-        phone: billingData.selectedCustomer.phone,
-        id: billingData.selectedCustomer.id,
-        name: billingData.selectedCustomer.name,
-        sex: billingData.selectedCustomer.sex,
-        birthTime: "",
-        transactUserId: billingData.selectedSale.userId,
-        transactuser: billingData.selectedSale.userId,
-        buyCardTime: billingData.date,
-        pactId: billingData.pactId,
-        cardSource: billingData.selectedSource.value,
-        remarks: billingData.remarks,
-        transferAccounts: 0,
-        paymentType: 0, // 0 全款 1 定金 2 赠送
-        wechatPay: 0,
-        aliPay: 0,
-        cardPay: 0,
-        cashPay: 0,
-        token: billingData.token
-      }
+      customerDeduction: [], // 该用户的拥有的抵扣合同列表
+      deductionArray: [], // 选择的抵扣合同列表
+      showCardList: false,
+      reqBaseData: {},
+      deductionlist: [],
+      dedFilterPhone: ""
     };
+  },
+  components: {
+    headerSearch
+  },
+  mixins: [colorMixin],
+  onLoad() {
+    this.reqBaseData = {
+      storeId: billingData.selectedStore.storeId,
+      phone: billingData.selectedCustomer.phone,
+      id: billingData.selectedCustomer.id,
+      name: billingData.selectedCustomer.name,
+      sex: billingData.selectedCustomer.sex,
+      birthTime: "",
+      transactuser: billingData.selectedSale.userName,
+      transactuserId: billingData.selectedSale.userId,
+      buyCardTime: billingData.date,
+      pactId: billingData.pactId,
+      cardSource: billingData.selectedSource.value,
+      remarks: billingData.remarks,
+      transferAccounts: 0,
+      paymentType: 0, // 0 全款 1 定金 2 赠送
+      wechatPay: 0,
+      aliPay: 0,
+      cardPay: 0,
+      cashPay: 0,
+      token: billingData.token,
+      referrerPhone: ""
+    };
+  },
+  onUnload() {
+    Object.assign(this.$data, this.$options.data());
   },
   mounted() {
     setNavTab();
     this.checkDeduction();
+    this.getDeductionlist();
   },
-  mixins: [colorMixin],
   computed: {
     billingText() {
       if (billingData.billingType == 1) {
@@ -128,6 +186,13 @@ export default {
       return billingData;
     },
     orderDesc() {
+      if (billingData.billingType == 4) {
+        return `${this.billingText}-客户：${
+          billingData.selectedCustomer.name
+        }(${billingData.selectedCustomer.phone})，办理销售：${
+          billingData.selectedSale.userName
+        }`;
+      }
       return `${this.billingText}-客户：${billingData.selectedCustomer.name}(${
         billingData.selectedCustomer.phone
       })，${billingData.selectedCard.first_1}，${
@@ -144,19 +209,29 @@ export default {
         return billingData.selectedCard.salePrice;
       }
     },
+    dedTip() {
+      let pact = ""
+      this.deductionArray.forEach((e) => {
+        pact += e.pactId + ','
+      })
+      return `合同编号为${pact}将被用于抵扣`
+    },
     payCost() {
       return Number(
         Number(this.reqBaseData.transferAccounts) +
-        Number(this.reqBaseData.wechatPay) +
-        Number(this.reqBaseData.aliPay) +
-        Number(this.reqBaseData.cardPay) +
-        Number(this.reqBaseData.cashPay)
+          Number(this.reqBaseData.wechatPay) +
+          Number(this.reqBaseData.aliPay) +
+          Number(this.reqBaseData.cardPay) +
+          Number(this.reqBaseData.cashPay)
       );
     }
   },
   methods: {
     confirm() {
-      if(this.payCost != this.payablePrice) {
+      if (
+        Number(this.payCost) + Number(this.deductionMoney) !=
+        this.payablePrice
+      ) {
         return wx.showToast({
           title: "实付金额有误",
           icon: "none",
@@ -179,7 +254,7 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
-            that.deduction = res.data.data;
+            that.customerDeduction = res.data.data;
           }
         }
       });
@@ -188,38 +263,20 @@ export default {
     addCompact() {
       let that = this;
       let data;
+      let _deductionArray = this.deductionArray.map(e => {
+        return String(e.cardId);
+      });
       let basaData = {
-        // storeId: billingData.selectedStore.storeId,
-        // phone: billingData.selectedCustomer.phone,
-        // id: billingData.selectedCustomer.id,
-        // name: billingData.selectedCustomer.name,
-        // sex: billingData.selectedCustomer.sex,
-        // birthTime: "",
-        // transactUserId: billingData.selectedSale.userId,
-        // transactuser: billingData.selectedSale.userId,
-        // buyCardTime: billingData.date,
-        // pactId: billingData.pactId,
-        // remarks: billingData.remarks,
-        // cardSource: billingData.selectedSource.value,
-        /* 收款新增参数 */
-        // transferAccounts: that.transferAccounts,
-        // paymentType: 0,
-        // wechatPay: that.wechatPay,
-        // aliPay: that.aliPay,
-        // cardPay: that.cardPay,
-        // cashPay: that.cashPay,
-        // cost: that.cost, // 总数
-        // token: billingData.token,
         mainUser: billingData.selectedCustomer.name,
         cardClassId: billingData.selectedCard.cardId,
         sellingPrice: billingData.selectedCard.salePrice,
         buyAuthority: billingData.selectedCard.buyAuthority,
         periodOfValidity: billingData.selectedCard.periodOfValidity,
-        teachCardType: billingData.teachCardType,
+        teachCardType: billingData.selectedCard.teachCardType,
         canTeachCard: billingData.isTeachingContract,
         authorityUnit: billingData.selectedCard.authorityUnit,
         coachUserId: billingData.selectedCoach.userId,
-        labelIdsStr: billingData.selectedLable.cardLabelId,
+        labelIdsStr: billingData.selectedLableId,
         isTimingOfActivation: billingData.payCardType,
         activateDate:
           billingData.payCardType == 1 ? billingData.payCardStartDate : "",
@@ -231,14 +288,14 @@ export default {
         compactNum: 1,
         compactSumMoney: billingData.selectedCard.salePrice,
         deductionMoney: that.deductionMoney,
-        deductionArray: [],
+        deductionArray: JSON.stringify(_deductionArray),
         cardUserJson: [],
         cost: that.payCost
       };
       data = Object.assign(basaData, billingData.curCardSet, this.reqBaseData);
-      for(let k in data) {
-        if(!data[k] || data[k] == null) {
-          data[k] = ""
+      for (let k in data) {
+        if (undefined == data[k] || data[k] == null) {
+          data[k] = "";
         }
       }
       HttpRequest({
@@ -246,7 +303,7 @@ export default {
         data: data,
         success(res) {
           if (res.data.code == 200) {
-            that.addWorkLog(this.billingText, res.data.message);
+            that.addWorkLog(that.billingText, res.data.message);
             that.msgPush(res.data.data);
             if (billingData.payCardType == 2) {
               that.cardActiveMsg();
@@ -255,7 +312,12 @@ export default {
               title: res.data.message,
               icon: "success",
               duration: 1000
-            })
+            });
+            setTimeout(() => {
+              wx.redirectTo({
+                url: "../pay_card/main"
+              });
+            }, 1000);
           }
         }
       });
@@ -284,7 +346,12 @@ export default {
               title: res.data.message,
               icon: "success",
               duration: 1000
-            })
+            });
+            setTimeout(() => {
+              wx.redirectTo({
+                url: "../pay_card/main"
+              });
+            }, 1000);
           }
         }
       });
@@ -325,6 +392,11 @@ export default {
     },
     // 新增合同推送信息
     msgPush(data) {
+      for (let k in data) {
+        if (null == data[k] || undefined == data[k]) {
+          data[k] = "";
+        }
+      }
       HttpRequest({
         url: "/customer/register/compact/push",
         data: data
@@ -332,6 +404,11 @@ export default {
     },
     // 新增定金合同推送
     deductionMsgPush(data) {
+      for (let k in data) {
+        if (null == data[k] || undefined == data[k]) {
+          data[k] = "";
+        }
+      }
       HttpRequest({
         url: "/customer/register/subscription/push",
         data: data
@@ -347,10 +424,82 @@ export default {
         }
       });
     },
+    clickDedInput() {
+      if (!this.deductionArray.length) {
+        wx.showToast({
+          title: "未选择抵扣合同",
+          icon: "none"
+        });
+      }
+    },
+    addDed() {
+      if (!this.deductionlist.length) {
+        return wx.showToast({
+          title: "无可用抵扣合同",
+          icon: "none"
+        });
+      }
+      this.showCardList = true;
+    },
+    // 获取抵扣合同
+    getDeductionlist() {
+      let that = this;
+      HttpRequest({
+        url: "/customer/register/deductionlist",
+        data: {
+          name: "",
+          pactId: "",
+          phone: that.dedFilterPhone || "",
+          page: 1,
+          pageSize: 100
+        },
+        success(res) {
+          if (null != res.data.data && res.data.code == 200) {
+            that.deductionlist = res.data.data.result.map(e => {
+              e.transactTimeFmt = formatDate(
+                new Date(e.transactTime),
+                "yyyy-MM-dd"
+              );
+              e.isSelect = false;
+              return e;
+            });
+          }
+        }
+      });
+    },
+    // 搜索抵扣合同
+    searchDed(e) {
+      this.dedFilterPhone = e;
+      this.getDeductionlist();
+    },
+    // 选择抵扣合同
+    selectDed(item, index) {
+      console.log(this.deductionArray)
+      console.log("beforedeductionMoney:" + this.deductionMoney)
+      if (!this.deductionArray.filter(e => e.cardId == item.cardId).length) {
+        item.isSelect = true;
+        this.deductionArray.push(item);
+      } else {
+        item.isSelect = false;
+        this.deductionArray.splice(index, 1);
+      }
+      let sum = 0
+      this.deductionArray.forEach(e => {
+        sum += e.sellingPrice;
+      });
+      this.deductionMoney = sum
+      console.log(this.deductionArray)
+      console.log("afterdeductionMoney:" + this.deductionMoney)
+      console.log("***********************************************")
+    },
+    confirmSelect() {
+      // this.deductionMoney = deductionArray
+      this.showCardList = false;
+    },
     back() {
       wx.navigateBack({
         delta: 1
-      })
+      });
     }
   }
 };
@@ -368,13 +517,28 @@ export default {
     .cell-value {
       flex: 0 0 25%;
     }
-    .cell-input {
-      position: relative;
-      &:after {
-        content: "元";
-        position: absolute;
-        top: 0;
-        right: 0;
+    .cell-content {
+      display: flex;
+      .cell-input {
+        position: relative;
+        flex: 1;
+      }
+      .pay-cell {
+        &:after {
+          content: "元";
+          position: absolute;
+          top: 0;
+          right: 0;
+        }
+      }
+      .add-ded {
+        width: 46px;
+        height: 46px;
+        font-size: 20px;
+        margin-right: -15px;
+        border-left: 1rpx solid #eee;
+        line-height: 46px;
+        text-align: center;
       }
     }
   }
@@ -395,7 +559,7 @@ export default {
     left: 0px;
     display: flex;
     width: 100%;
-    line-height: 48px;
+    line-height: 42px;
     height: 48px;
     border-top: 1rpx solid #eee;
     .price {
@@ -415,6 +579,54 @@ export default {
   }
   .confirm {
     color: #fff;
+  }
+  .ded-list-pop {
+    position: relative;
+    .header-search {
+      position: sticky;
+      top: 0;
+      background-color: #fff;
+      z-index: 2;
+    }
+    .ded-group {
+      margin-bottom: 42px;
+      .ded-item {
+        position: relative;
+        padding: 0 10px;
+        border-top: 1rpx solid #eee;
+        display: flex;
+        flex-wrap: wrap;
+        >span {
+          line-height: 30px;
+          margin-right: 20px;
+        }
+        // > div {
+        //   line-height: 30px;
+        //   > span {
+        //     margin-right: 20px;
+        //   }
+        // }
+        .icon {
+          position: absolute;
+          top: 50%;
+          right: 15px;
+          transform: translateY(-50%);
+        }
+      }
+    }
+    .confirm-select {
+      position: sticky;
+      bottom: 0;
+      left: 0;
+      font-size: 16px;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      line-height: 42px;
+    }
+  }
+  .cell-tip {
+    padding: 0 15px;
   }
 }
 </style>

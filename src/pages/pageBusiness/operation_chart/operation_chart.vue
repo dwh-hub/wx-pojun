@@ -120,7 +120,8 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  WechatMenuisLogin
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
@@ -198,6 +199,7 @@ export default {
     filterNav
   },
   onLoad(options) {
+    WechatMenuisLogin("staff")
     if (options.nav) {
       this.navIndex = options.nav;
     }

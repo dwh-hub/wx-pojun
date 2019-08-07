@@ -27,24 +27,25 @@
     <div class="reminder" v-if="phoneType == 200">
       <span>
         <span class="customer-name">{{customerInfo.name}}</span>
-        于{{customerInfo.addTime}}在{{customerInfo.addStoreName}}登记过
+        于{{customerInfo.addTime}}在{{selectedStore.storeName}}登记过
       </span>
     </div>
 
-    <div class="register-content" v-if="phoneType == 201">
+    <div class="register-content" v-if="phoneType == 201 || phoneType == '202-1'">
       <div class="input-cell-wrapper">
         <div class="cell-value must-input">姓名</div>
         <div class="cell-content">
           <input
             class="cell-input"
             type="text"
+            :disabled="phoneType == '202-1'"
             v-model="name"
             placeholder="请输入姓名"
             placeholder-class="placeholder"
           />
         </div>
       </div>
-      <div class="input-cell-wrapper">
+      <div class="input-cell-wrapper" v-if="phoneType == 201">
         <div class="cell-value must-input">性别</div>
         <div class="cell-content">
           <radio-group class="radio-group" @change="onChangeSex">
@@ -68,6 +69,7 @@
           />
         </div>
       </div>
+      <div v-show="phoneType == 201">
       <div class="input-cell-wrapper">
         <div class="cell-value">身份证</div>
         <div class="cell-content">
@@ -102,7 +104,7 @@
         <div class="cell-value">健身历史</div>
         <div class="cell-content">
           <radio-group class="radio-group" @change="onChangeFitness">
-            <radio value="1" :color="themeColor" />
+            <radio value="1" :color="themeColor" :checked="isFitness == 1"/>
             <span class="radio-span">有</span>
             <radio value="0" :color="themeColor" />
             <span class="radio-span">无</span>
@@ -146,13 +148,15 @@
           </label>
         </radio-group>
       </div>
+      </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">跟进记录</div>
       </div>
       <div class="textarea-wrapper">
         <textarea
+          v-show="!showPopup"
           v-model="followUpContent"
-          placeholder="字备注不能超过120字"
+          placeholder="备注不能超过120字"
           maxlength="120"
           placeholder-style="placeholder"
         />
@@ -176,7 +180,7 @@
         <div class="btn-group">
           <div class="success-btn" @click="toCustomerDetail">查看客户</div>
           <div class="success-btn" @click="alignRegister">继续录入</div>
-          <div class="success-btn" @click="toNav('../pay_card/main')">前往开单</div>
+          <div class="success-btn" @click="toNav('../pay_card/main')" v-if="isCanPay">前往开单</div>
           <div class="success-btn" @click="toNav('../workbench/main')">返回首页</div>
         </div>
       </div>
@@ -201,6 +205,7 @@ import {
 } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import store from "@/utils/store.js";
+import {checkAuth} from "../common/js/service_config.js";
 export default {
   data() {
     return {
@@ -256,7 +261,9 @@ export default {
       source: [], // 客户来源
       followUpContent: "",
       phoneType: 0, // 200 客户信息已存在 201 正常录入 202 客户在其他门店有录入 405 在公海中
-      successCustomerId: 0
+      successCustomerId: 0,
+      customerId: '', // 已存在的客户id
+      isCanPay: checkAuth(346)
     };
   },
   mixins: [colorMixin],
@@ -264,21 +271,18 @@ export default {
     Object.assign(this.$data, this.$options.data());
     setNavTab()
     this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
     this.storeActions = this.storeList.map(e => {
-      return {
-        name: e.storeName,
-        storeName: e.storeName,
-        storeId: e.storeId
-      };
+      e.name = e.storeName;
+      return e;
     });
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     this.actionList = this.storeActions;
   },
   methods: {
     selectStore(e) {
-      this.phone = ""
-      this.phoneType = 0
       if (e.mp.detail.storeName) {
+        this.phoneType = 0
+        this.phone = ""
         this.selectedStore = e.mp.detail;
       } else {
         this.selectedCoach = e.mp.detail;
@@ -287,6 +291,9 @@ export default {
     },
     // 校验手机号
     checkPhone(e) {
+      if(e.mp.detail.value.length != 11) {
+        this.phoneType = 0
+      }
       if (e.mp.detail.value.length == 11) {
         let that = this;
         this.phoneType = 0;
@@ -307,6 +314,7 @@ export default {
             } else if (res.data.code == 201) {
               that.getServiceCoachList();
             } else if (res.data.code == 202) {
+              let info = res.data.data
               wx.showModal({
                 title: "提示",
                 content: `该客户于${that.customerInfo.addTime}在${
@@ -314,7 +322,10 @@ export default {
                 }登记过，是否继续添加到${that.selectedStore.storeName}？`,
                 success(res) {
                   if (res.confirm) {
-                    that.phoneType = 201
+                    that.phoneType = '202-1'
+                    // 回显信息
+                    that.name = info.name
+                    that.customerId = info.id
                     that.getServiceCoachList();
                   }
                 }
@@ -330,6 +341,7 @@ export default {
                 }
               });
             }
+            console.log("that.phoneType:"+that.phoneType)
           }
         });
       }
@@ -462,34 +474,70 @@ export default {
         })
       })
     },
+    // 添加已存在其他门店的客户
+    registerCustomer_2() {
+      let that = this
+      return new Promise((resolve) => {
+        HttpRequest({
+          url: '/customer/store/add',
+          data: {
+            customerId: that.customerId,
+            storeId: that.selectedStore.storeId,
+            addUserId: wx.getStorageSync("staff_info").userId,
+            serviceUserId: wx.getStorageSync("staff_info").userId,
+            serviceCoachId: that.selectedCoach.userId || '',
+            phone: that.phone,
+          },
+          success(res) {
+            if(res.data.code == 200) {
+              resolve(res)
+            } else {
+              wx.showToast({
+                title: res.data.message,
+                icon: "none",
+                duration: 1000
+              });
+            }
+          }
+        })
+      })},
     // 登记用户按钮
     registerCustomer() {
-      if(!this.name) {
-        return wx.showToast({
-          title: "请输入姓名",
-          icon: "none",
-          duration: 1000
-        });
-      }
-      if(!this.sex) {
-        return wx.showToast({
-          title: "请选择性别",
-          icon: "none",
-          duration: 1000
-        });
-      }
-      if(this.idCard && this.idCard.length != 18) {
-        return wx.showToast({
-          title: "身份证号格式不正确",
-          icon: "none",
-          duration: 1000
-        });
+      if(this.phoneType == 201) {
+        if(!this.name) {
+          return wx.showToast({
+            title: "请输入姓名",
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(!this.sex) {
+          return wx.showToast({
+            title: "请选择性别",
+            icon: "none",
+            duration: 1000
+          });
+        }
+        if(this.idCard && this.idCard.length != 18) {
+          return wx.showToast({
+            title: "身份证号格式不正确",
+            icon: "none",
+            duration: 1000
+          });
+        }
       }
       this.checkIdCard().then(() => {
-        this.registerCustomerMethod().then((data) => {
-          this.successCustomerId = data.data.data
-          this.showPopup = true
-        })
+        if(this.phoneType == "202-1") {
+          this.registerCustomer_2().then((data) => {
+            this.successCustomerId = data.data.data
+            this.showPopup = true
+          })
+        } else {
+          this.registerCustomerMethod().then((data) => {
+            this.successCustomerId = data.data.data
+            this.showPopup = true
+          })
+        }
       })
     },
     toCustomerDetail() {

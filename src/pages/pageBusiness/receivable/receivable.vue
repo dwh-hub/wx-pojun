@@ -71,7 +71,7 @@
       class="ded-list-pop"
       :show="showCardList"
       position="bottom"
-      @close="showCardList = false"
+      @close="closeDedPopup"
       custom-style="width:100%;max-height:60vh;"
     >
       <header-search :search="searchDed" placeholder="请输入手机号搜索"></header-search>
@@ -98,7 +98,7 @@
           </div>
         </div>
       </div>
-      <div class="confirm-select" @click="confirmSelect" :style="{'background-color':themeColor}">确认</div>
+      <div class="confirm-select" @click="closeDedPopup" :style="{'background-color':themeColor}">确认</div>
     </van-popup>
   </div>
 </template>
@@ -133,7 +133,7 @@ export default {
       sex: billingData.selectedCustomer.sex,
       birthTime: "",
       transactuser: billingData.selectedSale.userName,
-      transactuserId: billingData.selectedSale.userId,
+      transactUserId: billingData.selectedSale.userId,
       buyCardTime: billingData.date,
       pactId: billingData.pactId,
       cardSource: billingData.selectedSource.value,
@@ -196,7 +196,7 @@ export default {
       return `${this.billingText}-客户：${billingData.selectedCustomer.name}(${
         billingData.selectedCustomer.phone
       })，${billingData.selectedCard.first_1}，${
-        billingData.selectedCard.salePrice
+        billingData.selectedCard.salePrice || 0
       }元，${this.payCardType}(${billingData.payCardStartDate} -
         ${billingData.payCardEndDate})，办理销售：${
         billingData.selectedSale.userName
@@ -206,7 +206,7 @@ export default {
       if (billingData.billingType == 4) {
         return billingData.depositSellingPrice;
       } else {
-        return billingData.selectedCard.salePrice;
+        return billingData.selectedCard.salePrice || 0;
       }
     },
     dedTip() {
@@ -261,17 +261,27 @@ export default {
     },
     // 新增合同
     addCompact() {
+      wx.showLoading({
+        title: '加载中..'
+      })
       let that = this;
       let data;
       let _deductionArray = this.deductionArray.map(e => {
         return String(e.cardId);
       });
+      let _periodOfValidity = 0
+      if(billingData.selectedCard.authorityUnit == 1) {
+        _periodOfValidity = Number(billingData.selectedCard.buyAuthority) + Number(billingData.curCardSet.giveAwayAuthority)
+      } else {
+        _periodOfValidity = billingData.selectedCard.periodOfValidity
+      }
+      billingData.curCardSet.isCanTransCard = billingData.curCardSet.canTransCard
       let basaData = {
         mainUser: billingData.selectedCustomer.name,
         cardClassId: billingData.selectedCard.cardId,
-        sellingPrice: billingData.selectedCard.salePrice,
+        sellingPrice: billingData.selectedCard.salePrice || 0,
         buyAuthority: billingData.selectedCard.buyAuthority,
-        periodOfValidity: billingData.selectedCard.periodOfValidity,
+        periodOfValidity: _periodOfValidity,
         teachCardType: billingData.selectedCard.teachCardType,
         canTeachCard: billingData.isTeachingContract,
         authorityUnit: billingData.selectedCard.authorityUnit,
@@ -284,15 +294,15 @@ export default {
           billingData.payCardType == 1 ? billingData.payCardEndDate : "",
         phoneVerifyStatus: "",
         physicsCardNo: billingData.cardNum,
-        pactImgPath: billingData.uploadImgList,
+        pactImgPath: JSON.stringify(billingData.uploadImgList),
         compactNum: 1,
-        compactSumMoney: billingData.selectedCard.salePrice,
+        compactSumMoney: billingData.selectedCard.salePrice || 0,
         deductionMoney: that.deductionMoney,
         deductionArray: JSON.stringify(_deductionArray),
         cardUserJson: [],
         cost: that.payCost
       };
-      data = Object.assign(basaData, billingData.curCardSet, this.reqBaseData);
+      data = Object.assign(billingData.curCardSet, basaData, this.reqBaseData);
       for (let k in data) {
         if (undefined == data[k] || data[k] == null) {
           data[k] = "";
@@ -302,6 +312,7 @@ export default {
         url: "/customer/register/compact",
         data: data,
         success(res) {
+          wx.hideLoading()
           if (res.data.code == 200) {
             that.addWorkLog(that.billingText, res.data.message);
             that.msgPush(res.data.data);
@@ -314,9 +325,9 @@ export default {
               duration: 1000
             });
             setTimeout(() => {
-              wx.redirectTo({
-                url: "../pay_card/main"
-              });
+              wx.navigateBack({
+                delta: 2
+              })
             }, 1000);
           }
         }
@@ -324,6 +335,9 @@ export default {
     },
     // 新增定金合同
     addAubscription() {
+      wx.showLoading({
+        title: '加载中..'
+      })
       let that = this;
       let data = Object.assign(
         {
@@ -339,6 +353,7 @@ export default {
         url: "/customer/register/subscription/save",
         data: data,
         success(res) {
+          wx.hideLoading()
           if (res.data.code == 200) {
             that.addWorkLog("购买订金合同", res.data.message);
             that.deductionMsgPush(res.data.data);
@@ -370,7 +385,7 @@ export default {
           }）,有效天数：${billingData.selectedCard.periodOfValidity}天,赠送${
             billingData.curCardSet.giveAwayAuthority
           }${billingData.selectedCard.unit},购卡金额:${
-            billingData.selectedCard.salePrice
+            billingData.selectedCard.salePrice || 0
           },销售员:${billingData.selectedSale.userName},微信:${
             this.reqBaseData.wechatPay
           },支付宝:${this.reqBaseData.aliPay},刷卡:${
@@ -473,24 +488,32 @@ export default {
       this.getDeductionlist();
     },
     // 选择抵扣合同
-    selectDed(item, index) {
-      console.log(this.deductionArray)
-      console.log("beforedeductionMoney:" + this.deductionMoney)
+    selectDed(item) {
       if (!this.deductionArray.filter(e => e.cardId == item.cardId).length) {
         item.isSelect = true;
-        this.deductionArray.push(item);
+        // this.deductionArray.push(item);
       } else {
         item.isSelect = false;
-        this.deductionArray.splice(index, 1);
+        // this.deductionArray.splice(index, 1);
       }
+      // let sum = 0
+      // this.deductionArray.forEach(e => {
+      //   sum += e.sellingPrice;
+      // });
+      // this.deductionMoney = sum
+    },
+    closeDedPopup() {
+      let dedArr = []
       let sum = 0
-      this.deductionArray.forEach(e => {
-        sum += e.sellingPrice;
-      });
+      this.deductionlist.forEach((e) => {
+        if (e.isSelect) {
+          dedArr.push(e)
+          sum += e.sellingPrice
+        }
+      })
+      this.deductionArray = dedArr
       this.deductionMoney = sum
-      console.log(this.deductionArray)
-      console.log("afterdeductionMoney:" + this.deductionMoney)
-      console.log("***********************************************")
+      this.showCardList = false;
     },
     confirmSelect() {
       // this.deductionMoney = deductionArray
@@ -559,7 +582,7 @@ export default {
     left: 0px;
     display: flex;
     width: 100%;
-    line-height: 42px;
+    line-height: 48px;
     height: 48px;
     border-top: 1rpx solid #eee;
     .price {
@@ -622,10 +645,11 @@ export default {
       color: #fff;
       width: 100%;
       text-align: center;
-      line-height: 42px;
+      line-height: 48px;
     }
   }
   .cell-tip {
+    box-sizing: border-box;
     padding: 0 15px;
   }
 }

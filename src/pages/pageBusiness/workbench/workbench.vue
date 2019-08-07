@@ -1,14 +1,20 @@
 <template>
   <div class="workbench">
     <div class="header-search list-header">
-      <div class="search-wrapper">
+      <header-search
+        :storeList="storeList"
+        :color="themeColor"
+        :enterSearch="searchChange"
+        @selectStore="selectStore"
+      ></header-search>
+      <!-- <div class="search-wrapper">
         <van-search
           :value="searchText"
           :background="themeColor"
           @search="searchChange"
           placeholder="请输入搜索内容"
         ></van-search>
-      </div>
+      </div> -->
     </div>
     <div class="subtitle" v-if="noAuthLineView">
       <img class="screening-icon" src="/static/images/staff/title-icon.svg">
@@ -46,6 +52,8 @@
 <script>
 import { setNavTab, window, formatDate, HttpRequest } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue"
+import store from "@/utils/store.js";
+import headerSearch from "../components/header-search.vue";
 import { getUseServiceList } from "../common/js/http.js";
 import { serviceList } from "../common/js/service_config.js";
 import F2 from '@antv/wx-f2';
@@ -60,12 +68,19 @@ export default {
       opts: {
         lazyLoad: true
       },
-      name: ''
+      name: '',
+      storeList: [],
+      selectedStore: {}
     };
+  },
+  components: {
+    headerSearch
   },
   mixins:[colorMixin],
   mounted() {
     setNavTab();
+    this.storeList = store.state.allStore;
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     this.getLineView()
     this.name = wx.getStorageSync('staff_info').userName
   },
@@ -91,6 +106,17 @@ export default {
         url: url
       });
     },
+    // 更改默认门店
+    selectStore(item) {
+      this.storeList.forEach(e => {
+        if (e.storeId == item.storeId) {
+          e.isDefault = true
+        } else {
+          e.isDefault = false
+        }
+      })
+      store.commit("saveAllStore", this.storeList);
+    },
     changeTabbar(e) {
       if (e.mp.detail == 0) {
         wx.redirectTo({
@@ -114,8 +140,9 @@ export default {
       }
     },
     searchChange(e) {
+      let store = JSON.stringify(this.selectedStore)
       wx.navigateTo({
-        url: '../customer/main?searchText=' + e.mp.detail
+        url: `../customer/main?searchText=${e.mp.detail.value}&store=${store}`
       })
     },
     getLineView() {
@@ -232,6 +259,9 @@ page {
 }
 .workbench {
   padding-bottom: 60px;
+  .header-search {
+    width: 100%;
+  }
   .line-view-wrapper {
     box-sizing: border-box;
     height: 40vh;

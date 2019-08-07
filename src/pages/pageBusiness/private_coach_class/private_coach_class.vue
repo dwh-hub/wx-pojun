@@ -158,9 +158,7 @@ export default {
           dataNum: "0"
         }
       ],
-      storeList: [],
       coachList: [],
-      selectedStore: {},
       actionList: [],
       showOperate: false,
       actionList_0: [
@@ -242,8 +240,6 @@ export default {
   },
   mounted() {
     this.nav[0].navTitle = "今日";
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
     // this.getList();
     this.filterDate(1);
     this.getCoachList();
@@ -265,10 +261,6 @@ export default {
     clickOperate(item) {
       this.showOperate = false
       item.action(item)
-    },
-    selectStore(item) {
-      this.selectedStore = item;
-      this.refreshList();
     },
     searchChange(event) {
       this.filter.nameOrPhone = event;
@@ -330,6 +322,7 @@ export default {
                 coachId: e.coachId,
                 coachName: e.coachName,
                 studentName: e.name,
+                timeStart: e.timeStart,
                 cover: e.coachHeadImg
                   ? e.coachHeadImg
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
@@ -422,6 +415,13 @@ export default {
     },
     // 上课
     attendClass() {
+      if(this.curSelectClass.timeStart.slice(0, 10) != formatDate(new Date(), 'yyyy-MM-dd')) {
+        return wx.showToast({
+          title: "只可上当天的课程",
+          icon: "none",
+          duration: 1000
+        });
+      }
       this.checkAttendStatus();
     },
     // 取消预约
@@ -532,6 +532,7 @@ export default {
             let params;
             params = {
               way: way,
+              canFace: res.data.data.privateSignWayByCustomer == 1,
               coachName: that.curSelectClass.coachName,
               coachId: that.curSelectClass.coachId,
               studentName: that.curSelectClass.studentName,
@@ -546,8 +547,14 @@ export default {
               that.attendclassMethod();
             } else if (way == 5) {
               that.showOperate = false;
+              wx.showLoading({
+                title: '加载中..'
+              })
               wx.redirectTo({
-                url: "../face/main?params=" + JSON.stringify(params)
+                url: "../face/main?params=" + JSON.stringify(params),
+                success() {
+                  wx.hideLoading()
+                }
               });
             } else {
               that.showOperate = false;
@@ -685,11 +692,6 @@ page {
   background-color: #f6f6f6;
 }
 .private_coach_class {
-  .filter-nav {
-    .mask {
-      top: 165px;
-    }
-  }
   .staff-coach-item {
     border-top: 1rpx solid #eee;
     .icon-right {

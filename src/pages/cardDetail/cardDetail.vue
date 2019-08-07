@@ -26,7 +26,7 @@
       </div>
       <div class="carad-info-item">
         <span class="item-title">办理时间</span>
-        <span class="item-content">{{activateDate || '--'}}</span>
+        <span class="item-content">{{cardInfo.buyCardTime || '--'}}</span>
       </div>
       <div class="carad-info-item">
         <span class="item-title">合同编号</span>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest, WechatMenuisLogin } from "COMMON/js/common.js";
 import card from "COMPS/card";
 import pageFooter from "COMPS/pageFooter.vue"
 export default {
@@ -68,6 +68,7 @@ export default {
     this.cardId = option.id
     this.type = option.type || ''
     setNavTab();
+    WechatMenuisLogin(option.type || "")
   },
   mounted() {
     this.getCardDetail()

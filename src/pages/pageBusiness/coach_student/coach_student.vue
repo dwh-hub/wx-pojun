@@ -249,12 +249,12 @@ export default {
       isAllSelect: false,
       showSalesPopup: false,
       // page: 1,
-      storeList: [],
+      // storeList: [],
       // coachList: [],
       // saleList: [],
       actionList: [],
       selectedRole: {},
-      selectedStore: {},
+      // selectedStore: {},
       operateText: "",
       timePickerType: "",
       filter: {
@@ -268,9 +268,7 @@ export default {
     };
   },
   mounted() {
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
-    this.getList();
+    this.refreshList();
   },
   mixins: [colorMixin, listPageMixin],
   components: {
@@ -305,10 +303,6 @@ export default {
     toggleStore() {
       this.showMask = !this.showMask;
       this.showStoreList = !this.showStoreList;
-    },
-    selectStore(item) {
-      this.selectedStore = item;
-      this.refreshList();
     },
     loadData() {
       let that = this;
@@ -620,11 +614,6 @@ page {
       &.underline {
         border-bottom: 2px solid #fff;
       }
-    }
-  }
-  .filter-nav {
-    .mask {
-      top: 165px;
     }
   }
   .customer-list {

@@ -37,7 +37,8 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  WechatMenuisLogin
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
@@ -144,7 +145,7 @@ export default {
               }
             },
             {
-              sonText: "定金",
+              sonText: "订金",
               action: () => {
                 this.filter.customerClass = 4;
               }
@@ -174,8 +175,6 @@ export default {
           dataNum: "0"
         }
       ],
-      selectedStore: {},
-      storeList: [],
       filter: {
         nameOrPhone: "",
         appointmentTimeStart: "",
@@ -195,18 +194,13 @@ export default {
   },
   mixins: [colorMixin, listPageMixin],
   mounted() {
+    WechatMenuisLogin("staff")
     this.nav[0].navTitle = "今日";
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
     this.filterDate(1);
   },
   methods: {
     searchChange(event) {
       this.filter.nameOrPhone = event;
-    },
-    selectStore(item) {
-      this.selectedStore = item;
-      this.refreshList();
     },
     loadData() {
       let that = this;
@@ -293,11 +287,6 @@ page {
   background-color: #f6f6f6;
 }
 .customer_interview {
-  .filter-nav {
-    .mask {
-      top: 165px;
-    }
-  }
   .staff-coach-item {
     border-bottom: 1rpx solid #eee;
     .icon-right {

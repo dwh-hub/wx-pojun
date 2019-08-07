@@ -10,7 +10,7 @@
         <!-- <wxParse :content="info.topText||'<p></p>'"/>
         <wxParse :content="info.bottomText||'<p></p>'"/> -->
         <rich-text :nodes="info.topText||'<p></p>'"></rich-text>
-        <rich-text :nodes="info.bottomText||'<p></p>'"></rich-text>
+        <rich-text class="middle-2" :nodes="info.bottomText||'<p></p>'"></rich-text>
         <!-- <div class="flex-middle-item">{{info.topText}}</div> -->
         <!-- <div class="flex-middle-item">{{info.bottomText}}</div> -->
       </div>

@@ -5,6 +5,7 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
+import store from "@/utils/store.js";
 export default {
   data() {
     return {
@@ -24,17 +25,13 @@ export default {
         limitEndTime: "2055-05-06"
       },
       unLoading: false,
+      storeList: [],
+      selectedStore: {}
     };
   },
-  created() {
-    // Object.assign(this.$data, this.$options.data());
-    // this.list = [{}, {}, {}, {}]
-  },
-  destroyed() {
-    // this.list = [{}, {}, {}, {}]
-    this.unLoading = true
-  },
   mounted() {
+    this.storeList = store.state.allStore;
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     this.unLoading = false
     setNavTab();
   },
@@ -97,7 +94,12 @@ export default {
     refreshList() {
       this.page = 1;
       this.isNoMore = false;
+      this.list = [{}, {}, {}, {}];
       this.getList();
+    },
+    selectStore(item) {
+      this.selectedStore = item;
+      this.refreshList()
     },
     filterDateMethod(day) {
       let obj = {

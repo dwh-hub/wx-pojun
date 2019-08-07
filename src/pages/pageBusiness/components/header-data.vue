@@ -33,7 +33,7 @@ export default {
 <style lang="less">
 .header-data {
   display: flex;
-  border-bottom: 1rpx solid #eee;
+  border-bottom: 20rpx solid #f6f6f6;
   background-color: #fff;
   .data-item {
     flex: 1;
@@ -43,6 +43,12 @@ export default {
       font-size: 20px;
       font-weight: bold;
       margin-bottom: 3px;
+    }
+    .text {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 10px;
+      color: #999;
     }
   }
 }

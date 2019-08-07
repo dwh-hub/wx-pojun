@@ -62,7 +62,8 @@ import {
   window,
   HttpRequest,
   formatDate,
-  getRange
+  getRange,
+  WechatMenuisLogin
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
@@ -119,6 +120,7 @@ export default {
   onLoad(options) {
     // 进页面前先清空数据
     Object.assign(this.$data, this.$options.data());
+    WechatMenuisLogin(options.type || "")
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     if (options.teamAttendId) {
@@ -145,14 +147,14 @@ export default {
         wx.navigateTo({
           url: `../assess/main?teamAttendId=${
             this.teamAttendId
-          }&detail=${detailStr}`
+          }`
         });
       }
       if (this.coachAppointId) {
         wx.navigateTo({
           url: `../assess/main?coachAppointId=${
             this.coachAppointId
-          }&detail=${detailStr}`
+          }`
         });
       }
     },

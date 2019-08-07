@@ -156,6 +156,7 @@
             <div class="cell-content">
               <input
                 class="cell-input"
+                disabled
                 v-model="selectedCoach.name"
                 @click="actionsList = coachList;showActionsList = true;actionType='coach'"
                 placeholder="请选择上课教练"
@@ -164,10 +165,13 @@
             </div>
           </div>
           <div class="input-cell-wrapper" v-if="billingType != 4">
-            <div class="cell-value">{{selectedCard.cellValue}}</div>
+            <div class="cell-value must-input">{{selectedCard.cellValue}}</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
+                type="number"
+                @input="changeDayPeriodOfValidity"
+                :placeholder="selectedCard.buyAuthorityText || ''"
                 v-model="selectedCard.buyAuthority"
               />
               <div>{{selectedCard.unit}}</div>
@@ -175,11 +179,13 @@
             </div>
           </div>
           <div class="input-cell-wrapper" v-if="billingType != 4">
-            <div class="cell-value">会员卡总价</div>
+            <div class="cell-value must-input">会员卡总价</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
                 @input="inputSalePrice"
+                type="number"
+                :placeholder="selectedCard.salePriceText || ''"
                 :disabled="curCardSet.canModifyPrice == 1 && curCardSet.modifiableMinValue==0"
                 v-model="selectedCard.salePrice"
               />
@@ -189,11 +195,13 @@
           </div>
           <div class="limt-cell" v-if="isShowSalePriceTip">会员卡单价的范围是{{constCardInfo.salePrice - 20}}-{{constCardInfo.salePrice+20}}</div>
           <div class="input-cell-wrapper" v-if="billingType != 4">
-            <div class="cell-value">赠送{{selectedCard.cellValue}}</div>
+            <div class="cell-value must-input">赠送{{selectedCard.cellValue}}</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
+                type="number"
                 @input="inputGifHit"
+                :placeholder="curCardSet.giveAwayAuthorityText || ''"
                 v-model="curCardSet.giveAwayAuthority"
               />
               <div>{{selectedCard.unit}}</div>
@@ -202,11 +210,13 @@
           </div>
           <div class="limt-cell" v-if="isShowGifTip">赠送权益的范围是{{curCardSet.theHighestGiftInterest}}</div>
           <div class="input-cell-wrapper" v-if="selectedCard.authorityUnit != 1 && billingType != 4">
-            <div class="cell-value">有效天数</div>
+            <div class="cell-value must-input">有效天数</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
                 @input="changePeriodOfValidity"
+                type="number"
+                :placeholder="selectedCard.periodOfValidityText || ''"
                 :disabled="curCardSet.canModifyTheValidDate == 1 && curCardSet.modifiableValidDateThreshold == 0"
                 v-model="selectedCard.periodOfValidity"
               />
@@ -249,13 +259,13 @@
             <div class="cell-content">
               <input
                 class="cell-input cell-input-lang"
-                :disabled="!isNeedCardNum"
+                v-show="isNeedCardNum"
                 v-model="cardNum"
                 :placeholder="isNeedCardNum ? '请输入卡号' : '无需卡号'"
                 placeholder-class="placeholder"
               />
               <div class="card-num-btn">
-                <div class="no-card-num" @click="isNeedCardNum = false;cardNum=''" v-if="isNeedCardNum">无需卡号</div>
+                <div class="no-card-num" @click="unwantedCardNum" v-if="isNeedCardNum">无需卡号</div>
                 <div class="random-card-num" @click="randomCardId">随机卡号</div>
               </div>
             </div>
@@ -271,14 +281,14 @@
             <div class="img-btn img-item" @click="chooseImg">+</div>
           </div> 
           <div class="cell-subtitle">备注</div>
-          <div class="carRemark">
+          <div class="carRemark" v-show="!showEntryBox">
             <textarea v-model="remarks" maxlength="120" cursor-spacing="50" placeholder="备注不能超过120个字" placeholder-class="placeholder"></textarea>
           </div>
           <div class="cell-subtitle" @click="toMore" v-if="billingType != 4">更多设置选项</div>
           <div class="submit-wrapper">
-            <div class="clear" :style="{'color': themeColor}" @click="clearForm">清空</div>
-            <div class="submit" @click="submitCashier" :style="{'color': themeColor}">提交收银台</div>
-            <div class="collection" v-if="isCanPay" @click="toPay" :style="{'background-color': themeColor}">收款</div>
+            <div class="submit-btn clear" :style="{'color': themeColor}" @click="clearForm">清空</div>
+            <div class="submit-btn submit" @click="submitCashier" :style="{'color': themeColor}">提交收银台</div>
+            <div class="submit-btn collection" v-if="isCanPay" @click="toPay" :style="{'background-color': themeColor}">收款</div>
           </div>
         </div>
       </div>
@@ -313,7 +323,7 @@
       <div class="label-list">
         <checkbox-group class="radio-group">
           <label class="radio" v-for="(item, index) in cardLabelList" :key="index" @click="selectAction(item)">
-            <checkbox :value="item.id" :color="themeColor" />
+            <checkbox :value="item.id" :color="themeColor" :checked="item.checked"/>
             <span class="radio-span">{{item.name}}</span>
           </label>
         </checkbox-group>
@@ -378,7 +388,7 @@
         <div class="box-item"><span class="text-left">办理日期</span><span class="text-right">{{date}}</span></div>
         <div class="box-item"><span class="text-left">合同名称</span><span class="text-right">{{billingType == 4 ? '定金合同' : selectedCard.first_1}}</span></div>
         <div class="box-item"><span class="text-left">合同编号</span><span class="text-right">{{pactId}}</span></div>
-        <div class="box-item"><span class="text-left">需付金额</span><span class="text-right">{{ billingType == 4 ? depositSellingPrice : selectedCard.salePrice}}</span></div>
+        <div class="box-item"><span class="text-left">需付金额</span><span class="text-right">{{ billingType == 4 ? depositSellingPrice : (selectedCard.salePrice || 0)}}</span></div>
         <div class="btn-wrapper">
           <span class="cancel" @click="showEntryBox = false">取消</span>
           <span class="confirm" @click="billingSubmit" :style="{'background-color': themeColor}">确认</span>
@@ -422,18 +432,17 @@ export default {
     filterNav
   },
   onLoad(options) {
+    console.log("billing==onload")
+    Object.assign(this.$data, this.$options.data());
     this.isTeachingContract = options.isTeachingContract
     this.teachCardType = options.teachCardType || ''
     this.billingType = options.billingType
     setNavTab();
     this.storeList = store.state.allStore.map(e => {
-      return {
-        name: e.storeName,
-        storeName: e.storeName,
-        storeId: e.storeId
-      };
+      e.name = e.storeName;
+      return e;
     });
-    this.selectedStore = this.storeList[0];
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     this.searchCustomer()
     this._mounted()
   },
@@ -568,7 +577,7 @@ export default {
         success(res) {
           wx.hideLoading()
           let info = res.data
-          if(info.code == 200) {
+          if(info.code == 200 || info.code == 405) {
             info.data.headImgPath = item.cover
             // info.data.customerPhone = item.second_1
             info.data.sex = item.second_1
@@ -607,6 +616,7 @@ export default {
     delCurSelect() {
       this.showSearch = true
       this.showCustomerInfo = false
+      this.resetPage()
     },
     // 获取卡列表
     getCardList() {
@@ -627,34 +637,45 @@ export default {
           that.cardList = allCardList.map((e) => {
             let TermOfValidity_1 = ""
             let TermOfValidity_2 = ""
-            if(e.periodOfValidity == '-1') {
+            if(e.periodOfValidity == '-1') {  // 有效天数
+              e.periodOfValidity = ''
               TermOfValidity_1 = "面议"
+              e.periodOfValidityText = "面议"
             } else {
               TermOfValidity_1 = e.periodOfValidity + '天'
             }
-            if(e.buyAuthority == '-1'){
-              TermOfValidity_2 = " | 面议"
-            } else {
-              if(e.authorityUnit == 0) {
-                e.rightBlock = "储值卡"
-                e.color = "#22cab9"
-                e.unit = "元"
-                e.cellValue = "金额"
-                TermOfValidity_2 = ` | ${e.buyAuthority}元`
-              } else if (e.authorityUnit == 1){
-                e.rightBlock = "时期卡"
-                e.color = "#ff9f56"
-                e.unit = "天"
-                e.cellValue = "天数"
-                TermOfValidity_2 = ""
-              } else {
-                e.rightBlock = "次卡"
-                e.color = "#49afff"
-                e.unit = "次"
-                e.cellValue = "次数"
-                TermOfValidity_2 = ` | ${e.buyAuthority}次`
-              }
+            if(e.salePrice == '-1') { // 会员卡总价
+              e.salePrice = ''
+              e.salePriceText = "面议"
             }
+            if(e.buyAuthority == '-1'){ // 金额
+              e.buyAuthority = ''
+              TermOfValidity_2 = " | 面议"
+              e.buyAuthorityText = "面议"
+            } 
+            
+            // else {
+            if(e.authorityUnit == 0) {
+              e.rightBlock = "储值卡"
+              e.color = "#22cab9"
+              e.unit = "元"
+              e.cellValue = "金额"
+              TermOfValidity_2 = ` | ${e.buyAuthority}元`
+            } else if (e.authorityUnit == 1){
+              e.rightBlock = "时期卡"
+              e.color = "#ff9f56"
+              e.unit = "天"
+              e.cellValue = "天数"
+              TermOfValidity_2 = ""
+            } else {
+              e.rightBlock = "次卡"
+              e.color = "#49afff"
+              e.unit = "次"
+              e.cellValue = "次数"
+              TermOfValidity_2 = ` | ${e.buyAuthority}次`
+            }
+
+            // }
             e.cover = e.headImgPath || ''
             e.id = e.cardId
             e.first_1 = e.cardName
@@ -669,6 +690,7 @@ export default {
     },
     // 选择卡
     selectCard(item) {
+      console.log(item)
       this.selectedCard = item
       this.constCardInfo = JSON.parse(JSON.stringify(item))
       this.showCardList = false
@@ -692,6 +714,7 @@ export default {
           that.cardLabelList = res.data.data.result.map((e) => {
             e.name = e.labelName
             e.id = e.cardLabelId
+            e.checked = false
             return e
           })
         }
@@ -778,6 +801,7 @@ export default {
       if(this.curCardSet.canGiveAway == 2) {
         return
       }
+      this.changeDayPeriodOfValidity()
       if (Math.abs(e.mp.detail.value - this.constGiveAwayAuthority)  > Number(this.curCardSet.theHighestGiftInterest)) {
         return this.isShowGifTip = true
       }
@@ -913,61 +937,71 @@ export default {
             duration: 1000
           });
         }
-        if (!this.cardNum && this.billingType != 4 && this.isNeedCardNum) {
-          return wx.showToast({
-            title: "请填写卡号",
-            icon: "none",
-            duration: 1000
-          });
-        }
-        if(this.isShowlimtDate) {
-          return wx.showToast({
-            title: "有效天数有误",
-            icon: "none",
-            duration: 1000
-          });
-        }
-        if(this.selectedCard.periodOfValidity < 1 && this.billingType != 4) {
-          return wx.showToast({
-            title: "有效天数需大于0",
-            icon: "none",
-            duration: 1000
-          });
-        }
-        if(!this.selectedCard.buyAuthority) {
-          return wx.showToast({
-            title: `请填写${this.selectedCard.cellValue}`,
-            icon: "none",
-            duration: 1000
-          });
-        }
-        if(!this.selectedCard.salePrice) {
-          return wx.showToast({
-            title: `请填写会员总价`,
-            icon: "none",
-            duration: 1000
-          });
-        }
-        if(!this.curCardSet.giveAwayAuthority) {
-          return wx.showToast({
-            title: `请填写赠送${this.selectedCard.cellValue}`,
-            icon: "none",
-            duration: 1000
-          });
-        }
-        if(this.isShowSalePriceTip) {
-          return wx.showToast({
-            title: "会员卡价格有误",
-            icon: "none",
-            duration: 1000
-          });
-        }
-        if(this.isShowGifTip) {
-          return wx.showToast({
-            title: "赠送权益有误",
-            icon: "none",
-            duration: 1000
-          });
+        if (this.billingType == 4) {
+          if(!this.depositSellingPrice && this.depositSellingPrice != "0") {
+            return wx.showToast({
+              title: "付款金额",
+              icon: "none",
+              duration: 1000
+            });
+          }
+        } else {
+          if(this.isShowlimtDate) {
+            return wx.showToast({
+              title: "有效天数有误",
+              icon: "none",
+              duration: 1000
+            });
+          }
+          if(this.selectedCard.periodOfValidity < 1) {
+            return wx.showToast({
+              title: "有效天数需大于0",
+              icon: "none",
+              duration: 1000
+            });
+          }
+          if(!this.selectedCard.buyAuthority || this.selectedCard.buyAuthority < 1) {
+            return wx.showToast({
+              title: `请填写${this.selectedCard.cellValue}`,
+              icon: "none",
+              duration: 1000
+            });
+          }
+          if(!this.selectedCard.salePrice && this.selectedCard.salePrice != "0") {
+            return wx.showToast({
+              title: `请填写会员总价`,
+              icon: "none",
+              duration: 1000
+            });
+          }
+          if(!this.curCardSet.giveAwayAuthority && this.curCardSet.giveAwayAuthority != "0") {
+            return wx.showToast({
+              title: `请填写赠送${this.selectedCard.cellValue}`,
+              icon: "none",
+              duration: 1000
+            });
+          }
+          if(this.isShowSalePriceTip) {
+            return wx.showToast({
+              title: "会员卡价格有误",
+              icon: "none",
+              duration: 1000
+            });
+          }
+          if(this.isShowGifTip) {
+            return wx.showToast({
+              title: "赠送权益有误",
+              icon: "none",
+              duration: 1000
+            });
+          }
+          if (!this.cardNum && this.isNeedCardNum) {
+            return wx.showToast({
+              title: "请填写卡号",
+              icon: "none",
+              duration: 1000
+            });
+          }
         }
         this.checkInPactId().then(res => {
           if(this.billingType == 4 || !this.isNeedCardNum) {
@@ -976,9 +1010,10 @@ export default {
             })
           }
           this.checkCardNum().then(res => {
-            this.getToken().then(() => {
-              resolve()
-            })
+            resolve()
+            // this.getToken().then(() => {
+            //   resolve()
+            // })
           }).catch(reject => {
             wx.showModal({
               title: "提示",
@@ -1007,7 +1042,9 @@ export default {
             new RegExp(e.id + ",", "g"),
             ""
           );
+          e.checked = false
         } else {
+          e.checked = true
           this.selectedLableName += `${e.labelName},`
           this.selectedLableId += `${e.id},`
         }
@@ -1031,7 +1068,13 @@ export default {
           storeId: that.selectedStore.storeId
         },
         success(res) {
-          that.cardSetList = res.data.data
+          that.cardSetList = res.data.data.map((e) => {
+            if (e.giveAwayAuthority == "-1") { // 赠送权益
+              e.giveAwayAuthority = ''
+              e.giveAwayAuthorityText = "面议"
+            }
+            return e
+          })
         }
       })
     },
@@ -1060,6 +1103,14 @@ export default {
       this.isSelectCard = false
       this.selectedCard = {}
       this.constCardInfo = {}
+      this.cardLabelList.forEach((e) => {
+        e.checked = false
+      })
+    },
+    // 无需卡号，设置一个随机卡号
+    unwantedCardNum() {
+      this.randomCardId()
+      this.isNeedCardNum = false;
     },
     // 随机卡号
     randomCardId() {
@@ -1102,16 +1153,25 @@ export default {
         }
       })
     },
-    // 修改有效参数
+    // 天卡修改有效天数
+    changeDayPeriodOfValidity(e) {
+      console.log("this.selectedCard.authorityUnit:"+this.selectedCard.authorityUnit)
+      if (this.selectedCard.authorityUnit == 1) {
+        this.payCardEndDate = this.computedEndTime(Number(this.selectedCard.buyAuthority) + Number(this.curCardSet.giveAwayAuthority))
+      }
+    },
+    // 修改有效天数
     changePeriodOfValidity(e) {
-      if(this.curCardSet.canModifyTheValidDate == 2) {
-        return
+      if(this.curCardSet.canModifyTheValidDate == 1 && this.curCardSet.modifiableValidDateThreshold == 0) {
+        return wx.showToast({
+          title: '不可修改'
+        })
       }
       if (Math.abs(e.mp.detail.value  - this.selectedCard.periodOfValidity) > this.curCardSet.modifiableValidDateThreshold) {
         return this.isShowlimtDate = true
       }
       this.isShowlimtDate = false
-      this.payCardEndDate = this.computedEndTime(this.selectedCard.periodOfValidity)
+      this.payCardEndDate = this.computedEndTime(Number(this.selectedCard.periodOfValidity))
     },
     onPayCardStartDate(e) {
       let startTime = new Date(e.mp.detail.value).getTime()
@@ -1137,7 +1197,17 @@ export default {
       }
       this.payCardEndDate = e.mp.detail.value
       let day = 24 * 60 * 60 * 1000
-      this.selectedCard.periodOfValidity = ((endTime - startTime) / day) + 1
+      let startToEndDay = ((endTime - startTime) / day) + 1
+      if(this.selectedCard.authorityUnit == 1) {
+        if(startToEndDay - this.curCardSet.giveAwayAuthority > 0) {
+          this.selectedCard.buyAuthority = startToEndDay  - this.curCardSet.giveAwayAuthority
+        } else {
+          this.selectedCard.buyAuthority = 0;
+          this.curCardSet.giveAwayAuthority = startToEndDay
+        }
+      } else {
+        this.selectedCard.periodOfValidity = startToEndDay
+      }
     },
     // 提交表单时获取token
     getToken() {
@@ -1155,13 +1225,21 @@ export default {
         })
       })
     },
-    billingSubmit() {
+    async billingSubmit() {
       wx.showLoading({
         title: '加载中..'
       })
+      await this.getToken()
       let that = this
       let data = {}
+      this.curCardSet.isCanTransCard = this.curCardSet.canTransCard
       if(this.billingType != 4) {
+        let _periodOfValidity = 0
+        if(this.selectedCard.authorityUnit == 1) {
+          _periodOfValidity = Number(this.selectedCard.buyAuthority) + Number(this.curCardSet.giveAwayAuthority)
+        } else {
+          _periodOfValidity = this.selectedCard.periodOfValidity
+        }
         let basaData = {
           storeId: that.selectedStore.storeId,
           phone: that.selectedCustomer.phone,
@@ -1175,9 +1253,9 @@ export default {
           buyCardTime: that.date,
           pactId: that.pactId,
           cardClassId: that.selectedCard.cardId,
-          sellingPrice: that.selectedCard.salePrice,
+          sellingPrice: that.selectedCard.salePrice || 0,
           buyAuthority: that.selectedCard.buyAuthority,
-          periodOfValidity: that.selectedCard.periodOfValidity,
+          periodOfValidity: _periodOfValidity,
           teachCardType: that.selectedCard.teachCardType,
           canTeachCard: that.isTeachingContract,
           remarks: that.remarks,
@@ -1190,12 +1268,12 @@ export default {
           doomsday: that.payCardType == 1 ? that.payCardEndDate : '',
           phoneVerifyStatus: "",
           physicsCardNo: that.cardNum,
-          pactImgPath: that.uploadImgList,
+          pactImgPath: JSON.stringify(that.uploadImgList),
           token: that.token,
           compactNum: 1,
-          compactSumMoney: that.selectedCard.salePrice
+          compactSumMoney: that.selectedCard.salePrice || 0
         }
-        data = Object.assign(basaData, this.curCardSet);
+        data = Object.assign(this.curCardSet, basaData);
         for(let k in data) {
           if(undefined == data[k] || data[k] == null) {
             data[k] = ""
@@ -1232,6 +1310,14 @@ export default {
               icon: "success",
               duration: 1000
             })
+            setTimeout(() => {
+              // wx.redirectTo({
+              //   url: "../pay_card/main"
+              // });
+              wx.navigateBack({
+                delta: 1
+              })
+            }, 500);
             that.resetPage()
             that.showEntryBox = false
           } else {
@@ -1244,7 +1330,7 @@ export default {
         }
       })
     },
-    onCanpayment() {
+    onCanpayment(e) {
       this.canpayment = e.mp.detail.value;
     },
     submitCashier() {
@@ -1572,7 +1658,7 @@ export default {
       border: 1rpx solid #eee;
       display: flex;
       z-index: 2;
-      >div {
+      .submit-btn {
         flex: 1;
         text-align: center;
         line-height: 48px;

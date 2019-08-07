@@ -251,11 +251,13 @@ export default {
           if (res.data.code == 200) {
             let list = res.data.data;
             that.cardInfoList = list.filter(e => {
+              if(e.cardStatus != 2) {
+                return false
+              }
               return (
                 e.teachCardType == 3 ||
                 (e.canTeachCard == 1 &&
-                  e.teachCardType == 1 &&
-                  e.cardStatus == 2)
+                  e.teachCardType == 1)
               );
             });
           }

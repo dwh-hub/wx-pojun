@@ -15,7 +15,7 @@
       <div class="input-cell-wrapper">
         <div class="cell-value">可请假天数</div>
         <div class="cell-content">
-          <input class="cell-input" type="number" v-model="curCardSet.everyleaveDay" />
+          <input class="cell-input" type="number" v-model="curCardSet.canLeaveDay" />
         </div>
       </div>
       <div class="input-cell-wrapper">
@@ -27,7 +27,7 @@
       <div class="input-cell-wrapper">
         <div class="cell-value">每次最多请假天数</div>
         <div class="cell-content">
-          <input class="cell-input" type="number" v-model="curCardSet.canLeaveDay" />
+          <input class="cell-input" type="number" v-model="curCardSet.everyleaveDay" />
         </div>
       </div>
     </div>

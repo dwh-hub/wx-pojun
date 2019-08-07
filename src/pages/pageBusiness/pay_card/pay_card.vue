@@ -32,7 +32,7 @@ export default {
         navUrl: "../billing/main?teachCardType=1&isTeachingContract=1&billingType=3"
       },{
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_1.svg",
-        text: "预交定金",
+        text: "预交订金",
         navUrl: "../billing/main?billingType=4"
       }]
     }

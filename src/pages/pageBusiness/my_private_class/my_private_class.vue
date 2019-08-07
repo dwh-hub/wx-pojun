@@ -53,8 +53,6 @@ import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 export default {
   data() {
     return {
-      storeList: [],
-      selectedStore: {},
       nav: [
         {
           navTitle: "全部",
@@ -189,9 +187,7 @@ export default {
     noneResult
   },
   mounted() {
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
-    this.getList();
+    this.refreshList();
   },
   methods: {
     searchChange(event) {

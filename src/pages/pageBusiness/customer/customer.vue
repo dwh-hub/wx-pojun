@@ -240,7 +240,7 @@ export default {
               }
             },
             {
-              sonText: "定金",
+              sonText: "订金",
               action: () => {
                 this.toggleState(4);
               }
@@ -303,7 +303,6 @@ export default {
         limitEndTime: "2055-05-06"
       },
       curCustomer: {},
-      storeList: [],
       showTrackResult: false,
       isResultDateShow: false,
       trackTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'),
@@ -311,7 +310,6 @@ export default {
       trackResult: [{ id: 1, name: "继续跟进" }, { id: 3, name: "不确定" }],
       actionList: [],
       selectedRole: {},
-      selectedStore: {},
       operateText: "",
       timePickerType: "",
       filter: {
@@ -325,15 +323,13 @@ export default {
     };
   },
   mounted() {
+    this.refreshList();
   },
   onLoad(options) {
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
     if(options.searchText) {
       this.filter.namePhone = options.searchText
-      console.log(this.filter.namePhone)
+      this.selectedStore = JSON.parse(options.store)
     }
-    this.getList();
   },
   mixins: [colorMixin,listPageMixin],
   components: {
@@ -371,10 +367,6 @@ export default {
       for (let key in this.filter) {
         this.filter[key] = "";
       }
-    },
-    selectStore(item) {
-      this.selectedStore = item;
-      this.refreshList()
     },
     setResultTime(val) {
       let data = val.mp.detail;
@@ -744,6 +736,8 @@ export default {
 
 <style lang="less">
 @import "../common/less/staff_common.less";
+@import "~COMMON/less/common.less";
+
 page {
   height: 100%;
   background-color: #f6f6f6;
@@ -763,11 +757,6 @@ page {
       &.underline {
         border-bottom: 2px solid #fff;
       }
-    }
-  }
-  .filter-nav {
-    .mask {
-      top: 165px;
     }
   }
   .customer-list {

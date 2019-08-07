@@ -22,6 +22,7 @@
           :placeholder="placeholder"
           placeholder-style="color:#999;"
           @input="_search"
+          @confirm="enterSearch"
         >
       </div>
     </div>
@@ -32,6 +33,7 @@
 <script>
 import { debounce } from "COMMON/js/common.js";
 import {EventBus} from '../common/js/eventBus.js'
+import store from "@/utils/store.js";
 export default {
   props: {
     storeList: {
@@ -44,7 +46,14 @@ export default {
       type: String
     },
     search: {
-      type: Function
+      type: Function,
+      default: function() {
+      }
+    },
+    enterSearch: {
+      type: Function,
+      default: function() {
+      }
     },
     searchText: {
       type: String,
@@ -52,7 +61,7 @@ export default {
     },
     placeholder: {
       type: String,
-      default: "请输入搜索内容"
+      default: "请输入手机号或姓名搜索"
     }
   },
   data() {
@@ -70,16 +79,19 @@ export default {
       this.showStoreList = false;
     })
     this.text = this.searchText
-    if(this.storeList.length) {
-      this._storeList = this.storeList
-      this.selectedStore = this.storeList[0]
-    }
   },
   watch: {
-    storeList(val, oldVal) {
-      this.selectedStore = val[0]
-      this._storeList = val
+    storeList: {
+      handler(val, oldVal) {
+        this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
+        this._storeList = val
+      },
+      deep: true
     }
+  },
+  onShow() {
+    this._storeList = store.state.allStore;
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
   },
   methods: {
     toggleStore() {
@@ -99,6 +111,9 @@ export default {
       this.$emit("selectStore", item)
     },
     _search: debounce(function(e){
+      if(!this.search) {
+        return
+      }
       this.search(e.mp.detail.value)
     },200)
   }

@@ -5,6 +5,7 @@
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        placeholder="请输入名字或者手机号搜索"
         @selectStore="selectStore"
       ></header-search>
       <header-data :headerData="headerData"></header-data>
@@ -16,7 +17,11 @@
         :key="index"
         :info="item"
         @clickItem="toCardDetail(item)"
-      ></staff-coach-item>
+      >
+        <div>
+          <img src="/static/images/staff/right-arrow.svg" alt>
+        </div>
+      </staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading" />
       <none-result text="暂无合同" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
@@ -110,9 +115,10 @@ export default {
       type: "", // 判断点击合同的事件 addStudent = 新增上课学员
       venueId: "", // options 的场馆参数
       teamScheduleId: "", // options 的 teamScheduleId 参数
+      classStoreId: "", // 团课的门店
       nav: [
         {
-          navTitle: "今日",
+          navTitle: "全部",
           children: [
             {
               sonText: "全部",
@@ -207,8 +213,6 @@ export default {
       // cardstatuslist: [],
       // page: 1,
       list: [{}, {}, {}, {}],
-      selectedStore: {},
-      storeList: [],
       // isLoading: true,
       filter: {
         nameOrPhone: "",
@@ -232,13 +236,12 @@ export default {
       this.type = options.type;
       this.venueId = options.venueId;
       this.teamScheduleId = options.teamScheduleId;
+      this.classStoreId = options.classStoreId
     }
   },
   mounted() {
-    this.nav[0].navTitle = "今日";
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
-    this.filterDate(1);
+    // this.nav[0].navTitle = "今日";
+    this.refreshList();
   },
   components: {
     headerSearch,
@@ -251,10 +254,6 @@ export default {
   methods: {
     searchChange(event) {
       this.filter.nameOrPhone = event;
-    },
-    selectStore(item) {
-      this.selectedStore = item;
-      this.refreshList();
     },
     toCardDetail(item) {
       if (this.type == "addStudent") {
@@ -321,11 +320,13 @@ export default {
                 cover: e.headImgPath
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
-                first_1: `${e.name}(${e.pactId})`,
-                second_1: e.secondCardClass,
                 rightText: e.cardStatusChar,
                 cardClassId: e.cardClassId || "",
-                storeId: e.storeId
+                storeId: e.storeId,
+                first_1: e.name,
+                second_1: e.pactId,
+                second_tip_1: '合同编号：',
+                third_1: e.secondCardClass
               };
             });
             Promise.all(_data).then(result => {
@@ -386,7 +387,7 @@ export default {
         url: window.api + "/teamClass/getProject",
         data: {
           cardClassId: that.selectedCard.cardClassId,
-          storeId: that.selectedCard.storeId,
+          storeId: that.classStoreId,
           venueId: that.venueId,
           teamScheduleId: that.teamScheduleId,
           valueCardType: that.selectedCard.teachCardType ? 3 : "" // 2 私教
@@ -447,7 +448,7 @@ export default {
         url: window.api + "/teamClass/teamAttend/attend",
         data: {
           projectId: that.selectedProject.projectId,
-          storeId: that.selectedCard.storeId,
+          storeId: that.classStoreId,
           venueId: that.venueId,
           physicsCardNo: that.selectedUser.physicsCardNo,
           passMode: 10, // 教练点名上课
@@ -461,7 +462,6 @@ export default {
             for (let k in msgData) {
               msgData[k] = msgData[k] ? msgData[k] : "";
             }
-            msgData.storeId = that.selectedCard.storeId;
             HttpRequest({
               url: "/sendmsg/customer/teamconsumemsg",
               data: msgData
@@ -490,18 +490,19 @@ page {
   background-color: #f6f6f6;
 }
 .contract-list {
-  .filter-nav {
-    .mask {
-      top: 165px;
-    }
-  }
   .staff-coach-item {
     border-top: 1rpx solid #eee;
     .coach-info {
-      line-height: 26px;
+      // line-height: 26px;
     }
     .icon-right {
-      line-height: 60px;
+      // line-height: 60px;
+      display: flex;
+      margin-top: 20px;
+      img {
+        width: 18px;
+        height: 18px;
+      }
     }
   }
   .action-list {

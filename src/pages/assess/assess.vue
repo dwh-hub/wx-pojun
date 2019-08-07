@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest, WechatMenuisLogin } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
@@ -74,17 +74,20 @@ export default {
     this.clearId()
   },
   onLoad(options) {
-    this.detail = JSON.parse(options.detail);
-    this.detail["masterImg"] = window.api + this.detail.headImgPath;
-    console.log(JSON.parse(options.detail));
+    WechatMenuisLogin()
+    // this.detail = JSON.parse(options.detail);
+    // this.detail["masterImg"] = window.api + this.detail.headImgPath;
+    // console.log(JSON.parse(options.detail));
     if (options.teamAttendId) {
       this.typeText = "团课"
       this.teamAttendId = options.teamAttendId;
+      this.getClassDetail()
     }
     if (options.coachAppointId) {
       this.typeText = "教练"
       this.coachAppointId = options.coachAppointId;
-      this.detail["anotherName"] = this.detail.projectName;
+      this.getCoachDetail()
+      // this.detail["anotherName"] = this.detail.projectName;
     }
     setNavTab();
   },
@@ -135,7 +138,6 @@ export default {
           remarks: this.remarks
         };
       }
-      console.log(data);
       let that = this;
       wx.showModal({
         title: "确认",
@@ -184,7 +186,40 @@ export default {
     },
     onStoreRate(event) {
       this.storeRateVaule = event.mp.detail;
-    }
+    },
+    // 团课
+    getClassDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/teamClass/teamAttend/getOne",
+        data: {
+          teamAttendId: that.teamAttendId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            that.detail = res.data.data;
+          }
+        }
+      });
+    },
+    // 私教课
+    getCoachDetail() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/mobile/coach/appoint/detail",
+        data: {
+          coachAppointId: that.coachAppointId
+        },
+        success(res) {
+          if (res.data.code === 200) {
+            let data = res.data.data
+            data.handwrittenImgPath = data.handwrittenImgPath ? window.api + data.handwrittenImgPath : data.handwrittenImgPath
+            data["anotherName"] = data.projectName;
+            that.detail = data;
+          }
+        }
+      });
+    },
   }
 };
 </script>

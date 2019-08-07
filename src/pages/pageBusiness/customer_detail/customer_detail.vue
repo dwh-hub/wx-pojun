@@ -326,11 +326,11 @@ export default {
           dataNum: "0"
         },
         {
-          dataText: "数据一",
+          dataText: "使用中",
           dataNum: "0"
         },
         {
-          dataText: "数据二",
+          dataText: "过期",
           dataNum: "0"
         }
       ],
@@ -639,8 +639,8 @@ export default {
                 id: e.trackUserId,
                 day: e.trackTime.substring(8, 10),
                 month: e.trackTime.substring(5, 7),
-                topText: "操作人：" + e.userName,
-                bottomText: "内容：" + e.content
+                bottomText: "操作人：" + e.userName,
+                topText: "内容：" + e.content
               };
             });
           }
@@ -655,7 +655,8 @@ export default {
         url: window.api + "/customer/card/cardInfos",
         data: {
           customerId: that.id,
-          page: that.cardpage
+          page: that.cardpage,
+          pageCount: 100
         },
         success: function(res) {
           that.isCardLoading = false;
@@ -1079,6 +1080,13 @@ page {
     > img {
       width: 100%;
       height: 100%;
+    }
+  }
+  .day-item {
+    .flex-middle {
+      .middle-2 {
+        color: #999;
+      }
     }
   }
   .van-icon {

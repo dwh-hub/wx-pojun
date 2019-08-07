@@ -160,9 +160,15 @@ export default {
               }
             },
             {
-              sonText: "定金",
+              sonText: "订金",
               action: () => {
                 this.filterType(4);
+              }
+            },
+            {
+              sonText: "失效",
+              action: () => {
+                this.filterType(5);
               }
             }
           ]
@@ -195,8 +201,6 @@ export default {
       isOperate: false,
       isAllSelect: false,
       showStoreList: false,
-      selectedStore: {},
-      storeList: [],
       showMask: false,
       timePickerType: "",
       filter: {
@@ -211,8 +215,6 @@ export default {
   },
   mounted() {
     this.nav[0].navTitle = "今日";
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
     this.getList();
   },
   components: {
@@ -238,10 +240,6 @@ export default {
   methods: {
     searchChange(event) {
       this.filter.nameOrPhone = event;
-    },
-    selectStore(item) {
-      this.selectedStore = item;
-      this.refreshList();
     },
     toDetail(item, index) {
       if (this.isOperate) {
@@ -435,11 +433,6 @@ page {
   overflow-y: auto !important;
 }
 .public-sea {
-  .filter-nav {
-    .mask {
-      top: 165px;
-    }
-  }
   .customer-list {
     .customer-item {
       display: flex;

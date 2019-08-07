@@ -30,7 +30,7 @@
     <div class="cell-title">上课列表</div>
     <div class="student-list">
       <div class="student-item block-wrapper" v-for="(item, index) in studentList" :key="index">
-        <img :src="item.masterImg" alt />
+        <img :src="item.headImgPath" alt />
         <div class="class-info block-info">
           <div class="first">{{item.name}}</div>
           <div class="second">{{item.secondCardClassName}}</div>
@@ -117,7 +117,7 @@ export default {
       wx.navigateTo({
         url: `../contract_list/main?type=addStudent&venueId=${
           this.classDetail.venueId
-        }&teamScheduleId=${this.classDetail.teamScheduleId}`
+        }&teamScheduleId=${this.classDetail.teamScheduleId}&classStoreId=${this.classDetail.storeId}`
       });
     },
     getClassDetail() {
@@ -170,13 +170,14 @@ export default {
           if (res.data.code == 200) {
             that.canAhead = res.data.data.result.filter(e => e.status == 2).length > 0
             that.studentList = res.data.data.result.map(e => {
-              if (!e.masterImg) {
-                e.masterImg = window.api + "/assets/img/morenTo.png";
+              if (!e.headImgPath) {
+                e.headImgPath = window.api + "/assets/img/morenTo.png";
               } else {
-                e.masterImg = window.api + e.masterImg;
+                e.headImgPath = window.api + e.headImgPath;
               }
               return e;
             });
+            console.log(that.studentList)
           }
         }
       });

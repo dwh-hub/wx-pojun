@@ -47,13 +47,13 @@ export function getPhoneNumber(e, url, isTab) {
         // });
       } else {
         // TODO:
-        wx.setStorage({
-          key: "phone",
-          data: "18888888881", // "13285923990",
-          success: function () {
-            login(url, isTab);
-          }
-        });
+        // wx.setStorage({
+        //   key: "phone",
+        //   data: "18888888881", // "13285923990",
+        //   success: function () {
+        //     login(url, isTab);
+        //   }
+        // });
         wx.hideLoading();
         wx.showModal({
           title: "提示",
@@ -186,6 +186,7 @@ export function enterStaff(res) {
   wx.setStorageSync("staff_info", staff_info);
   wx.setStorageSync("companyId", staff_info.companyId);
   wx.setStorageSync("companyName", staff_info.companyName);
+  store.commit("changeStaffLogin", true);
   
   // 进入商户端时，门店权限过滤
   console.log("getStorageSync:"+wx.getStorageSync("companyId"))
@@ -196,8 +197,10 @@ export function enterStaff(res) {
     },
     success(res) {
       if (res.data.code === 200) {
-        store.commit("saveAllStore", res.data.data);
-        storeId = res.data.data[0].storeId
+        let data = res.data.data
+        data[0].isDefault = true
+        store.commit("saveAllStore", data);
+        storeId = data[0].storeId
       }
     }
   });
@@ -352,8 +355,10 @@ function getAllStore() {
 }
 getAllStore().then((res) => {
   if (res.data.code === 200) {
-    store.commit("saveAllStore", res.data.data);
-    storeId = res.data.data[0].storeId
+    let data = res.data.data
+    data[0].isDefault = true
+    store.commit("saveAllStore", data);
+    storeId = data[0].storeId
   }
 })
 

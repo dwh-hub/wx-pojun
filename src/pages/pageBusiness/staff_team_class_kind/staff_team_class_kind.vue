@@ -42,9 +42,9 @@ export default {
     return {
       type: '',
       isLoading: false,
+      classkindList: [],
       storeList: [],
-      selectedStore: {},
-      classkindList: []
+      selectedStore: {}
     };
   },
   onLoad(options) {
@@ -53,7 +53,7 @@ export default {
   mounted() {
     setNavTab();
     this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     this.getClasskindList();
   },
   // listPageMixin
@@ -77,7 +77,7 @@ export default {
       HttpRequest({
         url: "/teamClass/teamTempStore/pages",
         data: {
-          store: that.selectedStore.storeId
+          store: 126, // that.selectedStore.storeId
         },
         success(res) {
           that.isLoading = false

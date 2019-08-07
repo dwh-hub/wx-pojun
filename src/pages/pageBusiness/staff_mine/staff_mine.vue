@@ -134,6 +134,7 @@ export default {
             wx.removeStorageSync("phone");
             wx.removeStorageSync("authInto")
             wx.removeStorageSync("staff_info")
+            store.commit("changeStaffLogin", false);
             wx.switchTab({
               url: "../../homepage/main"
             });

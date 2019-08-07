@@ -172,8 +172,6 @@ export default {
           dataNum: "0"
         }
       ],
-      selectedStore: {},
-      storeList: [],
       filter: {
         nameOrPhone: "",
         addTimeStart: "",
@@ -205,8 +203,6 @@ export default {
     this.nav[0].navTitle = "今日";
     let _title = this.trackUserType == 1 ? "销售跟进日志" : "教练跟进日志";
     setNavTab(_title);
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
     this.filterDate(1);
   },
   methods: {
@@ -221,9 +217,6 @@ export default {
     },
     searchChange(event) {
       this.filter.nameOrPhone = event;
-    },
-    selectStore(item) {
-      this.selectedStore = item;
     },
     toCardDetail(item) {
       wx.navigateTo({
@@ -328,11 +321,6 @@ page {
   background-color: #f6f6f6;
 }
 .follow_up_log {
-  .filter-nav {
-    .mask {
-      top: 165px;
-    }
-  }
   .staff-coach-item {
     border-top: 1rpx solid #eee;
     .coach-info {

@@ -1,5 +1,7 @@
+import store from "../../utils/store.js"
+
 const window = {}
-window.DEBUGGING = true
+window.DEBUGGING = false
 window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
 // 获取 ext.json 配置信息
@@ -315,6 +317,33 @@ export function getRange(lat1, lng1, lat2, lng2) {
   }
 }
 
+// 公共号进来判断是否登录
+export function WechatMenuisLogin(type) {
+  if(store.state.isLogin && type != "staff") {
+    return
+  }
+  if(store.state.staffIsLogin && type == "staff") {
+    return
+  }
+  return wx.showModal({
+    title: "提示",
+    content: "当前状态为未登录，请前往登录",
+    showCancel: false,
+    success(res) {
+      if (res.confirm) {
+        if(type == "staff") {
+          return wx.switchTab({
+            url: "../../homepage/main"
+          });
+        }
+        wx.switchTab({
+          url: "../homepage/main"
+        });
+      }
+    }
+  });
+}
+
 export default {
   window,
   getThemeColor,
@@ -325,5 +354,6 @@ export default {
   formatDate,
   debounce,
   getRange,
-  wxLogin
+  wxLogin,
+  WechatMenuisLogin
 }

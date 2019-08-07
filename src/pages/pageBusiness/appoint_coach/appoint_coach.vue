@@ -767,7 +767,10 @@ export default {
               if(e.doomsday) {
                 e.doomsday = e.doomsday.split(" ")[0];
               }
-              return e.teachCardType == 3 || (e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2)
+              if(e.cardStatus != 2) {
+                return false
+              }
+              return e.teachCardType == 3 || (e.canTeachCard == 1 && e.teachCardType == 2)
             });
             console.log(that.cardList)
             if (that.cardList.length == 1) {
@@ -929,9 +932,16 @@ export default {
           duration: 1000
         });
       }
-      if (this.cardCellText == "请选择" || this.cardCellText == "") {
+      if (this.timeCellText == "请选择" || this.timeCellText == "") {
         return wx.showToast({
           title: "请选择预约时间",
+          icon: "none",
+          duration: 1000
+        });
+      }
+      if (this.appointType == "一键上课" && this.timeCellText.slice(0, 10) != formatDate(new Date(), 'yyyy-MM-dd')) {
+        return wx.showToast({
+          title: "只可上当天的课程",
           icon: "none",
           duration: 1000
         });
@@ -1040,6 +1050,7 @@ export default {
             let params;
             params = {
               way: way,
+              canFace: res.data.data.privateSignWayByCustomer == 1,
               coachName: that.userInfo.userName,
               coachId: that.userInfo.userId,
               studentName: that.studentInfo.name,
@@ -1053,8 +1064,14 @@ export default {
               // 教练自签
               that.attendclass(appointId);
             } if(way == 5) {
+              wx.showLoading({
+                title: '加载中..'
+              })
               wx.redirectTo({
-                url: "../face/main?params=" + JSON.stringify(params)
+                url: "../face/main?params=" + JSON.stringify(params),
+                success() {
+                  wx.hideLoading()
+                }
               });
             } else {
               wx.redirectTo({

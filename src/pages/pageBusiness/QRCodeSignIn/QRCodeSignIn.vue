@@ -10,6 +10,8 @@
         size="25px"
         custom-class="replay"
       />
+      <image class="to-face" src="/static/images/staff/camera.svg" @click="toFace"></image>
+       <!-- v-if="params.canFace" -->
       <div class="qrcode">
         <img :src="qrcodeURL" alt>
       </div>
@@ -38,6 +40,7 @@ import {
 import Vue from 'vue'
 import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
+import { EventBus } from "../common/js/eventBus.js";
 
 // TODO:
 Vue.prototype.globalData.normalCoachCourse = new GoEasy({
@@ -96,7 +99,16 @@ export default {
     if (this.params.way == 4) {
       this.pushMsg();
     }
+  },
+  onShow() {
     this.addHit();
+  },
+  mounted() {
+    console.log(this.params)
+    EventBus.$on("confirmed", () => {
+      this.studentText = "学员已确认"
+    });
+    this._nav = this.nav;
   },
   onUnload() {
     this.clear()
@@ -135,6 +147,17 @@ export default {
         size: 500
       });
       this.qrcodeURL = imgData;
+    },
+    toFace() {
+      wx.showLoading({
+        title: '加载中..'
+      })
+      wx.navigateTo({
+        url: '../face/main?params=' + JSON.stringify(this.params),
+        success() {
+          wx.hideLoading()
+        }
+      })
     },
     getQrCode() {
       let that = this;
@@ -282,7 +305,7 @@ export default {
             frontSures.coachAppointOut.coachAppointId == this.params.appointId
           ) {
             this.studentText = "学员已确认";
-            this.pushMsg();
+            // this.pushMsg();
           }
         }
         // qrCodes = false;
@@ -411,6 +434,13 @@ page {
       position: absolute;
       top: 10px;
       right: 10px;
+    }
+    .to-face {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 30px;
+      height: 20px;
     }
     .qrcode {
       width: 200px;

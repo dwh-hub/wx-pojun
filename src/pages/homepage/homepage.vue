@@ -153,7 +153,7 @@ export default {
     wxLogin();
     let that = this;
     // 场景值为公众号自定义菜单进入时，无法触发组件的mounted钩子，在这里自动登录
-    if (wx.getLaunchOptionsSync().scene == 1035) {
+    if (wx.getLaunchOptionsSync().scene == 1035 && !store.state.isLogin) {
       getCompanyColor().then(() => {
         this.login();
       });

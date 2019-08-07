@@ -719,7 +719,7 @@ export default {
           duration: 1000
         });
       }
-      if (this.cardCellText == "请选择" || this.cardCellText == "") {
+      if (this.timeCellText == "请选择" || this.timeCellText == "") {
         return wx.showToast({
           title: "请选择预约时间",
           icon: "none",
@@ -855,7 +855,10 @@ export default {
               if(e.doomsday) {
                 e.doomsday = e.doomsday.split(" ")[0];
               }
-              return e.teachCardType == 3 || (e.canTeachCard == 1 && e.teachCardType == 2 && e.cardStatus == 2)
+              if(e.cardStatus != 2) {
+                return false
+              }
+              return e.teachCardType == 3 || (e.canTeachCard == 1 && e.teachCardType == 2)
             });
 
             if (that.cardList.length == 1) {

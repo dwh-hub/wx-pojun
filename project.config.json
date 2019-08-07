@@ -42,13 +42,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 7,
+			"current": 6,
 			"list": [
 				{
 					"id": 0,
 					"name": "主页",
-					"pathName": "pages/homepage/main",
-					"query": "scene=52-118-1460",
+					"pathName": "pages/appointmentResult/main",
+					"query": "",
 					"scene": null
 				},
 				{
@@ -60,8 +60,8 @@
 				},
 				{
 					"id": 2,
-					"name": "客户列表",
-					"pathName": "pages/pageBusiness/customer/main",
+					"name": "pages/pageBusiness/face/main",
+					"pathName": "pages/pageBusiness/face/main",
 					"query": "",
 					"scene": null
 				},
@@ -81,16 +81,16 @@
 				},
 				{
 					"id": 5,
-					"name": "pages/pageBusiness/face/main",
-					"pathName": "pages/pageBusiness/face/main",
-					"query": "",
+					"name": "pages/pageBusiness/QRCodeSignIn/main",
+					"pathName": "pages/pageBusiness/QRCodeSignIn/main",
+					"query": "params={\"way\":2,\"coachName\":\"董文浩1\",\"coachId\":1516,\"studentName\":\"岑今\",\"studentId\":144993,\"appointId\":\"7120\",\"storeId\":126,\"venueId\":90}",
 					"scene": null
 				},
 				{
 					"id": 6,
-					"name": "demo",
-					"pathName": "pages/pageBusiness/pay_card/main",
-					"query": "",
+					"name": "pages/pageBusiness/face/main",
+					"pathName": "pages/pageBusiness/face/main",
+					"query": "id=144995",
 					"scene": null
 				},
 				{

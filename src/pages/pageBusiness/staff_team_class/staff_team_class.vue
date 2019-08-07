@@ -171,7 +171,6 @@ export default {
             });}
         }
       ],
-      storeList: [],
       isLoading: false,
       // actionList: [
       //   {
@@ -199,7 +198,6 @@ export default {
       //     }
       //   }
       // ],
-      selectedStore: {},
       selectedClass: {},
       showOperatePopup: false,
       isOperate: false,
@@ -214,8 +212,6 @@ export default {
   },
   mounted() {
     this.nav[0].navTitle = "今日";
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
     this.getVenueList()
     this.filterDate(1);
   },
@@ -342,11 +338,6 @@ page {
   background-color: #f6f6f6;
 }
 .satff_team_class {
-  .filter-nav {
-    .mask {
-      top: 165px;
-    }
-  }
   .team-class-item {
     padding: 10px 0;
     padding-left: 10px;

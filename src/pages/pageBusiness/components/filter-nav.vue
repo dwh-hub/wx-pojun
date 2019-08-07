@@ -244,7 +244,7 @@ export default {
 
 .mask {
   position: fixed;
-  top: 165px;
+  top: 180px;
   bottom: 0;
   right: 0;
   left: 0;

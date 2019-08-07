@@ -115,11 +115,6 @@ export default {
       }
     },
     login() {
-      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey")) {
-        getUserInfo().then((member_res) => {
-          enterMember(member_res)
-        })
-      }
       if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
         wx.showLoading()
         staff_login().then((staff_res) => {
@@ -128,6 +123,14 @@ export default {
             return
           }
           enterStaff(staff_res)
+        })
+      }
+      if(store.state.isLogin) {
+        return
+      }
+      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey")) {
+        getUserInfo().then((member_res) => {
+          enterMember(member_res)
         })
       }
     },

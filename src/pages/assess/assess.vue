@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest, WechatMenuisLogin } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
@@ -74,7 +74,6 @@ export default {
     this.clearId()
   },
   onLoad(options) {
-    WechatMenuisLogin()
     // this.detail = JSON.parse(options.detail);
     // this.detail["masterImg"] = window.api + this.detail.headImgPath;
     // console.log(JSON.parse(options.detail));

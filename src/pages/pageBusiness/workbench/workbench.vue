@@ -55,7 +55,7 @@ import colorMixin from "COMPS/colorMixin.vue"
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import { getUseServiceList } from "../common/js/http.js";
-import { serviceList } from "../common/js/service_config.js";
+import { serviceList, filterAuth } from "../common/js/service_config.js";
 import F2 from '@antv/wx-f2';
 
 export default {
@@ -85,6 +85,7 @@ export default {
     this.name = wx.getStorageSync('staff_info').userName
   },
   onShow() {
+    filterAuth()
     getUseServiceList().then((data) => {
       if(!data.length) {
         data = serviceList.slice(0,7)

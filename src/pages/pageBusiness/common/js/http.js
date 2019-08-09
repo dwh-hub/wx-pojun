@@ -127,7 +127,7 @@ function qiniuUpload(tempFilePath, fileName) {
 
 // 手机端私教上课接口
 function attendclass(coachAppointId) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     HttpRequest({
       url: "/mobile/coach/appoint/attendclass",
       data: {
@@ -149,6 +149,7 @@ function attendclass(coachAppointId) {
             data: msgData
           })
         } else {
+          reject()
           wx.showModal({
             title: "提示",
             content: res.data.message,

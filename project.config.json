@@ -88,9 +88,9 @@
 				},
 				{
 					"id": 6,
-					"name": "pages/pageBusiness/face/main",
-					"pathName": "pages/pageBusiness/face/main",
-					"query": "id=144995",
+					"name": "pages/appointmentResult/main",
+					"pathName": "pages/appointmentResult/main",
+					"query": "coachAppointId=7150&type=staff",
 					"scene": null
 				},
 				{

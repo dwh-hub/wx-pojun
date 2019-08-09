@@ -27,7 +27,7 @@
       :key="index"
       :class="{hidden: !item.hasAuth}"
     >
-      <div class="icon-title">{{item.title}}</div>
+      <div class="icon-title" v-if="item.list.length">{{item.title}}</div>
       <div class="common-services icon-wrapper">
         <div
           class="services-item icon-item"
@@ -47,12 +47,12 @@
 </template>
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
-import { service } from "../common/js/service_config.js";
+import { service, filterAuth } from "../common/js/service_config.js";
 import { getUseServiceList } from "../common/js/http.js";
 export default {
   data() {
     return {
-      iconList: service,
+      iconList: [],
       serviceList: [],
       editing: false,
       alwaysService: [],
@@ -60,6 +60,8 @@ export default {
     };
   },
   onLoad(options) {
+    filterAuth()
+    this.iconList = service
     this.serviceList = wx.getStorageSync("serviceList") || [];
     if (options.type == "edit") {
       setNavTab("设置常用服务");

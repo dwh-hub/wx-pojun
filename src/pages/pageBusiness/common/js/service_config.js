@@ -367,42 +367,50 @@ let service = [{
   }
 ]
 
-const authInto = wx.getStorageSync("authInto")
-
 let authArr = []
 let serviceList = []
 
-authInto.forEach(e => {
-  authArr = authArr.concat(e.authArr)
-})
-// console.log(String(authArr))
-
-console.group("权限过滤的项")
-service.forEach((group) => {
-  if(group.title == "销售管理" && !authArr.includes(40)) {
-    console.log("销售管理")
-    group.hasAuth = false
-  }
-  if(group.title == "教练服务" && !authArr.includes(63)) {
-    console.log("教练服务")
-    group.hasAuth = false
-  }
-  if(group.title == "运营报表" && !authArr.includes(89)) {
-    console.log("运营报表")
-    group.hasAuth = false
-  }
-  group.list.forEach(item => {
-    if(item.authorityId) {
-      if(authArr.includes(item.authorityId)) {
-        serviceList.push(item)
-      } else {
-        console.log(item.text)
-        item.hasAuth = false
-      }
-    }
+function filterAuth() {
+  const authInto = wx.getStorageSync("authInto")
+  
+  let _authArr = []
+  let _serviceList = []
+  
+  authInto.forEach(e => {
+    _authArr = _authArr.concat(e.authArr)
   })
-})
-console.groupEnd()
+  authArr = _authArr
+  
+  console.group("权限过滤的项")
+  service.forEach((group) => {
+    if(group.title == "销售管理" && !_authArr.includes(40)) {
+      console.log("销售管理")
+      group.hasAuth = false
+    }
+    if(group.title == "教练服务" && !_authArr.includes(63)) {
+      console.log("教练服务")
+      group.hasAuth = false
+    }
+    if(group.title == "运营报表" && !_authArr.includes(89)) {
+      console.log("运营报表")
+      group.hasAuth = false
+    }
+    group.list.forEach(item => {
+      if(item.authorityId) {
+        if(_authArr.includes(item.authorityId)) {
+          _serviceList.push(item)
+        } else {
+          console.log(item.text)
+          item.hasAuth = false
+        }
+      }
+    })
+  })
+  serviceList = _serviceList
+  console.groupEnd()
+  return _serviceList
+}
+filterAuth()
 
 // function getUseServiceList() {
 //   let useServiceList = []
@@ -437,5 +445,6 @@ export {
   service,
   serviceList, // 一级list
   // getUseServiceList,
-  checkAuth
+  checkAuth,
+  filterAuth
 }

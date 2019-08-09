@@ -363,9 +363,9 @@ export default {
               duration: 1000
             });
             setTimeout(() => {
-              wx.redirectTo({
-                url: "../pay_card/main"
-              });
+              wx.navigateBack({
+                delta: 2
+              })
             }, 1000);
           }
         }

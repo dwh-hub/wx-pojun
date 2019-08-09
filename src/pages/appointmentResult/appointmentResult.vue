@@ -62,8 +62,7 @@ import {
   window,
   HttpRequest,
   formatDate,
-  getRange,
-  WechatMenuisLogin
+  getRange
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
@@ -120,7 +119,6 @@ export default {
   onLoad(options) {
     // 进页面前先清空数据
     Object.assign(this.$data, this.$options.data());
-    WechatMenuisLogin(options.type || "")
     this.longitude = store.state.longitude;
     this.latitude = store.state.latitude;
     if (options.teamAttendId) {
@@ -133,6 +131,13 @@ export default {
       this.getCoachDetail();
     }
     setNavTab();
+  },
+  onUnload() {
+    if (getCurrentPages()[3].route.indexOf('QRCodeSignIn') > -1) {
+      wx.navigateBack({
+        delta: 2
+      });
+    }
   },
   onPullDownRefresh() {
     setTimeout(() => {

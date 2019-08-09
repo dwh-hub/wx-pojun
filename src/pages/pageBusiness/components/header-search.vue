@@ -4,14 +4,14 @@
       <sapn class="store-text">{{selectedStore.storeName || '门店'}}</sapn>
       <i class="triangle-icon"></i>
     </div>
-    <div class="store-list" v-show="showStoreList">
-      <div
+    <cover-view class="store-list" v-show="showStoreList">
+      <cover-view
         class="store-item"
         @click="selectStore(item)"
         v-for="(item,index) in _storeList"
         :key="index"
-      >{{item.storeName}}</div>
-    </div>
+      >{{item.storeName}}</cover-view>
+    </cover-view>
     <div class="search-wrapper" :style="{background: color}">
       <div class="input-wrapper">
         <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
@@ -26,7 +26,7 @@
         >
       </div>
     </div>
-    <div class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></div>
+    <cover-view class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></cover-view>
   </div>
 </template>
 

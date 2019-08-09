@@ -167,6 +167,36 @@ export function HttpRequest(obj) {
     obj.url = obj.url.indexOf(window.api) == -1 ? (window.api + obj.url) : obj.url;
     obj.header = obj.header || {};
     obj.header['Cookie'] = res;
+    
+    let success = obj.success || ''
+    
+    for(let k in obj.data) {
+      if(undefined == obj.data[k] || null == obj.data[k]) {
+        obj.data[k] = ""
+      }
+    }
+
+    obj.success = function(res) {
+      if(JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
+        if(getCurrentPages()[0].route.indexOf('mine') == -1) {
+          return wx.showModal({
+            title: "提示",
+            content: "当前状态为未登录，请先登录",
+            success(res) {
+              if (res.confirm) {
+                wx.switchTab({
+                  url: "/pages/mine/main"
+                });
+              }
+            }
+          });
+        }
+      }
+      if(success) {
+        success(res)
+      }
+    }
+
     wx.request(obj)
   });
 }
@@ -318,31 +348,31 @@ export function getRange(lat1, lng1, lat2, lng2) {
 }
 
 // 公共号进来判断是否登录
-export function WechatMenuisLogin(type) {
-  if(store.state.isLogin && type != "staff") {
-    return
-  }
-  if(store.state.staffIsLogin && type == "staff") {
-    return
-  }
-  return wx.showModal({
-    title: "提示",
-    content: "当前状态为未登录，请前往登录",
-    showCancel: false,
-    success(res) {
-      if (res.confirm) {
-        if(type == "staff") {
-          return wx.switchTab({
-            url: "../../homepage/main"
-          });
-        }
-        wx.switchTab({
-          url: "../homepage/main"
-        });
-      }
-    }
-  });
-}
+// export function WechatMenuisLogin(type) {
+//   if(store.state.isLogin && type != "staff") {
+//     return
+//   }
+//   if(store.state.staffIsLogin && type == "staff") {
+//     return
+//   }
+//   return wx.showModal({
+//     title: "提示",
+//     content: "当前状态为未登录，请前往登录",
+//     showCancel: false,
+//     success(res) {
+//       if (res.confirm) {
+//         if(type == "staff") {
+//           return wx.switchTab({
+//             url: "../../homepage/main"
+//           });
+//         }
+//         wx.switchTab({
+//           url: "../homepage/main"
+//         });
+//       }
+//     }
+//   });
+// }
 
 export default {
   window,
@@ -354,6 +384,5 @@ export default {
   formatDate,
   debounce,
   getRange,
-  wxLogin,
-  WechatMenuisLogin
+  wxLogin
 }

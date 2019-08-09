@@ -37,8 +37,7 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate,
-  WechatMenuisLogin
+  formatDate
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
@@ -194,7 +193,6 @@ export default {
   },
   mixins: [colorMixin, listPageMixin],
   mounted() {
-    WechatMenuisLogin("staff")
     this.nav[0].navTitle = "今日";
     this.filterDate(1);
   },

@@ -545,8 +545,9 @@ export default {
               cover: e.headImgPath,
               id: e.id,
               first_1: e.name,
-              // second_tip_1: "合同数：",
-              second_1: e.sex,
+              sex: e.sex,
+              second_tip_1: "客户状态：",
+              second_1: e.customerClassChar,
               third_1: e.phone
             }
           })
@@ -1274,11 +1275,6 @@ export default {
           compactSumMoney: that.selectedCard.salePrice || 0
         }
         data = Object.assign(this.curCardSet, basaData);
-        for(let k in data) {
-          if(undefined == data[k] || data[k] == null) {
-            data[k] = ""
-          }
-        }
       } else {
         data = {
           id: that.selectedCustomer.id,
@@ -1297,6 +1293,11 @@ export default {
           remarks: that.remarks,
           phoneVerifyStatus: "",
           token: that.token,
+        }
+      }
+      for(let k in data) {
+        if(undefined == data[k] || null == data[k]) {
+          data[k] = ""
         }
       }
       HttpRequest({

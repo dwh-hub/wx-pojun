@@ -1,4 +1,5 @@
 <template>
+  <!-- 废弃页 -->
   <div class="appoint_result">
     <div class="result-img">
       <image src="http://pojun-tech.cn/assets/img/come_class.png" mode="aspectFit" alt="" v-if="type=='attend'"></image>

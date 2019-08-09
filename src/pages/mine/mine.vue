@@ -266,18 +266,18 @@ export default {
         method: "POST",
         success(res) {
           if (res.data.code === 200) {
-            that.myPoints = res.data.data.selfIntegral;
-            that.FreeCount = res.data.data.attendClassCount;
-            that.cardNum = res.data.data.cardCount;
+            that.myPoints = res.data.data.selfIntegral || '';
+            that.FreeCount = res.data.data.attendClassCount || '';
+            that.cardNum = res.data.data.cardCount || '';
             that.mineNav.forEach(function(e) {
               if (e.navName == "会员卡") {
-                e.hit = res.data.data.cardCount;
+                e.hit = res.data.data.cardCount || '';
               } else if (e.navName == "上课次数") {
-                e.hit = res.data.data.attendClassCount;
+                e.hit = res.data.data.attendClassCount || '';
               } else if (e.navName == "预约记录") {
-                e.hit = res.data.data.appointCount;
+                e.hit = res.data.data.appointCount || '';
               } else if (e.navName == "签到记录") {
-                e.hit = res.data.data.consumeLogCount;
+                e.hit = res.data.data.consumeLogCount || '';
               }
               // else if (e.navName == "我的积分") {
               //   e.hit = res.data.data.selfIntegral;

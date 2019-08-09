@@ -46,7 +46,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest, WechatMenuisLogin } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import card from "COMPS/card";
 import pageFooter from "COMPS/pageFooter.vue"
 export default {
@@ -68,7 +68,6 @@ export default {
     this.cardId = option.id
     this.type = option.type || ''
     setNavTab();
-    WechatMenuisLogin(option.type || "")
   },
   mounted() {
     this.getCardDetail()

@@ -10,8 +10,8 @@
         size="25px"
         custom-class="replay"
       />
-      <image class="to-face" src="/static/images/staff/camera.svg" @click="toFace"></image>
-       <!-- v-if="params.canFace" -->
+      <image v-if="params.canFace" class="to-face" src="/static/images/staff/camera.svg" @click="toFace"></image>
+       <!--  -->
       <div class="qrcode">
         <img :src="qrcodeURL" alt>
       </div>
@@ -104,7 +104,6 @@ export default {
     this.addHit();
   },
   mounted() {
-    console.log(this.params)
     EventBus.$on("confirmed", () => {
       this.studentText = "学员已确认"
     });

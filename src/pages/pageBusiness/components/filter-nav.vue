@@ -4,31 +4,32 @@
       <span v-show="currentNav!=index">{{item.navTitle}}</span>
       <span v-show="currentNav==index" :style="{color: window.color}">{{item.navTitle}}</span>
       <i class="triangle-icon"></i>
-      <div
+
+      <cover-view
         class="list-warpper"
         :class="{slideWrap: (showSlideList && currentNav==index)}"
         @click.stop="clickMask"
       >
-        <div class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
-          <div
+        <cover-view class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
+          <cover-view
             class="store-nav-item"
             v-for="(itemS, indexS) in item.children"
             :key="indexS"
             @click.stop="clickSonNav(index,itemS)"
           >
-            <span>{{itemS.sonText}}</span>
+            <cover-view class="item-span">{{itemS.sonText}}</cover-view>
             <!-- <picker v-else mode="date" :value="date" @change="dateChange($event, item)">
               <view class="picker">{{itemS.sonText}}</view>
             </picker>-->
-          </div>
-        </div>
-      </div>
+          </cover-view>
+        </cover-view>
+      </cover-view>
     </div>
     <!-- <div class="all-filter" @click="allFilter()">
       <span>筛选</span>
       <img class="screening-icon" src="/static/images/staff/screening.png">
     </div>-->
-    <div class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
+    <cover-view class="mask" v-show="maskShow" @click.prevent="clickMask"></cover-view>
 
     <!-- <picker mode="date" :value="date" @change="dateChange">
       <view class="picker">当前选择: {{date}}</view>
@@ -233,7 +234,7 @@ export default {
           background-color: #eee;
           border-radius: 50%;
         }
-        > span {
+        .item-span {
           display: inline-block;
           vertical-align: middle;
         }

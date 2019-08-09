@@ -166,6 +166,8 @@ export default {
                     that.params.appointId
                   }&type=staff`
                 });
+              }).catch(res => {
+                wx.hideLoading();
               });
             }
             if(that.params.way == 3) {

@@ -58,7 +58,7 @@ import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import suspensionWindow from "../components/suspension-window.vue";
 import noneResult from "COMPS/noneResult.vue";
-import listPageMinxi from "../components/list-page-mixin.vue";
+import listPageMinxin from "../components/list-page-mixin.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 
 export default {
@@ -225,7 +225,7 @@ export default {
     headerSearch,
     noneResult
   },
-  mixins: [colorMixin, listPageMinxi],
+  mixins: [colorMixin, listPageMinxin],
   computed: {
     selectNum() {
       let _num = 0;

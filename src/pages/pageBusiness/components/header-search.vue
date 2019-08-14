@@ -4,7 +4,7 @@
       <sapn class="store-text">{{selectedStore.storeName || '门店'}}</sapn>
       <i class="triangle-icon"></i>
     </div>
-    <cover-view class="store-list" v-show="showStoreList">
+    <cover-view class="store-list" v-if="isCoverView" v-show="showStoreList">
       <cover-view
         class="store-item"
         @click="selectStore(item)"
@@ -12,6 +12,14 @@
         :key="index"
       >{{item.storeName}}</cover-view>
     </cover-view>
+    <div class="store-list" v-else v-show="showStoreList">
+      <div
+        class="store-item"
+        @click="selectStore(item)"
+        v-for="(item,index) in _storeList"
+        :key="index"
+      >{{item.storeName}}</div>
+    </div>
     <div class="search-wrapper" :style="{background: color}">
       <div class="input-wrapper">
         <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
@@ -26,7 +34,8 @@
         >
       </div>
     </div>
-    <cover-view class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></cover-view>
+    <cover-view v-if="isCoverView" :style="{'top':maskTop}" class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></cover-view>
+    <div v-else class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></div>
   </div>
 </template>
 
@@ -62,6 +71,10 @@ export default {
     placeholder: {
       type: String,
       default: "请输入手机号或姓名搜索"
+    },
+    isCoverView: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -79,6 +92,14 @@ export default {
       this.showStoreList = false;
     })
     this.text = this.searchText
+  },
+  computed: {
+    maskTop() {
+      if(!this.showMask) {
+        return "42px"
+      }
+      return (42 + this._storeList.length*46)*2 + 'rpx'
+    }
   },
   watch: {
     storeList: {
@@ -121,6 +142,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
+@import "../common/less/staff_common.less";
 .header-search {
   display: flex;
   position: relative;
@@ -163,7 +185,9 @@ export default {
     overflow: auto;
     z-index: 99;
     .store-item {
-      padding: 15px;
+      padding-left: 15px;
+      line-height: 46px;
+      box-sizing: border-box;
       background-color: #fff;
       border-bottom: 1rpx solid #eee;
       box-shadow: none;

@@ -270,12 +270,13 @@ export default {
   onLoad() {
     Object.assign(this.$data, this.$options.data());
     setNavTab()
-    this.storeList = store.state.allStore;
-    this.storeActions = this.storeList.map(e => {
+    let allStore = store.state.allStore.map(e => {
       e.name = e.storeName;
       return e;
     });
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
+    this.storeList = allStore.filter(e => e.storeId)
+    this.storeActions = this.storeList
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
     this.actionList = this.storeActions;
   },
   methods: {

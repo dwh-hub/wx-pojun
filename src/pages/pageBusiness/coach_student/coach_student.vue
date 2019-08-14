@@ -459,6 +459,12 @@ export default {
     },
     // 通过回传的iconText来获取对应的列表
     getOperate(param) {
+      if(!this.selectedStore.storeId) {
+        return wx.showToast({
+          title: "请选择门店",
+          icon: 'none'
+        })
+      }
       this.operateText = param;
       this.isOperate = true;
       if (param == "分配教练") {

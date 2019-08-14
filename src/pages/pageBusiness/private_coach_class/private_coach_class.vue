@@ -59,7 +59,7 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
-import listPageMinxi from "../components/list-page-mixin.vue";
+import listPageMinxin from "../components/list-page-mixin.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
@@ -249,7 +249,7 @@ export default {
       this.refreshList(1);
     }
   },
-  mixins: [colorMixin, listPageMinxi],
+  mixins: [colorMixin, listPageMinxin],
   components: {
     headerData,
     filterNav,

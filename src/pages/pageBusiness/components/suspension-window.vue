@@ -46,7 +46,7 @@ export default {
       let clientX = e.mp.touches[0].clientX
       let clientY = e.mp.touches[0].clientY
       //此处clientY与clientX为拖动悬浮窗超过设定的大小会返回默认显示位置
-      if (clientX < 350 && clientY < 550 && clientX > 0 && clientY > 0){
+      if (clientX < 350 && clientY < 550 && clientX > 100 && clientY > 0){
         this.right = this.windowW - clientX
         this.bottom = this.windowH - clientY
       } else {

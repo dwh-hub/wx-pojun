@@ -232,6 +232,7 @@ export default {
     };
   },
   onLoad(options) {
+    this.type = ""
     if (options.type) {
       this.type = options.type;
       this.venueId = options.venueId;

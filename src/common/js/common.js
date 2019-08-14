@@ -178,6 +178,7 @@ export function HttpRequest(obj) {
 
     obj.success = function(res) {
       if(JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
+        store.commit('changeLogin', false)
         if(getCurrentPages()[0].route.indexOf('mine') == -1) {
           return wx.showModal({
             title: "提示",

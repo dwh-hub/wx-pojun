@@ -4,6 +4,7 @@
       <header-search
         :storeList="storeList"
         :color="themeColor"
+        :isCoverView="true"
         :enterSearch="searchChange"
         @selectStore="selectStore"
       ></header-search>
@@ -159,9 +160,10 @@ export default {
           if(res.data.code == 500) {
             return that.noAuthLineView = false
           }
+          let isIOS = wx.getSystemInfoSync().system.indexOf("iOS") > -1
           let data = res.data.data.map(e => {
             return {
-              time: e.date,
+              time: isIOS ? ("2019/"+e.date.replace(/-/g, "/")) : e.date,
               tem: e.cost
             };
           });

@@ -53,6 +53,15 @@
         is-link
       />
     </van-cell-group>
+    <!-- <div class="item-cell">
+      <div class="cell-left">是否可以重复上课</div>
+      <div class="cell-right">
+        <van-radio-group :value="isLimitAttendTimes" @change="onChangeLimitAttend" custom-class="radio-group">
+          <van-radio :checked-color="themeColor" custom-class="radio" name="0">是</van-radio>
+          <van-radio :checked-color="themeColor" custom-class="radio" name="1">否</van-radio>
+        </van-radio-group>
+      </div>
+    </div> -->
     <div class="item-cell">
       <div class="cell-left">是否预约</div>
       <div class="cell-right">
@@ -221,6 +230,7 @@ export default {
       batchWeek: [],
       batchWeekStr: "",
        /* 批量排期日期 */
+      isLimitAttendTimes: "1",
       isAppoint: "1", // 是否预约
       isAppointAttend: "1", // 是否预约才能上课
     };
@@ -458,6 +468,9 @@ export default {
       this.schedulingDetail.venueId = item.venueId;
       this.showVenuePopup = false;
     },
+    onChangeLimitAttend(event) {
+      this.isLimitAttendTimes = event.mp.detail;
+    },
     onChangeAppoint(event) {
       this.isAppoint = event.mp.detail;
       this.getIsNeedAppoint();
@@ -520,6 +533,7 @@ export default {
           stopAppoint: that.schedulingDetail.stopAppoint,
           advanceAppoint: that.schedulingDetail.advanceAppoint,
           teamScheduleTimeJsonStr: _timeStr
+          // attendClassPersonLimit: that.isLimitAttendTimes
         },
         success(res) {
           wx.showModal({
@@ -552,7 +566,8 @@ export default {
           minPeople: that.schedulingDetail.minPeople,
           maxPeople: that.schedulingDetail.maxPeople,
           stopAppoint: that.schedulingDetail.stopAppoint,
-          advanceAppoint: that.schedulingDetail.advanceAppoint,
+          advanceAppoint: that.schedulingDetail.advanceAppoint
+          // attendClassPersonLimit: that.isLimitAttendTimes
         },
         success(res) {
           wx.showModal({

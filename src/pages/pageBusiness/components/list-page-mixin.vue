@@ -71,6 +71,7 @@ export default {
         } else {
           this.list = this.list.concat(result);
         }
+        wx.stopPullDownRefresh();
         this.isLoading = false;
         this.page++;
       });

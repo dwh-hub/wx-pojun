@@ -438,11 +438,15 @@ export default {
     this.teachCardType = options.teachCardType || ''
     this.billingType = options.billingType
     setNavTab();
-    this.storeList = store.state.allStore.map(e => {
+    let allStore = store.state.allStore.map(e => {
       e.name = e.storeName;
       return e;
     });
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
+    this.storeList = allStore.filter(e => e.storeId)
+    // console.log(this.storeList)
+    // this.storeList.splice(0, 1)
+    // console.log(this.storeList)
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
     this.searchCustomer()
     this._mounted()
   },
@@ -603,6 +607,7 @@ export default {
               return that.showVerify = true
             }
             that.showCardForm = true
+            that.showCardList = true
           } else {
             wx.showModal({
               title: "提示",
@@ -645,10 +650,6 @@ export default {
             } else {
               TermOfValidity_1 = e.periodOfValidity + '天'
             }
-            if(e.salePrice == '-1') { // 会员卡总价
-              e.salePrice = ''
-              e.salePriceText = "面议"
-            }
             if(e.buyAuthority == '-1'){ // 金额
               e.buyAuthority = ''
               TermOfValidity_2 = " | 面议"
@@ -683,6 +684,11 @@ export default {
             e.second_tip_1 = "有效期："
             e.second_1 = TermOfValidity_1  + TermOfValidity_2
             e.third_1 = e.salePrice == '-1' ? '￥ 面议' : '￥ '+e.salePrice
+
+            if(e.salePrice == '-1') { // 会员卡总价
+              e.salePrice = ''
+              e.salePriceText = "面议"
+            }
             return e
           })
           that.filterCardList = that.cardList
@@ -691,12 +697,17 @@ export default {
     },
     // 选择卡
     selectCard(item) {
-      console.log(item)
       this.selectedCard = item
       this.constCardInfo = JSON.parse(JSON.stringify(item))
       this.showCardList = false
       this.isSelectCard = true
-
+      if (item.defaultActivteMode == 0) {
+        this.payCardType = 2
+      } else if (item.defaultActivteMode == 1) {
+        this.payCardType = 3
+      } else if (item.defaultActivteMode == 2) {
+        this.payCardType = 1
+      }
       this.payCardStartDate = formatDate(new Date(), 'yyyy-MM-dd')
       this.payCardEndDate = this.computedEndTime(this.selectedCard.periodOfValidity)
 
@@ -1483,7 +1494,7 @@ export default {
     }
     .img-item {
       width: 70px;
-      height: 100px;
+      height: 70px;
       margin-right: 15px;
       background: #e3e3e3;
       border-radius: 0;
@@ -1499,7 +1510,7 @@ export default {
     .img-btn {
       font-size: 30px;
       text-align: center;
-      line-height: 100px;
+      line-height: 70px;
       color: #fff;
       border: 1rpx solid #b4b4b4;
     }

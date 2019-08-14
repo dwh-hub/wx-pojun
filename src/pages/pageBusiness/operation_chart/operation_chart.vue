@@ -1,7 +1,7 @@
 <template>
   <div class="operation_chart">
     <!-- <cover-view class="list-header"> -->
-      <filter-nav :nav="nav"></filter-nav>
+      <filter-nav :nav="nav" :isCoverView="true"></filter-nav>
       <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
         <van-tab title="运营报表"></van-tab>
         <van-tab title="课程报表"></van-tab>

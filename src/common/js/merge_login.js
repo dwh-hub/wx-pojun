@@ -139,6 +139,12 @@ export function login(url, isTab) {
 
 // 进入会员的逻辑
 export function enterMember(res) {
+  HttpRequest({
+    url: '/mini/login/after/customer',
+    data: {
+      miniOpenId: wx.getStorageSync("openId")
+    }
+  })
   wx.hideLoading();
   let _data = res.data.data
   if (!_data || !_data.length) {
@@ -178,6 +184,12 @@ export function enterStaff(res) {
   // staff_login().then((res) => {
   wx.showLoading({
     title: '正在进入..'
+  });
+  HttpRequest({
+    url: '/mini/login/after/user',
+    data: {
+      miniOpenId: wx.getStorageSync("openId")
+    }
   })
   let staff_info = res.data.data
   staff_info.authList = {}
@@ -198,9 +210,14 @@ export function enterStaff(res) {
     success(res) {
       if (res.data.code === 200) {
         let data = res.data.data
+        if(data.length > 1 ) {
+          data.unshift({
+            storeName: "所有门店",
+            storeId: ""
+          })
+        }
         data[0].isDefault = true
         store.commit("saveAllStore", data);
-        storeId = data[0].storeId
       }
     }
   });

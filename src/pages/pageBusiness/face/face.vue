@@ -1,6 +1,5 @@
 <template>
   <div class="face">
-    <!-- <button @click="start" type="primary">{{camera? '结束':'开始'}}</button> -->
     <camera class="camera" :device-position="device?'back':'front'" flash="off">
       <cover-view class="img-wrapper" @click="flipCamera" :style="{'background-color':color}">
         镜头翻转
@@ -9,12 +8,12 @@
           src="/static/images/staff/uFace.png"
         ></cover-image> -->
       </cover-view>
+      <cover-view class="tip" v-if="showTip">人脸识别中...</cover-view>
       <cover-image
         class="face-outline"
         src="/static/images/staff/uFace.png"
       ></cover-image>
     </camera>
-    <!-- <button @click="takePhoto" v-if="camera" type="primary">拍照</button> -->
     <van-toast id="van-toast" />
   </div>
 </template>
@@ -40,6 +39,7 @@ export default {
       tempImagePath: "",
       faceTimer: null,
       flag: true,
+      showTip: true,
       color: window.color
     };
   },
@@ -254,6 +254,17 @@ export default {
     border-radius: 4px;
     // width: 30px;
     // height: 20px;
+  }
+  .tip {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 8%;
+    line-height: 36px;
+    padding: 0 20px;
+    border-radius: 5px;
+    color: #fff;
+    background-color: rgba(0,0,0,0.5);
   }
   .face-outline {
     position: fixed;

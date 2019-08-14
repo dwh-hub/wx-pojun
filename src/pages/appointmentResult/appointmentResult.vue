@@ -93,7 +93,7 @@ export default {
     timeStart() {
       if (this.detail.timeStart) {
         return formatDate(
-          new Date(this.detail.timeStart),
+          new Date(this.detail.timeStart.replace(/-/g, "/")),
           "yyyy-MM-dd hh:mm:ss"
         );
       } else {

@@ -38,6 +38,12 @@
         </div>
         <div
           class="class-over"
+          v-if="item.status == 1"
+          :style="{'background-color': themeColor}"
+          @click="attendClass(item)"
+        >上课</div>
+        <div
+          class="class-over"
           v-if="item.status == 2"
           :style="{'background-color': themeColor}"
           @click="classOver(item)"
@@ -177,10 +183,39 @@ export default {
               }
               return e;
             });
-            console.log(that.studentList)
           }
         }
       });
+    },
+    attendClass(item) {
+      let that = this
+      wx.showLoading({
+        title: '上课中...'
+      })
+      HttpRequest({
+        url: '/teamClass/teamAttend/appointAttend',
+        data: {
+          teamAttendId: item.teamAttendId,
+          passMode: 10
+        },
+        success(res) {
+          wx.hideLoading()
+          if(res.data.code == 200) {
+            wx.showToast({
+              title: res.data.message,
+              icon: "success",
+              duration: 1000
+            });
+            that.getStudentList()
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            })
+          }
+        }
+      })
     },
     classOver(item) {
       let that = this;

@@ -6,8 +6,9 @@
       <i class="triangle-icon"></i>
 
       <cover-view
-        class="list-warpper"
-        :class="{slideWrap: (showSlideList && currentNav==index)}"
+        v-if="isCoverView"
+        class="list-warpper-cover"
+        :class="{show: (showSlideList && currentNav==index)}"
         @click.stop="clickMask"
       >
         <cover-view class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
@@ -18,22 +19,32 @@
             @click.stop="clickSonNav(index,itemS)"
           >
             <cover-view class="item-span">{{itemS.sonText}}</cover-view>
-            <!-- <picker v-else mode="date" :value="date" @change="dateChange($event, item)">
-              <view class="picker">{{itemS.sonText}}</view>
-            </picker>-->
           </cover-view>
         </cover-view>
       </cover-view>
-    </div>
-    <!-- <div class="all-filter" @click="allFilter()">
-      <span>筛选</span>
-      <img class="screening-icon" src="/static/images/staff/screening.png">
-    </div>-->
-    <cover-view class="mask" v-show="maskShow" @click.prevent="clickMask"></cover-view>
 
-    <!-- <picker mode="date" :value="date" @change="dateChange">
-      <view class="picker">当前选择: {{date}}</view>
-    </picker>-->
+      <div
+        v-else
+        class="list-warpper"
+        :class="{slideWrap: (showSlideList && currentNav==index)}"
+        @click.stop="clickMask"
+      >
+        <div class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
+          <div
+            class="store-nav-item"
+            v-for="(itemS, indexS) in item.children"
+            :key="indexS"
+            @click.stop="clickSonNav(index,itemS)"
+          >
+            <div class="item-span">{{itemS.sonText}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <cover-view v-if="isCoverView" :style="{'top':maskTop}" class="mask" v-show="maskShow" @click.prevent="clickMask"></cover-view>
+    <div v-else class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
+
   </div>
 </template>
 
@@ -88,6 +99,10 @@ export default {
           ]
         }
       ]
+    },
+    isCoverView: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -103,6 +118,12 @@ export default {
   computed: {
     window() {
       return window;
+    },
+    maskTop() {
+      if(!this.maskShow) {
+        return "42px"
+      }
+      return (42 + this._nav[this.currentNav].children.length*50)*2 + 'rpx'
     }
   },
   mounted() {
@@ -130,6 +151,7 @@ export default {
       this.currentNav = index;
       this.maskShow = true;
       this.showSlideList = true;
+      console.log(this.maskTop)
     },
     clickSonNav(index, item) {
       this._nav[index].navTitle = item.sonText;
@@ -198,6 +220,32 @@ export default {
       margin-left: 5px;
       vertical-align: middle;
       background-size: 100%;
+    }
+  }
+  .list-warpper-cover {
+    display: none;
+    position: absolute;
+    top: 42px;
+    left: 0px;
+    width: 100%;
+    max-height: 300px;
+    overflow: hidden;
+    z-index: 98;
+    &.show {
+      display: block;
+    }
+    .store-nav-list {
+      text-align: left;
+      max-height: 300px;
+      background-color: #fff;
+      .store-nav-item {
+        .item-span {
+          box-sizing: border-box;
+          line-height: 50px;
+          padding-left: 20px;
+          border-top: 1rpx solid #eee;
+        }
+      }
     }
   }
   .list-warpper {

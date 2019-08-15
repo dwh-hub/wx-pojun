@@ -13,7 +13,8 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_2.svg",
         text: "签到",
-        navUrl: "",
+        // authorityId: 71,
+        navUrl: "../check_in_type/main",
         isOpen: false,
         hasAuth: true,
         class: "iconfont icon-workbench_icon_1"
@@ -236,6 +237,7 @@ let service = [{
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_1.svg",
         text: "运营报表",
+        authorityId: 88,
         hasAuth: true,
         navUrl: "../operation_chart/main",
         isOpen: true,
@@ -244,6 +246,7 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
         text: "业绩报表",
+        authorityId: 89,
         navUrl: "",
         isOpen: false,
         hasAuth: true,
@@ -252,6 +255,7 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_3.svg",
         text: "课程报表",
+        authorityId: 89,
         navUrl: "../operation_chart/main?nav=1",
         isOpen: true,
         hasAuth: true,
@@ -369,8 +373,10 @@ let service = [{
 
 let authArr = []
 let serviceList = []
-
 function filterAuth() {
+  if(!wx.getStorageSync("authInto")) {
+    return
+  }
   const authInto = wx.getStorageSync("authInto")
   
   let _authArr = []

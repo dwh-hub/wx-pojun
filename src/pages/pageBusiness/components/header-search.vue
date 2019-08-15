@@ -35,7 +35,7 @@
       </div>
     </div>
     <cover-view v-if="isCoverView" :style="{'top':maskTop}" class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></cover-view>
-    <div v-else class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></div>
+    <div v-if="!isCoverView" class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></div>
   </div>
 </template>
 
@@ -145,6 +145,7 @@ export default {
 @import "../common/less/staff_common.less";
 .header-search {
   display: flex;
+  width: 100%;
   position: relative;
   /* 兼容真机白边 */
   margin-top: -1rpx;

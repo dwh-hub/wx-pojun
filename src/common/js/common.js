@@ -1,5 +1,4 @@
 import store from "../../utils/store.js"
-
 const window = {}
 window.DEBUGGING = false
 window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
@@ -30,7 +29,7 @@ export function getThemeColor() {
     HttpRequest({
       url: window.api + '/system/set/wxcompanyinfo',
       data: {
-        companyId: wx.getStorageSync("companyId")
+        companyId: wx.getStorageSync("companyId") || ''
       },
       success(res) {
         if (res.data.code == 200) {
@@ -106,7 +105,7 @@ export function setNavTab(title) {
     });
   }
   if (!window.color || window.color == "#2a82e4") {
-    getThemeColor().then(() => {
+    getCompanyColor().then(() => {
       wx.setNavigationBarColor({
         frontColor: "#ffffff",
         backgroundColor: window.color || "#2a82e4",
@@ -158,6 +157,8 @@ export function getWXCompany(appid) {
   })
 }
 
+
+let isShowModal = false
 /**
  * 封装wx.request,在请求头包个SetCookie
  * @param {Object} obj 像wx.request一样调用
@@ -179,11 +180,15 @@ export function HttpRequest(obj) {
     obj.success = function(res) {
       if(JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
         store.commit('changeLogin', false)
-        if(getCurrentPages()[0].route.indexOf('mine') == -1) {
+        if(getCurrentPages()[0].route.indexOf('mine') == -1 && !isShowModal) {
+          isShowModal = true
           return wx.showModal({
             title: "提示",
             content: "当前状态为未登录，请先登录",
+            confirmText: '前往登录',
+            showCancel: false,
             success(res) {
+              isShowModal = false
               if (res.confirm) {
                 wx.switchTab({
                   url: "/pages/mine/main"

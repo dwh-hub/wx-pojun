@@ -304,13 +304,13 @@ export default {
             let _data;
             that.headerData[0].dataNum = _res.recCount;
             _data = _res.result.map(async e => {
-              if (e.coachHeadImg) {
-                if (e.coachHeadImg.indexOf(".jsp") != -1) {
-                  await that.getAvatar(e.coachHeadImg).then(res => {
-                    e.coachHeadImg = res;
+              if (e.headImgPath) {
+                if (e.headImgPath.indexOf(".jsp") != -1) {
+                  await that.getAvatar(e.headImgPath).then(res => {
+                    e.headImgPath = res;
                   });
                 } else {
-                  e.coachHeadImg = window.api + e.coachHeadImg;
+                  e.headImgPath = window.api + e.headImgPath;
                 }
               }
               return {
@@ -323,8 +323,8 @@ export default {
                 coachName: e.coachName,
                 studentName: e.name,
                 timeStart: e.timeStart,
-                cover: e.coachHeadImg
-                  ? e.coachHeadImg
+                cover: e.headImgPath
+                  ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 status: e.status,
                 color: that.transformColor(e.status),

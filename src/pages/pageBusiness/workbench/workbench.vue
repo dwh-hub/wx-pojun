@@ -41,7 +41,8 @@
       <van-tabbar-item icon="question-o">帮助</van-tabbar-item>
       <!-- <van-tabbar-item icon="desktop-o">工作台</van-tabbar-item> -->
       <div class="index-tab">
-        <img src="https://pojun-tech.cn/assets/img/loginlogo.png" alt="">
+        <img :src="window.api + companyInfo.logimage" alt="">
+        <!-- <img src="https://pojun-tech.cn/assets/img/loginlogo.png" alt=""> -->
         <!-- <div class="text">工作台</div> -->
       </div>
       <van-tabbar-item icon="chat-o">消息</van-tabbar-item>
@@ -71,19 +72,26 @@ export default {
       },
       name: '',
       storeList: [],
-      selectedStore: {}
+      selectedStore: {},
+      companyInfo: {}
     };
   },
   components: {
     headerSearch
   },
   mixins:[colorMixin],
+  computed: {
+    window() {
+      return window
+    }
+  },
   mounted() {
     setNavTab();
+    this.getCompanyInfo()
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     this.getLineView()
-    this.name = wx.getStorageSync('staff_info').userName
+    this.name = wx.getStorageSync('staff_info') ? wx.getStorageSync('staff_info').userName : ''
   },
   onShow() {
     filterAuth()
@@ -100,6 +108,18 @@ export default {
     })
   },
   methods: {
+    getCompanyInfo() {
+      let that = this;
+      HttpRequest({
+        url: window.api + "/system/set/wxcompanyinfo",
+        data: {
+          companyId: wx.getStorageSync("companyId") || ''
+        },
+        success(res) {
+          that.companyInfo = JSON.parse(res.data.data.baseInfo);
+        }
+      });
+    },
     toNav(url) {
       if(!url) {
         return

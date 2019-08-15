@@ -63,7 +63,8 @@
       "pay_card/main",
       "receivable/main",
       "face/main",
-      "my_private_class/main"
+      "my_private_class/main",
+      "check_in_type/main"
     ]
   }],
   "permission": {

@@ -79,6 +79,21 @@ function getStoreSet(storeId) {
   })
 }
 
+// 获取门店场馆列表
+function getVenueList(storeId) {
+  return new Promise((resolve) => {
+    HttpRequest({
+      url: "/venue/name/list",
+      data: {
+        storeId: storeId
+      },
+      success(res) {
+        resolve(res.data.data)
+      }
+    });
+  })
+}
+
 // 获取教练/销售
 function getUserofrole(storeId, positionType) {
   return new Promise((resolve) => {
@@ -167,5 +182,6 @@ export {
   getStoreSet,
   getUserofrole,
   qiniuUpload,
-  attendclass
+  attendclass,
+  getVenueList
 }

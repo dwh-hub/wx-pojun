@@ -25,7 +25,7 @@
     </van-cell-group>
 
     <!-- <button @click="login">登录</button> -->
-    <div class="mineExit" :style="{'background-color': window.color}" @click="signOut">退出登录</div>
+    <div class="mineExit" :style="{'background-color': window.color,'bottom':isPhoneX?'105px':'65px'}" @click="signOut">退出登录</div>
 
     <van-tabbar active="4" @change="changeTabbar">
       <van-tabbar-item icon="home-o">快捷</van-tabbar-item>
@@ -86,14 +86,18 @@ export default {
   computed: {
     window() {
       return window;
+    },
+    isPhoneX() {
+      return store.state.isIphoneX;
     }
   },
   mounted() {
     setNavTab();
-    this.storeList = store.state.allStore.map(e => {
+    let allStore = store.state.allStore.map(e => {
       e["name"] = e.storeName;
       return e;
     });
+    this.storeList = allStore.filter(e => e.storeId)
     this.selectedStore = this.storeList[0];
     this.userInfo = wx.getStorageSync("staff_info");
   },

@@ -8,7 +8,7 @@
       </div>
       <div class="coach-info">
         <div class="coach-name">
-          <img :src="sexSrc_backup" class="sex" v-if="sexSrc_backup">
+          <img :src="sexSrc_backup" class="sex" v-if="sexSrc_backup" />
           <span class="first-1">{{info.first_tip_1 || ''}}{{info.first_1 || ''}}</span>
           <span class="first-2">{{info.first_tip_2 || ''}}{{info.first_2 || ''}}</span>
         </div>
@@ -28,7 +28,11 @@
       </div>
       <div class="icon-right" @click.stop="clickIcon">
         <div v-if="info.rightText" :style="{color: info.color?info.color:'#333'}">{{info.rightText}}</div>
-        <div v-if="info.rightBlock" class="right-block" :style="{'background-color': info.color}">{{info.rightBlock}}</div>
+        <div
+          v-if="info.rightBlock"
+          class="right-block"
+          :style="{'background-color': info.color}"
+        >{{info.rightBlock}}</div>
         <slot></slot>
       </div>
     </div>
@@ -146,7 +150,7 @@ export default {
     }
     .coach-name {
       font-size: 14px;
-      >span {
+      > span {
         vertical-align: middle;
       }
       .sex {
@@ -199,13 +203,16 @@ export default {
     color: #fff;
     border-radius: 2px;
   }
-  // .icon-right {
-  //   margin-top: 20px;
-  //   > img {
-  //     width: 18px;
-  //     height: 18px;
-  //   }
-  // }
+  .icon-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // margin-top: 20px;
+    // > img {
+    //   width: 18px;
+    //   height: 18px;
+    // }
+  }
   .coach-skeleton {
     .cover {
       flex: 0 0 70px;

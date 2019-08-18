@@ -94,7 +94,9 @@
       </div>
     </div>
 
-    <div class="fixed-bottom-btn" @click="back" :style="{'background-color': themeColor}">确认</div>
+    <div class="fixed-bottom-btn" @click="back" :style="{'background-color': themeColor}">确认
+      <div class="block" v-if="isIphoneX"></div>
+    </div>
   </div>
 </template>
 

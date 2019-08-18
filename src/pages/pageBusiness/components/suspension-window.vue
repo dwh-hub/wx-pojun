@@ -28,7 +28,7 @@ export default {
     return {
       showOperate: false,
       right: 20,
-      bottom: 20,
+      bottom: 40,
       windowH: wx.getSystemInfoSync().windowHeight,
       windowW: wx.getSystemInfoSync().windowWidth,
     };
@@ -51,7 +51,7 @@ export default {
         this.bottom = this.windowH - clientY
       } else {
         this.right = 20, //默认显示位置 left距离
-        this.bottom = 20  //默认显示位置 top距离
+        this.bottom = 40  //默认显示位置 top距离
       }
     },
     preventTouchMove() {
@@ -78,7 +78,7 @@ export default {
   .suspension {
     position: fixed;
     right: 20px;
-    bottom: 20px;
+    bottom: 40px;
     z-index: 4;
     .icon-suspension {
       float: right;

@@ -246,8 +246,7 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
         text: "业绩报表",
-        authorityId: 89,
-        navUrl: "",
+        navUrl: "../achievement/main",
         isOpen: false,
         hasAuth: true,
         class: "iconfont icon-operation_report_icon_2"

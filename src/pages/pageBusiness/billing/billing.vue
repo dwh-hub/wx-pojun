@@ -1,5 +1,5 @@
 <template>
-  <div class="billing">
+  <div class="billing" :class="{'isPhoneX-wrap': isIphoneX}">
     <!-- <div class="store-wrapper input-cell-wrapper">
       <div>门店</div>
       <div
@@ -285,7 +285,7 @@
             <textarea v-model="remarks" maxlength="120" cursor-spacing="50" placeholder="备注不能超过120个字" placeholder-class="placeholder"></textarea>
           </div>
           <div class="cell-subtitle" @click="toMore" v-if="billingType != 4">更多设置选项</div>
-          <div class="submit-wrapper">
+          <div class="submit-wrapper" :class="{'safe-bottom': isIphoneX}">
             <div class="submit-btn clear" :style="{'color': themeColor}" @click="clearForm">清空</div>
             <div class="submit-btn submit" @click="submitCashier" :style="{'color': themeColor}">提交收银台</div>
             <div class="submit-btn collection" v-if="isCanPay" @click="toPay" :style="{'background-color': themeColor}">收款</div>
@@ -422,6 +422,7 @@ import {checkAuth} from "../common/js/service_config.js";
 export default {
   data() {
     billingData.isCanPay = checkAuth(346)
+    billingData.isIphoneX = store.state.isIphoneX
     return billingData
   },
   mixins: [colorMixin],
@@ -965,7 +966,7 @@ export default {
               duration: 1000
             });
           }
-          if(this.selectedCard.periodOfValidity < 1) {
+          if(this.selectedCard.periodOfValidity < 1 && this.selectedCard.authorityUnit != 1) {
             return wx.showToast({
               title: "有效天数需大于0",
               icon: "none",
@@ -1374,6 +1375,7 @@ export default {
 
 <style lang="less">
 @import "../common/less/form.less";
+@import "~COMMON/less/common";
 @import "../common/less/staff_common.less";
 .billing {
   .input-cell-wrapper {
@@ -1670,6 +1672,7 @@ export default {
       border: 1rpx solid #eee;
       display: flex;
       z-index: 2;
+      background-color: #fff;
       .submit-btn {
         flex: 1;
         text-align: center;

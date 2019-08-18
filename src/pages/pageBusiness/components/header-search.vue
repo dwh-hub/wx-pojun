@@ -4,13 +4,16 @@
       <sapn class="store-text">{{selectedStore.storeName || '门店'}}</sapn>
       <i class="triangle-icon"></i>
     </div>
-    <cover-view class="store-list" v-if="isCoverView" v-show="showStoreList">
-      <cover-view
-        class="store-item"
-        @click="selectStore(item)"
-        v-for="(item,index) in _storeList"
-        :key="index"
-      >{{item.storeName}}</cover-view>
+
+    <cover-view v-if="isCoverView" class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false">
+      <cover-view class="store-list" :style="{'top': '0px'}">
+        <cover-view
+          class="store-item"
+          @click="selectStore(item)"
+          v-for="(item,index) in _storeList"
+          :key="index"
+        >{{item.storeName}}</cover-view>
+      </cover-view>
     </cover-view>
     <div class="store-list" v-else v-show="showStoreList">
       <div
@@ -34,7 +37,7 @@
         >
       </div>
     </div>
-    <cover-view v-if="isCoverView" :style="{'top':maskTop}" class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></cover-view>
+    
     <div v-if="!isCoverView" class="mask-all" v-show="showMask" @click.prevent="showMask = false;showStoreList = false"></div>
   </div>
 </template>
@@ -92,6 +95,14 @@ export default {
       this.showStoreList = false;
     })
     this.text = this.searchText
+    this._storeList = store.state.allStore;
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
+    
+    EventBus.$on('selectedStore', (item) => {
+      if (item.storeName != this.selectedStore.storeName) {
+        this.selectedStore = item
+      }
+    })
   },
   computed: {
     maskTop() {
@@ -108,11 +119,14 @@ export default {
         this._storeList = val
       },
       deep: true
-    }
-  },
-  onShow() {
-    this._storeList = store.state.allStore;
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
+    },
+    // selectedStore: {
+    //   handler(val, oldval) {
+    //     console.log("======selectedStore=====")
+    //     EventBus.$emit('selectedStore', val)
+    //   },
+    //   deep: true
+    // }
   },
   methods: {
     toggleStore() {
@@ -229,7 +243,7 @@ export default {
     }
   }
   .mask-all {
-    top: 82px;
+    top: 44px;
   }
 }
 </style>

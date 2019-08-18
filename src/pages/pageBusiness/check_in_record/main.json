@@ -1,0 +1,9 @@
+{
+    "navigationBarTitleText": "签到记录",
+    "enablePullDownRefresh": false,
+    "usingComponents": {
+        "van-dialog": "/static/vant/dialog/index",
+        "van-loading": "../../../../static/vant/loading/index",
+        "time-picker": "/static/timePicker/timePicker"
+    }
+}

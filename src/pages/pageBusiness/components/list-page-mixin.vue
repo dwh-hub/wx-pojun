@@ -6,6 +6,7 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
+import {EventBus} from '../common/js/eventBus.js'
 export default {
   data() {
     return {
@@ -33,6 +34,7 @@ export default {
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     this.unLoading = false
+    EventBus.$emit('selectedStore', this.selectedStore)
     setNavTab();
   },
   onReachBottom() {

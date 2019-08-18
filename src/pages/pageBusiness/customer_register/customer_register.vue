@@ -1,5 +1,5 @@
 <template>
-  <div class="customer_register">
+  <div class="customer_register" :class="{'safe-bottom': isIphoneX}">
     <div class="check-in-block">
       <div class="input-cell-wrapper">
         <div class="cell-value">登记门店</div>
@@ -263,7 +263,8 @@ export default {
       phoneType: 0, // 200 客户信息已存在 201 正常录入 202 客户在其他门店有录入 405 在公海中
       successCustomerId: 0,
       customerId: '', // 已存在的客户id
-      isCanPay: checkAuth(346)
+      isCanPay: checkAuth(346),
+      isIphoneX: store.state.isIphoneX
     };
   },
   mixins: [colorMixin],
@@ -562,13 +563,13 @@ export default {
 </script>
 
 <style lang="less">
+@import "~COMMON/less/common.less";
 @import "../common/less/form.less";
 page {
-  background-color: #eeeeee;
+  background-color: #fff;
 }
 .customer_register {
   .register-content {
-    background-color: #fff;
     padding-bottom: 15px;
     .textarea-wrapper {
       > textarea {

@@ -20,7 +20,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wx30a8e0c9c1d59f09",
+	"appid": "wxf88e780a44d47beb",
 	"projectname": "%E6%9C%AC%E5%9C%B0%E7%89%88%E6%9C%AC%E5%B0%8F%E7%A8%8B%E5%BA%8F",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
@@ -42,7 +42,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 5,
 			"list": [
 				{
 					"id": 0,
@@ -60,8 +60,8 @@
 				},
 				{
 					"id": 2,
-					"name": "pages/pageBusiness/face/main",
-					"pathName": "pages/pageBusiness/face/main",
+					"name": "pages/appointmentClass/main",
+					"pathName": "pages/appointmentClass/main",
 					"query": "",
 					"scene": null
 				},
@@ -81,9 +81,9 @@
 				},
 				{
 					"id": 5,
-					"name": "pages/pageBusiness/QRCodeSignIn/main",
-					"pathName": "pages/pageBusiness/QRCodeSignIn/main",
-					"query": "params={\"way\":2,\"coachName\":\"董文浩1\",\"coachId\":1516,\"studentName\":\"岑今\",\"studentId\":144993,\"appointId\":\"7120\",\"storeId\":126,\"venueId\":90}",
+					"name": "签到记录",
+					"pathName": "pages/pageBusiness/check_in_record/main",
+					"query": "",
 					"scene": null
 				},
 				{

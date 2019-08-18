@@ -4,21 +4,22 @@
       <span v-show="currentNav!=index">{{item.navTitle}}</span>
       <span v-show="currentNav==index" :style="{color: window.color}">{{item.navTitle}}</span>
       <i class="triangle-icon"></i>
-
-      <cover-view
-        v-if="isCoverView"
-        class="list-warpper-cover"
-        :class="{show: (showSlideList && currentNav==index)}"
-        @click.stop="clickMask"
-      >
-        <cover-view class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
-          <cover-view
-            class="store-nav-item"
-            v-for="(itemS, indexS) in item.children"
-            :key="indexS"
-            @click.stop="clickSonNav(index,itemS)"
-          >
-            <cover-view class="item-span">{{itemS.sonText}}</cover-view>
+      <cover-view v-if="isCoverView" class="mask" v-show="(maskShow && currentNav==index)" @click.prevent.stop="clickMask">
+        <cover-view
+          v-if="isCoverView"
+          class="list-warpper-cover"
+          :class="{show: (showSlideList && currentNav==index)}"
+          @click.stop="clickMask"
+        >
+          <cover-view class="store-nav-list">
+            <cover-view
+              class="store-nav-item"
+              v-for="(itemS, indexS) in item.children"
+              :key="indexS"
+              @click.stop="clickSonNav(index,itemS)"
+            >
+              <cover-view class="item-span">{{itemS.sonText}}</cover-view>
+            </cover-view>
           </cover-view>
         </cover-view>
       </cover-view>
@@ -42,8 +43,7 @@
       </div>
     </div>
 
-    <cover-view v-if="isCoverView" :style="{'top':maskTop}" class="mask" v-show="maskShow" @click.prevent="clickMask"></cover-view>
-    <div v-else class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
+    <div v-if="!isCoverView" class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
 
   </div>
 </template>
@@ -225,7 +225,7 @@ export default {
   .list-warpper-cover {
     display: none;
     position: absolute;
-    top: 42px;
+    top: 0px;
     left: 0px;
     width: 100%;
     max-height: 300px;

@@ -58,7 +58,7 @@
       </div>
       <div class="cell-tip" v-if="deductionArray.length">{{dedTip}}</div>
     </div>
-    <div class="receivable-bottom">
+    <div class="receivable-bottom" :class="{'safe-bottom': isIphoneX}">
       <div class="price">收款：{{payCost}}元</div>
       <div class="receivable-btn">
         <div :style="{color: themeColor}" @click="back">删除</div>
@@ -224,6 +224,9 @@ export default {
           Number(this.reqBaseData.cardPay) +
           Number(this.reqBaseData.cashPay)
       );
+    },
+    isIphoneX() {
+      return billingData.isIphoneX
     }
   },
   methods: {
@@ -529,6 +532,7 @@ export default {
 </script>
 
 <style lang="less">
+@import "~COMMON/less/common.less";
 @import "../common/less/staff_common.less";
 @import "../common/less/form.less";
 

@@ -19,11 +19,24 @@
         {{venueNameList[venueIndex]}}
       </div>
     </picker>
+    <div class="check_in-input-wrapper">
+      <input type="text" v-model="checkInNum" class="check_in-input" placeholder="请输入手机号或卡号确认签到">
+      <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
+    </div> 
+    <div class="bottom-btn" @click="confirmCheckIn">
+      确认签到
+      <div class="block"></div>
+    </div>
   </div>
 </template>
 
 <script>
-import { setNavTab } from "COMMON/js/common.js";
+import {
+  setNavTab,
+  window,
+  HttpRequest,
+  formatDate
+} from "COMMON/js/common.js";
 import { getVenueList } from "../common/js/http.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue"
@@ -47,7 +60,9 @@ export default {
       selectedStore: {},
       venueIndex: 0,
       venueNameList: [],
-      venueList: []
+      venueList: [],
+      checkInNum: "",
+      brushCardSwich: 0 // 是否开启快速签到
     }
   },
   components: {
@@ -74,9 +89,9 @@ export default {
     selectStore(item) {
       this.selectedStore = item
       this._getVenueList()
+      this.getSetting()
     },
     _getVenueList() {
-      console.log(this.selectedStore)
       getVenueList(this.selectedStore.storeId).then((res) => {
         this.venueList = res
         let nameList = []
@@ -85,6 +100,32 @@ export default {
         })
         this.venueNameList = nameList
       })
+    },
+    // 获取门店设置
+    getSetting() {
+      let that = this
+      HttpRequest({
+        url: 'consumption/log/sign/getsetting',
+        data: {
+          storeId: that.selectedStore.storeId
+        },
+        success(res) {
+          that.brushCardSwich = res.data.data.brushCardSwich
+        }
+      })
+    },
+    // 校验
+    confirmCheckIn() {
+      let that = this
+      HttpRequest({
+        url: '/customer/register/compact/querycard',
+        data: {
+          cardId: that.checkInNum
+        },
+        success(res) {
+
+        }
+      })
     }
   }
 }
@@ -92,6 +133,7 @@ export default {
 
 <style lang="less">
 @import "../common/less/staff_common.less";
+@import "~COMMON/less/common.less";
 @import "../common/less/font.less";
 .check-in-type {
   .icon-item {
@@ -110,6 +152,27 @@ export default {
       margin-top: -12px; 
       font-size: 12px;
     }
+  }
+  .check_in-input-wrapper {
+    position: relative;
+    margin-top: 15px;
+    .check_in-input {
+      padding: 0 20px;
+      box-sizing: border-box;
+      height: 70px;
+      text-align: center;
+      background-color: #e7e7e7;
+    }
+    .search-icon {
+      position: absolute;
+      top: 24px;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+  .bottom-btn {
+    font-size: 14px;
   }
   .venue {
     box-sizing: border-box;

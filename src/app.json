@@ -64,7 +64,10 @@
       "receivable/main",
       "face/main",
       "my_private_class/main",
-      "check_in_type/main"
+      "check_in_type/main",
+      "achievement/main",
+      "check_in_record/main",
+      "entry_registration/main"
     ]
   }],
   "permission": {

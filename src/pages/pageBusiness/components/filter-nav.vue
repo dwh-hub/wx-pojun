@@ -1,50 +1,60 @@
 <template>
   <div class="filter-nav">
-    <div class="nav-item" v-for="(item,index) in _nav" :key="index" @click="selectNav(index)">
-      <span v-show="currentNav!=index">{{item.navTitle}}</span>
-      <span v-show="currentNav==index" :style="{color: window.color}">{{item.navTitle}}</span>
-      <i class="triangle-icon"></i>
-      <cover-view v-if="isCoverView" class="mask" v-show="(maskShow && currentNav==index)" @click.prevent.stop="clickMask">
+    <div class="nav">
+      <div class="nav-item" v-for="(item,index) in _nav" :key="index" @click="selectNav(index)">
+        <span v-show="currentNav!=index">{{item.navTitle}}</span>
+        <span v-show="currentNav==index" :style="{color: window.color}">{{item.navTitle}}</span>
+        <i class="triangle-icon"></i>
         <cover-view
           v-if="isCoverView"
-          class="list-warpper-cover"
-          :class="{show: (showSlideList && currentNav==index)}"
+          class="mask"
+          v-show="(maskShow && currentNav==index)"
+          @click.prevent.stop="clickMask"
+        >
+          <cover-view
+            v-if="isCoverView"
+            class="list-warpper-cover"
+            :class="{show: (showSlideList && currentNav==index)}"
+            @click.stop="clickMask"
+          >
+            <cover-view class="store-nav-list">
+              <cover-view
+                class="store-nav-item"
+                v-for="(itemS, indexS) in item.children"
+                :key="indexS"
+                @click.stop="clickSonNav(index,itemS)"
+              >
+                <cover-view class="item-span">{{itemS.sonText}}</cover-view>
+              </cover-view>
+            </cover-view>
+          </cover-view>
+        </cover-view>
+
+        <div
+          v-else
+          class="list-warpper"
+          :class="{slideWrap: (showSlideList && currentNav==index)}"
           @click.stop="clickMask"
         >
-          <cover-view class="store-nav-list">
-            <cover-view
+          <div class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
+            <div
               class="store-nav-item"
               v-for="(itemS, indexS) in item.children"
               :key="indexS"
               @click.stop="clickSonNav(index,itemS)"
             >
-              <cover-view class="item-span">{{itemS.sonText}}</cover-view>
-            </cover-view>
-          </cover-view>
-        </cover-view>
-      </cover-view>
-
-      <div
-        v-else
-        class="list-warpper"
-        :class="{slideWrap: (showSlideList && currentNav==index)}"
-        @click.stop="clickMask"
-      >
-        <div class="store-nav-list" :class="{slide: (showSlideList && currentNav==index)}">
-          <div
-            class="store-nav-item"
-            v-for="(itemS, indexS) in item.children"
-            :key="indexS"
-            @click.stop="clickSonNav(index,itemS)"
-          >
-            <div class="item-span">{{itemS.sonText}}</div>
+              <div class="item-span">{{itemS.sonText}}</div>
+            </div>
           </div>
         </div>
       </div>
+      <div class="detail-to" v-if="hasTodetail" @click="toDetail">
+        <span>详情</span>
+        <img src="/static/images/staff/right-arrow.svg" alt />
+      </div>
     </div>
-
+    <div class="filter-text">{{filterText}}</div>
     <div v-if="!isCoverView" class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
-
   </div>
 </template>
 
@@ -58,6 +68,7 @@ export default {
       default: [
         {
           navTitle: "今日",
+          name: "",
           children: [
             {
               sonText: "今日"
@@ -72,6 +83,7 @@ export default {
         },
         {
           navTitle: "时间段",
+          name: "",
           children: [
             {
               sonText: "全部"
@@ -89,6 +101,7 @@ export default {
         },
         {
           navTitle: "条件三",
+          name: "",
           children: [
             {
               sonText: "子条件四"
@@ -100,9 +113,17 @@ export default {
         }
       ]
     },
+    hasTodetail: {
+      type: Boolean,
+      default: false
+    },
     isCoverView: {
       type: Boolean,
       default: false
+    },
+    toDetail: {
+      type: Function,
+      default: function() {}
     }
   },
   data() {
@@ -112,7 +133,8 @@ export default {
       maskShow: false,
       showSlideList: false,
       date: "",
-      _nav: []
+      _nav: [],
+      filterText: ""
     };
   },
   computed: {
@@ -120,10 +142,10 @@ export default {
       return window;
     },
     maskTop() {
-      if(!this.maskShow) {
-        return "42px"
+      if (!this.maskShow) {
+        return "42px";
       }
-      return (42 + this._nav[this.currentNav].children.length*50)*2 + 'rpx'
+      return (42 + this._nav[this.currentNav].children.length * 50) * 2 + "rpx";
     }
   },
   mounted() {
@@ -132,8 +154,12 @@ export default {
       this.showSlideList = false;
     });
     this._nav = this.nav;
+    this.computedFilterText()
   },
   methods: {
+    computedFilterText() {
+      this.filterText = `${this._nav[0].name}：${this._nav[0].navTitle == this._nav[0].name ? '全部': this._nav[0].navTitle} ， ${this._nav[1].name}：${this._nav[1].navTitle == this._nav[1].name ? '全部': this._nav[1].navTitle} ， ${this._nav[2].name}：${this._nav[2].navTitle == this._nav[2].name ? '全部': this._nav[2].navTitle}`
+    },
     // dateChange(e, item) {
     //   console.log(e);
     //   console.log(e.mp.detail);
@@ -151,10 +177,10 @@ export default {
       this.currentNav = index;
       this.maskShow = true;
       this.showSlideList = true;
-      console.log(this.maskTop)
     },
     clickSonNav(index, item) {
       this._nav[index].navTitle = item.sonText;
+      this.computedFilterText()
       this.maskShow = false;
       this.showSlideList = false;
       if (item.action) {
@@ -164,7 +190,7 @@ export default {
     clickMask() {
       this.maskShow = false;
       this.showSlideList = false;
-      EventBus.$emit('showFilterMask')
+      EventBus.$emit("showFilterMask");
     },
     allFilter() {
       this.maskShow = false;
@@ -178,116 +204,136 @@ export default {
 <style lang="less">
 @import "~COMMON/less/common.less";
 .filter-nav {
-  display: flex;
-  height: 42px;
-  background-color: #fff;
-  position: relative;
-  border-bottom: 1rpx solid #eee;
-  .triangle-icon {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    margin-left: 5px;
-    vertical-align: middle;
-    background-size: 100%;
-    background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTU0ODg1MDMwOTQ5IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIxODgiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTUxMS45OTk0ODggODE5LjQxMzQ2MiA3Mi44Mzc0IDIwNC41ODY1MzggOTUxLjE2MjYgMjA0LjU4NjUzOFoiIHAtaWQ9IjIxODkiIGZpbGw9IiM5OTk5OTkiPjwvcGF0aD48L3N2Zz4=");
-    transition: transform 0.3s;
-    &.active {
-      transform: rotate(-180deg);
-    }
-  }
-  > div {
-    flex: 1;
-    line-height: 42px;
-    text-align: center;
-  }
-  // .nav-item {
-  // border-top: 1rpx solid #eee;
-  // border-bottom: 1rpx solid #eee;
-  // border-right: 1rpx solid #eee;
-  // &:nth-last-of-type(1) {
-  //   border-right: none;
-  // }
-  // }
-  .all-filter {
-    // flex: 1;
-    // padding: 0 5px;
-    // line-height: 42px;
-    .screening-icon {
+  .nav {
+    display: flex;
+    height: 42px;
+    background-color: #fff;
+    position: relative;
+    border-bottom: 1rpx solid #eee;
+    .triangle-icon {
       display: inline-block;
-      width: 15px;
-      height: 15px;
+      width: 10px;
+      height: 10px;
       margin-left: 5px;
       vertical-align: middle;
       background-size: 100%;
+      background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTU0ODg1MDMwOTQ5IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIxODgiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTUxMS45OTk0ODggODE5LjQxMzQ2MiA3Mi44Mzc0IDIwNC41ODY1MzggOTUxLjE2MjYgMjA0LjU4NjUzOFoiIHAtaWQ9IjIxODkiIGZpbGw9IiM5OTk5OTkiPjwvcGF0aD48L3N2Zz4=");
+      transition: transform 0.3s;
+      &.active {
+        transform: rotate(-180deg);
+      }
     }
-  }
-  .list-warpper-cover {
-    display: none;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    width: 100%;
-    max-height: 300px;
-    overflow: hidden;
-    z-index: 98;
-    &.show {
-      display: block;
+    > div {
+      flex: 1;
+      line-height: 42px;
+      text-align: center;
     }
-    .store-nav-list {
-      text-align: left;
+    .detail-to {
+      flex: 0 0 50px;
+      width: 50px;
+      padding: 0 5px;
+      > img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+    // .nav-item {
+    // border-top: 1rpx solid #eee;
+    // border-bottom: 1rpx solid #eee;
+    // border-right: 1rpx solid #eee;
+    // &:nth-last-of-type(1) {
+    //   border-right: none;
+    // }
+    // }
+    .all-filter {
+      // flex: 1;
+      // padding: 0 5px;
+      // line-height: 42px;
+      .screening-icon {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        margin-left: 5px;
+        vertical-align: middle;
+        background-size: 100%;
+      }
+    }
+    .list-warpper-cover {
+      display: none;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      width: 100%;
       max-height: 300px;
-      background-color: #fff;
-      .store-nav-item {
-        .item-span {
-          box-sizing: border-box;
+      overflow: hidden;
+      z-index: 98;
+      &.show {
+        display: block;
+      }
+      .store-nav-list {
+        text-align: left;
+        max-height: 300px;
+        background-color: #fff;
+        .store-nav-item {
+          .item-span {
+            box-sizing: border-box;
+            line-height: 50px;
+            padding-left: 20px;
+            border-top: 1rpx solid #eee;
+          }
+        }
+      }
+    }
+    .list-warpper {
+      position: absolute;
+      top: 42px;
+      left: 0px;
+      width: 100%;
+      height: 0px;
+      overflow: hidden;
+      background-color: rgba(0, 0, 0, 0);
+      transition: height 0.3s;
+      z-index: 98;
+      &.slideWrap {
+        height: 300px;
+      }
+      .store-nav-list {
+        text-align: left;
+        max-height: 300px;
+        transform: translateY(-100%);
+        background-color: #fff;
+        overflow-y: auto;
+        transition: transform 0.3s;
+        &.slide {
+          transform: translateY(0px);
+        }
+        .store-nav-item {
           line-height: 50px;
           padding-left: 20px;
           border-top: 1rpx solid #eee;
+          > img {
+            margin-right: 10px;
+            width: 36px;
+            height: 36px;
+            background-color: #eee;
+            border-radius: 50%;
+          }
+          .item-span {
+            display: inline-block;
+            vertical-align: middle;
+          }
         }
       }
     }
   }
-  .list-warpper {
-    position: absolute;
-    top: 42px;
-    left: 0px;
-    width: 100%;
-    height: 0px;
-    overflow: hidden;
-    background-color: rgba(0, 0, 0, 0);
-    transition: height 0.3s;
-    z-index: 98;
-    &.slideWrap {
-      height: 300px;
-    }
-    .store-nav-list {
-      text-align: left;
-      max-height: 300px;
-      transform: translateY(-100%);
-      background-color: #fff;
-      overflow-y: auto;
-      transition: transform 0.3s;
-      &.slide {
-        transform: translateY(0px);
-      }
-      .store-nav-item {
-        line-height: 50px;
-        padding-left: 20px;
-        border-top: 1rpx solid #eee;
-        > img {
-          margin-right: 10px;
-          width: 36px;
-          height: 36px;
-          background-color: #eee;
-          border-radius: 50%;
-        }
-        .item-span {
-          display: inline-block;
-          vertical-align: middle;
-        }
-      }
-    }
+  .filter-text {
+    padding-left: 15px;
+    line-height: 24px;
+    font-size: 12px;
+    color: #86a1bf;
+    background-color: #f6f6f6;
+    border-bottom: 1rpx solid #eee;
+    .Mult-line(1);
   }
 }
 

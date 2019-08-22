@@ -1,10 +1,10 @@
 import {
   window,
   HttpRequest,
-  getThemeColor
+  getThemeColor,
+  formatDate
 } from "COMMON/js/common.js";
 import store from "../../utils/store.js"
-
 
 let storeId
 let url = ""
@@ -40,7 +40,7 @@ export function getPhoneNumber(e, url, isTab) {
         });
         // wx.setStorage({
         //   key: "phone",
-        //   data: "18259260870", //"18759888263",
+        //   data: "13073618012", //"18759888263",
         //   success: function () {
         //     login(url, isTab);
         //   }
@@ -139,12 +139,24 @@ export function login(url, isTab) {
 
 // 进入会员的逻辑
 export function enterMember(res) {
+  // 清除商户登录信息
   HttpRequest({
-    url: '/mini/login/after/customer',
-    data: {
-      miniOpenId: wx.getStorageSync("openId")
-    }
+    url: window.api + '/user/exit'
   })
+  // 微信授权
+  // HttpRequest({
+  //   url: '/mini/login/after/customer',
+  //   data: {
+  //     miniOpenId: wx.getStorageSync("openId")
+  //   },
+  //   success(res) {
+  //     if (res.data.code == 201) {
+  //       wx.request({
+  //         url: res.data.data
+  //       })
+  //     }
+  //   }
+  // })
   wx.hideLoading();
   let _data = res.data.data
   if (!_data || !_data.length) {
@@ -185,10 +197,31 @@ export function enterStaff(res) {
   wx.showLoading({
     title: '正在进入..'
   });
+  // 清除会员登录信息
   HttpRequest({
-    url: '/mini/login/after/user',
+    url: window.api + '/wxcustomer/exit'
+  })
+  // 微信授权
+  // HttpRequest({
+  //   url: '/mini/login/after/user',
+  //   data: {
+  //     miniOpenId: wx.getStorageSync("openId")
+  //   },
+  //   success(res) {
+  //     if (res.data.code == 201) {
+  //       wx.request({
+  //         url: res.data.data
+  //       })
+  //     }
+  //   }
+  // })
+  // 登录日志
+  HttpRequest({
+    url: '/system/log/addWorkLog',
     data: {
-      miniOpenId: wx.getStorageSync("openId")
+      workType: 24,
+      result: res.data.message,
+      descInfo: `登录-商户-小程序：账号:${wx.getStorageSync("phone")}，登录设备:${wx.getSystemInfoSync().model},${wx.getSystemInfoSync().system}，登录时间:${formatDate(new Date(), 'yyyy-MM-dd')}`
     }
   })
   let staff_info = res.data.data

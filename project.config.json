@@ -20,7 +20,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "wxf88e780a44d47beb",
+	"appid": "wx30a8e0c9c1d59f09",
 	"projectname": "%E6%9C%AC%E5%9C%B0%E7%89%88%E6%9C%AC%E5%B0%8F%E7%A8%8B%E5%BA%8F",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},
@@ -42,27 +42,28 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 5,
+			"current": 6,
 			"list": [
 				{
 					"id": 0,
-					"name": "pages/homepage/main",
-					"pathName": "pages/homepage/main",
-					"query": "55-127-1516",
+					"name": "pages/",
+					"pathName": "pages/memberCard/main",
+					"query": "",
 					"scene": null
 				},
 				{
 					"id": 1,
-					"name": "团课列表",
-					"pathName": "pages/teamClassList/main",
+					"name": "pages/homepage/main",
+					"pathName": "pages/homepage/main",
 					"query": "",
-					"scene": null
+					"scene": 1035,
+					"referrerInfo": {}
 				},
 				{
 					"id": 2,
-					"name": "pages/appointmentClass/main",
-					"pathName": "pages/appointmentClass/main",
-					"query": "",
+					"name": "pages/pageBusiness/customer_detail/main",
+					"pathName": "pages/pageBusiness/customer_detail/main",
+					"query": "id=145048",
 					"scene": null
 				},
 				{
@@ -88,8 +89,8 @@
 				},
 				{
 					"id": 6,
-					"name": "pages/pageBusiness/check_in_type/main",
-					"pathName": "pages/pageBusiness/check_in_type/main",
+					"name": "pages/pageBusiness/achievement_detail/main",
+					"pathName": "pages/pageBusiness/achievement_detail/main",
 					"query": "",
 					"scene": null
 				},

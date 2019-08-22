@@ -55,7 +55,7 @@ let service = [{
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
-        text: "我的私教",
+        text: "私教卡",
         authorityId: 63,
         hasAuth: true,
         navUrl: "../my_private_class/main",
@@ -78,7 +78,7 @@ let service = [{
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/member_service_icon_2.svg",
-        text: "学员",
+        text: "私教学员",
         authorityId: 64,
         hasAuth: true,
         navUrl: "../coach_student/main",
@@ -206,8 +206,9 @@ let service = [{
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_5.svg",
-        text: "上课统计报表",
-        navUrl: "",
+        text: "私教耗课", // 上课统计报表
+        // authorityId: 63,
+        navUrl: "../coach_class_total/main",
         isOpen: false,
         hasAuth: true,
         class: "iconfont icon-coach_service_icon_1"
@@ -246,6 +247,7 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
         text: "业绩报表",
+        // authorityId: 87,
         navUrl: "../achievement/main",
         isOpen: false,
         hasAuth: true,

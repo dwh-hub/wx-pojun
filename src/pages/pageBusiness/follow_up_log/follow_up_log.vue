@@ -58,9 +58,10 @@ export default {
       nav: [
         {
           navTitle: "今日",
+          name: "登记时间",
           children: [
             {
-              sonText: "全部(登记时间)",
+              sonText: "全部",
               action: () => {
                 this.filterDate(0);
               }
@@ -94,9 +95,10 @@ export default {
         },
         {
           navTitle: "跟进时间",
+          name: "跟进时间",
           children: [
             {
-              sonText: "全部(跟进时间)",
+              sonText: "全部",
               action: () => {
                 this.filterTrackDate(0);
               }
@@ -130,9 +132,10 @@ export default {
         },
         {
           navTitle: "跟进结果",
+          name: "跟进结果",
           children: [
             {
-              sonText: "全部(跟进结果)",
+              sonText: "全部",
               action: () => {
                 this.filter.trackResult = "";
               }

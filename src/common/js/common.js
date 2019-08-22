@@ -1,12 +1,20 @@
 import store from "../../utils/store.js"
 const window = {}
 window.DEBUGGING = false
-window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
+window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://www.pojun-tech.cn' // 'https://test.lirenos.com'
 window.color = "#2a82e4" // "#00c2a9"
 // 获取 ext.json 配置信息
 const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
+const spareCompany = "37"
+
 if (extConfig.companyId) {
   wx.setStorageSync('companyId', extConfig.companyId)
+} else {
+  if (window.DEBUGGING) {
+    wx.setStorageSync('companyId', '53')
+  } else {
+    wx.setStorageSync('companyId', spareCompany)
+  }
 }
 console.log("common.js")
 
@@ -43,7 +51,7 @@ export function getThemeColor() {
   })
 }
 
-// 获取公司id之后获取主题色
+// 获取公司id之后获取主题色 = 多余代码 = 待整理
 export function getCompanyColor() {
   if (!wx.getStorageSync("companyId")) {
     if (window.DEBUGGING) {
@@ -53,7 +61,7 @@ export function getCompanyColor() {
       if (extConfig.companyId) {
         wx.setStorageSync('companyId', extConfig.companyId)
       } else {
-        wx.setStorageSync('companyId', '55')
+        wx.setStorageSync('companyId', spareCompany)
       }
       return getThemeColor()
     }
@@ -92,6 +100,7 @@ export function wxLogin() {
     })
   })
 }
+wxLogin()
 
 /**
  * 设置页面导航条的标题和颜色
@@ -178,13 +187,14 @@ export function HttpRequest(obj) {
     }
 
     obj.success = function(res) {
+      let curPageRoute = getCurrentPages()[getCurrentPages().length-1].route
       if(JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
-        store.commit('changeLogin', false)
-        if(getCurrentPages()[0].route.indexOf('mine') == -1 && !isShowModal) {
+        // store.commit('changeLogin', false)
+        if(curPageRoute.indexOf('mine') == -1 && curPageRoute.indexOf('homepage') == -1 && !isShowModal) {
           isShowModal = true
           return wx.showModal({
             title: "提示",
-            content: "当前状态为未登录，请先登录",
+            content: "当前状态为未登录，请先登录!",
             confirmText: '前往登录',
             showCancel: false,
             success(res) {
@@ -197,6 +207,10 @@ export function HttpRequest(obj) {
             }
           });
         }
+      }
+      let type = curPageRoute.indexOf('pageBusiness') > -1 ? "staff" : "member"
+      if(type == "staff") {
+        WechatMenuisLogin("staff")
       }
       if(success) {
         success(res)
@@ -354,31 +368,35 @@ export function getRange(lat1, lng1, lat2, lng2) {
 }
 
 // 公共号进来判断是否登录
-// export function WechatMenuisLogin(type) {
-//   if(store.state.isLogin && type != "staff") {
-//     return
-//   }
-//   if(store.state.staffIsLogin && type == "staff") {
-//     return
-//   }
-//   return wx.showModal({
-//     title: "提示",
-//     content: "当前状态为未登录，请前往登录",
-//     showCancel: false,
-//     success(res) {
-//       if (res.confirm) {
-//         if(type == "staff") {
-//           return wx.switchTab({
-//             url: "../../homepage/main"
-//           });
-//         }
-//         wx.switchTab({
-//           url: "../homepage/main"
-//         });
-//       }
-//     }
-//   });
-// }
+export function WechatMenuisLogin(type) { // 1035 1043
+  if(isShowModal) {
+    return
+  }
+  // let curPageRoute = getCurrentPages()[getCurrentPages().length-1].route
+  // if(!type) {
+  //   curPageRoute.indexOf('pageBusiness') > -1 ? type = "staff" : type = "member" 
+  // }
+  if(store.state.isLogin && type != "staff") {
+    return
+  }
+  if(store.state.staffIsLogin && type == "staff") {
+    return
+  }
+  isShowModal = true
+  return wx.showModal({
+    title: "提示",
+    content: "当前状态为未登录，请前往登录",
+    showCancel: false,
+    success(res) {
+      if (res.confirm) {
+        isShowModal = false
+        wx.switchTab({
+          url: "/pages/mine/main"
+        });
+      }
+    }
+  });
+}
 
 export default {
   window,
@@ -390,5 +408,6 @@ export default {
   formatDate,
   debounce,
   getRange,
-  wxLogin
+  wxLogin,
+  WechatMenuisLogin
 }

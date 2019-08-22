@@ -42,7 +42,6 @@ import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 import { EventBus } from "../common/js/eventBus.js";
 
-// TODO:
 Vue.prototype.globalData.normalCoachCourse = new GoEasy({
   appkey: wx.getStorageSync("instMsgSubKey"),
   onConnected: function() {
@@ -85,9 +84,9 @@ export default {
       this.params = JSON.parse(options.params);
       console.log(this.params);
     }
-    this.timer = setInterval(() => {
-      this.getNowTime();
-    }, 60000);
+    // this.timer = setInterval(() => {
+    //   this.getNowTime();
+    // }, 60000);
     this.timer;
     if (this.params.way == 2 || this.params.way == 3) {
       this.getQrCode();

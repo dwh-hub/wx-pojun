@@ -56,9 +56,10 @@ export default {
       nav: [
         {
           navTitle: "全部",
+          name: "登记时间",
           children: [
             {
-              sonText: "全部(登记时间)",
+              sonText: "全部",
               action: () => {
                 this.filterDate(0);
               }
@@ -92,9 +93,10 @@ export default {
         },
         {
           navTitle: "资料来源",
+          name: "资料来源",
           children: [
             {
-              sonText: "全部(资料来源)",
+              sonText: "全部",
               action: () => {
                 this.filter.coachDataSource = ""
               }
@@ -133,9 +135,10 @@ export default {
         },
         {
           navTitle: "私教状态",
+          name: "私教状态",
           children: [
             {
-              sonText: "全部(私教状态)",
+              sonText: "全部",
               action: () => {
                 this.filter.isTrainer = ""
               }
@@ -242,7 +245,7 @@ export default {
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.name,
                 second_1: e.lastTrackTime || "--",
-                second_tip_1: "最近维护时间："
+                second_tip_1: "最近回访时间："
               };
             });
             Promise.all(_data).then(result => {

@@ -20,10 +20,17 @@ function getUseServiceList() {
           list = serviceList.slice(0,7)
           return resolve(list)
         }
-        serviceList.forEach((item, index) => {
-          if (data.filter(e => e.authorityId == item.authorityId).length) {
-            list.push(item)
-          }
+        // serviceList.forEach((item, index) => {
+        //   if (data.filter(e => e.authorityId == item.authorityId).length) {
+        //     list.push(item)
+        //   }
+        // })
+        data.forEach((e) => {
+          serviceList.forEach((item) => {
+            if (e.authorityId == item.authorityId) {
+              list.push(item)
+            }
+          })
         })
         resolve(list)
       }

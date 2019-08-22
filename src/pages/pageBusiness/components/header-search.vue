@@ -99,6 +99,9 @@ export default {
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
     
     EventBus.$on('selectedStore', (item) => {
+      if(undefined == this.selectedStore || null == this.selectedStore) {
+        return
+      }
       if (item.storeName != this.selectedStore.storeName) {
         this.selectedStore = item
       }

@@ -75,12 +75,12 @@ export default {
         this.getDetail();
       }
     },
-    toInfoCell(type, text) {
+    toInfoCell(name, value) {
       if (this.type !== "oneself") {
         return;
       }
       wx.navigateTo({
-        url: `../modify_cell/main?type=${type}&text=${text}`
+        url: `../modify_cell/main?type=oneself&name=${name}&value=${value}`
       });
     },
     getDetail() {

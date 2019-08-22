@@ -62,7 +62,8 @@ import {
   window,
   HttpRequest,
   formatDate,
-  getRange
+  getRange,
+  WechatMenuisLogin
 } from "COMMON/js/common.js";
 import titleCell from "COMPS/titleCell";
 import storeItem from "COMPS/storeItem";
@@ -116,6 +117,9 @@ export default {
       return window.color;
     }
   },
+  onShow() {
+    WechatMenuisLogin(this.type)
+  },
   onLoad(options) {
     // 进页面前先清空数据
     Object.assign(this.$data, this.$options.data());
@@ -133,7 +137,7 @@ export default {
     setNavTab();
   },
   onUnload() {
-    if (getCurrentPages()[3].route.indexOf('QRCodeSignIn') > -1) {
+    if (getCurrentPages().filter(e => e.route.indexOf('QRCodeSignIn') > -1).length) {
       wx.navigateBack({
         delta: 2
       });

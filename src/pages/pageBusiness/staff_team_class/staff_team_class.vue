@@ -73,6 +73,7 @@ export default {
       nav: [
         {
           navTitle: "今日",
+          name: "课程时间",
           children: [
             {
               sonText: "全部",
@@ -108,9 +109,10 @@ export default {
         },
         {
           navTitle: "课程状态",
+          name: "课程状态",
           children: [
             {
-              sonText: "全部(课程状态)",
+              sonText: "全部",
               action: () => {
                 this.filter.scheduleldStatus = ""
               }
@@ -130,6 +132,7 @@ export default {
         },
         {
           navTitle: "场馆",
+          name: "场馆",
           children: [
             {
               sonText: "全部场馆"

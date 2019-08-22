@@ -1,5 +1,14 @@
 <template>
-  <div class="achievement"></div>
+  <div class="achievement">
+    <div class="subtitle">
+      <img class="screening-icon" src="/static/images/staff/title-icon.svg" />
+      <span class="subtitle-text">销售员业绩</span>
+    </div>
+    <div class="header">
+      <header-data :headerData="headerData"></header-data>
+      <filter-nav :nav="nav" :hasTodetail="true" :toDetail="toDetail"></filter-nav>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -11,7 +20,7 @@ import {
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
-import listDayItem from "../components/list-day-item";
+import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 export default {
   data() {
@@ -29,16 +38,76 @@ export default {
         belongerId: wx.getStorageSync("userInfo").userId,
         isCoverage: 0
       },
-      page: 1
+      nav: [
+        {
+          navTitle: "所有业务",
+          name: "业务类型",
+          children: [
+            {
+              sonText: ""
+            }
+          ]
+        },
+        {
+          navTitle: "所有销售",
+          name: "销售/教练名",
+          children: [
+            {
+              sonText: "无"
+            }
+          ]
+        },
+        {
+          navTitle: "近七天",
+          name: "时间",
+          children: [
+            {
+              sonText: "今日",
+              action: () => {
+
+              }
+            },
+            {
+              sonText: "近七天",
+              action: () => {
+
+              }
+            },
+            {
+              sonText: "本月",
+              action: () => {
+
+              }
+            },
+            {
+              sonText: "上月",
+              action: () => {
+
+              }
+            }
+          ]
+        }
+      ],
+      headerData: [
+        {
+          dataText: "业绩总额",
+          dataNum: "0"
+        },
+        {
+          dataText: "实际业绩总额",
+          dataNum: "0"
+        }
+      ]
     };
   },
   mixins: [colorMixin],
   components: {
-    listDayItem,
+    headerData,
     filterNav
   },
   mounted() {
     setNavTab();
+    this.getAchievementTable()
   },
   methods: {
     getAchievementTable() {
@@ -48,35 +117,48 @@ export default {
         data: that.requestData,
         success(res) {
           if (res.data.code == 200) {
-            that.achievementTable = res.data.data;
+            let sum = 0
+            res.data.data.forEach((e) => {
+              sum += e.cost
+            })
+            that.headerData[0].dataNum = sum
+            that.headerData[1].dataNum = sum
           }
         }
       });
     },
-    getAchievementForm() {
-      let that = this;
-      HttpRequest({
-        url: "/performance/card/pages",
-        data: that.requestData,
-        success(res) {
-          if (res.data.code == 200 && res.data.data.length) {
-            let _data
-            _data = res.data.data.map(e => {
-              // TODO:
-            });
-            if (that.page == 1) {
-              that.achievementForm = _data;
-            } else {
-              that.achievementForm = that.achievementForm.concat(_data);
-            }
-            that.page++
-          }
-        }
-      });
+    toDetail() {
+      wx.navigateTo({
+        url: '../achievement_list/main'
+      })
     }
+    // getAchievementForm() {
+    //   let that = this;
+    //   HttpRequest({
+    //     url: "/performance/card/pages",
+    //     data: that.requestData,
+    //     success(res) {
+    //       if (res.data.code == 200 && res.data.data.length) {
+    //         let _data;
+    //         _data = res.data.data.map(e => {
+    //         });
+    //         if (that.page == 1) {
+    //           that.achievementForm = _data;
+    //         } else {
+    //           that.achievementForm = that.achievementForm.concat(_data);
+    //         }
+    //         that.page++;
+    //       }
+    //     }
+    //   });
+    // }
   }
 };
 </script>
 
 <style lang="less">
+@import "~COMMON/less/common.less";
+@import "../common/less/staff_common.less";
+.achievement {
+}
 </style>

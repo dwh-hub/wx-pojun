@@ -99,6 +99,8 @@ export default {
     });
     this.storeList = allStore.filter(e => e.storeId)
     this.selectedStore = this.storeList[0];
+  },
+  onShow() {
     this.userInfo = wx.getStorageSync("staff_info");
   },
   methods: {
@@ -131,8 +133,8 @@ export default {
         content: "是否退出登录？",
         success(res) {
           if (res.confirm) {
-            wx.request({
-              url: window.api + '/user/cancelbind'
+            HttpRequest({
+              url: window.api + '/user/exit'
             })
             wx.removeStorageSync("instMsgSubKey");
             wx.removeStorageSync("phone");

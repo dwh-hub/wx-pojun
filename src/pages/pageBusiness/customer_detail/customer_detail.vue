@@ -124,7 +124,10 @@
       <swiper-item>
         <div class="info">
           <van-cell-group custom-class="van-cell-group">
-            <van-cell title="基本信息" is-link @click="toUserInfo"/>
+            <!-- <van-cell title="基本信息" is-link @click="toUserInfo"/> -->
+            <van-cell title="姓名" is-link :value="userInfo.name" @click="toInfoCell('name', userInfo.name)"></van-cell>
+            <van-cell title="性别" is-link :value="userInfo.sexChar" @click="showSexAction"/>
+            <van-cell title="手机号" :value="userInfo.phone" @click="toInfoCell('phone', userInfo.phone)" is-link/>
           </van-cell-group>
           <van-cell title="服务教练" @click="showCoachList()">
             <div slot="right-icon">
@@ -142,9 +145,21 @@
               <van-icon name="arrow" color="#999"/>
             </div>
           </van-cell>
-          <van-cell title="预约记录" is-link @click="toAppointList"/>
-          <van-cell title="健身目的" is-link value="未填写"/>
-          <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
+          <van-cell title="预约记录" @click="toAppointList" :value="appointList.length+'条'" is-link/>
+          <van-cell title="身份证号" :value="userInfo.identityCard || '未填写'" @click="toInfoCell('identityCard', userInfo.identityCard)" is-link />
+          <van-cell title="出生日期" is-link>
+            <div style="color: #999">
+              <picker mode="date" :value="userInfo.birthTime" @change="changeBirthTime">
+                <view class="picker">
+                  {{userInfo.birthTime || '未填写'}}
+                </view>
+              </picker>
+            </div>
+          </van-cell>
+          <van-cell title="客户备注" :value="userInfo.remarks || '未填写'"/>
+          <van-cell title="健身目的" :value="userInfo.purpose || '未填写'"/>
+          <van-cell title="客户星级" :value="userInfo.starLevel"/>
+          <van-cell title="喜好" :value="userInfo.interest || '未填写'"/>
         </div>
       </swiper-item>
     </swiper>
@@ -280,6 +295,7 @@ import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import card from "COMPS/card";
 import noneResult from "COMPS/noneResult.vue";
+import { EventBus } from "../common/js/eventBus.js";
 
 export default {
   data() {
@@ -460,6 +476,9 @@ export default {
     this.getCheckInList();
     this.getFollowUpList();
     this.getCardList();
+    EventBus.$on('modifyCell', (obj) => {
+      this.modifyInfo(obj.name, obj.value)
+    })
   },
   onLoad(options) {
     this.id = options.id;
@@ -564,7 +583,6 @@ export default {
             that.userInfo = _data;
             that.storeId = _data.storeId;
             that.getTrackusertype();
-
             _data.customerStoreArrays.forEach(e => {
               console.log(e.headImgPath)
               if (e.serviceCoachId) {
@@ -929,6 +947,63 @@ export default {
           }
         }
       });
+    },
+    showSexAction() {
+      let that = this
+      wx.showActionSheet({
+        itemList: ['男', '女'],
+        success (res) {
+          that.modifyInfo('sex',res.tapIndex+1)
+        },
+        fail (res) {
+          console.log(res.errMsg)
+        }
+      })
+    },
+    changeBirthTime(event) {
+      this.modifyInfo('birthTime', event.mp.detail.value)
+    },
+    toInfoCell(name, value) {
+      wx.navigateTo({
+        url: `../modify_cell/main?type=customer&name=${name}&value=${value}`
+      });
+    },
+    // 修改信息
+    modifyInfo(name, value) {
+      wx.showLoading({
+        title: '修改中..'
+      })
+      let data = {
+        id: this.userInfo.id,
+        name: this.userInfo.name,
+        phone: this.userInfo.phone,
+        sex: this.userInfo.sex,
+        birthTime: this.userInfo.birthTime,
+        weight: this.userInfo.weight,
+        height: this.userInfo.height,
+        identityCard: this.userInfo.identityCard
+      }
+      data[name] = value
+      let that = this
+      HttpRequest({
+        url: '/customer/archives/updatadetail',
+        data: data,
+        success(res) {
+          wx.hideLoading()
+          if (res.data.code === 200) {
+            wx.showToast({
+              title: "修改成功"
+            });
+            that.getDetail()
+          } else {
+            wx.showModal({
+              title: "错误",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      })
     }
   }
 };

@@ -82,7 +82,7 @@
 import {
   setNavTab,
   window,
-  wxLogin,
+  // wxLogin,
   HttpRequest
 } from "COMMON/js/common.js";
 import {getPhoneNumber} from "COMMON/js/merge_login.js";
@@ -167,9 +167,9 @@ export default {
   mixins:[colorMixin],
   onShow() {
     this.getTimes();
-    if(store.state.isLogin == false) {
-      wxLogin();
-    }
+    // if(store.state.isLogin == false) {
+    //   wxLogin();
+    // }
     if (this.themeColor != window.color) {
       this.themeColor = window.color;
       setNavTab(wx.getStorageSync("companyName"));

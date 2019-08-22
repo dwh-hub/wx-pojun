@@ -33,12 +33,12 @@
 
     <van-dialog
       use-slot
-      title="请输入账号密码"
-      v-show="true"
+      title="请输入账号密码确认操作"
+      :show="showRevokeDialog"
       show-cancel-button
       @confirm="confirmPwd"
       @close="showRevokeDialog = false">
-      <image src="https://img.yzcdn.cn/1.jpg" />
+      <input type="text" class="input-pwd" v-model="pwd" placeholder="请输入账号密码">
     </van-dialog>
   </div>
 </template>
@@ -69,6 +69,7 @@ export default {
       nav: [
         {
           navTitle: "今日",
+          name: "签到时间",
           children: [{
               sonText: "全部",
               action: () => {
@@ -102,13 +103,15 @@ export default {
         },
         {
           navTitle: "全部场馆",
+          name: "场馆",
           children: []
         },
         {
           navTitle: "入场状态",
+          name: "入场状态",
           children: [
             {
-              sonText: "全部(入场状态)",
+              sonText: "全部",
               action: () => {
                 this.filter.status = ""
               }
@@ -152,6 +155,8 @@ export default {
         timeStart: "",
         timeEnd: ""
       },
+      selectedCustomer: {},
+      pwd: "",
       showRevokeDialog: false
     };
   },
@@ -179,6 +184,7 @@ export default {
     },
     clickIcon(item) {
       this.showRevokeDialog = true
+      this.selectedCustomer = item
     },
     loadData() {
       let that = this;
@@ -215,6 +221,7 @@ export default {
               return {
                 isSelect: false,
                 id: e.customerId,
+                consumptionLogId: e.consumptionLogId,
                 sex: e.sex,
                 phone: e.phone,
                 cover: e.headImgPath
@@ -240,6 +247,27 @@ export default {
       });
     },
     confirmPwd() {
+      let that = this
+      HttpRequest({
+        url: `/consumption/general/withraw/${that.selectedCustomer.consumptionLogId}/${that.pwd}`,
+        success(res) {
+          that.pwd = ""
+          if(res.data.code == 200)  {
+            that.refreshList()
+            wx.showToast({
+              title: res.data.message,
+              icon: "success",
+              duration: 1000
+            });
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      })
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
@@ -296,6 +324,10 @@ export default {
         height: 18px;
       }
     }
+  }
+  .input-pwd {
+    margin: 15px;
+    padding: 0 15px;
   }
 }
 </style>

@@ -25,7 +25,7 @@
     </div> 
     <div class="bottom-btn" @click="confirmCheckIn">
       确认签到
-      <div class="block"></div>
+      <div class="block" v-if="isPhoneX"></div>
     </div>
   </div>
 </template>
@@ -62,6 +62,7 @@ export default {
       venueNameList: [],
       venueList: [],
       checkInNum: "",
+      frontSign: "",
       brushCardSwich: 0 // 是否开启快速签到
     }
   },
@@ -69,6 +70,11 @@ export default {
     headerSearch
   },
   mixins:[colorMixin],
+  computed: {
+    isPhoneX() {
+      return store.state.isIphoneX;
+    }
+  },
   mounted() {
     setNavTab()
     this.storeList = store.state.allStore.filter(e => e.storeId);
@@ -123,7 +129,31 @@ export default {
           cardId: that.checkInNum
         },
         success(res) {
-
+          if(res.data.code == 500) { // 为卡号
+            that.frontSign = ""
+          } else { // 不为卡号,查询客户
+            that.frontSign = 1
+            that.getCustomerList()
+          }
+        }
+      })
+    },
+    getCustomerList() {
+      let that = this
+      HttpRequest({
+        url: '/consumption/general/customerforcost',
+        data: {
+          nameOrPhone: that.checkInNum,
+          customerClass: 3
+        },
+        success(res) {
+          if(!res.data.data.result.length || res.data.data.result.length > 1) {
+            wx.showModal({
+              title: "提示",
+              content: "请输入具体信息查询",
+              showCancel: false
+            });
+          }
         }
       })
     }

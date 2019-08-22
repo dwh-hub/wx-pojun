@@ -120,7 +120,8 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  WechatMenuisLogin
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
@@ -136,10 +137,12 @@ export default {
       nav: [
         {
           navTitle: "",
+          name: "门店",
           children: []
         },
         {
           navTitle: "今日",
+          name: "时间",
           children: [
             {
               sonText: "全部",
@@ -196,6 +199,9 @@ export default {
     listDayItem,
     staffCoachItem,
     filterNav
+  },
+  onShow() {
+    WechatMenuisLogin("staff")
   },
   onLoad(options) {
     if (options.nav) {

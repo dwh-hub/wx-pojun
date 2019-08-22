@@ -119,6 +119,7 @@ export default {
       nav: [
         {
           navTitle: "全部",
+          name: "办理日期",
           children: [
             {
               sonText: "全部",
@@ -153,7 +154,8 @@ export default {
           ]
         },
         {
-          navTitle: "筛选条件二",
+          navTitle: "合同状态",
+          name: "合同状态",
           children: [
             {
               sonText: "无"
@@ -162,6 +164,7 @@ export default {
         },
         {
           navTitle: "卡类型",
+          name: "卡类型",
           children: [
             {
               sonText: "全部",
@@ -218,7 +221,8 @@ export default {
         nameOrPhone: "",
         transactTimeEnd: "",
         transactTimeStart: "",
-        cardType: ""
+        cardType: "",
+        cardStatus: ""
       },
       selectedCard: {},
       showProjectPopup: false,
@@ -239,6 +243,7 @@ export default {
       this.teamScheduleId = options.teamScheduleId;
       this.classStoreId = options.classStoreId
     }
+    this.getCardStatus()
   },
   mounted() {
     // this.nav[0].navTitle = "今日";
@@ -476,10 +481,31 @@ export default {
         }
       });
     },
+    /* 上课流程-结束 */
     changePrice(e) {
       this.modifyPrice = e.mp.detail;
+    },
+    getCardStatus() {
+      let that = this
+      HttpRequest({
+        url: '/customer/card/cardstatuslist',
+        success(res) {
+          let list = res.data.data.map((e) => {
+            e.sonText = e.cardStatusChar,
+            e.action = function () {
+              that.filter.cardStatus = e.cardStatus
+            }
+            return e
+         })
+         that.nav[1].children = [{
+           sonText: "全部(合同状态)",
+           action: function () {
+              that.filter.cardStatus = ""
+            }
+         }].concat(list)
+        }
+      })
     }
-    /* 上课流程-结束 */
   }
 };
 </script>

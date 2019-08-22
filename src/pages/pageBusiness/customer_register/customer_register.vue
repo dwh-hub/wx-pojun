@@ -49,9 +49,9 @@
         <div class="cell-value must-input">性别</div>
         <div class="cell-content">
           <radio-group class="radio-group" @change="onChangeSex">
-            <radio value="1" :color="themeColor" :checked="sex == 1"/>
+            <radio value="1" :color="themeColor" :checked="sex == 1" />
             <span class="radio-span">男</span>
-            <radio value="2" :color="themeColor" :checked="sex == 2"/>
+            <radio value="2" :color="themeColor" :checked="sex == 2" />
             <span class="radio-span">女</span>
           </radio-group>
         </div>
@@ -70,84 +70,84 @@
         </div>
       </div>
       <div v-show="phoneType == 201">
-      <div class="input-cell-wrapper">
-        <div class="cell-value">身份证</div>
-        <div class="cell-content">
-          <input
-            class="cell-input"
-            type="text"
-            v-model="idCard"
-            placeholder="请输入身份证号"
-            placeholder-class="placeholder"
-          />
+        <div class="input-cell-wrapper">
+          <div class="cell-value">客户来源</div>
         </div>
-      </div>
-      <div class="input-cell-wrapper">
-        <div class="cell-value">居住地</div>
-        <div class="cell-content">
-          <input
-            class="cell-input"
-            type="text"
-            v-model="address"
-            placeholder="请输入居住地址"
-            placeholder-class="placeholder"
-          />
-        </div>
-      </div>
-      <div class="input-cell-wrapper">
-        <div class="cell-value">客户星级</div>
-        <div class="cell-content">
-          <van-rate :value="rateValue" @change="onChangeRate" />
-        </div>
-      </div>
-      <div class="input-cell-wrapper">
-        <div class="cell-value">健身历史</div>
-        <div class="cell-content">
-          <radio-group class="radio-group" @change="onChangeFitness">
-            <radio value="1" :color="themeColor" :checked="isFitness == 1"/>
-            <span class="radio-span">有</span>
-            <radio value="0" :color="themeColor" />
-            <span class="radio-span">无</span>
+        <div class="input-cell-wrapper">
+          <radio-group class="radio-group" @change="selectSource">
+            <label class="radio" v-for="(item, index) in sourceList" :key="index">
+              <radio :color="themeColor" :value="item.value" />
+              <span class="radio-span">{{item.name}}</span>
+            </label>
           </radio-group>
         </div>
-      </div>
-      <div class="input-cell-wrapper">
-        <div class="cell-value">健身目的</div>
-        <div class="cell-content">
-          <checkbox-group @change="selectPurpose">
-            <checkbox value="1" :color="themeColor"/>
-            <span class="check-span">减肥</span>
-            <checkbox value="2" :color="themeColor"/>
-            <span class="check-span">塑性</span>
-            <checkbox value="3" :color="themeColor"/>
-            <span class="check-span">增肌</span>
-            <checkbox value="4" :color="themeColor"/>
-            <span class="check-span">其他</span>
-          </checkbox-group>
+        <div class="input-cell-wrapper">
+          <div class="cell-value">身份证</div>
+          <div class="cell-content">
+            <input
+              class="cell-input"
+              type="text"
+              v-model="idCard"
+              placeholder="请输入身份证号"
+              placeholder-class="placeholder"
+            />
+          </div>
         </div>
-      </div>
-      <div class="input-cell-wrapper">
-        <div class="cell-value">喜好</div>
-        <div class="cell-content">
-          <checkbox-group @change="selectInterest">
-            <checkbox value="1" :color="themeColor"/>
-            <span class="check-span">课程</span>
-            <checkbox value="2" :color="themeColor"/>
-            <span class="check-span">器械</span>
-          </checkbox-group>
+        <div class="input-cell-wrapper">
+          <div class="cell-value">居住地</div>
+          <div class="cell-content">
+            <input
+              class="cell-input"
+              type="text"
+              v-model="address"
+              placeholder="请输入居住地址"
+              placeholder-class="placeholder"
+            />
+          </div>
         </div>
-      </div>
-      <div class="input-cell-wrapper">
-        <div class="cell-value">客户来源</div>
-      </div>
-      <div class="input-cell-wrapper">
-        <radio-group class="radio-group" @change="selectSource">
-          <label class="radio" v-for="(item, index) in sourceList" :key="index">
-            <radio :color="themeColor" :value="item.value" />
-            <span class="radio-span">{{item.name}}</span>
-          </label>
-        </radio-group>
-      </div>
+        <div class="input-cell-wrapper">
+          <div class="cell-value">客户星级</div>
+          <div class="cell-content">
+            <van-rate :value="rateValue" @change="onChangeRate" />
+          </div>
+        </div>
+        <div class="input-cell-wrapper">
+          <div class="cell-value">健身历史</div>
+          <div class="cell-content">
+            <radio-group class="radio-group" @change="onChangeFitness">
+              <radio value="1" :color="themeColor" :checked="isFitness == 1" />
+              <span class="radio-span">有</span>
+              <radio value="0" :color="themeColor" />
+              <span class="radio-span">无</span>
+            </radio-group>
+          </div>
+        </div>
+        <div class="input-cell-wrapper">
+          <div class="cell-value">健身目的</div>
+          <div class="cell-content">
+            <checkbox-group @change="selectPurpose">
+              <checkbox value="1" :color="themeColor" />
+              <span class="check-span">减肥</span>
+              <checkbox value="2" :color="themeColor" />
+              <span class="check-span">塑性</span>
+              <checkbox value="3" :color="themeColor" />
+              <span class="check-span">增肌</span>
+              <checkbox value="4" :color="themeColor" />
+              <span class="check-span">其他</span>
+            </checkbox-group>
+          </div>
+        </div>
+        <div class="input-cell-wrapper">
+          <div class="cell-value">喜好</div>
+          <div class="cell-content">
+            <checkbox-group @change="selectInterest">
+              <checkbox value="1" :color="themeColor" />
+              <span class="check-span">课程</span>
+              <checkbox value="2" :color="themeColor" />
+              <span class="check-span">器械</span>
+            </checkbox-group>
+          </div>
+        </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">跟进记录</div>
@@ -162,9 +162,12 @@
         />
       </div>
       <div class="quick-tip-wrapper">
-        <div class="quick-tip-item" v-for="(item, index) in quickTipList" :key="index" @click="addTip(item)">
-          {{item}}
-        </div>
+        <div
+          class="quick-tip-item"
+          v-for="(item, index) in quickTipList"
+          :key="index"
+          @click="addTip(item)"
+        >{{item}}</div>
       </div>
       <div class="register" :style="{'background-color': themeColor}" @click="registerCustomer">确定</div>
     </div>
@@ -205,7 +208,7 @@ import {
 } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import store from "@/utils/store.js";
-import {checkAuth} from "../common/js/service_config.js";
+import { checkAuth } from "../common/js/service_config.js";
 export default {
   data() {
     return {
@@ -218,7 +221,24 @@ export default {
       showPopup: false,
       phone: "",
       customerInfo: {},
-      quickTipList: ['要优惠','挂断电话','被拉黑一直提示通话中','学瑜伽','觉得价格贵','没有意向，终止跟进','没有空','没人接','在出差','为家人办卡','已交预售定金','其他会所会员','嫌卡价太贵','说不要打了','不喜欢健身','对私教有兴趣'],
+      quickTipList: [
+        "要优惠",
+        "挂断电话",
+        "被拉黑一直提示通话中",
+        "学瑜伽",
+        "觉得价格贵",
+        "没有意向，终止跟进",
+        "没有空",
+        "没人接",
+        "在出差",
+        "为家人办卡",
+        "已交预售定金",
+        "其他会所会员",
+        "嫌卡价太贵",
+        "说不要打了",
+        "不喜欢健身",
+        "对私教有兴趣"
+      ],
       sourceList: [
         {
           name: "AS邀约到场",
@@ -251,7 +271,7 @@ export default {
       ],
       name: "", // 姓名
       sex: 0, // 性别
-      idCard: '', // 身份证号
+      idCard: "", // 身份证号
       selectedCoach: {}, // 选择的服务教练
       address: "", // 居住地址
       rateValue: 0, // 星级
@@ -262,7 +282,7 @@ export default {
       followUpContent: "",
       phoneType: 0, // 200 客户信息已存在 201 正常录入 202 客户在其他门店有录入 405 在公海中
       successCustomerId: 0,
-      customerId: '', // 已存在的客户id
+      customerId: "", // 已存在的客户id
       isCanPay: checkAuth(346),
       isIphoneX: store.state.isIphoneX
     };
@@ -270,21 +290,22 @@ export default {
   mixins: [colorMixin],
   onLoad() {
     Object.assign(this.$data, this.$options.data());
-    setNavTab()
+    setNavTab();
     let allStore = store.state.allStore.map(e => {
       e.name = e.storeName;
       return e;
     });
-    this.storeList = allStore.filter(e => e.storeId)
-    this.storeActions = this.storeList
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
+    this.storeList = allStore.filter(e => e.storeId);
+    this.storeActions = this.storeList;
+    this.selectedStore =
+      this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
     this.actionList = this.storeActions;
   },
   methods: {
     selectStore(e) {
       if (e.mp.detail.storeName) {
-        this.phoneType = 0
-        this.phone = ""
+        this.phoneType = 0;
+        this.phone = "";
         this.selectedStore = e.mp.detail;
       } else {
         this.selectedCoach = e.mp.detail;
@@ -293,8 +314,9 @@ export default {
     },
     // 校验手机号
     checkPhone(e) {
-      if(e.mp.detail.value.length != 11) {
-        this.phoneType = 0
+      this.phone = e.mp.detail.value.replace(/\s+/g,"");
+      if (e.mp.detail.value.length != 11) {
+        this.phoneType = 0;
       }
       if (e.mp.detail.value.length == 11) {
         let that = this;
@@ -316,7 +338,7 @@ export default {
             } else if (res.data.code == 201) {
               that.getServiceCoachList();
             } else if (res.data.code == 202) {
-              let info = res.data.data
+              let info = res.data.data;
               wx.showModal({
                 title: "提示",
                 content: `该客户于${that.customerInfo.addTime}在${
@@ -324,10 +346,10 @@ export default {
                 }登记过，是否继续添加到${that.selectedStore.storeName}？`,
                 success(res) {
                   if (res.confirm) {
-                    that.phoneType = '202-1'
+                    that.phoneType = "202-1";
                     // 回显信息
-                    that.name = info.name
-                    that.customerId = info.id
+                    that.name = info.name;
+                    that.customerId = info.id;
                     that.getServiceCoachList();
                   }
                 }
@@ -343,7 +365,7 @@ export default {
                 }
               });
             }
-            console.log("that.phoneType:"+that.phoneType)
+            console.log("that.phoneType:" + that.phoneType);
           }
         });
       }
@@ -391,7 +413,7 @@ export default {
       this.sex = e.mp.detail.value;
     },
     onChangeRate(e) {
-      this.rateValue = e.mp.detail
+      this.rateValue = e.mp.detail;
     },
     onChangeFitness(e) {
       this.isFitness = e.mp.detail.value;
@@ -406,29 +428,29 @@ export default {
       this.interest = e.mp.detail.value;
     },
     addTip(item) {
-      if(this.followUpContent.indexOf(item) > -1) {
-        return this.followUpContent = this.followUpContent.replace(
+      if (this.followUpContent.indexOf(item) > -1) {
+        return (this.followUpContent = this.followUpContent.replace(
           new RegExp(` ${item} `, "g"),
           ""
-        );
+        ));
       }
-      this.followUpContent += ` ${item} `
+      this.followUpContent += ` ${item} `;
     },
     // 校验身份证号
     checkIdCard() {
-      let that = this
-      return new Promise((resolve) => {
-        if(!that.idCard) {
-          return resolve()
+      let that = this;
+      return new Promise(resolve => {
+        if (!that.idCard) {
+          return resolve();
         }
         HttpRequest({
-          url: '/customer/register/latent/identityCard',
+          url: "/customer/register/latent/identityCard",
           data: {
             identityCard: that.idCard
           },
           success(res) {
-            if(res.data.code == 200) {
-              resolve()
+            if (res.data.code == 200) {
+              resolve();
             } else {
               wx.showToast({
                 title: res.data.message,
@@ -437,18 +459,18 @@ export default {
               });
             }
           }
-        })
-      })
+        });
+      });
     },
     // 添加客户
     registerCustomerMethod() {
-      let that = this
-      return new Promise((resolve) => {
+      let that = this;
+      return new Promise(resolve => {
         HttpRequest({
-          url: '/customer/register/latent/savecustomer',
+          url: "/customer/register/latent/savecustomer",
           data: {
             identityCard: that.idCard,
-            serviceCoachId: that.selectedCoach.userId || '',
+            serviceCoachId: that.selectedCoach.userId || "",
             phone: that.phone,
             storeId: that.selectedStore.storeId,
             addUserId: wx.getStorageSync("staff_info").userId,
@@ -459,12 +481,12 @@ export default {
             name: that.name,
             sex: that.sex,
             interest: String(that.interest),
-            purpose: String(that.FitnessPurpose),
+            purpose: String(that.FitnessPurpose)
             // isSubscriptionPact: 0,
           },
           success(res) {
-            if(res.data.code == 200) {
-              resolve(res)
+            if (res.data.code == 200) {
+              resolve(res);
             } else {
               wx.showToast({
                 title: res.data.message,
@@ -473,26 +495,26 @@ export default {
               });
             }
           }
-        })
-      })
+        });
+      });
     },
     // 添加已存在其他门店的客户
     registerCustomer_2() {
-      let that = this
-      return new Promise((resolve) => {
+      let that = this;
+      return new Promise(resolve => {
         HttpRequest({
-          url: '/customer/store/add',
+          url: "/customer/store/add",
           data: {
             customerId: that.customerId,
             storeId: that.selectedStore.storeId,
             addUserId: wx.getStorageSync("staff_info").userId,
             serviceUserId: wx.getStorageSync("staff_info").userId,
-            serviceCoachId: that.selectedCoach.userId || '',
-            phone: that.phone,
+            serviceCoachId: that.selectedCoach.userId || "",
+            phone: that.phone
           },
           success(res) {
-            if(res.data.code == 200) {
-              resolve(res)
+            if (res.data.code == 200) {
+              resolve(res);
             } else {
               wx.showToast({
                 title: res.data.message,
@@ -501,26 +523,27 @@ export default {
               });
             }
           }
-        })
-      })},
+        });
+      });
+    },
     // 登记用户按钮
     registerCustomer() {
-      if(this.phoneType == 201) {
-        if(!this.name) {
+      if (this.phoneType == 201) {
+        if (!this.name) {
           return wx.showToast({
             title: "请输入姓名",
             icon: "none",
             duration: 1000
           });
         }
-        if(!this.sex) {
+        if (!this.sex) {
           return wx.showToast({
             title: "请选择性别",
             icon: "none",
             duration: 1000
           });
         }
-        if(this.idCard && this.idCard.length != 18) {
+        if (this.idCard && this.idCard.length != 18) {
           return wx.showToast({
             title: "身份证号格式不正确",
             icon: "none",
@@ -529,18 +552,18 @@ export default {
         }
       }
       this.checkIdCard().then(() => {
-        if(this.phoneType == "202-1") {
-          this.registerCustomer_2().then((data) => {
-            this.successCustomerId = data.data.data
-            this.showPopup = true
-          })
+        if (this.phoneType == "202-1") {
+          this.registerCustomer_2().then(data => {
+            this.successCustomerId = data.data.data;
+            this.showPopup = true;
+          });
         } else {
-          this.registerCustomerMethod().then((data) => {
-            this.successCustomerId = data.data.data
-            this.showPopup = true
-          })
+          this.registerCustomerMethod().then(data => {
+            this.successCustomerId = data.data.data;
+            this.showPopup = true;
+          });
         }
-      })
+      });
     },
     toCustomerDetail() {
       wx.redirectTo({

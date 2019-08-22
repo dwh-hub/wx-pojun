@@ -8,6 +8,7 @@ import {
 import store from "./utils/store"
 // import login from "COMMON/js/login.js"
 
+Vue.config._mpTrace = true
 Vue.config.productionTip = false
 App.mpType = 'app'
 

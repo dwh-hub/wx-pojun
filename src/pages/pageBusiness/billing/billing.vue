@@ -414,7 +414,7 @@ import store from "@/utils/store.js";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 import { transformJspImg,getStoreSet,getUserofrole,qiniuUpload } from "../common/js/http.js";
 import headerSearch from "../components/header-search.vue";
-import filterNav from "../components/filter-nav.vue";
+// import filterNav from "../components/filter-nav.vue";
 import billingData from "../common/js/billingData";
 import noneResult from "COMPS/noneResult.vue";
 import {checkAuth} from "../common/js/service_config.js";
@@ -430,7 +430,7 @@ export default {
     staffCoachItem,
     headerSearch,
     noneResult,
-    filterNav
+    // filterNav
   },
   onLoad(options) {
     console.log("billing==onload")

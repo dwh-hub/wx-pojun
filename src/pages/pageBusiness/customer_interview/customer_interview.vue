@@ -37,7 +37,8 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  WechatMenuisLogin
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
@@ -54,9 +55,10 @@ export default {
       nav: [
         {
           navTitle: "今日",
+          name: "预约时间",
           children: [
             {
-              sonText: "全部(预约时间)",
+              sonText: "全部",
               action: () => {
                 this.filterDate(0);
               }
@@ -89,9 +91,10 @@ export default {
         },
         {
           navTitle: "预约目的",
+          name: "预约目的",
           children: [
             {
-              sonText: "全部(预约目的)",
+              sonText: "全部",
               action: () => {
                 this.filter.appointmentPurpose = "";
               }
@@ -124,9 +127,10 @@ export default {
         },
         {
           navTitle: "客户状态",
+          name: "客户状态",
           children: [
             {
-              sonText: "全部(客户状态)",
+              sonText: "全部",
               action: () => {
                 this.filter.customerClass = "";
               }
@@ -192,6 +196,9 @@ export default {
     noneResult
   },
   mixins: [colorMixin, listPageMixin],
+  onShow() {
+    WechatMenuisLogin("staff")
+  },
   mounted() {
     this.nav[0].navTitle = "今日";
     this.filterDate(1);

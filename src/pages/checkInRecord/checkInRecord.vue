@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest,WechatMenuisLogin } from "COMMON/js/common.js";
 import noneResult from "COMPS/noneResult.vue";
 import pageFooter from "COMPS/pageFooter.vue"
 
@@ -35,6 +35,9 @@ export default {
       isLoading: false,
       isNoneResult: false
     };
+  },
+  onShow() {
+    WechatMenuisLogin()
   },
   onLoad() {
     setNavTab();

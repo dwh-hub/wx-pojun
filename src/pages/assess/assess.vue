@@ -43,7 +43,7 @@
 </template>
 
 <script>
-import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
+import { setNavTab, window, HttpRequest,WechatMenuisLogin } from "COMMON/js/common.js";
 import teamClassItem from "COMPS/teamClassItem.vue";
 import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
@@ -62,6 +62,7 @@ export default {
     };
   },
   onShow() {
+    WechatMenuisLogin()
     this.coachRateVaule = 5
     this.storeRateVaule = 5
     this.teamClasVaule = 5

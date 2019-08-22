@@ -71,6 +71,7 @@ export default {
       nav: [
         {
           navTitle: "今日",
+          name: "课程时间",
           children: [
             {
               sonText: "全部",
@@ -106,10 +107,12 @@ export default {
         },
         {
           navTitle: "教练",
+          name: "教练",
           children: []
         },
         {
           navTitle: "课程状态",
+          name: "课程状态",
           children: [
             {
               sonText: "全部",

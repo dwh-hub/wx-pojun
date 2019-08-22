@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "营业额",
+    "usingComponents": {
+      "van-loading": "/static/vant/loading/index",
+      "time-picker": "/static/timePicker/timePicker"
+    }
+  }

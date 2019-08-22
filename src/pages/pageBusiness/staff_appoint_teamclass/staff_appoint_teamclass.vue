@@ -63,6 +63,7 @@ export default {
       nav: [
         {
           navTitle: "今日",
+          name: "时间",
           children: [
             {
               sonText: "今日"
@@ -77,6 +78,7 @@ export default {
         },
         {
           navTitle: "时间段",
+          name: "时间段",
           children: [
             {
               sonText: "全部"

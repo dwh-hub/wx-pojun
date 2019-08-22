@@ -108,7 +108,8 @@ export default {
       tabIndex: 1,
       nav: [
         {
-          navTitle: "全部(登记时间)",
+          navTitle: "全部",
+          name: "登记时间",
           children: [
             {
               sonText: "全部",
@@ -145,9 +146,10 @@ export default {
         },
         {
           navTitle: "签到时间",
+          name: "签到时间",
           children: [
             {
-              sonText: "全部(签到时间)",
+              sonText: "全部",
               action: () => {
                 this.filterConsumedDate(0);
               }
@@ -181,6 +183,7 @@ export default {
         },
         {
           navTitle: "学员状态",
+          name: "学员状态",
           children: [
             {
               sonText: "全部",

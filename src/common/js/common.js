@@ -1,11 +1,11 @@
 import store from "../../utils/store.js"
 const window = {}
-window.DEBUGGING = false
-window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://www.pojun-tech.cn' // 'https://test.lirenos.com'
+window.DEBUGGING = true
+window.api = window.DEBUGGING ? "http://192.168.1.18" : 'https://test.lirenos.com' // 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
 // 获取 ext.json 配置信息
 const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
-const spareCompany = "37"
+const spareCompany = "55"
 
 if (extConfig.companyId) {
   wx.setStorageSync('companyId', extConfig.companyId)
@@ -177,20 +177,20 @@ export function HttpRequest(obj) {
     obj.url = obj.url.indexOf(window.api) == -1 ? (window.api + obj.url) : obj.url;
     obj.header = obj.header || {};
     obj.header['Cookie'] = res;
-    
+
     let success = obj.success || ''
-    
-    for(let k in obj.data) {
-      if(undefined == obj.data[k] || null == obj.data[k]) {
+
+    for (let k in obj.data) {
+      if (undefined == obj.data[k] || null == obj.data[k]) {
         obj.data[k] = ""
       }
     }
 
-    obj.success = function(res) {
-      let curPageRoute = getCurrentPages()[getCurrentPages().length-1].route
-      if(JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
+    obj.success = function (res) {
+      let curPageRoute = getCurrentPages()[getCurrentPages().length - 1].route
+      if (JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
         // store.commit('changeLogin', false)
-        if(curPageRoute.indexOf('mine') == -1 && curPageRoute.indexOf('homepage') == -1 && !isShowModal) {
+        if (curPageRoute.indexOf('mine') == -1 && curPageRoute.indexOf('homepage') == -1 && !isShowModal) {
           isShowModal = true
           return wx.showModal({
             title: "提示",
@@ -198,21 +198,23 @@ export function HttpRequest(obj) {
             confirmText: '前往登录',
             showCancel: false,
             success(res) {
-              isShowModal = false
               if (res.confirm) {
                 wx.switchTab({
                   url: "/pages/mine/main"
                 });
               }
+            },
+            complete() {
+              isShowModal = false
             }
           });
         }
       }
       let type = curPageRoute.indexOf('pageBusiness') > -1 ? "staff" : "member"
-      if(type == "staff") {
+      if (type == "staff") {
         WechatMenuisLogin("staff")
       }
-      if(success) {
+      if (success) {
         success(res)
       }
     }
@@ -369,17 +371,13 @@ export function getRange(lat1, lng1, lat2, lng2) {
 
 // 公共号进来判断是否登录
 export function WechatMenuisLogin(type) { // 1035 1043
-  if(isShowModal) {
+  if (isShowModal) {
     return
   }
-  // let curPageRoute = getCurrentPages()[getCurrentPages().length-1].route
-  // if(!type) {
-  //   curPageRoute.indexOf('pageBusiness') > -1 ? type = "staff" : type = "member" 
-  // }
-  if(store.state.isLogin && type != "staff") {
+  if (store.state.isLogin && type != "staff") {
     return
   }
-  if(store.state.staffIsLogin && type == "staff") {
+  if (wx.getStorageSync("staffIsLogin") && type == "staff") {
     return
   }
   isShowModal = true
@@ -389,11 +387,13 @@ export function WechatMenuisLogin(type) { // 1035 1043
     showCancel: false,
     success(res) {
       if (res.confirm) {
-        isShowModal = false
         wx.switchTab({
           url: "/pages/mine/main"
         });
       }
+    },
+    complete() {
+      isShowModal = false
     }
   });
 }

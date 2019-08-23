@@ -19,8 +19,8 @@
           <span class="second-2">{{info.second_tip_2 || ''}}{{info.second_2 || ''}}</span>
         </div>
         <div class="coach-desc" v-if="info.third_1">
-          <span class="third-1">{{info.third_tip_1 || ''}}{{info.third_1 || ''}}</span>
-          <span class="third-2">{{info.third_tip_2 || ''}}{{info.third_2 || ''}}</span>
+          <span class="third-1 third">{{info.third_tip_1 || ''}}{{info.third_1 || ''}}</span>
+          <text class="third-2 third">{{info.third_tip_2 || ''}}{{info.third_2 || ''}}</text>
         </div>
       </div>
       <div class="tag" v-if="isTag">
@@ -116,13 +116,16 @@ export default {
   }
   .cover {
     position: relative;
-    flex: 0 0 60px;
-    width: 60px;
-    height: 60px;
-    padding-left: 12px;
+    flex: 0 0 84px;
+    // width: 60px;
+    // height: 60px;
+    // padding-left: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     .avatar {
-      width: 100%;
-      height: 100%;
+      width: 60px;
+      height: 60px;
       border-radius: 12px;
       background-color: #eee;
       background-size: 100% auto;
@@ -142,7 +145,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 12px;
+    // padding-left: 12px;
     color: #505050;
     > div {
       flex: 1;
@@ -162,7 +165,8 @@ export default {
     }
     .coach-times,
     .coach-desc {
-      > span {
+      > span,
+      .third {
         font-size: 12px;
         margin-right: 5px;
       }
@@ -218,6 +222,7 @@ export default {
       flex: 0 0 70px;
       width: 70px;
       height: 70px;
+      padding-left: 12px;
     }
     .skeleton-wrapper {
       padding: 0 12px;

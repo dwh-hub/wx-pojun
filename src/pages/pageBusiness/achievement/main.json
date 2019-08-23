@@ -2,6 +2,7 @@
   "navigationBarTitleText": "业绩报表",
   "enablePullDownRefresh": false,
   "usingComponents": {
+    "ff-canvas": "/static/f2-canvas/f2-canvas",
     "van-loading": "/static/vant/loading/index",
     "time-picker": "/static/timePicker/timePicker"
   }

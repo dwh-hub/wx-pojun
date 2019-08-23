@@ -1,21 +1,21 @@
 <template>
   <div class="achievement-detail" :class="{'isPhoneX-wrap':isPhoneX}">
     <div class="achievement-header">  
-      <div class="sell-price">￥2000.00元</div>
+      <div class="sell-price">￥{{detail.cost}}元</div>
       <div class="sell-text">金额</div>
     </div>
     <div class="achievement-info">
       <div class="line-cell">
         <span class="cell-name">订单号:</span>
-        <span class="cell-value">2019809898989</span>
+        <span class="cell-value">{{detail.orderNumber}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">订单类型:</span>
-        <span class="cell-value">办卡</span>
+        <span class="cell-value">{{detail.purchasePatternChar}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">客户:</span>
-        <span class="cell-value">吴娟（ID:99544448）</span>
+        <span class="cell-value">{{detail.customerName}}（ID:{{detail.customerId}}）</span>
       </div>
       <div class="table-cell">
         <span class="cell-name">订单明细:</span>
@@ -27,54 +27,55 @@
             <td>金额</td>
           </tr>
           <tr>
-            <td>健身游泳卡</td>
+            <td>{{detail.secondCardClassName}}</td>
             <td>1</td>
-            <td>2000元</td>
-            <td>2000元</td>
+            <td>{{detail.sellingPrice}}</td>
+            <td>{{detail.sellingPrice}}</td>
           </tr>
         </div>
       </div>
       <div class="line-cell">
-        <span class="cell-name">卡号:</span>
-        <span class="cell-value">7956456321566</span>
+        <span class="cell-name">合同编号:</span>
+        <span class="cell-value">{{detail.pactId}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">办理销售:</span>
-        <span class="cell-value">陈元</span>
+        <span class="cell-value">{{detail.transactUserName}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">业绩归属:</span>
-        <span class="cell-value">陈元 1000元 小李 1000元</span>
+        <span class="cell-value">{{detail.performence}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">支付方式:</span>
-        <span class="cell-value">现金 2000元</span>
+        <span class="cell-value">{{detail.payChar}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">订单备注:</span>
-        <span class="cell-value">总经理特批价格</span>
+        <span class="cell-value">{{detail.remark || "无"}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">订单来源:</span>
-        <span class="cell-value">DI派单</span>
+        <span class="cell-value">{{detail.cardSourceChar || "无"}}</span>
       </div>
       <div class="line-cell">
         <span class="cell-name">订单标签:</span>
-        <span class="cell-value">培训班A1班</span>
+        <span class="cell-value">{{detail.labelsName || "无"}}</span>
       </div>
       <div class="table-cell">
         <span class="cell-name">合同照片:</span>
-        <div class="img-list">
-          <img src="" alt="">
+        <span v-if="!detail.pactImg.length">无</span>
+        <div class="img-list" v-if="detail.pactImg.length">
+          <img src="" alt="" v-for="(item, index) in detail.pactImg" :key="index">
         </div>
       </div>
       <div class="line-cell">
-        <span class="cell-name">合同使用人:吴娟</span>
-        <span class="cell-value"></span>
+        <span class="cell-name">合同使用人:</span>
+        <span class="cell-value">{{detail.cardUsers}}</span>
       </div>
       <div class="bottom-cell">
-        <div>开单时间：2019/8/9 12:00       操作人：黄莺</div>
-        <div>收款时间：2019/8/9 21:00       操作人：李白</div>
+        <div><span>开单时间：{{detail.cardAddTime}}</span><span>操作人：{{detail.cardAddUserName}}</span></div>
+        <div><span>收款时间：{{detail.paymentTime}}</span><span>操作人：{{detail.paymentUserName}}</span></div>
       </div>
     </div>
     <!-- <div class="bottom-btn" :style="{'background-color': themeColor,color:'#fff'}">
@@ -96,11 +97,19 @@ import store from "@/utils/store.js";
 export default {
   data() {
     return {
-      imgList: []
+      id: '',
+      imgList: [],
+      detail: {
+        pactImg: []
+      }
     }
   },
   mounted() {
     setNavTab()
+    this.getAchievementDetail()
+  },
+  onLoad(options) {
+    this.id = options.id
   },
   computed: {
     isPhoneX() {
@@ -108,6 +117,42 @@ export default {
     }
   },
   methods: {
+    getAchievementDetail() {
+      let that = this;
+      HttpRequest({
+        url: '/performance/card/detail',
+        data: {
+          makeupCardId: that.id
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            let data = res.data.data
+            let performence = ""
+            let cardUsers = ""
+            data.performence.forEach(e => {
+              performence += `${e.userName} ${e.proportion*data.cost}元，`
+            })
+            data.performence = performence.slice(0,performence.length-1)
+            data.cardUsers.forEach(e => {
+              cardUsers += `${e.customerName}，`
+            })
+            data.cardUsers = cardUsers.slice(0,cardUsers.length-1)
+            data.cardAddTime = formatDate(new Date(data.cardAddTime), 'yyyy/MM/dd hh:mm:ss')
+            data.paymentTime = formatDate(new Date(data.paymentTime), 'yyyy/MM/dd hh:mm:ss')
+
+            let payChar = ""
+            data.wechatPay ? (payChar = payChar + `微信：${data.wechatPay元},`) : ''
+            data.aliPay ? (payChar = payChar + `支付宝：${data.aliPay},`) : ''
+            data.cardPay ? (payChar = payChar + `刷卡：${data.cardPay},`) : ''
+            data.cashPay ? (payChar= payChar + `现金：${data.cashPay},`) : ''
+            data.transferAccounts ? (payChar = payChar + `转账：${data.transferAccounts},`) : ''
+            data.deductionMoney ? (payChar = payChar + `折扣：${data.deductionMoney},`) : ''
+            data.payChar = payChar.slice(0,payChar.length-1)
+            that.detail = data
+          }
+        }
+      })
+    },
     // 查看合同
     previewImage(item) {
       // wx.previewImage({
@@ -180,7 +225,8 @@ export default {
       }
     }
     .bottom-cell {
-      >div {
+      >div>span {
+        margin-right: 15px;
         line-height: 24px;
         font-size: 12px;
         color: #a6a6a6;

@@ -47,19 +47,19 @@ export function getPhoneNumber(e, url, isTab) {
         // });
       } else {
         // TODO:
-        // wx.setStorage({
-        //   key: "phone",
-        //   data: "18888888881", // "13285923990",
-        //   success: function () {
-        //     login(url, isTab);
-        //   }
-        // });
-        wx.hideLoading();
-        wx.showModal({
-          title: "提示",
-          content: res.data.message,
-          showCancel: false
+        wx.setStorage({
+          key: "phone",
+          data: "18888888881", // "13285923990",
+          success: function () {
+            login(url, isTab);
+          }
         });
+        // wx.hideLoading();
+        // wx.showModal({
+        //   title: "提示",
+        //   content: res.data.message,
+        //   showCancel: false
+        // });
       }
     }
   });
@@ -143,6 +143,7 @@ export function enterMember(res) {
   HttpRequest({
     url: window.api + '/user/exit'
   })
+  wx.setStorageSync("staffIsLogin", false);
   // 微信授权
   // HttpRequest({
   //   url: '/mini/login/after/customer',
@@ -231,7 +232,8 @@ export function enterStaff(res) {
   wx.setStorageSync("staff_info", staff_info);
   wx.setStorageSync("companyId", staff_info.companyId);
   wx.setStorageSync("companyName", staff_info.companyName);
-  store.commit("changeStaffLogin", true);
+  store.commit("changeLogin", false);
+  wx.setStorageSync("staffIsLogin", true);
   
   // 进入商户端时，门店权限过滤
   console.log("getStorageSync:"+wx.getStorageSync("companyId"))

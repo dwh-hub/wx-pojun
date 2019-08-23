@@ -56,9 +56,9 @@ import { setNavTab, window, formatDate, HttpRequest } from "COMMON/js/common.js"
 import colorMixin from "COMPS/colorMixin.vue"
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
-import { getUseServiceList } from "../common/js/http.js";
+import { getUseServiceList, initLine } from "../common/js/http.js";
 import { serviceList, filterAuth } from "../common/js/service_config.js";
-import F2 from '@antv/wx-f2';
+// import F2 from '@antv/wx-f2';
 
 export default {
   data() {
@@ -189,80 +189,80 @@ export default {
           });
           that.$mp.page
             .selectComponent("#line-view")
-            .init(that.initDataLine, data);
+            .init(initLine, data);
         }
       });
     },
-    initDataLine(canvas, width, height, initData) {
-      let data = []
-      if (!initData.length) {
-        data = [
-          {
-            time: formatDate(new Date(), "yyyy-MM-dd"),
-            tem: ""
-          }
-        ];
-      } else {
-        data = initData;
-      }
-      let chart = new F2.Chart({
-        el: canvas,
-        width,
-        height
-      });
+    // initDataLine(canvas, width, height, initData) {
+    //   let data = []
+    //   if (!initData.length) {
+    //     data = [
+    //       {
+    //         time: formatDate(new Date(), "yyyy-MM-dd"),
+    //         tem: ""
+    //       }
+    //     ];
+    //   } else {
+    //     data = initData;
+    //   }
+    //   let chart = new F2.Chart({
+    //     el: canvas,
+    //     width,
+    //     height
+    //   });
 
-      let defs = {
-        time: {
-          type: "timeCat",
-          mask: "MM-DD",
-          range: [0, 1]
-        },
-        tem: {
-          tickCount: 5,
-          min: 0,
-          alias: "元"
-        }
-      };
-      chart.source(data, defs);
-      // chart.tooltip({
-      //   showXTip: true,
-      //   onChange(e) {
-      //     console.log(e)
-      //   },
-      //   onShow(ev) {
-      //     console.log(ev)
-      //     const { items } = ev;
-      //     // items[0].name = null;
-      //     // items[0].name = items[0].title;
-      //     // items[0].value = '¥ ' + items[0].value;
-      //   }
-      // });
-      chart.tooltip({
-        custom: true,
-        showXTip: true,
-        showYTip: true,
-        showCrosshairs: true,
-        snap: true,
-        crosshairsType: 'xy',
-        crosshairsStyle: {
-          lineDash: [2]
-        }
-      });
+    //   let defs = {
+    //     time: {
+    //       type: "timeCat",
+    //       mask: "MM-DD",
+    //       range: [0, 1]
+    //     },
+    //     tem: {
+    //       tickCount: 5,
+    //       min: 0,
+    //       alias: "元"
+    //     }
+    //   };
+    //   chart.source(data, defs);
+    //   // chart.tooltip({
+    //   //   showXTip: true,
+    //   //   onChange(e) {
+    //   //     console.log(e)
+    //   //   },
+    //   //   onShow(ev) {
+    //   //     console.log(ev)
+    //   //     const { items } = ev;
+    //   //     // items[0].name = null;
+    //   //     // items[0].name = items[0].title;
+    //   //     // items[0].value = '¥ ' + items[0].value;
+    //   //   }
+    //   // });
+    //   chart.tooltip({
+    //     custom: true,
+    //     showXTip: true,
+    //     showYTip: true,
+    //     showCrosshairs: true,
+    //     snap: true,
+    //     crosshairsType: 'xy',
+    //     crosshairsStyle: {
+    //       lineDash: [2]
+    //     }
+    //   });
 
-      chart
-        .line()
-        .position("time*tem")
-        .shape("smooth");
-      chart
-        .point()
-        .position("time*tem")
-        .shape("smooth")
-        .style({
-          stroke: "#fff",
-          lineWidth: 1
-        });
-      chart.render();
-    },
+    //   chart
+    //     .line()
+    //     .position("time*tem")
+    //     .shape("smooth");
+    //   chart
+    //     .point()
+    //     .position("time*tem")
+    //     .shape("smooth")
+    //     .style({
+    //       stroke: "#fff",
+    //       lineWidth: 1
+    //     });
+    //   chart.render();
+    // },
     editService() {
       wx.navigateTo({
         url: '../allServices/main?type=edit'

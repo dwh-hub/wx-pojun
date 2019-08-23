@@ -125,6 +125,13 @@ export default {
         },
         // {
         //   imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
+        //   navName: "商户端",
+        //   navigatorUrl: "../pageBusiness/workbench/main",
+        //   hit: "",
+        //   text: "次"
+        // },
+        // {
+        //   imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
         //   navName: "我是工作人员",
         //   navigatorUrl: "../pageBusiness/index/main",
         //   hit: "",
@@ -207,6 +214,7 @@ export default {
       getPhoneNumber(e,"../mine/main",true)
     },
     navTo(url) {
+      // TODO:
       if (!store.state.isLogin) {
         return wx.showToast({
           title: "请登录",

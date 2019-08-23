@@ -22,6 +22,7 @@
       <van-cell title="信息展示" is-link/>
       <van-cell title="消息设置" is-link/>
       <van-cell title="专属二维码" is-link @click="showStore = true"/>
+      <!-- <van-cell title="会员" is-link @click="navTo('/pages/mine/main')"/> -->
     </van-cell-group>
 
     <!-- <button @click="login">登录</button> -->
@@ -140,7 +141,8 @@ export default {
             wx.removeStorageSync("phone");
             wx.removeStorageSync("authInto")
             wx.removeStorageSync("staff_info")
-            store.commit("changeStaffLogin", false);
+            wx.setStorageSync("staffIsLogin", false);
+            // store.commit("changeStaffLogin", false);
             wx.switchTab({
               url: "../../homepage/main"
             });
@@ -219,7 +221,13 @@ export default {
           }
         });
       });
-    }
+    },
+    // navTo(url) {
+    //   // TODO:
+    //   wx.switchTab({
+    //     url: url
+    //   });
+    // }
   }
 };
 </script>

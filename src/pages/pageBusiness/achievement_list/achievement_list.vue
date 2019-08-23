@@ -11,7 +11,7 @@
       <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
     </div>
     <div class="list">
-      <div class="list-item" v-for="(item, index) in list" :key="index" @click="toDetail">
+      <div class="list-item" v-for="(item, index) in list" :key="index" @click="toDetail(item)">
         <div v-if="item.id">
           <div class="cover">
             <div class="card-status another">{{item.masterCardClassName}}</div>
@@ -195,7 +195,7 @@ export default {
               }
               return {
                 // TODO: id
-                id: 1,
+                id: e.makeupCardId,
                 statusText: statusText,
                 pactId: e.pactId,
                 masterCardClassName: e.masterCardClassName,
@@ -213,9 +213,9 @@ export default {
         });
       });
     },
-    toDetail() {
+    toDetail(item) {
       wx.navigateTo({
-        url: "../achievement_detail/main"
+        url: "../achievement_detail/main?id=" + item.id
       });
     }
   }

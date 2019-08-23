@@ -223,8 +223,11 @@ export default {
     // this.computedScrollHeight();
 
     this.nav[0].navTitle = "今日";
-    this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList[0];
+    // this.storeList = store.state.allStore;
+    // this.selectedStore = this.storeList[0];
+    this.storeList = store.state.allStore.filter(e => e.storeId)
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
+    
     this.nav[0].navTitle = this.selectedStore.storeName;
     this.filter.storeId = this.selectedStore.storeId;
     this.nav[0].children = this.storeList.map(e => {

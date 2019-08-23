@@ -88,7 +88,7 @@ export default {
             if (res.statusCode == 200) {
               resolve(res.data);
             } else {
-              resolve("http://pojun-tech.cn/assets/img/morenTo.png");
+              resolve(window.api + "/assets/img/morenTo.png");
             }
           }
         });

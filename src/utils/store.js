@@ -7,7 +7,7 @@ const store = new Vuex.Store({
   state: {
     count: 0,
     isLogin: false, // 会员登录状态
-    staffIsLogin: false, // 商户登录状态
+    // staffIsLogin: false, // 商户登录状态
     isCheckLogin: false,
     userInfo: {},
     isIphoneX: false,
@@ -29,9 +29,9 @@ const store = new Vuex.Store({
     changeLogin(state, value) {
       state.isLogin = value
     },
-    changeStaffLogin(state, value) {
-      state.staffIsLogin = value
-    },
+    // changeStaffLogin(state, value) {
+    //   state.staffIsLogin = value
+    // },
     saveUserInfo(state, value) {
       state.userInfo = value
     },

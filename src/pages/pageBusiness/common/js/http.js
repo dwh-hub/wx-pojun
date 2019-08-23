@@ -6,6 +6,7 @@ import {
 } from "./service_config.js";
 import regeneratorRuntime from "./regenerator-runtime/runtime.js";
 import qiniuUploader from "./qiniuUploader.js"
+import F2 from '@antv/wx-f2';
 
 // 获取常用服务列表，并根据配置文件过滤添加
 function getUseServiceList() {
@@ -183,6 +184,65 @@ function attendclass(coachAppointId) {
   })
 }
 
+// 折线图
+function initLine(canvas, width, height, initData) {
+  let data = []
+  if (!initData.length) {
+    data = [
+      {
+        time: formatDate(new Date(), "yyyy-MM-dd"),
+        tem: ""
+      }
+    ];
+  } else {
+    data = initData;
+  }
+  let chart = new F2.Chart({
+    el: canvas,
+    width,
+    height
+  });
+
+  let defs = {
+    time: {
+      type: "timeCat",
+      mask: "MM-DD",
+      range: [0, 1]
+    },
+    tem: {
+      tickCount: 5,
+      min: 0,
+      alias: "元"
+    }
+  };
+  chart.source(data, defs);
+  chart.tooltip({
+    custom: true,
+    showXTip: true,
+    showYTip: true,
+    showCrosshairs: true,
+    snap: true,
+    crosshairsType: 'xy',
+    crosshairsStyle: {
+      lineDash: [2]
+    }
+  });
+
+  chart
+    .line()
+    .position("time*tem")
+    .shape("smooth");
+  chart
+    .point()
+    .position("time*tem")
+    .shape("smooth")
+    .style({
+      stroke: "#fff",
+      lineWidth: 1
+    });
+  chart.render();
+}
+
 export {
   getUseServiceList,
   transformJspImg,
@@ -190,5 +250,6 @@ export {
   getUserofrole,
   qiniuUpload,
   attendclass,
-  getVenueList
+  getVenueList,
+  initLine
 }

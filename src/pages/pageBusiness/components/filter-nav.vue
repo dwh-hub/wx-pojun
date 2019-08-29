@@ -158,7 +158,11 @@ export default {
   },
   methods: {
     computedFilterText() {
-      this.filterText = `${this._nav[0].name}：${this._nav[0].navTitle == this._nav[0].name ? '全部': this._nav[0].navTitle} ， ${this._nav[1].name}：${this._nav[1].navTitle == this._nav[1].name ? '全部': this._nav[1].navTitle} ， ${this._nav[2].name}：${this._nav[2].navTitle == this._nav[2].name ? '全部': this._nav[2].navTitle}`
+      let filterText = ""
+      this._nav.forEach((e, index) => {
+        filterText += `${this._nav[index].name}：${this._nav[index].navTitle == this._nav[index].name ? '全部': this._nav[0].navTitle}，`
+      })
+      this.filterText = filterText.slice(0, filterText.length-1)
     },
     // dateChange(e, item) {
     //   console.log(e);
@@ -272,6 +276,7 @@ export default {
       }
       .store-nav-list {
         text-align: left;
+        overflow-y: scroll;
         max-height: 300px;
         background-color: #fff;
         .store-nav-item {

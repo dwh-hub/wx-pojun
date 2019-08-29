@@ -118,7 +118,7 @@ export default {
   watch: {
     storeList: {
       handler(val, oldVal) {
-        this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
+        this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
         this._storeList = val
       },
       deep: true
@@ -201,6 +201,7 @@ export default {
     min-height: 44px;
     max-height: 40vh;
     overflow: auto;
+    overflow-y: scroll;
     z-index: 99;
     .store-item {
       padding-left: 15px;

@@ -141,12 +141,12 @@ export default {
             data.paymentTime = formatDate(new Date(data.paymentTime), 'yyyy/MM/dd hh:mm:ss')
 
             let payChar = ""
-            data.wechatPay ? (payChar = payChar + `微信：${data.wechatPay元},`) : ''
-            data.aliPay ? (payChar = payChar + `支付宝：${data.aliPay},`) : ''
-            data.cardPay ? (payChar = payChar + `刷卡：${data.cardPay},`) : ''
-            data.cashPay ? (payChar= payChar + `现金：${data.cashPay},`) : ''
-            data.transferAccounts ? (payChar = payChar + `转账：${data.transferAccounts},`) : ''
-            data.deductionMoney ? (payChar = payChar + `折扣：${data.deductionMoney},`) : ''
+            data.wechatPay ? (payChar = payChar + `微信：${data.wechatPay}元,`) : ''
+            data.aliPay ? (payChar = payChar + `支付宝：${data.aliPay}元,`) : ''
+            data.cardPay ? (payChar = payChar + `刷卡：${data.cardPay}元,`) : ''
+            data.cashPay ? (payChar= payChar + `现金：${data.cashPay}元,`) : ''
+            data.transferAccounts ? (payChar = payChar + `转账：${data.transferAccounts}元,`) : ''
+            data.deductionMoney ? (payChar = payChar + `折扣：${data.deductionMoney}元,`) : ''
             data.payChar = payChar.slice(0,payChar.length-1)
             that.detail = data
           }

@@ -69,7 +69,8 @@
       "achievement_list/main",
       "achievement_detail/main",
       "check_in_record/main",
-      "entry_registration/main"
+      "entry_registration/main",
+      "check_in_customer/main"
     ]
   }],
   "permission": {

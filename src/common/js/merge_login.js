@@ -47,19 +47,19 @@ export function getPhoneNumber(e, url, isTab) {
         // });
       } else {
         // TODO:
-        wx.setStorage({
-          key: "phone",
-          data: "18888888881", // "13285923990",
-          success: function () {
-            login(url, isTab);
-          }
-        });
-        // wx.hideLoading();
-        // wx.showModal({
-        //   title: "提示",
-        //   content: res.data.message,
-        //   showCancel: false
+        // wx.setStorage({
+        //   key: "phone",
+        //   data: "18888888882", // "13285923990",
+        //   success: function () {
+        //     login(url, isTab);
+        //   }
         // });
+        wx.hideLoading();
+        wx.showModal({
+          title: "提示",
+          content: res.data.message,
+          showCancel: false
+        });
       }
     }
   });

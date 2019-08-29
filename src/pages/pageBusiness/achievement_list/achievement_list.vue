@@ -43,6 +43,10 @@
           </div>
         </div>
       </div>
+
+      <van-loading :color="themeColor" v-if="isLoading" />
+      <none-result text="暂无业绩" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
     <timePicker
       :pickerShow="isPickerShow"
@@ -69,6 +73,7 @@ import staffCoachItem from "../components/staff-coach-item.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
+import { getUserofrole } from "../common/js/http.js";
 
 export default {
   data() {
@@ -90,7 +95,76 @@ export default {
           name: "业务类型",
           children: [
             {
-              sonText: ""
+              sonText: "全部",
+              action: () => {
+                this.filter.purchasePattern = "";
+              }
+            },
+            {
+              sonText: "新购",
+              action: () => {
+                this.filter.purchasePattern = 1;
+              }
+            },
+            {
+              sonText: "转卡",
+              action: () => {
+                this.filter.purchasePattern = 2;
+              }
+            },
+            {
+              sonText: "请假",
+              action: () => {
+                this.filter.purchasePattern = 3;
+              }
+            },
+            {
+              sonText: "转让",
+              action: () => {
+                this.filter.purchasePattern = 4;
+              }
+            },
+            {
+              sonText: "补办",
+              action: () => {
+                this.filter.purchasePattern = 5;
+              }
+            },
+            {
+              sonText: "补余",
+              action: () => {
+                this.filter.purchasePattern = 6;
+              }
+            },
+            {
+              sonText: "订金",
+              action: () => {
+                this.filter.purchasePattern = 7;
+              }
+            },
+            {
+              sonText: "退款",
+              action: () => {
+                this.filter.purchasePattern = 8;
+              }
+            },
+            {
+              sonText: "手牌遗失",
+              action: () => {
+                this.filter.purchasePattern = 9;
+              }
+            },
+            {
+              sonText: "手牌损坏",
+              action: () => {
+                this.filter.purchasePattern = 10;
+              }
+            },
+            {
+              sonText: "手牌租用",
+              action: () => {
+                this.filter.purchasePattern = 11;
+              }
             }
           ]
         },
@@ -109,15 +183,21 @@ export default {
           children: [
             {
               sonText: "今日",
-              action: () => {}
+              action: () => {
+                this.filterDate(1);
+              }
             },
             {
               sonText: "近七天",
-              action: () => {}
+              action: () => {
+                this.filterDate(7);
+              }
             },
             {
               sonText: "本月",
-              action: () => {}
+              action: () => {
+                this.filterDate(30);
+              }
             },
             {
               sonText: "上月",
@@ -129,7 +209,9 @@ export default {
       filter: {
         nameOrPhone: "",
         timeStart: "",
-        timeEnd: ""
+        timeEnd: "",
+        purchasePattern: "",
+        belongerId: ""
       }
     };
   },
@@ -137,23 +219,32 @@ export default {
     headerSearch,
     headerData,
     filterNav,
-    staffCoachItem
+    staffCoachItem,
+    noneResult
   },
   mounted() {
     setNavTab();
-    this.getAchievementTable();
-    this.refreshList();
+    this._getUserofrole();
+    this.filterDate(7);
   },
   mixins: [colorMixin, listPageMixin],
   methods: {
     searchChange(event) {
-      this.filter.namePhone = event;
+      this.filter.nameOrPhone = event;
     },
     getAchievementTable() {
       let that = this;
+      var _data = Object.assign(
+        {},
+        {
+          storeId: that.selectedStore.storeId,
+          isCoverage: 0
+        },
+        that.filter
+      );
       HttpRequest({
         url: "/performance/card/pagestotal",
-        data: that.requestData,
+        data: _data,
         success(res) {
           if (res.data.code == 200) {
             let sum = 0;
@@ -183,7 +274,7 @@ export default {
           data: _data,
           success(res) {
             let data = res.data.data.result.map(e => {
-              let statusText = ""
+              let statusText = "";
               if (e.authorityUnit == 0) {
                 statusText = "储值卡";
               }
@@ -217,6 +308,47 @@ export default {
       wx.navigateTo({
         url: "../achievement_detail/main?id=" + item.id
       });
+    },
+    refreshList() {
+      this.page = 1;
+      this.isNoMore = false;
+      this.list = [{}, {}, {}, {}];
+      this.getAchievementTable();
+      this.getList();
+    },
+    selectStore(item) {
+      console.log("list-page-minxi-main");
+      this.selectedStore = item;
+      this._getUserofrole();
+      this.refreshList();
+    },
+    _getUserofrole() {
+      getUserofrole(this.selectedStore.storeId, 2).then(data => {
+        let list = data.map(e => {
+          return {
+            sonText: e.userName,
+            action: () => {
+              this.filter.belongerId = e.id;
+            }
+          };
+        });
+        this.nav[1].children = [
+          {
+            sonText: "全部",
+            action: () => {
+              this.filter.belongerId = "";
+            }
+          }
+        ].concat(list);
+      });
+    },
+    filterDate(day) {
+      let obj = this.filterDateMethod(day);
+      this.setDate(obj);
+    },
+    setDate(obj) {
+      this.filter.timeStart = obj.startTime;
+      this.filter.timeEnd = obj.endTime;
     }
   }
 };
@@ -226,7 +358,7 @@ export default {
 .achievement-list {
   .list {
     .list-item {
-      >div {
+      > div {
         display: flex;
         padding: 10px 15px 10px 0;
         border-bottom: 1rpx solid #eee;
@@ -295,12 +427,12 @@ export default {
   }
   .coach-skeleton {
     .cover .card-status {
-      background-color: #eee;;
+      background-color: #eee;
     }
     .skeleton-wrapper {
       padding: 0 12px;
       width: 100%;
-      >div {
+      > div {
         margin-top: 12px;
         background-color: #eee;
       }

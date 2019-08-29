@@ -33,6 +33,14 @@
         :titleSize="16"
         @tapMore="showProjectPopup"
       ></title-cell>
+      <title-cell
+        v-if="isCheckIn"
+        title="上课教练"
+        :moreText="coachCellText"
+        :moreSize="14"
+        :titleSize="16"
+        @tapMore="showCoachPopup"
+      ></title-cell>
     </div>
 
     <div class="cell-list-sm">
@@ -50,8 +58,7 @@
       class="venue-pop"
       :show="isVenuePopup"
       position="bottom"
-      @close="isVenuePopup = false"
-    >
+      @close="isVenuePopup = false">
       <div class="pop-title">
         <span>请选择本次消费的场馆</span>
         <img src="/static/images/icon-close.png" @click="isVenuePopup = false">
@@ -71,8 +78,7 @@
       class="project-pop"
       :show="isProjectPopup"
       position="bottom"
-      @close="isProjectPopup = false"
-    >
+      @close="isProjectPopup = false">
       <div class="pop-title">
         <span>请选择本次消费的项目</span>
         <img src="/static/images/icon-close.png" @click="isProjectPopup = false">
@@ -92,8 +98,7 @@
       class="store-pop"
       :show="isStorePopup"
       position="bottom"
-      @close="isStorePopup = false"
-    >
+      @close="isStorePopup = false">
       <div class="pop-title">
         <span>请选择授课门店</span>
         <img src="/static/images/icon-close.png" @click="isStorePopup = false">
@@ -119,14 +124,41 @@
       </div>
     </van-popup>
 
+    <!-- 选择教练弹出框 -->
+    <van-popup
+      class="store-pop"
+      :show="isCoachPopup"
+      position="bottom"
+      custom-style="max-height: 60vh;"
+      @close="isCoachPopup = false">
+      <div class="pop-title">
+        <span>请选择上课教练</span>
+        <img src="/static/images/icon-close.png" @click="isCoachPopup = false">
+      </div>
+      <div class="store-list">
+        <div
+          class="store-popup-item"
+          @click="selectCoach(item)"
+          v-for="(item, index) in coachList"
+          :key="index"
+        >
+          <div class="coach-cover">
+            <img :src="window.api + item.cover">
+          </div>
+          <div class="name">
+            {{item.userName}}
+          </div>
+        </div>
+      </div>
+    </van-popup>
+
     <!-- 选择时间弹出框 -->
     <van-popup
       class="time-pop"
       custom-style="width: 100%;"
       :show="isTimePopup"
       position="bottom"
-      @close="isTimePopup = false"
-    >
+      @close="isTimePopup = false">
       <div class="date-group">
         <div class="date-group-header">
           <div class="pop-title">
@@ -235,8 +267,7 @@
       :show="showModifyPrice"
       @close="showModifyPrice = false"
       :duration="200"
-      custom-style="width:85%;border-radius: 5px;"
-    >
+      custom-style="width:85%;border-radius: 5px;">
       <div class="modify-price">
         <div class="modify-title">请输入扣费金额</div>
         <div class="modify-middle">
@@ -271,6 +302,7 @@ import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 import store from "../../../utils/store";
 import { attendclass } from "../common/js/http.js";
+import { getUserofrole } from "../common/js/http.js";
 
 export default {
   name: "appointment-coach",
@@ -288,6 +320,7 @@ export default {
       venueCellText: "请选择",
       // 项目选择文本
       projectCellText: "请选择",
+      coachCellText: "请选择",
       // 门店弹窗
       isStorePopup: false,
       // 时间弹窗
@@ -298,6 +331,7 @@ export default {
       isVenuePopup: false,
       // 项目弹窗
       isProjectPopup: false,
+      isCoachPopup: false,
       // 开店时间
       openTimeStart: "",
       // 关店时间
@@ -348,11 +382,14 @@ export default {
       venueId: "",
       // 项目id
       projectId: "",
+      selectedCoachId: '',
       // 学员信息
       studentInfo: {},
+      coachList: [],
       // 不能预约的时间
       todayPeriodTime: [],
-      isRevision: false,
+      isRevision: false, // 改约 限制部分参数不能修改
+      isCheckIn: false, // 入场签到
       modifyPrice: 0,
       showModifyPrice: false,
       // 是否是储值卡
@@ -372,8 +409,21 @@ export default {
     if (this.appointType == "改约") {
       this.isRevision = true
       this.revision();
+    } else if (this.appointType == "前台代签") {
+      this.isCheckIn = true
+      this.selectCardId = options.cardId
+      this.cardClassId = options.cardClassId
+      this.cardCellText = options.cardName
+      this.selectStoreId = options.storeId
+      this.venueId = options.venueId
+      this.storeCellText = options.storeName
+      this.venueCellText = options.venueName
+      this.getStoreQuery()
+      this._getUserofrole()
+      this.getProList()
     } else {
       this.isRevision = false
+      this.isCheckIn = false
       // this.computedTime();
       this.getStudentDetail();
       this.getCardList();
@@ -420,7 +470,7 @@ export default {
     },
     // 显示合同弹窗
     showCardPopop() {
-      if(this.isRevision) {
+      if(this.isRevision || this.isCheckIn) {
         return
       }
       if (!this.cardList.length) {
@@ -434,7 +484,7 @@ export default {
     },
     // 显示门店弹窗
     showStorePopup() {
-      if(this.isRevision) {
+      if(this.isRevision || this.isCheckIn) {
         return
       }
       if (!this.selectCardId) {
@@ -455,7 +505,7 @@ export default {
     },
     // 显示场馆弹窗
     showVenuePopup() {
-      if(this.isRevision) {
+      if(this.isRevision || this.isCheckIn) {
         return
       }
       if (!this.selectStoreId || !this.selectCardId) {
@@ -499,6 +549,9 @@ export default {
         });
       }
       this.isProjectPopup = true;
+    },
+    showCoachPopop() {
+      this.isCoachPopup = true;
     },
     // 选择时间
     selectHour(item, index) {
@@ -638,6 +691,7 @@ export default {
         }
       }
       this.dayTime = target;
+      
       for (let k in target) {
         if (!target[k].disable) {
           this.selectHour(target[k], k);
@@ -666,6 +720,13 @@ export default {
       if (this.selectCardId) {
         this.getStoreList();
       }
+    },
+    // 选择教练
+    selectCoach(item) {
+      this.coachCellText = item.userName
+      this.isCoachPopup = false
+      this.selectedCoachId = item.userId
+      this.getPeriodTime()
     },
     // 选择门店
     selectStore(item) {
@@ -702,8 +763,12 @@ export default {
         this.modifyPrice = item.projectPrice
         this.showModifyPrice = true
         return
+      } 
+      if(this.isCheckIn) {
+        this.isCoachPopup = true;
+      } else {
+        this.isTimePopup = true;
       }
-      this.isTimePopup = true;
     },
     // 确认选择时间
     selectDate() {
@@ -860,7 +925,7 @@ export default {
       HttpRequest({
         url: window.api + "/coach/private/caochTimePeriod",
         data: {
-          coachId: that.userInfo.userId,
+          coachId: that.isCheckIn ? that.selectedCoachId : that.userInfo.userId,
           calendar: date || formatDate(new Date(), "yyyy-MM-dd")
         },
         success(res) {
@@ -875,6 +940,9 @@ export default {
             console.log(_time)*/
             that.todayPeriodTime = res.data.data;
             that.computedTime();
+            if(that.isCheckIn) {
+              that.isTimePopup = true;
+            }
           } else {
             that.todayPeriodTime = [];
           }
@@ -946,13 +1014,20 @@ export default {
           duration: 1000
         });
       }
+      if (this.appointType == "前台代签" && !this.selectedCoachId) {
+        return wx.showToast({
+          title: "请选择上课教练",
+          icon: "none",
+          duration: 1000
+        });
+      }
       wx.showLoading({
         title: "预约中..."
       });
       let params = {
         status: 1,
         customerId: this.id,
-        coachId: this.userInfo.userId,
+        coachId: this.isCheckIn ? this.selectedCoachId : this.userInfo.userId,
         cardId: this.selectCardId,
         storeId: this.selectStoreId,
         venueId: this.venueId,
@@ -967,7 +1042,7 @@ export default {
       wx.hideLoading();
       if (this.appointType == "预约") {
         this.confirmAppoint(params);
-      } else if (this.appointType == "一键上课") {
+      } else if (this.appointType == "一键上课" || this.appointType == "前台代签") {
         this.confirmAttendClass(params);
       } else if(this.appointType == "改约") {
         this.revisionClass()
@@ -984,7 +1059,12 @@ export default {
           if (res.data.code == 200) {
             let _appointId = res.data.data;
             console.log("_appointId:" + _appointId);
-            that.attendClassWay(_appointId);
+            // 入场签到时为前台代签
+            if(that.isCheckIn) {
+              that.allograph(_appointId)
+            } else {
+              that.attendClassWay(_appointId);
+            }
           } else {
             wx.showModal({
               title: "提示",
@@ -1098,6 +1178,40 @@ export default {
         });
       })
     },
+    // 前台代签上课
+    allograph(appointId) {
+      let that = this
+      HttpRequest({
+        url: '/mobile/coach/appoint/attendclass',
+        data: {
+          coachAppointId: appointId,
+          privateFrontSign: 1,
+          realTimeStart: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss')
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            wx.showToast({
+              title: res.data.message,
+              icon: "success",
+              duration: 1000,
+              success() {
+                setTimeout(() => {
+                  wx.redirectTo({
+                    url: "/pages/pageBusiness/check_in_type/main"
+                  });
+                }, 600);
+              }
+            });
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            });
+          }
+        }
+      })
+    },
     // 改约
     revision() {
       this.getCoachDetail().then(res => {
@@ -1169,7 +1283,25 @@ export default {
     },
     modifyPriceSure() {
       this.showModifyPrice = false;
-      this.isTimePopup = true;
+      if(this.isCheckIn) {
+        this.isCoachPopup = true;
+      } else {
+        this.isTimePopup = true;
+      }
+    },
+    // 获取教练
+    _getUserofrole() {
+      getUserofrole(this.selectStoreId, 1).then((data) => {
+        this.coachList = data.map(e => {
+          return {
+            sex: e.sex,
+            userId: e.userId,
+            userName: e.userName,
+            cover: e.headImgPath
+          }
+        })
+        console.log(this.coachList)
+      })
     }
     // 上课校验
     // checkStatus() {
@@ -1244,7 +1376,7 @@ page {
         display: flex;
         padding: 15px 15px;
         border-top: 1rpx solid #eee;
-        .cover {
+        .cover, .coach-cover {
           flex: 0 0 100px;
           margin-right: 10px;
           > img {
@@ -1252,6 +1384,12 @@ page {
             height: 60px;
             border-radius: 4px;
             background-color: #eee;
+          }
+        }
+        .coach-cover {
+          flex: 0 0 50px;
+          >img {
+            height: 50px;
           }
         }
         .store-info {

@@ -23,10 +23,11 @@
       <input type="text" v-model="checkInNum" class="check_in-input" placeholder="请输入手机号或卡号确认签到">
       <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
     </div> 
-    <div class="bottom-btn" @click="confirmCheckIn">
+    <div class="bottom-btn" @click="confirmCheckIn" :style="{'background-color': themeColor}">
       确认签到
       <div class="block" v-if="isPhoneX"></div>
     </div>
+    <check-popup></check-popup>
   </div>
 </template>
 
@@ -37,6 +38,11 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
+import {
+  checkPopupData,
+  checkMethods
+} from "../components/check_popup/check_popup.js";
+import checkPopup from "../components/check_popup/check_popup.vue";
 import { getVenueList } from "../common/js/http.js";
 import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue"
@@ -48,12 +54,12 @@ export default {
       typeList: [{
         iconUrl: "/static/images/staff/face.svg",
         text: "人脸签到",
-        navUrl: "",
+        navUrl: "face",
         class: 'icon-lg'
       },{
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_2.svg",
         text: "签到记录",
-        navUrl: "",
+        navUrl: "../check_in_record/main",
         class: ''
       }],
       storeList: [],
@@ -67,7 +73,8 @@ export default {
     }
   },
   components: {
-    headerSearch
+    headerSearch,
+    checkPopup
   },
   mixins:[colorMixin],
   computed: {
@@ -77,29 +84,47 @@ export default {
   },
   mounted() {
     setNavTab()
-    this.storeList = store.state.allStore.filter(e => e.storeId);
+    this.checkInNum = ""
+    let allStore = store.state.allStore
+    this.storeList = allStore.filter(e => e.storeId);
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
+    this.changeCommonStore()
     this._getVenueList()
+    this.getSetting()
   },
   methods: {
     toNav(url) {
+      if(url == "face") {
+        url = `../face/main?type=checkIn&storeId=${this.selectedStore.storeId}&venueId=${this.venueList[this.venueIndex].venueId}`
+      }
       wx.navigateTo({
         url: url
       });
     },
     searchChange(e) {
     },
+    changeCommonStore() {
+      checkPopupData.storeId = this.selectedStore.storeId
+      checkPopupData.storeName = this.selectedStore.storeName
+    },
+    changeCommonVenue() {
+      checkPopupData.venueId = this.venueList[this.venueIndex].venueId
+      checkPopupData.venueName = this.venueList[this.venueIndex].venueName
+    },
     onVenueChange(e) {
       this.venueIndex = e.mp.detail.value
+      this.changeCommonVenue()
     },
     selectStore(item) {
       this.selectedStore = item
+      this.changeCommonStore()
       this._getVenueList()
       this.getSetting()
     },
     _getVenueList() {
       getVenueList(this.selectedStore.storeId).then((res) => {
         this.venueList = res
+        this.changeCommonVenue()
         let nameList = []
         res.forEach(e => {
           nameList.push(e.venueName)
@@ -111,7 +136,7 @@ export default {
     getSetting() {
       let that = this
       HttpRequest({
-        url: 'consumption/log/sign/getsetting',
+        url: '/consumption/log/sign/getsetting',
         data: {
           storeId: that.selectedStore.storeId
         },
@@ -129,8 +154,10 @@ export default {
           cardId: that.checkInNum
         },
         success(res) {
-          if(res.data.code == 500) { // 为卡号
+          if(res.data.code == 500 && that.brushCardSwich == 1) { // 为卡号
             that.frontSign = ""
+            checkPopupData.physicsCardNo = that.checkInNum
+            checkMethods.getCardCost()
           } else { // 不为卡号,查询客户
             that.frontSign = 1
             that.getCustomerList()
@@ -138,6 +165,7 @@ export default {
         }
       })
     },
+    // 获取卡号/手机号的用户信息
     getCustomerList() {
       let that = this
       HttpRequest({
@@ -147,16 +175,60 @@ export default {
           customerClass: 3
         },
         success(res) {
-          if(!res.data.data.result.length || res.data.data.result.length > 1) {
-            wx.showModal({
+          let list = res.data.data.result
+          if(!list.length) {
+            return wx.showModal({
+              title: "提示",
+              content: "未查询到信息",
+              showCancel: false
+            });
+          }
+          if(list.length > 1) {
+            return wx.showModal({
               title: "提示",
               content: "请输入具体信息查询",
               showCancel: false
             });
           }
+          if (list.length == 1) {
+            let info = list[0]
+            wx.navigateTo({
+              url: `../check_in_customer/main?id=${info.id}&storeId=${that.selectedStore.storeId}&venueId=${that.venueList[that.venueIndex].venueId}`
+            })
+          }
         }
       })
-    }
+    },
+    // 获取卡号含有的项目
+    // getCardCost() {
+    //   let that = this
+    //   HttpRequest({
+    //     url: '/consumption/general/card/cost',
+    //     data: {
+    //       storeId: that.selectedStore.storeId,
+    //       venueId: that.venueList[that.venueIndex].venueId,
+    //       physicsCardNo: that.checkInNum,
+    //       frontSign: that.frontSign,
+    //       valueCardFee: '' // 储值卡的扣费金额
+    //     },
+    //     success(res) {
+    //       let data = res.data.data
+    //       let code = res.data.code
+    //       if (code == 202 || code == 201) { // 消费天 202 其他 201
+    //         // 快速签到时直接签到
+    //       }
+    //       if(code == 503) {
+    //         // 含有多个项目，选择
+    //       }
+    //       if(code == 519) {
+    //         // 团课
+    //       }
+    //       if(code == 513) {
+    //         // 私教
+    //       }
+    //     }
+    //   })
+    // }
   }
 }
 </script>

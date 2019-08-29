@@ -6,13 +6,10 @@
         <!-- <cover-image
           class="camera-flip"
           src="/static/images/staff/uFace.png"
-        ></cover-image> -->
+        ></cover-image>-->
       </cover-view>
       <cover-view class="tip" v-if="showTip">人脸识别中...</cover-view>
-      <cover-image
-        class="face-outline"
-        src="/static/images/staff/uFace.png"
-      ></cover-image>
+      <cover-image class="face-outline" src="/static/images/staff/uFace.png"></cover-image>
     </camera>
     <van-toast id="van-toast" />
   </div>
@@ -32,6 +29,9 @@ import { EventBus } from "../common/js/eventBus.js";
 export default {
   data() {
     return {
+      type: "",
+      storeId: "",
+      venue: "",
       params: {},
       device: false, // 默认前置摄像头
       // camera: true,
@@ -46,25 +46,34 @@ export default {
   onShow() {
     wx.getSetting({
       success(res) {
-        if (!res.authSetting['scope.camera'] && JSON.stringify(res.authSetting).indexOf("camera") > -1) {
+        if (
+          !res.authSetting["scope.camera"] &&
+          JSON.stringify(res.authSetting).indexOf("camera") > -1
+        ) {
           wx.showModal({
             title: "授权",
             content: "是否授权摄像头使用？",
             success(res) {
               if (res.confirm) {
-                wx.openSetting()
+                wx.openSetting();
               }
             }
           });
         }
       }
-    })
+    });
   },
   onLoad(options) {
-    this.params = JSON.parse(options.params);
+    if (options.type && options.type == "checkIn") {
+      this.type = options.type;
+      this.storeId = options.storeId;
+      this.venueId = options.venueId;
+    } else {
+      this.params = JSON.parse(options.params);
+    }
     setNavTab();
     this.crx = wx.createCameraContext();
-    this.flag = true
+    this.flag = true;
     this.faceTimer = setInterval(() => {
       if (this.flag) {
         this.takePhoto();
@@ -89,7 +98,8 @@ export default {
       console.log(e);
     },
     flipCamera() {
-      this.device = !this.device;
+      clearInterval(this.faceTimer);
+      // this.device = !this.device;
     },
     // start(e) {
     //   this.camera = !this.camera;
@@ -123,11 +133,11 @@ export default {
           "content-type": "application/x-www-form-urlencoded" // 默认值
         },
         success(res) {
-          console.log("=========baiduFaceDetect=======success==")
+          console.log("=========baiduFaceDetect=======success==");
           if (res.data.code == 200) {
             that.searchFace(wxPathBase64);
           } else {
-            console.log(res.data.message)
+            console.log(res.data.message);
             that.flag = true;
             Toast({
               mask: false,
@@ -156,23 +166,29 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             clearInterval(that.faceTimer);
-            if(that.params.way == 5 || that.params.way == 2 || that.params.way == 9) {
+            if (
+              that.params.way == 5 ||
+              that.params.way == 2 ||
+              that.params.way == 9
+            ) {
               wx.showLoading({
                 title: "上课中..."
               });
-              attendclass(that.params.appointId).then(res => {
-                wx.redirectTo({
-                  url: `../../appointmentResult/main?coachAppointId=${
-                    that.params.appointId
-                  }&type=staff`
+              attendclass(that.params.appointId)
+                .then(res => {
+                  wx.redirectTo({
+                    url: `../../appointmentResult/main?coachAppointId=${
+                      that.params.appointId
+                    }&type=staff`
+                  });
+                })
+                .catch(res => {
+                  wx.hideLoading();
                 });
-              }).catch(res => {
-                wx.hideLoading();
-              });
             }
-            if(that.params.way == 3) {
-              that.pushThreeMsg()
-              EventBus.$emit('confirmed')
+            if (that.params.way == 3) {
+              that.pushThreeMsg();
+              EventBus.$emit("confirmed");
               wx.navigateBack({
                 delta: 1
               });
@@ -195,17 +211,17 @@ export default {
             //   });
             //   that.flag = true;
             // } else {
-              // if (res.data.message.indexOf("匹配指数过低") > -1) {
-              //   return that.flag = true;
-              // }
-              // wx.showModal({
-              //   title: "提示",
-              //   content: res.data.message,
-              //   showCancel: false,
-              //   success(res) {
-              //     that.flag = true;
-              //   }
-              // });
+            // if (res.data.message.indexOf("匹配指数过低") > -1) {
+            //   return that.flag = true;
+            // }
+            // wx.showModal({
+            //   title: "提示",
+            //   content: res.data.message,
+            //   showCancel: false,
+            //   success(res) {
+            //     that.flag = true;
+            //   }
+            // });
             // }
           }
         },
@@ -214,6 +230,9 @@ export default {
           // clearInterval(that.faceTimer)
         }
       });
+    },
+    // 人脸识别 入场签到
+    faceCheckIn() {
     },
     // 教练+前台发消息
     pushMsg() {
@@ -264,7 +283,7 @@ export default {
     padding: 0 20px;
     border-radius: 5px;
     color: #fff;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
   }
   .face-outline {
     position: fixed;

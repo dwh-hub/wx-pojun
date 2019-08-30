@@ -1,0 +1,50 @@
+<view wx:if="{{isShow}}" class="vehicle-panel" style="height:488rpx;bottom:{{_bottom}}px">
+  <!--数字键盘  -->
+  <view class="number-panel-box" wx:if="{{_keyBoardType == 2}}">
+    <view class="number-panel-row">
+      <view class='number-panel-row-key vehicle-hover' bindtap='vehicleTap' wx:for="{{keyPhone}}" data-value="{{item}}" wx:key="{{item}}">
+        {{item}}
+      </view>
+      <view class="switch-number number-panel-row-button" bindtap="switchKeyboard" data-value="1"><text style="color: #999;">英</text>/数字</view>
+      <view class='number-panel-row-key vehicle-hover' bindtap='vehicleTap' data-value="0">0</view>
+      <view bindlongtap="longPressDelete" bindtap='vehicleTap' class='number-panel-row-button vehicle-hover' data-value="delete">
+        <image src='/static/images/delete.png' data-value="delete" class='vehicle-en-button-delete' mode='aspectFit'>删除</image>
+      </view>
+    </view>
+  </view>
+  <!--英文键盘  -->
+  <block class="letter-panel-box" wx:if="{{_keyBoardType == 1}}">
+    <view class="vehicle-panel-row">
+      <view class='vehicle-panel-row-button vehicle-panel-row-button-number vehicle-hover'
+        bindtap='vehicleTap' wx:for="{{keyNumber}}" data-value="{{item}}" wx:key="{{item}}">
+        {{item}}
+      </view>
+    </view>
+    <view class="vehicle-panel-row">
+      <view class='vehicle-panel-row-button vehicle-hover'
+        wx:for="{{keyEnInput1}}" bindtap='vehicleTap' data-value="{{item}}" wx:key="{{item}}">
+        {{item}}
+      </view>
+    </view>
+    <view class="vehicle-panel-row">
+      <view class='vehicle-panel-row-button vehicle-hover'
+        wx:for="{{keyEnInput2}}" bindtap='vehicleTap' data-value="{{item}}" wx:key="{{item}}">
+        {{item}}
+      </view>
+      <view bindlongtap="longPressDelete" class='vehicle-panel-row-button vehicle-panel-row-button-img vehicle-hover'>
+        <image src='/static/images/delete.png' class='vehicle-en-button-delete' bindtap='vehicleTap' data-value="delete" mode='aspectFit'>删除</image>
+      </view>
+    </view>
+    <view class="vehicle-panel-row-last">
+      <view class="switch-vehicle vehicle-panel-row-button" bindtap="switchKeyboard" data-value="2">英/<text style="color: #999;">数</text></view>
+      <view class='vehicle-panel-row-button vehicle-panel-row-button-last vehicle-hover'
+         bindtap='vehicleTap' wx:for="{{keyEnInput3}}" data-value="{{item}}" wx:key="{{item}}">
+         {{item}}
+      </view>
+      <view class='vehicle-panel-row-button vehicle-panel-ok' bindtap='switchCaps' data-value="ok">
+        {{capsStr}}</view>
+    </view>
+  </block>
+</view>
+<!--适配iPhoneX的底条-->
+<!-- <view class="adaptive" wx:if="{{isAdaptive}}"></view> -->

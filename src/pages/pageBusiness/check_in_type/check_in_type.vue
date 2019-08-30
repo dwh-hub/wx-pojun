@@ -17,12 +17,14 @@
     <picker @change="onVenueChange" :value="venueIndex" :range="venueNameList">
       <div class="venue" :style="{'border': '1px solid '+ themeColor}">
         {{venueNameList[venueIndex]}}
+        <image class="icon" src="/static/images/arrow-bottom.png"></image>
       </div>
     </picker>
     <div class="check_in-input-wrapper">
-      <input type="text" v-model="checkInNum" class="check_in-input" placeholder="请输入手机号或卡号确认签到">
+      <input type="text" v-model="checkInNum" class="check_in-input" placeholder="请输入手机号或卡号确认签到" disabled>
       <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
     </div> 
+    <keyboard :isShow="true" :bottom="42" :isAdaptive="isPhoneX" @onInputChange="keyboardInput" @onIputdelete="keyboardDelete" @onLongPressDelete="keyboardDeleteAll"></keyboard>
     <div class="bottom-btn" @click="confirmCheckIn" :style="{'background-color': themeColor}">
       确认签到
       <div class="block" v-if="isPhoneX"></div>
@@ -148,6 +150,12 @@ export default {
     // 校验
     confirmCheckIn() {
       let that = this
+      if(!this.checkInNum) {
+        return wx.showToast({
+          title: '卡号/手机号为空',
+          icon: 'none'
+        })
+      }
       HttpRequest({
         url: '/customer/register/compact/querycard',
         data: {
@@ -168,6 +176,7 @@ export default {
     // 获取卡号/手机号的用户信息
     getCustomerList() {
       let that = this
+      wx.showLoading()
       HttpRequest({
         url: '/consumption/general/customerforcost',
         data: {
@@ -176,6 +185,7 @@ export default {
         },
         success(res) {
           let list = res.data.data.result
+          wx.hideLoading()
           if(!list.length) {
             return wx.showModal({
               title: "提示",
@@ -184,6 +194,19 @@ export default {
             });
           }
           if(list.length > 1) {
+            // 处理phone-1的情况
+            let isSame = false
+            list.forEach(e => {
+              if (e.phone == that.checkInNum) {
+                isSame = true
+                wx.navigateTo({
+                  url: `../check_in_customer/main?id=${e.id}&storeId=${that.selectedStore.storeId}&venueId=${that.venueList[that.venueIndex].venueId}`
+                })
+              }
+            })
+            if(isSame) {
+              return
+            }
             return wx.showModal({
               title: "提示",
               content: "请输入具体信息查询",
@@ -199,6 +222,16 @@ export default {
         }
       })
     },
+    // 自定义键盘事件
+    keyboardInput(e) {
+      this.checkInNum += e.mp.detail
+    },
+    keyboardDelete() {
+      this.checkInNum = this.checkInNum.substr(0, this.checkInNum.length-1);
+    },
+    keyboardDeleteAll() {
+      this.checkInNum = ""
+    }
     // 获取卡号含有的项目
     // getCardCost() {
     //   let that = this
@@ -260,6 +293,7 @@ export default {
     margin-top: 15px;
     .check_in-input {
       padding: 0 20px;
+      font-size: 16px;
       box-sizing: border-box;
       height: 70px;
       text-align: center;
@@ -275,16 +309,25 @@ export default {
   }
   .bottom-btn {
     font-size: 14px;
+    z-index: 1001;
   }
   .venue {
     box-sizing: border-box;
     line-height: 42px;
     width: 100%;
     margin-top: 15px;
+    padding-left: 45px;
     font-weight: bold;
     font-size: 16px;
     text-align: center;
     border-radius: 10px;
+    .icon {
+      width: 25px;
+      height: 25px;
+      margin-top: 10px;
+      margin-right: 20px;
+      float: right;
+    }
   }
 }
 </style>

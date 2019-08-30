@@ -356,6 +356,7 @@ export default {
         url: window.api + "/mobile/coach/appoint/attendclass",
         data: {
           coachAppointId: that.params.appointId,
+          customerSignWay: 0,
           realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
         },
         success(res) {

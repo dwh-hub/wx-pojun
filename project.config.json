@@ -46,16 +46,16 @@
 			"list": [
 				{
 					"id": 0,
-					"name": "pages/",
-					"pathName": "pages/memberCard/main",
-					"query": "",
+					"name": "pages/pageBusiness/customer_detail/main",
+					"pathName": "pages/pageBusiness/customer_detail/main",
+					"query": "id=144899",
 					"scene": null
 				},
 				{
 					"id": 1,
 					"name": "pages/pageBusiness/check_in_customer/main",
 					"pathName": "pages/pageBusiness/check_in_customer/main",
-					"query": "id=144956&storeId=126&venueId=90",
+					"query": "id=144899&storeId=123&venueId=81",
 					"scene": 1035,
 					"referrerInfo": {}
 				},

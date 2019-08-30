@@ -160,7 +160,7 @@ export default {
     computedFilterText() {
       let filterText = ""
       this._nav.forEach((e, index) => {
-        filterText += `${this._nav[index].name}：${this._nav[index].navTitle == this._nav[index].name ? '全部': this._nav[0].navTitle}，`
+        filterText += `${this._nav[index].name}：${this._nav[index].navTitle == this._nav[index].name ? '全部': this._nav[index].navTitle}，`
       })
       this.filterText = filterText.slice(0, filterText.length-1)
     },

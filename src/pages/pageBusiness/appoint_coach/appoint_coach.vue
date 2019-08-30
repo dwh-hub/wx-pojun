@@ -301,8 +301,7 @@ import {
 import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 import store from "../../../utils/store";
-import { attendclass } from "../common/js/http.js";
-import { getUserofrole } from "../common/js/http.js";
+import { attendclass, checkAttendStatus, getUserofrole } from "../common/js/http.js";
 
 export default {
   name: "appointment-coach",
@@ -723,10 +722,12 @@ export default {
     },
     // 选择教练
     selectCoach(item) {
-      this.coachCellText = item.userName
-      this.isCoachPopup = false
-      this.selectedCoachId = item.userId
-      this.getPeriodTime()
+      checkAttendStatus(item.userId).then(() => {
+        this.coachCellText = item.userName
+        this.selectedCoachId = item.userId
+        this.isCoachPopup = false
+        this.getPeriodTime()
+      })
     },
     // 选择门店
     selectStore(item) {
@@ -1143,7 +1144,7 @@ export default {
             if (way == 1) {
               // 教练自签
               that.attendclass(appointId);
-            } if(way == 5) {
+            } else if(way == 5) {
               wx.showLoading({
                 title: '加载中..'
               })
@@ -1300,7 +1301,6 @@ export default {
             cover: e.headImgPath
           }
         })
-        console.log(this.coachList)
       })
     }
     // 上课校验

@@ -21,7 +21,9 @@
         <div class="operate" :style="{border: '1px solid '+themeColor,color: themeColor}">撤销</div>
         <img src="/static/images/staff/right-arrow.svg" alt />
       </staff-coach-item>
-      <van-loading :color="themeColor" v-if="isLoading" />
+      <van-loading :color="themeColor" v-if="isLoading"/>
+      <none-result text="暂无客户" v-if="!list.length && !isLoading"></none-result>
+      <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
 
     <timePicker

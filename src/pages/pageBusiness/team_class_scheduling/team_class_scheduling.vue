@@ -1,5 +1,5 @@
 <template>
-  <div class="team_class_scheduling">
+  <div class="team_class_scheduling" :class="{'isPhoneX-wrap': isPhoneX}">
     <div class="class-info-wrapper">
       <img :src="schedulingDetail.masterImg" alt>
       <div class="class-info">
@@ -53,7 +53,7 @@
         is-link
       />
     </van-cell-group>
-    <!-- <div class="item-cell">
+    <div class="item-cell">
       <div class="cell-left">是否可以重复上课</div>
       <div class="cell-right">
         <van-radio-group :value="isLimitAttendTimes" @change="onChangeLimitAttend" custom-class="radio-group">
@@ -61,7 +61,7 @@
           <van-radio :checked-color="themeColor" custom-class="radio" name="1">否</van-radio>
         </van-radio-group>
       </div>
-    </div> -->
+    </div>
     <div class="item-cell">
       <div class="cell-left">是否预约</div>
       <div class="cell-right">
@@ -108,7 +108,10 @@
       </div>
     </van-cell-group>
 
-    <div class="save-btn" :style="{backgroundColor: themeColor}" @click="save">保存</div>
+    <div class="save-btn" :style="{backgroundColor: themeColor}" @click="save">
+      保存
+      <div class="block" v-if="isPhoneX"></div>
+    </div>
 
     <van-popup
       :show="showDatePopup"
@@ -160,6 +163,7 @@
             <van-icon name="checked" :color="themeColor" size="2em"/>
           </div>
         </div>
+        <div class="block" v-if="isPhoneX"></div>
         <div class="action-sure" :style="{'background-color': themeColor}" @click="showCoachPopup = false">确认</div>
       </div>
     </van-popup>
@@ -278,6 +282,11 @@ export default {
         }
       });
       this.batchWeekStr = _weekStr
+    }
+  },
+  computed: {
+    isPhoneX() {
+      return store.state.isIphoneX;
     }
   },
   mounted() {
@@ -532,8 +541,8 @@ export default {
           maxPeople: that.schedulingDetail.maxPeople,
           stopAppoint: that.schedulingDetail.stopAppoint,
           advanceAppoint: that.schedulingDetail.advanceAppoint,
-          teamScheduleTimeJsonStr: _timeStr
-          // attendClassPersonLimit: that.isLimitAttendTimes
+          teamScheduleTimeJsonStr: _timeStr,
+          attendClassPersonLimit: that.isLimitAttendTimes
         },
         success(res) {
           wx.showModal({
@@ -566,8 +575,8 @@ export default {
           minPeople: that.schedulingDetail.minPeople,
           maxPeople: that.schedulingDetail.maxPeople,
           stopAppoint: that.schedulingDetail.stopAppoint,
-          advanceAppoint: that.schedulingDetail.advanceAppoint
-          // attendClassPersonLimit: that.isLimitAttendTimes
+          advanceAppoint: that.schedulingDetail.advanceAppoint,
+          attendClassPersonLimit: that.isLimitAttendTimes
         },
         success(res) {
           wx.showModal({
@@ -666,6 +675,7 @@ export default {
 </script>
 
 <style lang="less">
+@import "~COMMON/less/common.less";
 @import "../common/less/staff_common.less";
 page {
   height: 100%;

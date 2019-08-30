@@ -14,7 +14,7 @@
       <div class="list-item" v-for="(item, index) in list" :key="index" @click="toDetail(item)">
         <div v-if="item.id">
           <div class="cover">
-            <div class="card-status another">{{item.masterCardClassName}}</div>
+            <div class="card-status" :class="item.class">{{item.masterCardClassName}}</div>
           </div>
           <div class="item-info">
             <div class="item-top">
@@ -257,6 +257,25 @@ export default {
         }
       });
     },
+    transClass(value) {
+      switch (value) {
+        case 0:
+          return {
+            name: '储值卡',
+            class: 'yuan'
+          };
+        case 1:
+          return {
+            name: '时期卡',
+            class: 'day'
+          };
+        case 2:
+          return {
+            name: '次卡',
+            class: 'unit'
+          };
+      }
+    },
     loadData() {
       let that = this;
       return new Promise(function(resolve) {
@@ -274,20 +293,21 @@ export default {
           data: _data,
           success(res) {
             let data = res.data.data.result.map(e => {
-              let statusText = "";
-              if (e.authorityUnit == 0) {
-                statusText = "储值卡";
-              }
-              if (e.authorityUnit == 1) {
-                statusText = "时期卡";
-              }
-              if (e.authorityUnit == 2) {
-                statusText = "次卡";
-              }
+              // let statusText = "";
+              // if (e.authorityUnit == 0) {
+              //   statusText = "储值卡";
+              // }
+              // if (e.authorityUnit == 1) {
+              //   statusText = "时期卡";
+              // }
+              // if (e.authorityUnit == 2) {
+              //   statusText = "次卡";
+              // }
               return {
                 // TODO: id
                 id: e.makeupCardId,
-                statusText: statusText,
+                statusText: that.transClass(e.authorityUnit).name,
+                class: that.transClass(e.authorityUnit).class,
                 pactId: e.pactId,
                 masterCardClassName: e.masterCardClassName,
                 proportionPrice: e.proportionPrice,
@@ -328,7 +348,7 @@ export default {
           return {
             sonText: e.userName,
             action: () => {
-              this.filter.belongerId = e.id;
+              this.filter.belongerId = e.userId;
             }
           };
         });
@@ -378,14 +398,14 @@ export default {
             &.private {
               background-color: #000000;
             }
-            &.team {
-              background-color: #ff5733;
+            &.yuan {
+              background-color: #13bfc4;
             }
-            &.member {
-              background-color: #43cf7c;
+            &.day {
+              background-color: #ff924f;
             }
-            &.another {
-              background-color: #a6a6a6;
+            &.unit {
+              background-color: #58b4ff;
             }
           }
         }

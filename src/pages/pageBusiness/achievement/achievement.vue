@@ -67,73 +67,73 @@ export default {
             {
               sonText: "全部",
               action: () => {
-                this.filter.purchasePattern = ''
+                this.filter.purchasePattern = "";
               }
             },
             {
               sonText: "新购",
               action: () => {
-                this.filter.purchasePattern = 1
+                this.filter.purchasePattern = 1;
               }
             },
             {
               sonText: "转卡",
               action: () => {
-                this.filter.purchasePattern = 2
+                this.filter.purchasePattern = 2;
               }
             },
             {
               sonText: "请假",
               action: () => {
-                this.filter.purchasePattern = 3
+                this.filter.purchasePattern = 3;
               }
             },
             {
               sonText: "转让",
               action: () => {
-                this.filter.purchasePattern = 4
+                this.filter.purchasePattern = 4;
               }
             },
             {
               sonText: "补办",
               action: () => {
-                this.filter.purchasePattern = 5
+                this.filter.purchasePattern = 5;
               }
             },
             {
               sonText: "补余",
               action: () => {
-                this.filter.purchasePattern = 6
+                this.filter.purchasePattern = 6;
               }
             },
             {
               sonText: "订金",
               action: () => {
-                this.filter.purchasePattern = 7
+                this.filter.purchasePattern = 7;
               }
             },
             {
               sonText: "退款",
               action: () => {
-                this.filter.purchasePattern = 8
+                this.filter.purchasePattern = 8;
               }
             },
             {
               sonText: "手牌遗失",
               action: () => {
-                this.filter.purchasePattern = 9
+                this.filter.purchasePattern = 9;
               }
             },
             {
               sonText: "手牌损坏",
               action: () => {
-                this.filter.purchasePattern = 10
+                this.filter.purchasePattern = 10;
               }
             },
             {
               sonText: "手牌租用",
               action: () => {
-                this.filter.purchasePattern = 11
+                this.filter.purchasePattern = 11;
               }
             }
           ]
@@ -211,14 +211,15 @@ export default {
     filterNav,
     headerSearch
   },
-  watch: {
-    filter: {
-      handler() {
-        this.refreshData()
-      },
-      deep: true
-    }
-  },
+  // watch: {
+  //   filter: {
+  //     handler() {
+  //       console.log(this.filter);
+  //       this.refreshData();
+  //     },
+  //     deep: true
+  //   }
+  // },
   mounted() {
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
@@ -231,25 +232,27 @@ export default {
     },
     selectStore(item) {
       this.selectedStore = item;
-      this.refreshData()
+      this.refreshData();
     },
     refreshData() {
-      this.getAchievementTable()
-      this.getAchievementChart()
-      this._getUserofrole()
+      this.getAchievementTable();
+      this.getAchievementChart();
+      this._getUserofrole();
     },
     getAchievementTable() {
       let that = this;
+      let _data = Object.assign(
+        {},
+        {
+          isCoverage: 0,
+          storeId: that.selectedStore.storeId,
+          transactUserId: that.filter.belongerId
+        },
+        that.filter
+      );
       HttpRequest({
         url: "/performance/card/pagestotal",
-        data: {
-          storeId: that.selectedStore.storeId,
-          timeStart: that.filter.timeStart,
-          timeEnd: that.filter.timeEnd,
-          transactUserId: wx.getStorageSync("userInfo").userId,
-          belongerId: wx.getStorageSync("userInfo").userId,
-          isCoverage: 0
-        },
+        data: _data,
         success(res) {
           if (res.data.code == 200) {
             let sum = 0;
@@ -269,7 +272,7 @@ export default {
     },
     getAchievementChart() {
       let that = this;
-      that.filter.storeId = that.selectedStore.storeId
+      that.filter.storeId = that.selectedStore.storeId;
       HttpRequest({
         url: "/performance/card/pagestotal/day",
         data: that.filter,
@@ -301,6 +304,7 @@ export default {
     filterDate(day) {
       let obj = this.filterDateMethod(day);
       this.setDate(obj);
+      this.refreshData();
     },
     setDate(obj) {
       this.filter.timeStart = obj.startTime;
@@ -366,16 +370,18 @@ export default {
             // sex: e.sex,
             // cover: e.headImgPath,
             action: () => {
-              this.filter.belongerId = e.id
+              this.filter.belongerId = e.userId;
+            }
+          };
+        });
+        this.nav[1].children = [
+          {
+            sonText: "全部",
+            action: () => {
+              this.filter.belongerId = "";
             }
           }
-        })
-        this.nav[1].children = [{
-          sonText: '全部',
-          action: () => {
-            this.filter.belongerId = ''
-          }
-        }].concat(list)
+        ].concat(list);
       });
     }
     // getAchievementForm() {
@@ -412,6 +418,11 @@ export default {
     height: 40vh;
     padding-right: 10px;
     background-color: #fff;
+  }
+  .filter-nav {
+    .mask {
+      top: 178px;
+    }
   }
 }
 </style>

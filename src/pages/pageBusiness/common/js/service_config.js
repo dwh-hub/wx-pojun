@@ -13,9 +13,9 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_2.svg",
         text: "签到",
-        // authorityId: 71,
-        navUrl: "", // ../check_in_type/main
-        isOpen: false,
+        authorityId: 71,
+        navUrl: "../check_in_type/main", // 
+        isOpen: true,
         hasAuth: true,
         class: "iconfont icon-workbench_icon_1"
       },
@@ -207,9 +207,9 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_5.svg",
         text: "私教耗课", // 上课统计报表
-        // authorityId: 63,
-        navUrl: "", // ../coach_class_total/main
-        isOpen: false,
+        authorityId: 63,
+        navUrl: "../coach_class_total/main", // 
+        isOpen: true,
         hasAuth: true,
         class: "iconfont icon-coach_service_icon_1"
       },
@@ -247,9 +247,9 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
         text: "业绩报表",
-        // authorityId: 87,
-        navUrl: "", // ../achievement/main 
-        isOpen: false,
+        authorityId: 87,
+        navUrl: "../achievement/main", // 
+        isOpen: true,
         hasAuth: true,
         class: "iconfont icon-operation_report_icon_2"
       },

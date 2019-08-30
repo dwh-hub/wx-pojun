@@ -1,14 +1,17 @@
 <template>
   <div class="check-in-customer">
     <div class="customer-detail">
-      <staff-coach-item :info="info" @clickIcon="clickIcon(info.first_2)">
+      <staff-coach-item :info="info" @clickIcon="clickIcon(info.first_2)" @clickItem="toCustomerDetail">
         <img src="/static/images/staff/phone.svg" alt />
         <img src="/static/images/staff/right-arrow.svg" alt />
       </staff-coach-item>
     </div>
-    <filter-nav :nav="nav"></filter-nav>
+    <!-- <filter-nav :nav="nav"></filter-nav> -->
+    <div class="filter-wrapper">
+      <switch @change="filterExpire"/><span>只显示使用中和未激活</span>
+    </div>
     <div class="list">
-      <div class="list-item" v-for="(item, index) in list" :key="index" @click="toDetail(item)">
+      <div class="list-item" v-for="(item, index) in list" :key="index" @click="toCardDetail(item)">
         <div v-if="item.id">
           <div class="cover">
             <div class="card-status" :class="item.class">{{item.masterClassName}}</div>
@@ -64,6 +67,7 @@ import {
 import staffCoachItem from "../components/staff-coach-item.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import filterNav from "../components/filter-nav.vue";
+import noneResult from "COMPS/noneResult.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import checkPopup from "../components/check_popup/check_popup.vue";
 import {
@@ -117,7 +121,8 @@ export default {
       ],
       filter: {
         cardType: ''
-      }
+      },
+      isFilterExpire: false
     };
   },
   onLoad(options) {
@@ -137,7 +142,8 @@ export default {
   components: {
     staffCoachItem,
     filterNav,
-    checkPopup
+    checkPopup,
+    noneResult
   },
   methods: {
     getDetail() {
@@ -171,8 +177,19 @@ export default {
         }
       });
     },
-    toDetail() {
-      console.log("toDetail");
+    filterExpire(e) {
+      this.isFilterExpire = e.mp.detail.value
+    },
+    toCustomerDetail() {
+      let that = this
+      wx.navigateTo({
+        url: "../customer_detail/main?id=" + that.customerId
+      });
+    },
+    toCardDetail(item) {
+      wx.navigateTo({
+        url: `../../cardDetail/main?id=${item.id}&type=staff`
+      });
     },
     loadData() {
       let that = this;
@@ -319,6 +336,10 @@ export default {
         }
       }
     }
+  }
+  .filter-wrapper {
+    text-align: right;
+    padding: 10px 15px 0 0;
   }
   .list {
     .list-item {

@@ -1,6 +1,7 @@
 import store from "../../utils/store.js"
 const window = {}
-window.DEBUGGING = false
+window.isPublic = false // 是否是公用的小程序
+window.DEBUGGING = true
 window.api = window.DEBUGGING ? "http://192.168.1.18" : "https://test.lirenos.com" // 'https://club.lirenos.com' // 'https://www.pojun-tech.cn'
 window.color = "#2a82e4" // "#00c2a9"
 // 获取 ext.json 配置信息

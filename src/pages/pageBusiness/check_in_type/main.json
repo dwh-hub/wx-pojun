@@ -1,4 +1,7 @@
 {
     "navigationBarTitleText": "入场签到",
-    "enablePullDownRefresh": false
+    "enablePullDownRefresh": false,
+    "usingComponents": {
+      "keyboard": "/static/keyboard/keyboard"
+    }
 }

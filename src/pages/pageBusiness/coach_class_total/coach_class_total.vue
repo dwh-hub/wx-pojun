@@ -159,7 +159,7 @@ export default {
         coachName: "",
         calendarStart: "",
         calendarEnd: "",
-        coachIdArray: [],
+        coachIdArray: "",
         cardType: ''
       },
       // cardClassMap: [],
@@ -309,7 +309,7 @@ export default {
                     ? e.headImgPath
                     : "http://pojun-tech.cn/assets/img/morenTo.png",
                   sex: e.sex,
-                  first_1: e.name,
+                  first_1: e.customerName,
                   first_2: e.phone,
                   second_tip_1: "上课数：",
                   second_1: e.finishClassNum + "节，",

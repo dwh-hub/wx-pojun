@@ -17,8 +17,8 @@ function getUseServiceList() {
       success(res) {
         let data = JSON.parse(res.data.data)
         let list = []
-        if(!data || !data.length) {
-          list = serviceList.slice(0,7)
+        if (!data || !data.length) {
+          list = serviceList.slice(0, 7)
           return resolve(list)
         }
         // serviceList.forEach((item, index) => {
@@ -41,7 +41,7 @@ function getUseServiceList() {
 
 // 请求.jsp地址的图片
 function loadJspUrl(url) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     wx.request({
       url: window.api + url,
       success(res) {
@@ -130,31 +130,36 @@ function qiniuUpload(tempFilePath, fileName) {
       url: '/qiniu/getToken',
       success(res) {
         let token = res.data.data
-        qiniuUploader.upload(tempFilePath,(uploadres) => {
+        qiniuUploader.upload(tempFilePath, (uploadres) => {
           // console.log(uploadres)
           resolve(uploadres)
         }, (error) => {
-          console.log('error:'+error)
+          console.log('error:' + error)
         }, { // 参数设置  地区代码 token domain 和直传的链接 注意七牛四个不同地域的链接不一样，我使用的是华南地区
-          region: 'SCN',
-          uptoken: token,
-          fileName: fileName,
-          uploadURL: 'http://upload-z2.qiniup.com',
-          domain: 'http://api.qiniu.com/v2/query',
-        })
+            region: 'SCN',
+            uptoken: token,
+            fileName: fileName,
+            uploadURL: 'http://upload-z2.qiniup.com',
+            domain: 'http://api.qiniu.com/v2/query',
+          })
       }
     })
   })
 }
 
 
-// 手机端私教上课接口
-function attendclass(coachAppointId) {
+/**
+ * 手机端私教上课接口
+ * @param {Number|String} coachAppointId 预约id
+ * @param {Number} customerSignWay 私教会员签到方式，0二维码，1人脸
+ */
+function attendclass(coachAppointId, customerSignWay) {
   return new Promise((resolve, reject) => {
     HttpRequest({
       url: "/mobile/coach/appoint/attendclass",
       data: {
         coachAppointId: coachAppointId,
+        customerSignWay: customerSignWay || '',
         realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
       },
       success(res) {
@@ -163,7 +168,7 @@ function attendclass(coachAppointId) {
           let msgData = res.data.data;
           for (let k in msgData) {
             msgData[k] = msgData[k] ? msgData[k] : "";
-            if(k == "cardCustomerInfoArray") {
+            if (k == "cardCustomerInfoArray") {
               delete msgData[k]
             }
           }
@@ -243,6 +248,62 @@ function initLine(canvas, width, height, initData) {
   chart.render();
 }
 
+// 校验教练上课状态 - 上课中弹结束课程弹窗
+function checkAttendStatus(coachId) {
+  wx.showLoading()
+  return new Promise((resolve) => {
+    HttpRequest({
+      url: window.api + "/coach/private/appoint/verifycoachId",
+      data: {
+        coachId: coachId
+      },
+      success(res) {
+        wx.hideLoading();
+        if (res.data.code == 200) {
+          resolve()
+        }
+        if (res.data.code == 300) {
+          wx.showModal({
+            title: "提示",
+            content: res.data.message,
+            success(modal_res) {
+              if (modal_res.confirm) {
+                wx.showLoading()
+                HttpRequest({
+                  url: window.api + "/mobile/coach/appoint/finishclass",
+                  data: {
+                    coachAppointId: res.data.data[0].coachAppointId,
+                    realTimeEnd: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
+                  },
+                  success(finish_res) {
+                    wx.hideLoading()
+                    if (finish_res.data.code == 200) {
+                      resolve()
+                    } else {
+                      wx.showModal({
+                        title: "提示",
+                        content: finish_res.data.message || finish_res.data,
+                        showCancel: false
+                      });
+                    }
+                  }
+                });
+              }
+            }
+          });
+        }
+        if (res.data.code == 405) {
+          wx.showModal({
+            title: "提示",
+            content: res.data.message,
+            showCancel: false
+          });
+        }
+      }
+    });
+  })
+}
+
 export {
   getUseServiceList,
   transformJspImg,
@@ -251,5 +312,6 @@ export {
   qiniuUpload,
   attendclass,
   getVenueList,
-  initLine
+  initLine,
+  checkAttendStatus
 }

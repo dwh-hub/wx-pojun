@@ -225,7 +225,7 @@ export default {
     this.nav[0].navTitle = "今日";
     // this.storeList = store.state.allStore;
     // this.selectedStore = this.storeList[0];
-    this.storeList = store.state.allStore.filter(e => e.storeId)
+    this.storeList = store.state.allStore
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
     
     this.nav[0].navTitle = this.selectedStore.storeName;
@@ -787,6 +787,11 @@ export default {
 
 <style lang="less">
 .operation_chart {
+  .filter-nav {
+    .filter-text {
+      display: none;
+    }
+  }
   .tab-nav {
     .tab-item {
       line-height: 40px;

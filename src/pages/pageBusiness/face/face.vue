@@ -26,6 +26,14 @@ import { attendclass } from "../common/js/http.js";
 import Toast from "../../../../static/vant/toast/toast";
 import { EventBus } from "../common/js/eventBus.js";
 
+// const toast = Toast.loading({
+//   duration: 0, // 持续展示 toast
+//   forbidClick: true, // 禁用背景点击
+//   message: "倒计时 3 秒",
+//   loadingType: "spinner",
+//   selector: "#van-toast"
+// });
+
 export default {
   data() {
     return {
@@ -40,7 +48,8 @@ export default {
       faceTimer: null,
       flag: true,
       showTip: true,
-      color: window.color
+      color: window.color,
+      timer: 500
     };
   },
   onShow() {
@@ -68,8 +77,10 @@ export default {
       this.type = options.type;
       this.storeId = options.storeId;
       this.venueId = options.venueId;
+      this.timer = 1000;
     } else {
       this.params = JSON.parse(options.params);
+      this.timer = 500;
     }
     setNavTab();
     this.crx = wx.createCameraContext();
@@ -78,7 +89,7 @@ export default {
       if (this.flag) {
         this.takePhoto();
       }
-    }, 500);
+    }, this.timer);
   },
   onUnload() {
     clearInterval(this.faceTimer);
@@ -135,10 +146,17 @@ export default {
         success(res) {
           console.log("=========baiduFaceDetect=======success==");
           if (res.data.code == 200) {
-            that.searchFace(wxPathBase64);
+            if (that.type == "checkIn") {
+              that.faceCheckIn(wxPathBase64);
+            } else {
+              that.searchFace(wxPathBase64);
+            }
           } else {
             console.log(res.data.message);
             that.flag = true;
+            if (that.type == "checkIn") {
+              return;
+            }
             Toast({
               mask: false,
               message: res.data.message
@@ -174,7 +192,7 @@ export default {
               wx.showLoading({
                 title: "上课中..."
               });
-              attendclass(that.params.appointId)
+              attendclass(that.params.appointId, 1)
                 .then(res => {
                   wx.redirectTo({
                     url: `../../appointmentResult/main?coachAppointId=${
@@ -203,7 +221,9 @@ export default {
               icon: "none",
               duration: 500
             });
-            that.flag = true;
+            setTimeout(() => {
+              that.flag = true;
+            }, 500);
             // if (res.data.message == "人脸模糊") {
             //   Toast({
             //     mask: false,
@@ -232,7 +252,63 @@ export default {
       });
     },
     // 人脸识别 入场签到
-    faceCheckIn() {
+    faceCheckIn(wxPathBase64) {
+      let that = this;
+      HttpRequest({
+        url: "/baidu/face/search",
+        method: "POST",
+        data: {
+          imageType: "BASE64",
+          image: wxPathBase64,
+          storeId: that.storeId,
+          venueId: that.venueId
+        },
+        header: {
+          "content-type": "application/x-www-form-urlencoded" // 默认值
+        },
+        success(res) {
+          if (res.data.code == 200) {
+            wx.showToast({
+              title: res.data.message,
+              icon: "success",
+              duration: 1000
+            });
+            setTimeout(() => {
+              that.flag = true;
+            }, 1000);
+          } else if (res.data.code == 401) {
+            let second = 3;
+            let toast = Toast.loading({
+              duration: 0, // 持续展示 toast
+              forbidClick: true, // 禁用背景点击
+              message: `${res.data.message}\n${second} 秒后重新识别`,
+              loadingType: "spinner",
+              selector: "#van-toast"
+            });
+            const timer = setInterval(() => {
+              second--;
+              if (second) {
+                toast.setData({
+                  message: `${res.data.message}\n${second} 秒后重新识别`
+                });
+              } else {
+                clearInterval(timer);
+                that.flag = true;
+                Toast.clear();
+              }
+            }, 1000);
+          } else {
+            wx.showToast({
+              title: res.data.message,
+              icon: "none",
+              duration: 500
+            });
+            setTimeout(() => {
+              that.flag = true;
+            }, 500);
+          }
+        }
+      });
     },
     // 教练+前台发消息
     pushMsg() {

@@ -19,7 +19,7 @@ export default {
   },
   onLoad(options) {
     this.type = options.type;
-    this.value = options.value;
+    this.value = options.value || '';
     this.name = options.name
     this.userInfo = wx.getStorageSync("staff_info");
   },

@@ -57,8 +57,21 @@
         </div>
       </div>
       <div class="input-cell-wrapper">
+        <div class="cell-value">服务销售</div>
+        <div class="cell-content" @click="showAction = true;actionList = saleListAction;positionType=2">
+          <input
+            class="cell-input"
+            type="text"
+            :value="selectedSale.userName"
+            placeholder="请选择服务销售"
+            placeholder-class="placeholder"
+            disabled
+          />
+        </div>
+      </div>
+      <div class="input-cell-wrapper">
         <div class="cell-value">服务教练</div>
-        <div class="cell-content" @click="showAction = true;actionList = coachListAction;">
+        <div class="cell-content" @click="showAction = true;actionList = coachListAction;positionType=1">
           <input
             class="cell-input"
             type="text"
@@ -209,6 +222,7 @@ import {
 import colorMixin from "COMPS/colorMixin.vue";
 import store from "@/utils/store.js";
 import { checkAuth } from "../common/js/service_config.js";
+import { getUserofrole } from "../common/js/http.js";
 export default {
   data() {
     return {
@@ -216,11 +230,13 @@ export default {
       storeActions: [],
       storeList: [],
       coachListAction: [],
+      saleListAction: [],
       selectedStore: {},
       showAction: false,
       showPopup: false,
       phone: "",
       customerInfo: {},
+      positionType: 0,
       quickTipList: [
         "要优惠",
         "挂断电话",
@@ -272,6 +288,7 @@ export default {
       name: "", // 姓名
       sex: 0, // 性别
       idCard: "", // 身份证号
+      selectedSale: {}, // 选择的服务销售
       selectedCoach: {}, // 选择的服务教练
       address: "", // 居住地址
       rateValue: 0, // 星级
@@ -307,8 +324,10 @@ export default {
         this.phoneType = 0;
         this.phone = "";
         this.selectedStore = e.mp.detail;
-      } else {
+      } else if (this.positionType == 1) {
         this.selectedCoach = e.mp.detail;
+      } else if (this.positionType == 2) {
+        this.selectedSale = e.mp.detail;
       }
       this.showAction = false;
     },
@@ -337,6 +356,7 @@ export default {
             if (res.data.code == 200) {
             } else if (res.data.code == 201) {
               that.getServiceCoachList();
+              that.getServiceSaleList();
             } else if (res.data.code == 202) {
               let info = res.data.data;
               wx.showModal({
@@ -351,6 +371,7 @@ export default {
                     that.name = info.name;
                     that.customerId = info.id;
                     that.getServiceCoachList();
+                    that.getServiceSaleList();
                   }
                 }
               });
@@ -390,24 +411,45 @@ export default {
         }
       });
     },
+    // 服务销售
+    getServiceSaleList() {
+      let curSaleId = wx.getStorageSync("staff_info").userId
+      getUserofrole(this.selectedStore.storeId, 2).then((data) => {
+        this.saleListAction = data.map(e => {
+          e.name = e.userName;
+          return e;
+        });
+        this.saleListAction.forEach(e => {
+          if(e.userId == curSaleId) {
+            this.selectedSale = e
+          }
+        })
+      })
+    },
     // 服务教练
     getServiceCoachList() {
-      let that = this;
-      HttpRequest({
-        url: "/customer/register/userofrole",
-        data: {
-          storeId: that.selectedStore.storeId,
-          positionType: 1
-        },
-        success(res) {
-          if (res.data.code == 200) {
-            that.coachListAction = res.data.data.map(e => {
-              e.name = e.userName;
-              return e;
-            });
-          }
-        }
-      });
+      getUserofrole(this.selectedStore.storeId, 1).then((data) => {
+        this.coachListAction = data.map(e => {
+          e.name = e.userName;
+          return e;
+        });
+      })
+      // let that = this;
+      // HttpRequest({
+      //   url: "/customer/register/userofrole",
+      //   data: {
+      //     storeId: that.selectedStore.storeId,
+      //     positionType: 1
+      //   },
+      //   success(res) {
+      //     if (res.data.code == 200) {
+      //       that.coachListAction = res.data.data.map(e => {
+      //         e.name = e.userName;
+      //         return e;
+      //       });
+      //     }
+      //   }
+      // });
     },
     onChangeSex(e) {
       this.sex = e.mp.detail.value;
@@ -473,7 +515,7 @@ export default {
             serviceCoachId: that.selectedCoach.userId || "",
             phone: that.phone,
             storeId: that.selectedStore.storeId,
-            addUserId: wx.getStorageSync("staff_info").userId,
+            addUserId: that.selectedSale.userId,//wx.getStorageSync("staff_info").userId,
             remarks: that.followUpContent,
             starLevel: that.rateValue,
             isFitness: that.isFitness,
@@ -507,8 +549,8 @@ export default {
           data: {
             customerId: that.customerId,
             storeId: that.selectedStore.storeId,
-            addUserId: wx.getStorageSync("staff_info").userId,
-            serviceUserId: wx.getStorageSync("staff_info").userId,
+            addUserId: that.selectedSale.userId,//wx.getStorageSync("staff_info").userId,
+            serviceUserId: that.selectedSale.userId,//wx.getStorageSync("staff_info").userId,
             serviceCoachId: that.selectedCoach.userId || "",
             phone: that.phone
           },
@@ -589,7 +631,7 @@ export default {
 @import "~COMMON/less/common.less";
 @import "../common/less/form.less";
 page {
-  background-color: #fff;
+  background-color: #f6f6f6;
 }
 .customer_register {
   .register-content {

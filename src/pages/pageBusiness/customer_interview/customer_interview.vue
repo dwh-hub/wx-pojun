@@ -6,13 +6,14 @@
           :storeList="storeList"
           :color="themeColor"
           :search="searchChange"
+          :isOverlap="true"
           @selectStore="selectStore"
         ></header-search>
-        <header-data :headerData="headerData"></header-data>
+        <header-data :isOverlap="true" :headerData="headerData"></header-data>
         <filter-nav :nav="nav"></filter-nav>
       </div>
     </div>
-    <div class="card-list">
+    <div class="card-list common-list">
       <staff-coach-item
         @clickItem="toDetail(item)"
         v-for="(item, index) in list"
@@ -40,7 +41,6 @@ import {
   formatDate,
   WechatMenuisLogin
 } from "COMMON/js/common.js";
-import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -287,9 +287,10 @@ export default {
 </script>
 
 <style lang="less">
+@import "../common/less/staff_common.less";
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
 }
 .customer_interview {
   .staff-coach-item {

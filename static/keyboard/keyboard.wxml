@@ -1,4 +1,4 @@
-<view wx:if="{{isShow}}" class="vehicle-panel" style="height:488rpx;bottom:{{_bottom}}px">
+<view wx:if="{{isShow}}" class="vehicle-panel" style="height:488rpx;bottom:{{_bottom}}px;position: {{isFixed?'fixed':'static'}};">
   <!--数字键盘  -->
   <view class="number-panel-box" wx:if="{{_keyBoardType == 2}}">
     <view class="number-panel-row">
@@ -8,7 +8,7 @@
       <view class="switch-number number-panel-row-button" bindtap="switchKeyboard" data-value="1"><text style="color: #999;">英</text>/数字</view>
       <view class='number-panel-row-key vehicle-hover' bindtap='vehicleTap' data-value="0">0</view>
       <view bindlongtap="longPressDelete" bindtap='vehicleTap' class='number-panel-row-button vehicle-hover' data-value="delete">
-        <image src='/static/images/delete.png' data-value="delete" class='vehicle-en-button-delete' mode='aspectFit'>删除</image>
+        <image src='/static/images/Delete.png' data-value="delete" class='vehicle-en-button-delete' mode='aspectFit'></image>
       </view>
     </view>
   </view>
@@ -32,7 +32,7 @@
         {{item}}
       </view>
       <view bindlongtap="longPressDelete" class='vehicle-panel-row-button vehicle-panel-row-button-img vehicle-hover'>
-        <image src='/static/images/delete.png' class='vehicle-en-button-delete' bindtap='vehicleTap' data-value="delete" mode='aspectFit'>删除</image>
+        <image src='/static/images/Delete.png' class='vehicle-en-button-delete' bindtap='vehicleTap' data-value="delete" mode='aspectFit'></image>
       </view>
     </view>
     <view class="vehicle-panel-row-last">

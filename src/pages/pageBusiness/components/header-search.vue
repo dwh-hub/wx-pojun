@@ -1,6 +1,6 @@
 <template>
   <div class="header-search">
-    <div v-if="storeList.length" class="store" :style="{background: color}" @click="toggleStore">
+    <div v-if="storeList.length" class="store" :style="{background: color,height: isOverlap ? '88px' : '44px'}" @click="toggleStore">
       <sapn class="store-text">{{selectedStore.storeName || '门店'}}</sapn>
       <i class="triangle-icon"></i>
     </div>
@@ -23,7 +23,7 @@
         :key="index"
       >{{item.storeName}}</div>
     </div>
-    <div class="search-wrapper" :style="{background: color}">
+    <div class="search-wrapper" :style="{background: color,height: isOverlap ? '88px' : '44px'}">
       <div class="input-wrapper">
         <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
         <input
@@ -76,6 +76,10 @@ export default {
       default: "请输入手机号或姓名搜索"
     },
     isCoverView: {
+      type: Boolean,
+      default: false
+    },
+    isOverlap: {
       type: Boolean,
       default: false
     }
@@ -167,7 +171,6 @@ export default {
   /* 兼容真机白边 */
   margin-top: -1rpx;
   .store {
-    height: 44px;
     /* 兼容真机白边 */
     margin-right: -1px;
     .store-text {
@@ -217,7 +220,6 @@ export default {
     flex: 1;
     box-sizing: border-box;
     padding: 7px 15px;
-    height: 44px;
     .input-wrapper {
       display: flex;
       padding: 3px 10px 3px 2px;

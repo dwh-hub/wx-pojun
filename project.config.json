@@ -42,13 +42,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 1,
+			"current": 9,
 			"list": [
 				{
 					"id": 0,
-					"name": "pages/pageBusiness/customer_detail/main",
-					"pathName": "pages/pageBusiness/customer_detail/main",
-					"query": "id=144899",
+					"name": "pages/pageBusiness/check_in_customer/main",
+					"pathName": "pages/pageBusiness/check_in_customer/main",
+					"query": "id=144911&storeId=126&venueId=90",
 					"scene": null
 				},
 				{
@@ -82,16 +82,16 @@
 				},
 				{
 					"id": 5,
-					"name": "签到记录",
-					"pathName": "pages/pageBusiness/check_in_record/main",
+					"name": "pages/pageBusiness/contract_list/main",
+					"pathName": "pages/pageBusiness/contract_list/main",
 					"query": "",
 					"scene": null
 				},
 				{
 					"id": 6,
-					"name": "pages/pageBusiness/achievement_detail/main",
-					"pathName": "pages/pageBusiness/achievement_detail/main",
-					"query": "",
+					"name": "pages/pageBusiness/face_collect/main",
+					"pathName": "pages/pageBusiness/face_collect/main",
+					"query": "id=145026&phone=13783453378",
 					"scene": null
 				},
 				{
@@ -99,6 +99,20 @@
 					"name": "业务",
 					"pathName": "pages/pageBusiness/billing/main",
 					"query": "isTeachingContract=0&billingType=1",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "pages/appointmentCoach/main",
+					"pathName": "pages/appointmentCoach/main",
+					"query": "coachId=1507",
+					"scene": null
+				},
+				{
+					"id": 9,
+					"name": "pages/pageBusiness/appoint_coach/main",
+					"pathName": "pages/pageBusiness/appoint_coach/main",
+					"query": "id=144956&type=一键上课",
 					"scene": null
 				}
 			]

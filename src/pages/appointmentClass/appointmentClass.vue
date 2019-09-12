@@ -98,7 +98,6 @@ import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import noneResult from "COMPS/noneResult.vue";
 import titleCell from "COMPS/titleCell.vue";
 import teamClassItem from "COMPS/teamClassItem.vue";
-import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 
@@ -200,7 +199,7 @@ export default {
     },
     selectNav(index, isClear = true) {
       this.currentNav = index;
-      if (!store.state.isLogin) {
+      if (!wx.getStorageSync("isLogin")) {
         this.teamClassList = [];
         this.coachList = [];
         return;
@@ -247,13 +246,13 @@ export default {
           duration: 1000
         });
       }
-      if (type == 2 && this.coachList.length < 2) {
-        return wx.showToast({
-          title: "暂无更多私教课",
-          icon: "none",
-          duration: 1000
-        });
-      }
+      // if (type == 2 && this.coachList.length < 2) {
+      //   return wx.showToast({
+      //     title: "暂无更多私教课",
+      //     icon: "none",
+      //     duration: 1000
+      //   });
+      // }
       // type 1 团课 2 私教课
       let status;
       let waitEvaluate;

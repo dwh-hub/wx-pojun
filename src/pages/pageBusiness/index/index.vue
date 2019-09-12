@@ -141,7 +141,7 @@ page {
       }
     }
     .staff-coach-item {
-      border-top: 1px solid #e5e5e5;
+      border-bottom: 1px solid #e5e5e5;
     }
     .see-more {
       border-top: 1px solid #e5e5e5;

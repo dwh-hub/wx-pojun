@@ -22,7 +22,7 @@
             </div>
             <div class="item-middle">卡号： {{item.physicsCardNo}}</div>
             <div class="item-desc">
-              <div>定期开卡：{{item.time}}</div>
+              <div>开卡时间：{{item.time}}</div>
             </div>
           </div>
           <div class="icon-right">
@@ -120,7 +120,7 @@ export default {
         }
       ],
       filter: {
-        cardType: ''
+        cardType: '' // 1 使用中 2 未激活 3 其他 4 1+2
       },
       isFilterExpire: false
     };
@@ -178,7 +178,11 @@ export default {
       });
     },
     filterExpire(e) {
-      this.isFilterExpire = e.mp.detail.value
+      if(e.mp.detail.value) {
+        this.filter.cardType = 4
+      } else {
+        this.filter.cardType = ''
+      }
     },
     toCustomerDetail() {
       let that = this
@@ -210,7 +214,7 @@ export default {
                 physicsCardNo: e.physicsCardNo,
                 time:
                   e.buyCardTime.split(" ")[0].replace(/-/g, "/") +
-                  " - " +
+                  "  " +
                   e.buyCardTime.split(" ")[1].replace(/-/g, "/"),
                 cardStatusChar: e.cardStatusChar,
                 class: that.trnasTeachCardType(e.teachCardType),

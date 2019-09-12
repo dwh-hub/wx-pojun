@@ -10,9 +10,10 @@
         :color="themeColor"
         :search="searchChange"
         :searchText="filter.namePhone"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :headerData="headerData" :isOverlap="true"></header-data>
       <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
     </div>
 
@@ -23,20 +24,50 @@
       custom-style="width:80%;height:100%"
     ></van-popup>
 
-    <div class="customer-list">
-      <div class="customer-item" v-for="(item,index) in list" :key="index">
+    <div class="customer-list common-list" :style="{'padding-bottom': isPhoneX ? '74px':'40px'}">
+      <div class="customer-item-wrapper" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">
             <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
           </div>
         </div>
-        <staff-coach-item @clickIcon="clickIcon(...arguments,item)" @clickItem="toDetail(item,index)" :info="item">
+        <div class="customer-item" v-if="item.id" @click="toDetail(item,index)">
+          <div class="cover">
+            <div class="tag" :style="{background: item.statusColor}">{{item.customerClassChar}}</div>
+            <img :src="item.cover">
+          </div>
+          <div class="customer-info">
+            <div class="customer-base-info">
+              <img class="customer-sex" :src="item.sexSrc">
+              <span class="customer-name">{{item.name}}</span>
+            </div>
+            <div class="customer-service">
+              <span>服务教练: </span><span class="service-text">{{item.serviceCoachName}}</span>
+              <span>服务销售: </span><span class="service-text">{{item.serviceUserName}}</span>
+            </div>
+          </div>
+          <div class="customer-operate">
+            <img class="phone" @click.stop="clickIcon(...arguments,item)" src="/static/images/staff/phone.png" alt>
+            <img src="/static/images/staff/right-arrow.svg" alt>
+          </div>
+        </div>
+        
+        <div class="coach-skeleton" v-else>
+          <div class="cover">
+          </div>
+          <div class="skeleton-wrapper">
+            <div class="skeleton-name"></div>
+            <div class="skeleton-desc"></div>
+            <div class="skeleton-time"></div>
+          </div>
+        </div>
+        <!-- <staff-coach-item @clickIcon="clickIcon(...arguments,item)" @clickItem="toDetail(item,index)" :info="item">
           <div>
             <img data-type="follow-up" class="follow-up" src="/static/images/staff/workbench_icon/coach_service_icon_7.jpg" alt="">
             <img src="/static/images/staff/phone.svg" alt>
             <img src="/static/images/staff/right-arrow.svg" alt>
           </div>
-        </staff-coach-item>
+        </staff-coach-item> -->
       </div>
       <van-loading :color="themeColor" v-if="isLoading"/>
       <none-result text="暂无客户" v-if="!list.length && !isLoading"></none-result>
@@ -55,15 +86,19 @@
         <div class="btn" @click="cancelOperate()" :style="{background: themeColor}">取消操作</div>
         <div class="btn" @click="operate" :style="{background: themeColor}">{{operateText}}</div>
       </div>
+      <div class="block" v-if="isPhoneX"></div>
     </div>
 
+    <div class="bottom-operate-btn" v-if="!isOperate">
+      <div v-for="(item, index) in operateList" :key="index" class="operate-item" :style="item.style" @click="item.action" :class="{hidde: item.hasAuth}">{{item.text}}</div>
+      <div class="block" v-if="isPhoneX"></div>
+    </div>
     <van-popup
       :show="showSalesPopup"
       @close="showSalesPopup = false"
       :duration="200"
       position="bottom"
-      custom-style="width:100%"
-    >
+      custom-style="width:100%">
       <div class="sales-list">
         <div
           class="sales-item"
@@ -85,8 +120,7 @@
       :show="showFollowUpPopup"
       @close="showFollowUpPopup = false;trackContent=''"
       :duration="200"
-      custom-style="width:85vw;border-radius:5px;top: 40%;"
-    >
+      custom-style="width:85vw;border-radius:5px;top: 40%;">
       <div class="followUp-popup">
         <div class="content">
           <van-cell
@@ -111,10 +145,9 @@
       @close="showTrackResult = false"
       @select="selectResult"
     />
-
     <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
     <timePicker :pickerShow="isResultDateShow" :config="resultDateConfig" @hidePicker="isResultDateShow = false" @setPickerTime="setResultTime"></timePicker>
-    <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
+    <!-- <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window> -->
   </div>
 </template>
 
@@ -131,7 +164,7 @@ import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
-import staffCoachItem from "../components/staff-coach-item.vue";
+// import staffCoachItem from "../components/staff-coach-item.vue";
 import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
@@ -259,24 +292,40 @@ export default {
       ],
       headerData: [
         {
-          dataText: "总人数",
-          dataNum: "0"
+          dataText: "总客户",
+          dataNum: "0",
+          color: "#333"
         },
         {
-          dataText: "潜在客户",
-          dataNum: "0"
+          dataText: "潜在",
+          dataNum: "0",
+          color: "#f25642"
         },
         {
-          dataText: "现有客户",
-          dataNum: "0"
+          dataText: "现有",
+          dataNum: "0",
+          color: "#119bf0"
         }
       ],
       operateList: [
         {
           text: "分配销售",
           hasAuth: checkAuth(58),
-          class: 'operate icon-fenpei',
-          iconUrl: "/static/images/staff/close.svg"
+          style: `color:${window.color};`,
+          action: () => {
+            this.distributeSale()
+          }
+          // class: 'operate icon-fenpei',
+          // iconUrl: "/static/images/staff/close.svg"
+        },{
+          text: "新增客户",
+          hasAuth: checkAuth(26),
+          style: `background-color:${window.color};color:#fff;`,
+          action: () => {
+            wx.navigateTo({
+              url: '../customer_register/main'
+            })
+          }
         },
         // {
         //   text: "分配教练",
@@ -338,7 +387,7 @@ export default {
   components: {
     headerData,
     filterNav,
-    staffCoachItem,
+    // staffCoachItem,
     suspensionWindow,
     headerSearch,
     noneResult
@@ -355,7 +404,10 @@ export default {
         }
       });
       return _num;
-    }
+    },
+    isPhoneX() {
+      return store.state.isIphoneX;
+    },
   },
   onPullDownRefresh() {
     this.isOperate = false;
@@ -464,21 +516,28 @@ export default {
                   e.headImgPath = window.api + e.headImgPath;
                 }
               }
+              let curStoreService = e.customerInfoList.filter(e => {return e.storeName == that.selectedStore.storeName})[0] || {}
               return {
                 isSelect: false,
                 id: e.id,
                 sex: e.sex,
+                sexSrc: e.sex == '男' ? '/static/images/staff/man.png' : (e.sex == '女' ? '/static/images/staff/women.png' : ''),
                 phone: e.phone,
                 cover: e.headImgPath
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
-                first_1: e.name,
-                first_2: e.customerClassChar,
-                second_1: e.cardNum || 0,
-                second_tip_1: "合同数：",
-                second_2: "",
-                third_1: e.lastTrackTime || "--",
-                third_tip_1: "最后跟进时间：",
+                serviceCoachName: curStoreService.serviceCoachName || e.customerInfoList[0].serviceCoachName || '--',
+                serviceUserName: curStoreService.serviceUserName || e.customerInfoList[0].serviceUserName || '--',
+                name: e.name,
+                customerClassChar: e.customerClassChar,
+                statusColor: e.customerClassChar == "现有" ? '#119bf0' : '#f25642',
+                // first_1: e.name,
+                // first_2: e.customerClassChar,
+                // second_1: e.cardNum || 0,
+                // second_tip_1: "合同数：",
+                // second_2: "",
+                // third_1: e.lastTrackTime || "--",
+                // third_tip_1: "最后跟进时间：",
                 customerClass: e.customerClass
               };
             });
@@ -590,37 +649,57 @@ export default {
     searchChange(event) {
       this.filter.namePhone = event;
     },
-    // 通过回传的iconText来获取对应的列表
-    getOperate(param) {
+    distributeSale() {
       if(!this.selectedStore.storeId) {
         return wx.showToast({
           title: "请选择门店",
           icon: 'none'
         })
       }
-      this.operateText = param;
+      this.operateText = "分配销售";
       this.isOperate = true;
-      if (param == "分配教练") {
-        this.getUserofrole(0).then(res => {
-          if (res.data.code == 200) {
-            this.actionList = res.data.data;
-          }
-        });
-      }
-      if (param == "分配销售") {
-        this.getUserofrole(1).then(res => {
-          if (res.data.code == 200) {
-            this.actionList = res.data.data;
-          }
-        });
-      }
-
-      if (param == "发送手机短信") {
-      }
+      this.getUserofrole(1).then(res => {
+        if (res.data.code == 200) {
+          this.actionList = res.data.data;
+        }
+      });
     },
+    // 通过回传的iconText来获取对应的列表
+    // getOperate(param) {
+    //   if(!this.selectedStore.storeId) {
+    //     return wx.showToast({
+    //       title: "请选择门店",
+    //       icon: 'none'
+    //     })
+    //   }
+    //   this.operateText = param;
+    //   this.isOperate = true;
+    //   if (param == "分配教练") {
+    //     this.getUserofrole(0).then(res => {
+    //       if (res.data.code == 200) {
+    //         this.actionList = res.data.data;
+    //       }
+    //     });
+    //   }
+    //   if (param == "分配销售") {
+    //     this.getUserofrole(1).then(res => {
+    //       if (res.data.code == 200) {
+    //         this.actionList = res.data.data;
+    //       }
+    //     });
+    //   }
+
+    //   if (param == "发送手机短信") {
+    //   }
+    // },
     clickIcon(event,item) {
-      console.log(item)
       if (event.mp.target.dataset.type == 'follow-up') {
+        if(!that.selectedStore.storeId) {
+          return wx.showToast({
+            title: '请先选择门店',
+            icon: 'none'
+          })
+        }
         this.curCustomer = item
         this.showFollowUpPopup = true
         return
@@ -749,7 +828,7 @@ export default {
 
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
 }
 .customer {
   .tabs {
@@ -769,7 +848,7 @@ page {
     }
   }
   .customer-list {
-    .customer-item {
+    .customer-item-wrapper {
       display: flex;
       background-color: #fff;
       .item-left {
@@ -780,23 +859,91 @@ page {
           margin-top: 27px;
         }
       }
+      .customer-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 10px 5px 10px 10px;
+        border-bottom: 1rpx solid #f6f6f6;
+        .cover {
+          position: relative;
+          flex: 0 0 32px;
+          height: 32px;
+          margin-right: 10px;
+          border-radius: 2px;
+          overflow: hidden;
+          background-color: #eee;
+          .tag {
+            position: absolute;
+            top: -2px;
+            right: 5px;
+            width: 40px;
+            padding-top: 6px;
+            padding-bottom: 1px;
+            text-align: center;
+            font-size: 8px;
+            transform: rotate(-45deg);
+            background-color: red;
+            color: #fff;
+          }
+          >img {
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .customer-info {
+          flex: 1;
+          .customer-base-info {
+            .customer-name {
+              font-size: 14px;
+            }
+            .customer-sex {
+              vertical-align: middle;
+              margin-right: 3px;
+              width: 12px;
+              height: 12px;
+            }
+          }
+          .customer-service {
+            >span {
+              font-size: 12px;
+              color: #999;
+            }
+            .service-text {
+              color: #666;
+              margin-right: 10px;
+            }
+          }
+        }
+        .customer-operate {
+          img {
+            width: 18px;
+            height: 18px;
+          }
+          .phone {
+            width: 28px;
+            height: 28px;
+          }
+        }
+      }
     }
   }
-  .staff-coach-item {
-    border-top: 1rpx solid #eee;
-    flex: 1;
-    .icon-right {
-      img {
-        margin-top: 10px;
-        width: 18px;
-        height: 18px;
-      }
-      .follow-up {
-        width: 50px;
-        height: 50px;
-      }
-    }
-  }
+  // .staff-coach-item {
+  //   border-bottom: 1rpx solid #eee;
+  //   flex: 1;
+  //   .icon-right {
+  //     img {
+  //       margin-top: 10px;
+  //       width: 18px;
+  //       height: 18px;
+  //     }
+  //     .follow-up {
+  //       width: 50px;
+  //       height: 50px;
+  //     }
+  //   }
+  // }
   .icon-wrapper {
     width: 20px;
     height: 20px;
@@ -815,12 +962,13 @@ page {
     left: 0;
     right: 0;
     line-height: 40px;
-    height: 40px;
     color: #2a82e4;
     background-color: #fff;
     border-top: 1rpx solid #eee;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
+    z-index: 2;
     .left {
       .icon-wrapper {
         display: inline-block;
@@ -834,13 +982,16 @@ page {
       }
     }
     .right {
-      // float: right;
       .btn {
         display: inline-block;
         padding: 0 15px;
         border-left: 1rpx solid #fff;
         color: #fff;
       }
+    }
+    .block {
+      flex-grow: 1;
+      width: 100%;
     }
   }
   .sales-list {

@@ -4,14 +4,15 @@
       <!-- <div class="tabs" :style="{background: themeColor}">
         <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
         <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
-      </div> -->
+      </div>-->
       <header-search
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :isOverlap="true" :headerData="headerData"></header-data>
       <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
     </div>
 
@@ -22,21 +23,21 @@
       custom-style="width:80%;height:100%"
     ></van-popup>
 
-    <div class="customer-list">
+    <div class="customer-list common-list">
       <div class="customer-item" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">
-            <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
+            <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect" />
           </div>
         </div>
         <staff-coach-item @clickIcon="appoint(item)" @clickItem="toDetail(item,index)" :info="item">
           <div>
             <div class="appoint" :style="{background: themeColor}">约课</div>
-            <img src="/static/images/staff/right-arrow.svg" alt>
+            <img src="/static/images/staff/right-arrow.svg" alt />
           </div>
         </staff-coach-item>
       </div>
-      <van-loading :color="themeColor" v-if="isLoading"/>
+      <van-loading :color="themeColor" v-if="isLoading" />
       <none-result text="暂无学员" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
@@ -44,7 +45,7 @@
     <div class="operate-bottom" v-if="isOperate">
       <div class="left" @click="selectAll">
         <div class="icon-wrapper" :class="{border: !isAllSelect}">
-          <img src="/static/images/staff/select-icon.png" alt v-show="isAllSelect">
+          <img src="/static/images/staff/select-icon.png" alt v-show="isAllSelect" />
         </div>
         <span class="left-text">全选</span>
       </div>
@@ -53,6 +54,18 @@
         <div class="btn" @click="cancelOperate()" :style="{background: themeColor}">取消操作</div>
         <div class="btn" @click="operate" :style="{background: themeColor}">{{operateText}}</div>
       </div>
+    </div>
+
+    <div class="bottom-operate-btn" v-if="!isOperate">
+      <div
+        v-for="(item, index) in operateList"
+        :key="index"
+        class="operate-item"
+        :style="item.style"
+        @click="item.action"
+        :class="{hidde: item.hasAuth}"
+      >{{item.text}}</div>
+      <div class="block" v-if="isPhoneX"></div>
     </div>
 
     <van-popup
@@ -70,14 +83,20 @@
           @click="selectRole(item)"
         >
           <div class="avatar">
-            <img :src="window.api + item.headImgPath" alt>
+            <img :src="window.api + item.headImgPath" alt />
           </div>
           <div class="name">{{item.userName}}</div>
           <div class="phone"></div>
         </div>
       </div>
-    </van-popup><timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
-    <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
+    </van-popup>
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
+    <!-- <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window> -->
   </div>
 </template>
 
@@ -89,8 +108,7 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
-import {checkAuth} from "../common/js/service_config.js";
-import store from "@/utils/store.js";
+import { checkAuth } from "../common/js/service_config.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
@@ -138,8 +156,8 @@ export default {
             {
               sonText: "自定义",
               action: () => {
-                this.timePickerType = ""
-                this.showPicker()
+                this.timePickerType = "";
+                this.showPicker();
               }
             }
           ]
@@ -175,8 +193,8 @@ export default {
             {
               sonText: "自定义",
               action: () => {
-                this.timePickerType = "consumed"
-                this.showPicker()
+                this.timePickerType = "consumed";
+                this.showPicker();
               }
             }
           ]
@@ -234,8 +252,22 @@ export default {
         {
           text: "分配教练",
           hasAuth: checkAuth(69),
-          class: 'operate icon-fenpei',
-          iconUrl: "/static/images/staff/calendar.svg"
+          style: `color:${window.color};`,
+          action: () => {
+            this.distributeCoach();
+          }
+          // class: 'operate icon-fenpei',
+          // iconUrl: "/static/images/staff/calendar.svg"
+        },
+        {
+          text: "新增客户",
+          hasAuth: checkAuth(26),
+          style: `background-color:${window.color};color:#fff;`,
+          action: () => {
+            wx.navigateTo({
+              url: "../customer_register/main"
+            });
+          }
         }
         // {
         //   text: "发送手机短信",
@@ -319,13 +351,13 @@ export default {
           that.filter
         );
         HttpRequest({
-          url: '/mobile/coach/static/count',
+          url: "/mobile/coach/static/count",
           data: _data,
-          success(res) {            
-            that.headerData[1].dataNum = res.data.data.transactedCount
-            that.headerData[2].dataNum = res.data.data.noTransactCount
+          success(res) {
+            that.headerData[1].dataNum = res.data.data.transactedCount;
+            that.headerData[2].dataNum = res.data.data.noTransactCount;
           }
-        })
+        });
         HttpRequest({
           url: window.api + "/mobile/coach/resourcepool/pages",
           data: _data,
@@ -354,7 +386,7 @@ export default {
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.name,
-                second_1: e.serviceCoachName || '--',
+                second_1: e.serviceCoachName || "--",
                 second_tip_1: "服务教练：",
                 third_1: e.lastTrackTime || "--",
                 third_tip_1: "最后签到时间："
@@ -378,9 +410,11 @@ export default {
             positionType: type
           },
           success(res) {
-            res.data.data.forEach((e) => {
-              e.headImgPath = e.headImgPath ? window.api + e.headImgPath : 'https://pojun-tech.cn/assets/img/morenTo.png'
-            })
+            res.data.data.forEach(e => {
+              e.headImgPath = e.headImgPath
+                ? window.api + e.headImgPath
+                : "https://pojun-tech.cn/assets/img/morenTo.png";
+            });
             resolve(res);
           }
         });
@@ -406,12 +440,12 @@ export default {
           },
           success(res) {
             HttpRequest({
-              url: '/sendmsg/user/allotsCoachMsg',
+              url: "/sendmsg/user/allotsCoachMsg",
               data: {
                 allotRandom: res.data.data,
                 storeId: that.selectedStore.storeId
               }
-            })
+            });
             resolve(res);
           }
         });
@@ -460,34 +494,49 @@ export default {
       this.filter.nameOrPhone = event;
       this.refreshList();
     },
-    // 通过回传的iconText来获取对应的列表
-    getOperate(param) {
+    distributeCoach() {
       if(!this.selectedStore.storeId) {
         return wx.showToast({
           title: "请选择门店",
           icon: 'none'
         })
       }
-      this.operateText = param;
+      this.operateText = "分配教练";
       this.isOperate = true;
-      if (param == "分配教练") {
-        this.getUserofrole(0).then(res => {
-          if (res.data.code == 200) {
-            this.actionList = res.data.data;
-          }
-        });
-      }
-      if (param == "分配销售") {
-        this.getUserofrole(1).then(res => {
-          if (res.data.code == 200) {
-            this.actionList = res.data.data;
-          }
-        });
-      }
-
-      if (param == "发送手机短信") {
-      }
+      this.getUserofrole(0).then(res => {
+        if (res.data.code == 200) {
+          this.actionList = res.data.data;
+        }
+      });
     },
+    // 通过回传的iconText来获取对应的列表
+    // getOperate(param) {
+    //   if (!this.selectedStore.storeId) {
+    //     return wx.showToast({
+    //       title: "请选择门店",
+    //       icon: "none"
+    //     });
+    //   }
+    //   this.operateText = param;
+    //   this.isOperate = true;
+    //   if (param == "分配教练") {
+    //     this.getUserofrole(0).then(res => {
+    //       if (res.data.code == 200) {
+    //         this.actionList = res.data.data;
+    //       }
+    //     });
+    //   }
+    //   if (param == "分配销售") {
+    //     this.getUserofrole(1).then(res => {
+    //       if (res.data.code == 200) {
+    //         this.actionList = res.data.data;
+    //       }
+    //     });
+    //   }
+
+    //   if (param == "发送手机短信") {
+    //   }
+    // },
     // 选择教练/销售 分配
     selectRole(item) {
       this.selectedRole = item;
@@ -581,19 +630,19 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.timePickerType = ""
-      this.setDate(obj)
+      this.timePickerType = "";
+      this.setDate(obj);
     },
     filterConsumedDate(day) {
       let obj = this.filterDateMethod(day);
-      this.timePickerType = "consumed"
-      this.setDate(obj)
+      this.timePickerType = "consumed";
+      this.setDate(obj);
     },
     setDate(obj) {
-      if(this.timePickerType == "consumed") {
-        this.filter.lastConsumedTimeStart = obj.startTime
-        this.filter.lastConsumedTimeEnd = obj.endTime
-        return
+      if (this.timePickerType == "consumed") {
+        this.filter.lastConsumedTimeStart = obj.startTime;
+        this.filter.lastConsumedTimeEnd = obj.endTime;
+        return;
       }
       this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
@@ -606,7 +655,7 @@ export default {
 @import "../common/less/staff_common.less";
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
 }
 .customer {
   .tabs {
@@ -650,10 +699,9 @@ page {
     }
   }
   .staff-coach-item {
-    border-top: 1rpx solid #eee;
+    border-bottom: 1rpx solid #eee;
     flex: 1;
     .icon-right {
-      margin-top: 20px;
       img {
         width: 18px;
         height: 18px;

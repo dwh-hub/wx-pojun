@@ -1,3 +1,5 @@
+@pageColor: #fff;
+
 // 头部搜索
 .header-search {
   display: flex;
@@ -126,6 +128,7 @@
   position: sticky;
   top: 0;
   z-index: 2;
+  background-color: #fff;
 }
 
 // 修改金额弹窗样式 
@@ -156,5 +159,80 @@
       border-radius: 5px;
       color: #fff;
     }
+  }
+}
+
+// 列表统一样式
+.common-list {
+  margin: 0 10px;
+  border-radius: 5px;
+  box-shadow: 0px 2px 7px 0px rgba(1, 60, 97, 0.1);
+}
+
+// 骨架屏
+.coach-skeleton {
+  display: flex;
+  padding: 10px 15px 10px 0;
+  border-bottom: 1rpx solid #f6f6f6;
+  .cover {
+    flex: 0 0 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #eee;
+    margin-left: 10px;
+  }
+  .skeleton-wrapper {
+    padding: 0 12px;
+    width: 100%;
+    > div {
+      margin-top: 12px;
+      background-color: #eee;
+    }
+    .skeleton-name {
+      margin-top: 4px;
+      height: 16px;
+    }
+    .skeleton-time {
+      height: 12px;
+      width: 200px;
+    }
+    .skeleton-desc {
+      height: 10px;
+      width: 100px;
+      margin-right: 10px;
+    }
+  }
+}
+
+.bottom-operate-btn {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  text-align: center;
+  border-top: 1rpx solid #f6f6f6;
+  background-color: #fff;
+  &.active {
+    opacity: 1;
+  }
+  .operate-item {
+    flex: 1;
+    font-size: 14px;
+    line-height: 36px;
+    color: #fff;
+    border-right: 1rpx solid #f6f6f6;
+    &:last-of-type {
+      border-right: none;
+    }
+    &.hidden {
+      display: none;
+    }
+  }
+  .block {
+    flex-grow: 1;
+    width: 100%;
   }
 }

@@ -6,7 +6,7 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
   state: {
     count: 0,
-    isLogin: false, // 会员登录状态
+    isLogin: true, // 会员登录状态
     // staffIsLogin: false, // 商户登录状态
     isCheckLogin: false,
     userInfo: {},

@@ -55,7 +55,7 @@ let service = [{
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
-        text: "私教卡",
+        text: "我的私教",
         authorityId: 63,
         hasAuth: true,
         navUrl: "../my_private_class/main",
@@ -207,7 +207,7 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_5.svg",
         text: "私教耗课", // 上课统计报表
-        authorityId: 63,
+        authorityId: 300,
         navUrl: "../coach_class_total/main", // 
         isOpen: true,
         hasAuth: true,
@@ -247,7 +247,7 @@ let service = [{
       {
         iconUrl: "/static/images/staff/workbench_icon/operation_report_icon_2.svg",
         text: "业绩报表",
-        authorityId: 87,
+        authorityId: 222,
         navUrl: "../achievement/main", // 
         isOpen: true,
         hasAuth: true,
@@ -378,7 +378,7 @@ function filterAuth() {
   if(!wx.getStorageSync("authInto")) {
     return
   }
-  const authInto = wx.getStorageSync("authInto")
+  let authInto = wx.getStorageSync("authInto")
   
   let _authArr = []
   let _serviceList = []
@@ -390,6 +390,7 @@ function filterAuth() {
   
   console.group("权限过滤的项")
   service.forEach((group) => {
+    group.hasAuth = true
     if(group.title == "销售管理" && !_authArr.includes(40)) {
       console.log("销售管理")
       group.hasAuth = false
@@ -402,9 +403,13 @@ function filterAuth() {
       console.log("运营报表")
       group.hasAuth = false
     }
+    if(group.list.filter(e => !e.isOpen || !e.hasAuth).length == group.list.length) {
+      group.hasAuth = false
+    }
     group.list.forEach(item => {
       if(item.authorityId) {
         if(_authArr.includes(item.authorityId)) {
+          item.hasAuth = true
           _serviceList.push(item)
         } else {
           console.log(item.text)
@@ -415,7 +420,7 @@ function filterAuth() {
   })
   serviceList = _serviceList
   console.groupEnd()
-  return _serviceList
+  return service
 }
 filterAuth()
 

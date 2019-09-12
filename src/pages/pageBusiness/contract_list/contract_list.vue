@@ -8,10 +8,11 @@
         placeholder="请输入名字或者手机号搜索"
         @selectStore="selectStore"
       ></header-search>
+      <filter-date @changeDate="setDate"></filter-date>
       <header-data :headerData="headerData"></header-data>
       <filter-nav :nav="nav"></filter-nav>
     </div>
-    <div class="card-list">
+    <div class="card-list common-list">
       <staff-coach-item
         v-for="(item, index) in list"
         :key="index"
@@ -19,7 +20,7 @@
         @clickItem="toCardDetail(item)"
       >
         <div>
-          <img src="/static/images/staff/right-arrow.svg" alt>
+          <img src="/static/images/staff/right-arrow.svg" alt />
         </div>
       </staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading" />
@@ -98,13 +99,13 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
-import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
+import filterDate from "../components/filter-date.vue";
 import noneResult from "COMPS/noneResult.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 import { setTimeout } from "timers";
@@ -202,7 +203,8 @@ export default {
       headerData: [
         {
           dataText: "总计",
-          dataNum: "0"
+          dataNum: "0",
+          color: window.color
         },
         {
           dataText: "有效合同",
@@ -236,14 +238,14 @@ export default {
     };
   },
   onLoad(options) {
-    this.type = ""
+    this.type = "";
     if (options.type) {
       this.type = options.type;
       this.venueId = options.venueId;
       this.teamScheduleId = options.teamScheduleId;
-      this.classStoreId = options.classStoreId
+      this.classStoreId = options.classStoreId;
     }
-    this.getCardStatus()
+    this.getCardStatus();
   },
   mounted() {
     // this.nav[0].navTitle = "今日";
@@ -253,6 +255,7 @@ export default {
     headerSearch,
     headerData,
     filterNav,
+    filterDate,
     staffCoachItem,
     noneResult
   },
@@ -290,13 +293,13 @@ export default {
           url = "/customer/card/pages";
         }
         HttpRequest({
-          url: '/customer/card/static/count',
+          url: "/customer/card/static/count",
           data: _data,
-          success(res) {            
-            that.headerData[1].dataNum = res.data.data.useingCardCount
-            that.headerData[2].dataNum = res.data.data.dueCardCount
+          success(res) {
+            that.headerData[1].dataNum = res.data.data.useingCardCount;
+            that.headerData[2].dataNum = res.data.data.dueCardCount;
           }
-        })
+        });
         HttpRequest({
           url: url,
           data: _data,
@@ -331,7 +334,7 @@ export default {
                 storeId: e.storeId,
                 first_1: e.name,
                 second_1: e.pactId,
-                second_tip_1: '合同编号：',
+                second_tip_1: "合同编号：",
                 third_1: e.secondCardClass
               };
             });
@@ -363,6 +366,7 @@ export default {
       this.setDate(obj);
     },
     setDate(obj) {
+      console.log(obj)
       this.filter.transactTimeStart = obj.startTime;
       this.filter.transactTimeEnd = obj.endTime;
     },
@@ -407,9 +411,9 @@ export default {
             });
           }
           if (res.data.code == 200 && res.data.data.length) {
-            let data = res.data.data
-            if(that.selectedCard.teachCardType == 3) {
-              data = data.filter(e => e.projectType == 3)
+            let data = res.data.data;
+            if (that.selectedCard.teachCardType == 3) {
+              data = data.filter(e => e.projectType == 3);
             }
             if (data.length == 1) {
               that.selectedProject = data[0];
@@ -486,25 +490,27 @@ export default {
       this.modifyPrice = e.mp.detail;
     },
     getCardStatus() {
-      let that = this
+      let that = this;
       HttpRequest({
-        url: '/customer/card/cardstatuslist',
+        url: "/customer/card/cardstatuslist",
         success(res) {
-          let list = res.data.data.map((e) => {
-            e.sonText = e.cardStatusChar,
-            e.action = function () {
-              that.filter.cardStatus = e.cardStatus
+          let list = res.data.data.map(e => {
+            (e.sonText = e.cardStatusChar),
+              (e.action = function() {
+                that.filter.cardStatus = e.cardStatus;
+              });
+            return e;
+          });
+          that.nav[1].children = [
+            {
+              sonText: "全部(合同状态)",
+              action: function() {
+                that.filter.cardStatus = "";
+              }
             }
-            return e
-         })
-         that.nav[1].children = [{
-           sonText: "全部(合同状态)",
-           action: function () {
-              that.filter.cardStatus = ""
-            }
-         }].concat(list)
+          ].concat(list);
         }
-      })
+      });
     }
   }
 };
@@ -514,18 +520,13 @@ export default {
 @import "../common/less/staff_common.less";
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
 }
 .contract-list {
   .staff-coach-item {
-    border-top: 1rpx solid #eee;
-    .coach-info {
-      // line-height: 26px;
-    }
+    border-bottom: 1rpx solid #eee;
     .icon-right {
-      // line-height: 60px;
       display: flex;
-      margin-top: 20px;
       img {
         width: 18px;
         height: 18px;

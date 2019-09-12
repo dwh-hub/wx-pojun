@@ -8,7 +8,7 @@
     >
       <div v-if="item.markId">
         <div class="active-cover">
-          <img :src="window.api + item.thumbUrl">
+          <img :src="window.api + item.thumbUrl" mode="aspectFill">
         </div>
         <div class="active-info clearfix">
           <div class="active-detail-left">

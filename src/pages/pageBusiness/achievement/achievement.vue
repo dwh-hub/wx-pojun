@@ -10,9 +10,10 @@
         :color="themeColor"
         :isCoverView="true"
         :search="searchChange"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :isOverlap="true" :headerData="headerData"></header-data>
       <filter-nav :nav="nav" :isCoverView="true" :hasTodetail="true" :toDetail="toDetail"></filter-nav>
     </div>
 
@@ -34,7 +35,8 @@ import {
   setNavTab,
   window,
   HttpRequest,
-  formatDate
+  formatDate,
+  filterDateMethod
 } from "COMMON/js/common.js";
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
@@ -144,30 +146,32 @@ export default {
           children: []
         },
         {
-          navTitle: "近七天",
+          navTitle: "本周",
           name: "时间",
           children: [
             {
               sonText: "今日",
               action: () => {
-                this.filterDate(1);
+                this.filterDate('day');
               }
             },
             {
-              sonText: "近七天",
+              sonText: "本周",
               action: () => {
-                this.filterDate(7);
+                this.filterDate('week');
               }
             },
             {
               sonText: "本月",
               action: () => {
-                this.filterDate(30);
+                this.filterDate('month');
               }
             },
             {
               sonText: "上月",
-              action: () => {}
+              action: () => {
+                this.filterDate('lastMonth');
+              }
             }
           ]
         }
@@ -175,11 +179,13 @@ export default {
       headerData: [
         {
           dataText: "业绩总额",
-          dataNum: "0"
+          dataNum: "0",
+          color: "#ffae08"
         },
         {
           dataText: "实际业绩总额",
-          dataNum: "0"
+          dataNum: "0",
+          color: "#14c88b "
         }
       ],
       pickerConfig: {
@@ -199,7 +205,8 @@ export default {
         timeStart: "",
         timeEnd: "",
         purchasePattern: "",
-        belongerId: ""
+        belongerId: "",
+        belongerName: ""
       },
       storeList: [],
       selectedStore: {}
@@ -211,26 +218,32 @@ export default {
     filterNav,
     headerSearch
   },
-  // watch: {
-  //   filter: {
-  //     handler() {
-  //       console.log(this.filter);
-  //       this.refreshData();
-  //     },
-  //     deep: true
-  //   }
-  // },
+  watch: {
+    filter: {
+      handler() {
+        console.log(this.filter);
+        this.refreshData();
+      },
+      deep: true
+    }
+  },
   mounted() {
+    setNavTab();
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
-    setNavTab();
-    this.filterDate(7);
+    this.nav[2].navTitle = "本周"
+    this.filterDate('week');
+    this.refreshData();
   },
   methods: {
     searchChange(event) {
       this.filter.belongerName = event;
     },
     selectStore(item) {
+      if (!item.storeId) {
+        this.filter.belongerId = ''
+        this.nav[1].navTitle = '全部'
+      }
       this.selectedStore = item;
       this.refreshData();
     },
@@ -243,12 +256,12 @@ export default {
       let that = this;
       let _data = Object.assign(
         {},
+        that.filter,
         {
           isCoverage: 0,
           storeId: that.selectedStore.storeId,
           transactUserId: that.filter.belongerId
-        },
-        that.filter
+        }
       );
       HttpRequest({
         url: "/performance/card/pagestotal",
@@ -302,63 +315,13 @@ export default {
       this.setDate(data);
     },
     filterDate(day) {
-      let obj = this.filterDateMethod(day);
+      let obj = filterDateMethod(day);
       this.setDate(obj);
-      this.refreshData();
+      // this.refreshData();
     },
     setDate(obj) {
       this.filter.timeStart = obj.startTime;
       this.filter.timeEnd = obj.endTime;
-    },
-    filterDateMethod(day) {
-      let obj = {
-        startTime: "",
-        endTime: ""
-      };
-      if (!day) {
-        return obj;
-      }
-      let date = new Date();
-      const DAY = 24 * 60 * 60 * 1000;
-      const HOUR8 = 8 * 60 * 60 * 1000;
-      let nowStamp = date.getTime();
-      let today = date.getDate() - 1;
-      let weekday = date.getDay() - 1;
-      if (day == 1) {
-        obj.startTime = formatDate(
-          new Date(parseInt(nowStamp / DAY) * DAY - HOUR8),
-          "yyyy-MM-dd hh:mm:ss"
-        );
-        obj.endTime = formatDate(
-          new Date(parseInt(nowStamp / DAY) * DAY + DAY - HOUR8 - 1),
-          "yyyy-MM-dd hh:mm:ss"
-        );
-      }
-      if (day == 7) {
-        obj.startTime = formatDate(
-          new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - weekday * DAY),
-          "yyyy-MM-dd hh:mm:ss"
-        );
-        obj.endTime = formatDate(
-          new Date(
-            parseInt(nowStamp / DAY) * DAY - HOUR8 + (7 - weekday) * DAY - 1
-          ),
-          "yyyy-MM-dd hh:mm:ss"
-        );
-      }
-      if (day == 30) {
-        obj.startTime = formatDate(
-          new Date(parseInt(nowStamp / DAY) * DAY - HOUR8 - today * DAY),
-          "yyyy-MM-dd hh:mm:ss"
-        );
-        obj.endTime = formatDate(
-          new Date(
-            parseInt(nowStamp / DAY) * DAY - HOUR8 + (30 - today) * DAY - 1
-          ),
-          "yyyy-MM-dd hh:mm:ss"
-        );
-      }
-      return obj;
     },
     _getUserofrole() {
       getUserofrole(this.selectedStore.storeId, 2).then(data => {

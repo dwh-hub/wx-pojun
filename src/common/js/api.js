@@ -174,7 +174,7 @@ function bindMethod(url, isTab) {
         });
         wx.removeStorageSync("storeId");
         getMessage()
-        store.commit("changeLogin", true);
+        wx.setStorageSync("isLogin", true)
         getThemeColor();
         let _url = url ? url : './main'
         if (isTab) {
@@ -262,7 +262,7 @@ export function getMessage() {
     },
     success(res) {
       if (res.data.code == 200) {
-        store.commit('changeLogin', true)
+        wx.setStorageSync("isLogin", true)
         if (res.data.data.recCount > 99) {
           return wx.setTabBarBadge({
             index: 3,

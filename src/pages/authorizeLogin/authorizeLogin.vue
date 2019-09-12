@@ -122,7 +122,7 @@ export default {
     });
   },
   onPullDownRefresh() {
-    if (store.state.isLogin) {
+    if (wx.getStorageSync("isLogin")) {
       wx.switchTab({
         url: "../homepage/main"
       });
@@ -150,7 +150,8 @@ export default {
       let that = this;
       if (!wx.getStorageSync("phone") || !wx.getStorageSync("openId")) {
         this.isShow = true;
-        return store.commit("changeLogin", false);
+        wx.setStorageSync("isLogin", false)
+        return
       }
       this.isShow = false;
       wx.showLoading({
@@ -169,7 +170,7 @@ export default {
             data: res.header["Set-Cookie"]
           });
           if (res.data.code === 200) {
-            store.commit("changeLogin", true);
+            wx.setStorageSync("isLogin", true)
             getMessage();
             wx.hideLoading();
             wx.reLaunch({
@@ -177,7 +178,7 @@ export default {
             });
           } else {
             that.isShow = true;
-            store.commit("changeLogin", false);
+            wx.setStorageSync("isLogin", false)
             wx.hideLoading();
             wx.removeStorageSync("userInfo");
             wx.removeStorageSync("phone");
@@ -340,7 +341,7 @@ export default {
             });
             wx.removeStorageSync("storeId");
             getMessage();
-            store.commit("changeLogin", true);
+            wx.setStorageSync("isLogin", true)
             getThemeColor();
             let _url = url ? url : "./main";
             if (isTab) {

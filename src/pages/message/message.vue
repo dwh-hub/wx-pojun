@@ -128,7 +128,6 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
-import store from "../../utils/store";
 import noneResult from "COMPS/noneResult.vue";
 import pageFooter from "COMPS/pageFooter.vue"
 import colorMixin from "COMPS/colorMixin.vue"
@@ -159,7 +158,7 @@ export default {
     }
   },
   onShow() {
-    if (!store.state.isLogin) {
+    if (!wx.getStorageSync("isLogin")) {
       return;
     }
     this.getMessage(0, 1);

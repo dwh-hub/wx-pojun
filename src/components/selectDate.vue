@@ -6,26 +6,25 @@
     @touchend="onTouchend"
   >
     <div class="date-month">
-      <!-- :class="{active: selectDateIndex == index}" -->
-      <div class="month-item" v-for="(item, index) in dayArray" :key="index">
-        <span v-show="selectDateIndex != index">{{item}}</span>
-        <span v-show="selectDateIndex == index" :style="{color:themeColor}">{{item}}</span>
+      <div
+        class="month-item"
+        v-for="(item, index) in dayArray"
+        :key="index"
+        @click="selectWeek(index)"
+      >
+        <div class="item-round">
+          <span :style="selectDateIndex == index ? dateStyle : ''">{{item}}</span>
+        </div>
       </div>
     </div>
     <div class="date-week">
-      <div class="week-item" v-for="(item, index) in weekArray" :key="index">
-        <!-- :class="{active: selectDateIndex == index}" -->
-        <div
-          class="item-round"
-          @click="selectWeek(index)"
-          v-show="selectDateIndex != index"
-        >{{item}}</div>
-        <div
-          class="item-round"
-          @click="selectWeek(index)"
-          :style="{'background-color': themeColor,color:'#fff'}"
-          v-show="selectDateIndex == index"
-        >{{item}}</div>
+      <div
+        class="week-item"
+        v-for="(item, index) in weekArray"
+        :key="index"
+        @click="selectWeek(index)"
+      >
+        <span :style="selectDateIndex == index ? weekStyle : ''">{{item}}</span>
       </div>
     </div>
   </div>
@@ -44,10 +43,10 @@ export default {
       curDay: "",
       // 选择的日期index
       selectDateIndex: 0,
-      startX: '', // 触摸开始时 X坐标
-      startY: '', // 触摸开始时 Y坐标
-      endX: '', // 触摸结束时 X坐标
-      endY: '' // 触摸结束时 Y坐标
+      startX: "", // 触摸开始时 X坐标
+      startY: "", // 触摸开始时 Y坐标
+      endX: "", // 触摸结束时 X坐标
+      endY: "" // 触摸结束时 Y坐标
     };
   },
   mounted() {
@@ -56,26 +55,38 @@ export default {
   computed: {
     themeColor() {
       return window.color;
+    },
+    dateStyle() {
+      if (!this.themeColor) {
+        return "";
+      }
+      return `background-color: ${this.themeColor};color:#fff`;
+    },
+    weekStyle() {
+      if (!this.themeColor) {
+        return "";
+      }
+      return `color: ${this.themeColor}`;
     }
   },
   methods: {
     getDateArray(weekDate) {
       let date = weekDate;
       let week = [
-        "周日",
-        "周一",
-        "周二",
-        "周三",
-        "周四",
-        "周五",
-        "周六",
-        "周日",
-        "周一",
-        "周二",
-        "周三",
-        "周四",
-        "周五",
-        "周六"
+        "日",
+        "一",
+        "二",
+        "三",
+        "四",
+        "五",
+        "六",
+        "日",
+        "一",
+        "二",
+        "三",
+        "四",
+        "五",
+        "六"
       ];
       let _weekArray = [];
       let _dayArray = [];
@@ -110,14 +121,13 @@ export default {
       this.$emit("selectWeek", date);
     },
     onTouchstart(e) {
-      this.startX = e.pageX
-      this.startY = e.pageY
+      this.startX = e.pageX;
+      this.startY = e.pageY;
     },
-    onTouchmove(e) {
-    },
+    onTouchmove(e) {},
     onTouchend(e) {
-      this.endX = e.pageX
-      this.endY = e.pageY
+      this.endX = e.pageX;
+      this.endY = e.pageY;
     }
   }
 };
@@ -128,6 +138,8 @@ export default {
 
 .select-date {
   padding: 5px 0;
+  box-shadow: 0px 2px 7px 0px rgba(1, 60, 97, 0.1);
+  border-radius: 5px;
   .date-month,
   .date-week {
     display: flex;
@@ -136,15 +148,18 @@ export default {
       text-align: center;
     }
   }
-  .date-week {
-    margin-top: 5px;
-    .week-item {
+  .date-month {
+    margin-bottom: 5px;
+    .month-item {
       .item-round {
-        border-radius: 50%;
-        width: 80%;
-        height: 11.4vw;
-        line-height: 11.4vw;
-        margin-left: 10%;
+        > span {
+          display: inline-block;
+          width: 22px;
+          height: 22px;
+          line-height: 22px;
+          text-align: center;
+          border-radius: 50%;
+        }
       }
     }
   }

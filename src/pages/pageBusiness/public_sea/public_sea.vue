@@ -5,12 +5,13 @@
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :isOverlap="true" :headerData="headerData"></header-data>
       <filter-nav :nav="nav"></filter-nav>
     </div>
-    <div class="customer-list">
+    <div class="customer-list common-list">
       <div class="customer-item" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">
@@ -50,7 +51,6 @@
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import {checkAuth} from "../common/js/service_config.js";
-import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import headerSearch from "../components/header-search.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
@@ -432,7 +432,7 @@ export default {
 @import "../common/less/staff_common.less";
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
   overflow-y: auto !important;
 }
 .public-sea {
@@ -451,7 +451,7 @@ page {
   }
   .staff-coach-item {
     flex: 1;
-    border-top: 1rpx solid #eee;
+    border-bottom: 1rpx solid #eee;
   }
 
   .icon-wrapper {

@@ -62,7 +62,8 @@ export default {
   data() {
     return {
       coachId: "",
-      coachInfo: {}
+      coachInfo: {},
+      isLogin: false
     };
   },
   onLoad(option) {
@@ -72,6 +73,9 @@ export default {
   },
   mounted() {
     this.getCoachDetail();
+  },
+  onShow() {
+    this.isLogin = wx.getStorageSync("isLogin")
   },
   onPullDownRefresh() {
     setTimeout(() => {
@@ -83,9 +87,6 @@ export default {
     pageFooter
   },
   computed: {
-    isLogin() {
-      return store.state.isLogin
-    },
     isPhoneX() {
       return store.state.isIphoneX;
     },
@@ -99,7 +100,7 @@ export default {
       getPhoneNumber(e,url)
     },
     toAppoint() {
-      if (!store.state.isLogin) {
+      if (!wx.getStorageSync("isLogin")) {
         return wx.showToast({
           title: "请先登录",
           icon: "none",

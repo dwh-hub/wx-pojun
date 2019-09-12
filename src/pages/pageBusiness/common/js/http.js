@@ -112,7 +112,15 @@ function getUserofrole(storeId, positionType) {
         positionType: positionType // 1 教练  2 销售
       },
       success(res) {
-        resolve(res.data.data)
+        let data = res.data.data
+        data.forEach((e1, index1) => {
+          data.forEach((e2, index2) => {
+            if (e1.userId == e2.userId && index1 != index2) {
+              delete data[index]
+            }
+          })
+        })
+        resolve(data)
       }
     });
   })

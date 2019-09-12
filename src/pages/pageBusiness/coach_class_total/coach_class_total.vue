@@ -5,16 +5,17 @@
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :isOverlap="true" :headerData="headerData"></header-data>
       <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
       <div class="tabs">
         <span :style="underline_1" @click="changeType(1)">按名单</span>
         <span :style="underline_2" @click="changeType(2)">按上课记录</span>
       </div>
     </div>
-    <div class="list">
+    <div class="list common-list">
       <staff-coach-item
         v-for="(item,index) in list"
         :key="index"
@@ -47,7 +48,6 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
-import store from "@/utils/store.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -107,33 +107,38 @@ export default {
         {
           navTitle: "卡类型",
           name: "卡类型",
-          children: [{
-            sonText: '全部',
-            action: () => {
-              this.filter.cardType = ''
+          children: [
+            {
+              sonText: "全部",
+              action: () => {
+                this.filter.cardType = "";
+              }
+            },
+            // {
+            //   sonText: '会籍卡',
+            //   action: () => {
+            //     this.filter.cardType = 0
+            //   }
+            // },{
+            //   sonText: '团课卡',
+            //   action: () => {
+            //     this.filter.cardType = 1
+            //   }
+            // },
+            {
+              sonText: "私教卡",
+              action: () => {
+                this.filter.cardType = 2;
+              }
+            },
+            {
+              sonText: "储值卡",
+              action: () => {
+                this.filter.cardType = 3;
+              }
             }
-          },{
-            sonText: '会籍卡',
-            action: () => {
-              this.filter.cardType = 0
-            }
-          },{
-            sonText: '团课卡',
-            action: () => {
-              this.filter.cardType = 1
-            }
-          },{
-            sonText: '私教课',
-            action: () => {
-              this.filter.cardType = 2
-            }
-          },{
-            sonText: '充值卡',
-            action: () => {
-              this.filter.cardType = 3
-            }
-          }]
-        },
+          ]
+        }
         // {
         //   navTitle: "服务项目",
         //   name: "服务项目",
@@ -156,11 +161,12 @@ export default {
       ],
       listType: 1, // 1 按名单 2 按上课记录
       filter: {
+        nameOrPhone: "",
         coachName: "",
         calendarStart: "",
         calendarEnd: "",
         coachIdArray: "",
-        cardType: ''
+        cardType: ""
       },
       // cardClassMap: [],
       // projectMap: [],
@@ -177,7 +183,9 @@ export default {
   mounted() {
     setNavTab();
     this._getUserofrole();
-    this.refreshList();
+    // this.refreshList();
+    this.nav[0].navTitle = "本周";
+    this.filterDate(7);
   },
   mixins: [colorMixin, listPageMixin],
   components: {
@@ -190,23 +198,30 @@ export default {
   computed: {
     underline_1() {
       if (this.listType == 1) {
-        return `border-bottom: 1px solid ${this.themeColor}; color: ${this.themeColor}`
+        return `border-bottom: 1px solid ${this.themeColor}; color: ${
+          this.themeColor
+        }`;
       } else {
-        return ''
+        return "";
       }
     },
     underline_2() {
       if (this.listType == 2) {
-        return `border-bottom: 1px solid ${this.themeColor}; color: ${this.themeColor}`
+        return `border-bottom: 1px solid ${this.themeColor}; color: ${
+          this.themeColor
+        }`;
       } else {
-        return ''
+        return "";
       }
     }
   },
   methods: {
+    searchChange(event) {
+      this.filter.nameOrPhone = event;
+    },
     changeType(value) {
-      this.listType = value
-      this.refreshList()
+      this.listType = value;
+      this.refreshList();
     },
     refreshList() {
       this.page = 1;
@@ -214,6 +229,9 @@ export default {
       this.list = [{}, {}, {}, {}];
       this.getTotal();
       this.getList();
+    },
+    pullDownMethods() {
+      this.getTotal();
     },
     selectStore(item) {
       this.selectedStore = item;
@@ -267,10 +285,13 @@ export default {
                   first_1: e.name,
                   first_2: e.phone,
                   second_tip_1: "上课时间：",
-                  second_1: e.realTimeStart + "-" + e.realTimeEnd.split(" ")[1],
+                  second_1:
+                    e.realTimeStart.slice(0, 16) +
+                    "-" +
+                    e.realTimeEnd.split(" ")[1].slice(0, 5),
                   third_tip_1: "服务项目：",
                   third_1: `${e.projectName} ${e.thisDeduction}元`,
-                  third_2: `\n上课教练：${e.coachName}\n${
+                  third_2: `上课教练：${e.coachName}\n${
                     e.masterCardClassName
                   }：${e.cardClassName}(${e.pactId})`
                 };
@@ -332,10 +353,12 @@ export default {
         url: "/mobile/coach/finishClass/total",
         data: that.filter,
         success(res) {
-          let data = JSON.parse(res.data.data);
-          that.headerData[0].dataNum = data.personCount;
-          that.headerData[1].dataNum = data.classCount;
-          that.headerData[2].dataNum = data.moneyCount;
+          if (res.data.code == 200) {
+            let data = JSON.parse(res.data.data);
+            that.headerData[0].dataNum = data.personCount;
+            that.headerData[1].dataNum = data.classCount;
+            that.headerData[2].dataNum = data.moneyCount;
+          }
         }
       });
     },
@@ -371,7 +394,7 @@ export default {
           {
             sonText: "全部",
             action: () => {
-              this.filter.coachIdArray = '';
+              this.filter.coachIdArray = "";
             }
           }
         ].concat(list);
@@ -382,10 +405,10 @@ export default {
 </script>
 
 <style lang="less">
+@import "../common/less/staff_common.less";
 .coach-class-total {
   .tabs {
     padding: 0 5px;
-    background-color: #fff;
     text-align: right;
     > span {
       display: inline-block;
@@ -397,7 +420,7 @@ export default {
   }
   .list {
     .staff-coach-item {
-      border-top: 1rpx solid #eee;
+      border-bottom: 1rpx solid #eee;
       .appoint {
         display: inline-block;
         vertical-align: middle;
@@ -419,6 +442,11 @@ export default {
       .coach-desc {
         -webkit-line-clamp: 3;
         overflow: inherit;
+        .third-2 {
+          display: inline-block;
+          overflow: hidden;
+          height: 35px;
+        }
       }
       .icon-right {
         img {

@@ -1,20 +1,25 @@
-import store from "../../utils/store.js"
 const window = {}
 window.isPublic = false // 是否是公用的小程序
-window.DEBUGGING = true
-window.api = window.DEBUGGING ? "http://192.168.1.18" : "https://test.lirenos.com" // 'https://club.lirenos.com' // 'https://www.pojun-tech.cn'
-window.color = "#2a82e4" // "#00c2a9"
+window.DEBUGGING = false
+// 榴莲: https://club.lirenos.com test: https://test.lirenos.com cn: https://www.pojun-tech.cn com: https://www.pojun-tech.com
+window.api = window.DEBUGGING ? "http://192.168.1.18" : "https://test.lirenos.com"
+window.defaultColor = "#0c9cf0"
+window.color = window.defaultColor // "#0c9cf0"
 // 获取 ext.json 配置信息
 const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
 const spareCompany = "55"
 
-if (extConfig.companyId) {
-  wx.setStorageSync('companyId', extConfig.companyId)
+if (window.isPublic && wx.getStorageSync('companyId')) {
+
 } else {
-  if (window.DEBUGGING) {
-    wx.setStorageSync('companyId', '53')
+  if (extConfig.companyId) {
+    wx.setStorageSync('companyId', extConfig.companyId)
   } else {
-    wx.setStorageSync('companyId', spareCompany)
+    if (window.DEBUGGING) {
+      wx.setStorageSync('companyId', '55')
+    } else {
+      wx.setStorageSync('companyId', spareCompany)
+    }
   }
 }
 console.log("common.js")
@@ -42,9 +47,9 @@ export function getThemeColor() {
       },
       success(res) {
         if (res.data.code == 200) {
-          window.color = JSON.parse(res.data.data.baseInfo).themeColor || '#2a82e4'
+          window.color = JSON.parse(res.data.data.baseInfo).themeColor || window.defaultColor
         } else {
-          window.color = "#2a82e4"
+          window.color = window.defaultColor
         }
         resolve(window.color)
       }
@@ -56,7 +61,7 @@ export function getThemeColor() {
 export function getCompanyColor() {
   if (!wx.getStorageSync("companyId")) {
     if (window.DEBUGGING) {
-      wx.setStorageSync('companyId', '53')
+      wx.setStorageSync('companyId', '55')
       return getThemeColor()
     } else {
       if (extConfig.companyId) {
@@ -114,18 +119,18 @@ export function setNavTab(title) {
       title: title
     });
   }
-  if (!window.color || window.color == "#2a82e4") {
+  if (!window.color || window.color == window.defaultColor) {
     getCompanyColor().then(() => {
       wx.setNavigationBarColor({
         frontColor: "#ffffff",
-        backgroundColor: window.color || "#2a82e4",
+        backgroundColor: window.color || window.defaultColor,
         animation: {
           duration: 0,
           timingFunc: "easeIn"
         }
       });
       wx.setTabBarStyle({
-        backgroundColor: window.color || "#2a82e4"
+        backgroundColor: window.color || window.defaultColor
       })
     })
   } else {
@@ -189,8 +194,13 @@ export function HttpRequest(obj) {
 
     obj.success = function (res) {
       let curPageRoute = getCurrentPages()[getCurrentPages().length - 1].route
+      let type = curPageRoute.indexOf('pageBusiness') > -1 ? "staff" : "member"
       if (JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
-        // store.commit('changeLogin', false)
+        if (type == "member") {
+          wx.setStorageSync("isLogin", false)
+        } else {
+          wx.setStorageSync("staffIsLogin", false)
+        }
         if (curPageRoute.indexOf('mine') == -1 && curPageRoute.indexOf('homepage') == -1 && !isShowModal) {
           isShowModal = true
           return wx.showModal({
@@ -211,7 +221,6 @@ export function HttpRequest(obj) {
           });
         }
       }
-      let type = curPageRoute.indexOf('pageBusiness') > -1 ? "staff" : "member"
       if (type == "staff") {
         WechatMenuisLogin("staff")
       }
@@ -375,7 +384,7 @@ export function WechatMenuisLogin(type) { // 1035 1043
   if (isShowModal) {
     return
   }
-  if (store.state.isLogin && type != "staff") {
+  if (wx.getStorageSync("isLogin") && type != "staff") {
     return
   }
   if (wx.getStorageSync("staffIsLogin") && type == "staff") {
@@ -399,6 +408,55 @@ export function WechatMenuisLogin(type) { // 1035 1043
   });
 }
 
+/**
+ * 筛选日期段
+ * @param {String} timer 筛选时间段
+ */
+export function filterDateMethod(timer) {
+  let obj = {
+    startTime: "",
+    endTime: ""
+  };
+  if (!timer) {
+    return obj;
+  }
+  let date = new Date();
+  const DAY = 24 * 60 * 60 * 1000;
+  const HOUR8 = 8 * 60 * 60 * 1000;
+  let nowStamp = date.getTime();
+  let today = date.getDate() - 1;
+  let weekday = date.getDay() - 1;
+  let month = date.getMonth() + 1
+  let year = date.getFullYear()
+  let monthDay = 0
+  let todayStamp = parseInt(nowStamp / DAY) * DAY - HOUR8 // 东八区今天0点的时间戳
+  if (timer == 'day') {
+    obj.startTime = formatDate(new Date(todayStamp), "yyyy-MM-dd hh:mm:ss");
+    obj.endTime = formatDate(new Date(todayStamp + DAY - 1), "yyyy-MM-dd hh:mm:ss");
+  }
+  if (timer == 'week') {
+    obj.startTime = formatDate(new Date(todayStamp - weekday * DAY), "yyyy-MM-dd hh:mm:ss");
+    obj.endTime = formatDate(new Date(todayStamp + (7 - weekday) * DAY - 1), "yyyy-MM-dd hh:mm:ss");
+  }
+  if (timer == 'month') {
+    monthDay = getMonthDay(year, month)
+    obj.startTime = formatDate(new Date(todayStamp - today * DAY), "yyyy-MM-dd hh:mm:ss");
+    obj.endTime = formatDate(new Date(todayStamp + (monthDay - today) * DAY - 1), "yyyy-MM-dd hh:mm:ss");
+  }
+  if (timer == 'lastMonth') {
+    monthDay = getMonthDay(year, month-1)
+    obj.startTime = formatDate(new Date(todayStamp - (monthDay + today) * DAY), "yyyy-MM-dd hh:mm:ss");
+    obj.endTime = formatDate(new Date(todayStamp - today * DAY - 1), "yyyy-MM-dd hh:mm:ss");
+  }
+  return obj;
+}
+
+// 获取月的天数
+function getMonthDay(year, month){
+  var d = new Date(year, month, 0);
+  return d.getDate();
+}
+
 export default {
   window,
   getThemeColor,
@@ -410,5 +468,6 @@ export default {
   debounce,
   getRange,
   wxLogin,
-  WechatMenuisLogin
+  WechatMenuisLogin,
+  filterDateMethod
 }

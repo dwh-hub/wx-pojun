@@ -38,12 +38,13 @@ let checkMethods = {
       success(res) {
         let data = res.data.data;
         let code = res.data.code;
+        wx.hideLoading()
         if (code == 202 || code == 201) {
           // 消费天 202 其他 201
           // 快速签到时直接签到
           checkPopupData.showMask = false;
           that.successMethod('签到成功')
-        } else if (code == 503) {
+        } else if (code == 503 || code == 502) {
           // 含有多个项目，选择
           checkPopupData.projectList = data.map(e => {
             e.cardType =
@@ -74,12 +75,12 @@ let checkMethods = {
         } else {
           that.failMethod(res.data.message)
         }
-        wx.hideLoading()
       }
     });
   },
   // 获取团课
   getTeamSchedule() {
+    let that = this
     HttpRequest({
       url: '/teamClass/teamSchedule/frontGet',
       data: {
@@ -116,15 +117,25 @@ let checkMethods = {
     wx.showToast({
       title: title,
       icon: "success",
-      duration: 1000,
-      success() {
-        setTimeout(() => {
-          wx.redirectTo({
-            url: "/pages/pageBusiness/check_in_type/main"
-          });
-        }, 600);
-      }
+      duration: 2000,
     });
+    setTimeout(() => {
+      let pageNum = 1
+      getCurrentPages().forEach((e, index) => {
+        if(e.route.includes('check_in_type')) {
+          pageNum = getCurrentPages().length - index - 1
+        }
+      })
+      if(pageNum == 0) {
+        wx.redirectTo({
+          url: "/pages/pageBusiness/check_in_type/main"
+        });
+      } else {
+        wx.navigateBack({
+          delta: pageNum
+        });
+      }
+    }, 1500);
   },
   failMethod(title) {
     checkPopupData.showMask = false;

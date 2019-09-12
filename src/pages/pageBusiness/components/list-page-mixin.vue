@@ -46,6 +46,7 @@ export default {
     this.isLoading = false;
     this.isNoMore = false;
     this.getList();
+    this.pullDownMethods()
     setTimeout(() => {
       wx.stopPullDownRefresh();
     }, 1000);
@@ -59,6 +60,7 @@ export default {
     }
   },
   methods: {
+    pullDownMethods() {},
     getList() {
       if (this.isLoading || this.isNoMore || this.unLoading) {
         return;

@@ -7,34 +7,48 @@
         :search="searchChange"
         @selectStore="selectStore"
       ></header-search>
+      <filter-date @changeDate="setDate"></filter-date>
       <header-data :headerData="headerData"></header-data>
       <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
     </div>
-    <div class="list">
+    <div class="list common-list">
       <div class="list-item" v-for="(item, index) in list" :key="index" @click="toDetail(item)">
         <div v-if="item.id">
           <div class="cover">
-            <div class="card-status" :class="item.class">{{item.masterCardClassName}}</div>
+            <div>
+              <div class="card-status" :class="item.class">{{item.masterCardClassName}}</div>
+              <div class="date">{{item.date}}</div>
+            </div>
+            <div class="vertical-line"></div>
           </div>
           <div class="item-info">
             <div class="item-top">
-              <span>合同编号：{{item.pactId}}</span>
-              <span>{{item.proportionPrice}}元</span>
+              合同编号：{{item.pactId}}
+              <!-- <span>合同编号：{{item.pactId}}</span> -->
+              <!-- <span>{{item.proportionPrice}}元</span> -->
             </div>
-            <div class="item-middle">[{{item.purchasePatternChar}}] {{item.customerName}}</div>
+            <!-- <div class="item-middle">[{{item.purchasePatternChar}}] {{item.customerName || "--"}}</div> -->
+            <div class="item-middle">合同类型: {{item.masterCardClassName}}</div>
             <div class="item-desc">
-              <div>卡：{{item.secondCardClassName}}（{{item.statusText}}）</div>
-              <div>业绩归属：{{item.userName}}（归属比例:{{item.proportion*100}}%）</div>
-              <div>付款金额：{{item.cost}}元</div>
+              合同信息: {{item.secondCardClassName}}
+              <!-- <div>卡：{{item.secondCardClassName}}（{{item.statusText}}）</div>
+              <div>业绩归属：{{item.userName || '--'}}（归属比例:{{item.proportion*100}}%）</div>
+              <div>付款金额：{{item.cost}}元</div>-->
             </div>
           </div>
-          <div class="icon-right">
+          <div class="item-right">
+            <div class="money">
+              <div class="sum-money">￥{{item.proportionPrice}}</div>
+              <div class="sale-money">
+                <div class="sale-money-text">￥{{item.proportionPrice * item.proportion}}</div>
+                <div class="sale">{{item.proportion*100}}%{{item.userName || '--'}}</div>
+              </div>
+            </div>
             <img src="/static/images/staff/right-arrow.svg" alt />
           </div>
         </div>
         <div class="coach-skeleton" v-else>
           <div class="cover">
-            <div class="card-status"></div>
           </div>
           <div class="skeleton-wrapper">
             <div class="skeleton-name"></div>
@@ -63,12 +77,12 @@ import {
   window,
   HttpRequest,
   formatDate,
-  debounce
+  filterDateMethod
 } from "COMMON/js/common.js";
-import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
+import filterDate from "../components/filter-date.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
@@ -81,11 +95,13 @@ export default {
       headerData: [
         {
           dataText: "业绩总额",
-          dataNum: "0"
+          dataNum: "0",
+          color: "#ffae08"
         },
         {
           dataText: "实际业绩总额",
-          dataNum: "0"
+          dataNum: "0",
+          color: "#14c88b "
         }
       ],
       page: 1,
@@ -95,7 +111,7 @@ export default {
           name: "业务类型",
           children: [
             {
-              sonText: "全部",
+              sonText: "所有业务",
               action: () => {
                 this.filter.purchasePattern = "";
               }
@@ -178,30 +194,32 @@ export default {
           ]
         },
         {
-          navTitle: "近七天",
+          navTitle: "本周",
           name: "时间",
           children: [
             {
               sonText: "今日",
               action: () => {
-                this.filterDate(1);
+                this.filterDate("day");
               }
             },
             {
-              sonText: "近七天",
+              sonText: "本周",
               action: () => {
-                this.filterDate(7);
+                this.filterDate("week");
               }
             },
             {
               sonText: "本月",
               action: () => {
-                this.filterDate(30);
+                this.filterDate("month");
               }
             },
             {
               sonText: "上月",
-              action: () => {}
+              action: () => {
+                this.filterDate("lastMonth");
+              }
             }
           ]
         }
@@ -220,12 +238,14 @@ export default {
     headerData,
     filterNav,
     staffCoachItem,
-    noneResult
+    noneResult,
+    filterDate
   },
   mounted() {
     setNavTab();
     this._getUserofrole();
-    this.filterDate(7);
+    this.nav[2].navTitle = "本周";
+    this.filterDate("week");
   },
   mixins: [colorMixin, listPageMixin],
   methods: {
@@ -234,14 +254,10 @@ export default {
     },
     getAchievementTable() {
       let that = this;
-      var _data = Object.assign(
-        {},
-        {
-          storeId: that.selectedStore.storeId,
-          isCoverage: 0
-        },
-        that.filter
-      );
+      var _data = Object.assign({}, that.filter, {
+        storeId: that.selectedStore.storeId,
+        isCoverage: 0
+      });
       HttpRequest({
         url: "/performance/card/pagestotal",
         data: _data,
@@ -261,18 +277,23 @@ export default {
       switch (value) {
         case 0:
           return {
-            name: '储值卡',
-            class: 'yuan'
+            name: "储值卡",
+            class: "yuan"
           };
         case 1:
           return {
-            name: '时期卡',
-            class: 'day'
+            name: "时期卡",
+            class: "day"
           };
         case 2:
           return {
-            name: '次卡',
-            class: 'unit'
+            name: "次卡",
+            class: "unit"
+          };
+        default:
+          return {
+            name: "订金合同",
+            class: "unit"
           };
       }
     },
@@ -306,7 +327,7 @@ export default {
               return {
                 // TODO: id
                 id: e.makeupCardId,
-                statusText: that.transClass(e.authorityUnit).name,
+                statusText: that.transClass(e.authorityUnit || "").name,
                 class: that.transClass(e.authorityUnit).class,
                 pactId: e.pactId,
                 masterCardClassName: e.masterCardClassName,
@@ -316,7 +337,8 @@ export default {
                 secondCardClassName: e.secondCardClassName,
                 userName: e.userName,
                 proportion: e.proportion,
-                cost: e.cost
+                cost: e.cost,
+                date: formatDate(new Date(e.performancEallotTime), "yyyy/MM/dd")
               };
             });
             resolve(data);
@@ -337,8 +359,11 @@ export default {
       this.getList();
     },
     selectStore(item) {
-      console.log("list-page-minxi-main");
       this.selectedStore = item;
+      if (!item.storeId) {
+        this.filter.belongerId = "";
+        this.nav[1].navTitle = "全部";
+      }
       this._getUserofrole();
       this.refreshList();
     },
@@ -366,6 +391,9 @@ export default {
       let obj = this.filterDateMethod(day);
       this.setDate(obj);
     },
+    filterDateMethod(day) {
+      return filterDateMethod(day);
+    },
     setDate(obj) {
       this.filter.timeStart = obj.startTime;
       this.filter.timeEnd = obj.endTime;
@@ -375,21 +403,35 @@ export default {
 </script>
 
 <style lang="less">
+@import "../common/less/staff_common.less";
 .achievement-list {
   .list {
     .list-item {
       > div {
         display: flex;
         padding: 10px 15px 10px 0;
-        border-bottom: 1rpx solid #eee;
+        border-bottom: 1rpx solid #f6f6f6;
         .cover {
-          flex: 0 0 80px;
+          flex: 0 0 84px;
           display: flex;
           align-items: center;
           justify-content: center;
+          .vertical-line {
+            width: 1px;
+            height: 23px;
+            margin-left: 6px;
+            background-color: #f6f6f6;
+          }
+          .date {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+          }
           .card-status {
             width: 44px;
             height: 44px;
+            margin: 0 auto;
             font-size: 10px;
             text-align: center;
             line-height: 44px;
@@ -413,61 +455,57 @@ export default {
       .item-info {
         flex: 1;
         > div {
-          line-height: 1.5em;
+          line-height: 22px;
           font-size: 12px;
           color: #333;
-          > span {
-            margin-right: 20px;
-            font-size: 12px;
-            color: #333;
-          }
+          // > span {
+          //   margin-right: 20px;
+          //   font-size: 12px;
+          //   color: #333;
+          // }
         }
-        .item-top,
-        .item-middle {
-          line-height: 24px;
-        }
-        .item-top {
-          font-weight: bold;
-        }
-        .item-desc > div {
-          font-size: 10px;
-          color: #808080;
+        // .item-top,
+        // .item-middle {
+        //   line-height: 24px;
+        // }
+        // .item-top {
+        //   font-weight: bold;
+        // }
+        .item-middle,
+        .item-desc {
+          color: #666;
         }
       }
-      .icon-right {
+      .item-right {
         display: flex;
         align-items: center;
         justify-content: center;
+        .money {
+          text-align: center;
+          .sum-money {
+            padding-bottom: 5px;
+            color: #14c88b;
+            font-size: 12px;
+            font-weight: bold;
+            border-bottom: 1rpx solid #f6f6f6;
+          }
+          .sale-money {
+            padding-top: 5px;
+            .sale-money-text {
+              color: #ffae08;
+              font-size: 12px;
+              font-weight: bold;
+            }
+            .sale {
+              font-size: 10px;
+              color: #999;
+            }
+          }
+        }
         > img {
           width: 20px;
           height: 20px;
         }
-      }
-    }
-  }
-  .coach-skeleton {
-    .cover .card-status {
-      background-color: #eee;
-    }
-    .skeleton-wrapper {
-      padding: 0 12px;
-      width: 100%;
-      > div {
-        margin-top: 12px;
-        background-color: #eee;
-      }
-      .skeleton-name {
-        margin-top: 4px;
-        height: 16px;
-      }
-      .skeleton-time {
-        height: 12px;
-        width: 200px;
-      }
-      .skeleton-desc {
-        height: 10px;
-        width: 100px;
-        margin-right: 10px;
       }
     }
   }

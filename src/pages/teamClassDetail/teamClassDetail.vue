@@ -137,7 +137,8 @@ export default {
       canAppoint: true,
       loadCount: 0,
       storeLat: '',
-      storeLong: ''
+      storeLong: '',
+      isLogin: false
     };
   },
   components: {
@@ -149,6 +150,9 @@ export default {
     Object.assign(this.$data, this.$options.data());
     this.id = option.classId;
     setNavTab();
+  },
+  onShow() {
+    this.isLogin = wx.getStorageSync("isLogin")
   },
   onUnload() {
     this.loadCount = 0
@@ -197,9 +201,6 @@ export default {
       }
       return "";
     },
-    isLogin() {
-      return store.state.isLogin
-    },
     isPhoneX() {
       return store.state.isIphoneX;
     },
@@ -233,7 +234,7 @@ export default {
     },
     // 预约团课
     appointClass() {
-      if (!store.state.isLogin) {
+      if (!wx.getStorageSync("isLogin")) {
         return wx.showToast({
           title: "请先登录",
           icon: "none",

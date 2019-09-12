@@ -34,7 +34,6 @@
 <script>
 import { setNavTab, window, HttpRequest } from "COMMON/js/common.js";
 import card from "COMPS/card";
-import store from "../../utils/store";
 import noneResult from "COMPS/noneResult.vue";
 import pageFooter from "COMPS/pageFooter.vue";
 

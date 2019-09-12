@@ -1,7 +1,9 @@
 <template>
   <div class="team-class-list">
     <div class="header">
-      <select-date @selectWeek="getClassList"></select-date>
+      <div class="select-date-wrapper">
+        <select-date @selectWeek="getClassList"></select-date>
+      </div>
       <div class="nav-tab">
         <div class="nav-item" v-for="(item,index) in nav" :key="index" @click="selectNav(index)">
           <span v-show="currentNav!=index">{{item.navTitle}}</span>
@@ -333,6 +335,9 @@ export default {
     height: 120px;
     z-index: 98;
     background-color: #fff;
+    .select-date-wrapper {
+      padding: 10px;
+    }
     .nav-tab {
       display: flex;
       position: relative;

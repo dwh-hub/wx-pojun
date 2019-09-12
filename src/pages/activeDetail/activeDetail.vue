@@ -67,7 +67,8 @@ export default {
       // content:
       //   '<p><span style="background-color: rgb（255, 255, 255）; color: rgb（255, 0, 0）; font-weight: bold;">缴纳定金权益享受下述权益:</span></p><p>1.预存50元定金，可享受办卡首年免费；</p><p>2.获得会所赠送价值200的水吧券一张；</p><p>3.获得会所价值288元的运动背包；</p><p>4.享受会所价值788元的一对一私教二节及专业的健康状况评估；</p><p>5.享受停车2小时免费（卡有效期内来游泳健身）；</p><p>6.享受独立淋浴间（共15间）使用权，极大保护个人隐私；</p><p>7.享受儿童独立淋浴室；</p><p>8.优先获得参加会所举办的所有常规和户外活动的权益；</p><p>9.参加会所开业庆典活动和抽奖活动；</p><p>10.如不办卡，享受持定金单换取会所VIP贵宾券二张。</p><p><br></p><p>门店效果预览图（以门店实际装修为准）</p><p><img src="/images/activities/37/1.55065529299746E12.jpeg" style="width: 874px; float: none;"></p><p><img src="/images/activities/37/1.5506553509545596E12.jpeg" style="width: 1500px; float: none;"></p><p><img src="/images/activities/37/1.5506553654493972E12.jpeg" style="width: 1500px;"></p><p><img src="/images/activities/37/1.5506553892880002E12.jpeg" style="width: 1426px;"></p><p><img src="/images/activities/37/1.550655397923402E12.jpeg" style="width: 1152px;"></p><p><img src="/images/activities/37/1.550655407173489E12.jpeg" style="width: 1152px;"><br></p>',
       companyId: '',
-      userInfo: {}
+      userInfo: {},
+      isLogin: false
     };
   },
   onLoad(options) {
@@ -85,15 +86,15 @@ export default {
     }
     this.getActiveDetail();
   },
+  onShow() {
+    this.isLogin = wx.getStorageSync("isLogin")
+  },
   onPullDownRefresh() {
     setTimeout(() => {
       wx.stopPullDownRefresh();
     }, 1000);
   },
   computed: {
-    isLogin() {
-      return store.state.isLogin
-    },
     isPhoneX() {
       return store.state.isIphoneX;
     },
@@ -177,7 +178,7 @@ export default {
       });
     },
     showPopup() {
-      if(!store.state.isLogin) {
+      if(!wx.getStorageSync("isLogin")) {
         return wx.showToast({
           title: "请先登录",
           icon: "none",

@@ -2,7 +2,8 @@ import {
   window,
   HttpRequest,
   getThemeColor,
-  formatDate
+  formatDate,
+  wxLogin
 } from "COMMON/js/common.js";
 import store from "../../utils/store.js"
 
@@ -40,7 +41,7 @@ export function getPhoneNumber(e, url, isTab) {
         });
         // wx.setStorage({
         //   key: "phone",
-        //   data: "13073618012", //"18759888263",
+        //   data: "13285923990", //"18759888263",
         //   success: function () {
         //     login(url, isTab);
         //   }
@@ -51,7 +52,7 @@ export function getPhoneNumber(e, url, isTab) {
         if(window.DEBUGGING) {
           return wx.setStorage({
             key: "phone",
-            data: "18888888881", // "13285923990",
+            data: "18888888882", // "13285923990",
             success: function () {
               login(url, isTab);
             }
@@ -62,6 +63,7 @@ export function getPhoneNumber(e, url, isTab) {
           content: res.data.message,
           showCancel: false
         });
+        wxLogin()
       }
     }
   });
@@ -218,6 +220,16 @@ export function enterStaff(res) {
   //     }
   //   }
   // })
+  let staff_info = res.data.data
+  staff_info.authList = {}
+  wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+  wx.setStorageSync("instMsgSubKey", staff_info.instMsgSubKey);
+  wx.setStorageSync("staff_info", staff_info);
+  wx.setStorageSync("companyId", staff_info.companyId);
+  wx.setStorageSync("companyName", staff_info.companyName);
+  wx.setStorageSync("isLogin", false)
+  wx.setStorageSync("staffIsLogin", true);
+  
   // 登录日志
   HttpRequest({
     url: '/system/log/addWorkLog',
@@ -227,15 +239,6 @@ export function enterStaff(res) {
       descInfo: `登录-商户-小程序：账号:${wx.getStorageSync("phone")}，登录设备:${wx.getSystemInfoSync().model},${wx.getSystemInfoSync().system}，登录时间:${formatDate(new Date(), 'yyyy-MM-dd')}`
     }
   })
-  let staff_info = res.data.data
-  staff_info.authList = {}
-  wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
-  wx.setStorageSync("instMsgSubKey", staff_info.instMsgSubKey);
-  wx.setStorageSync("staff_info", staff_info);
-  wx.setStorageSync("companyId", staff_info.companyId);
-  wx.setStorageSync("companyName", staff_info.companyName);
-  store.commit("changeLogin", false);
-  wx.setStorageSync("staffIsLogin", true);
   
   // 进入商户端时，门店权限过滤
   console.log("getStorageSync:"+wx.getStorageSync("companyId"))
@@ -334,7 +337,7 @@ function bindMethod() {
         });
         wx.removeStorageSync("storeId");
         getMessage()
-        store.commit("changeLogin", true);
+        wx.setStorageSync("isLogin", true)
         getThemeColor();
         let _url = url ? url : './main'
         if (isTab) {
@@ -425,7 +428,7 @@ export function getMessage() {
     },
     success(res) {
       if (res.data.code == 200) {
-        store.commit('changeLogin', true)
+        wx.setStorageSync("isLogin", true)
         if (res.data.data.recCount > 99) {
           return wx.setTabBarBadge({
             index: 3,

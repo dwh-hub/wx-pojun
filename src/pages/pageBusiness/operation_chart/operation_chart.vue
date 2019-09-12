@@ -851,7 +851,7 @@ export default {
     }
   }
   .staff-coach-item {
-    border-top: 1rpx solid #eee;
+    border-bottom: 1rpx solid #eee;
     .avatar {
       border-radius: 0px;
     }

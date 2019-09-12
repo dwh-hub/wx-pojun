@@ -5,12 +5,13 @@
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :isOverlap="true" :headerData="headerData"></header-data>
       <filter-nav :nav="nav"></filter-nav>
     </div>
-    <div class="class-list">
+    <div class="class-list common-list">
       <team-class-item
         :info="item"
         :isToDetail="false"
@@ -58,7 +59,6 @@ import {
   formatDate
 } from "COMMON/js/common.js";
 import { checkAuth } from "../common/js/service_config.js";
-import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
@@ -336,9 +336,10 @@ export default {
 </script>
 
 <style lang="less">
+@import "../common/less/staff_common.less";
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color:  @pageColor;
 }
 .satff_team_class {
   .team-class-item {
@@ -351,7 +352,7 @@ page {
     box-shadow: none;
   }
   .staff-coach-item {
-    border-top: 1rpx solid #eee;
+    border-bottom: 1rpx solid #eee;
     .icon-right {
       line-height: 60px;
     }

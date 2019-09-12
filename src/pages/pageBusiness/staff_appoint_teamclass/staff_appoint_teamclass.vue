@@ -226,7 +226,7 @@ export default {
 
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
 }
 .staff_appoint_teamclass {
   .item-wrapper {

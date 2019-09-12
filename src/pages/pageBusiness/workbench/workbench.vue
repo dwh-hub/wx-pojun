@@ -180,6 +180,7 @@ export default {
           if(res.data.code == 500) {
             return that.noAuthLineView = false
           }
+          that.noAuthLineView = true
           let isIOS = wx.getSystemInfoSync().system.indexOf("iOS") > -1
           let data = res.data.data.map(e => {
             return {

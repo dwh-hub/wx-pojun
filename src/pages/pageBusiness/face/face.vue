@@ -9,6 +9,7 @@
         ></cover-image>-->
       </cover-view>
       <cover-view class="tip" v-if="showTip">人脸识别中...</cover-view>
+      <cover-view class="center-tip tip" v-if="showCenterTip">{{centerTips}}</cover-view>
       <cover-image class="face-outline" src="/static/images/staff/uFace.png"></cover-image>
     </camera>
     <van-toast id="van-toast" />
@@ -49,7 +50,9 @@ export default {
       flag: true,
       showTip: true,
       color: window.color,
-      timer: 500
+      timer: 500,
+      showCenterTip: false,
+      centerTips: ""
     };
   },
   onShow() {
@@ -94,10 +97,12 @@ export default {
   onUnload() {
     clearInterval(this.faceTimer);
     this.flag = true;
+    this.type = ""
   },
   onHide() {
     clearInterval(this.faceTimer);
     this.flag = true;
+    this.type = ""
   },
   methods: {
     load(e) {
@@ -109,8 +114,7 @@ export default {
       console.log(e);
     },
     flipCamera() {
-      clearInterval(this.faceTimer);
-      // this.device = !this.device;
+      this.device = !this.device;
     },
     // start(e) {
     //   this.camera = !this.camera;
@@ -278,23 +282,26 @@ export default {
             }, 1000);
           } else if (res.data.code == 401) {
             let second = 3;
-            let toast = Toast.loading({
-              duration: 0, // 持续展示 toast
-              forbidClick: true, // 禁用背景点击
-              message: `${res.data.message}\n${second} 秒后重新识别`,
-              loadingType: "spinner",
-              selector: "#van-toast"
-            });
+            that.showCenterTip = true
+            // let toast = Toast.loading({
+            //   duration: 0, // 持续展示 toast
+            //   forbidClick: true, // 禁用背景点击
+            //   message: `${res.data.message}\n${second} 秒后重新识别`,
+            //   loadingType: "spinner",
+            //   selector: "#van-toast"
+            // });
             const timer = setInterval(() => {
-              second--;
               if (second) {
-                toast.setData({
-                  message: `${res.data.message}\n${second} 秒后重新识别`
-                });
+                that.centerTips = `${res.data.message}\n${second} 秒后重新识别`
+                second--;
+                // toast.setData({
+                //   message: `${res.data.message}\n${second} 秒后重新识别`
+                // });
               } else {
-                clearInterval(timer);
+                that.showCenterTip = false
                 that.flag = true;
-                Toast.clear();
+                clearInterval(timer);
+                // Toast.clear();
               }
             }, 1000);
           } else {
@@ -327,7 +334,8 @@ export default {
       HttpRequest({
         url: "/mobile/coach/attendclass/verify/coachAndCustomerAndFront",
         data: {
-          coachAppointId: that.params.appointId
+          coachAppointId: that.params.appointId,
+          customerSignWay: 1
         }
       });
     }
@@ -353,13 +361,16 @@ export default {
   .tip {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
     bottom: 8%;
-    line-height: 36px;
-    padding: 0 20px;
+    transform: translateX(-50%);
+    line-height: 32px;
+    padding: 0 15px;
     border-radius: 5px;
     color: #fff;
     background-color: rgba(0, 0, 0, 0.5);
+  }
+  .center-tip {
+    bottom: 50%;
   }
   .face-outline {
     position: fixed;

@@ -6,28 +6,6 @@
         感谢您对本课程的支持
         <span v-if="detail.status == 1">，请耐心等待开课</span>
       </p>
-      <div class="btn-group">
-        <span class="cancel" @click="cancel" v-if="detail.status == 1 && type == 'staff'">取消预约</span>
-        <span
-          class="assess"
-          :style="{'background-color': themeColor}"
-          @click="assess"
-          v-if="(!detail.evaluateId && !detail.teamClassEvaluteId) && detail.status == 3 && type !== 'staff'"
-        >评价</span>
-        <span class="again" :style="{'background-color': themeColor}" @click="again">再约一节</span>
-        <span
-          class="write"
-          v-if="!detail.handwrittenImgPath && isOpenHandwrittenBoard && coachAppointId && type == 'staff'&& detail.status == 2"
-          :style="{'background-color': themeColor}"
-          @click="handwrite"
-        >手写确认</span>
-        <span
-          class="see-board"
-          v-if="detail.handwrittenImgPath"
-          :style="{'background-color': themeColor}"
-          @click="showImg = true"
-        >查看签名</span>
-      </div>
     </div>
     <div class="class-info">
       <title-cell title="课程信息" moreText :moreSize="14" :titleSize="16"></title-cell>
@@ -38,6 +16,28 @@
     <div class="store" v-if="storeInfo.storeName">
       <div class="title">门店信息</div>
       <store-item :info="storeInfo"></store-item>
+    </div>
+    <div class="btn-group">
+      <span class="cancel" @click="cancel" v-if="detail.status == 1 && type == 'staff'">取消预约</span>
+      <span
+        class="assess"
+        :style="{'background-color': themeColor}"
+        @click="assess"
+        v-if="(!detail.evaluateId && !detail.teamClassEvaluteId) && detail.status == 3 && type !== 'staff'"
+      >评价</span>
+      <span class="again" :style="{'background-color': themeColor}" @click="again">再约一节</span>
+      <span
+        class="write"
+        v-if="!detail.handwrittenImgPath && isOpenHandwrittenBoard && coachAppointId && type == 'staff'&& detail.status == 2"
+        :style="{'background-color': themeColor}"
+        @click="handwrite"
+      >手写确认</span>
+      <span
+        class="see-board"
+        v-if="detail.handwrittenImgPath"
+        :style="{'background-color': themeColor}"
+        @click="showImg = true"
+      >查看签名</span>
     </div>
 
     <van-popup
@@ -387,28 +387,30 @@ export default {
         color: #bababa;
       }
     }
-    .btn-group {
-      padding-left: 25px;
-      padding-bottom: 10px;
-      border-bottom: 1rpx solid #eee;
-      > span {
-        display: inline-block;
-        width: 70px;
-        text-align: center;
-        line-height: 26px;
-        margin-right: 15px;
-        border-radius: 2px;
-      }
-      .cancel {
-        color: #333;
-        border: 1rpx solid #e2e2e2;
-      }
-      .assess,
-      .again,
-      .write,
-      .see-board {
-        color: #fff;
-      }
+  }
+  .btn-group {
+    padding-left: 25px;
+    padding-top: 10px;
+    margin: 15px 0;
+    border-top: 1rpx solid #eee;
+    text-align: right;
+    > span {
+      display: inline-block;
+      width: 70px;
+      text-align: center;
+      line-height: 26px;
+      margin-right: 15px;
+      border-radius: 2px;
+    }
+    .cancel {
+      color: #333;
+      border: 1rpx solid #e2e2e2;
+    }
+    .assess,
+    .again,
+    .write,
+    .see-board {
+      color: #fff;
     }
   }
   .class-info {

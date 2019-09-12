@@ -6,12 +6,13 @@
         :color="themeColor"
         :search="searchChange"
         :searchText="filter.namePhone"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :isOverlap="true" :headerData="headerData"></header-data>
       <filter-nav :nav="nav"></filter-nav>
     </div>
-    <div class="class-list">
+    <div class="class-list common-list">
       <staff-coach-item
         :info="item"
         v-for="(item, index) in list"
@@ -41,7 +42,6 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
-import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import filterNav from "../components/filter-nav.vue";
 import headerData from "../components/header-data.vue";
@@ -285,7 +285,7 @@ export default {
 .my-private-class {
   .class-list {
     .staff-coach-item {
-      border-top: 1rpx solid #eee;
+      border-bottom: 1rpx solid #eee;
       flex: 1;
       .coach-info {
         >div {

@@ -1,6 +1,6 @@
 <template>
   <div class="login-popup" v-show="showPopup">
-    <div class="authorize-popup">
+    <div class="authorize-popup" v-show="showAuthorizePoppup">
       <div class="logo">
         <image :src="window.api + companyInfo.logimage" mode="aspectFill"></image>
       </div>
@@ -16,6 +16,7 @@
         <button class="login-none" v-if="!systemSteup.isNeedLogin" @click="showPopup = false">暂不登录</button>
       </div>
     </div>
+    <select-company v-if="showCompanyList" :companyList="companyList"></select-company>
   </div>
 </template>
 
@@ -28,7 +29,7 @@ import {
   getCompanyColor,
   getThemeColor
 } from "COMMON/js/common.js";
-import store from "../utils/store";
+import selectCompany from "COMPS/selectCompany.vue"
 import {
   getPhoneNumber,
   getMessage,
@@ -37,15 +38,27 @@ import {
   enterMember,
   enterStaff
 } from "COMMON/js/merge_login.js";
+import { 
+  getPhoneNumber_staff,
+  staffLogin
+} from "COMMON/js/only_staff_login.js";
+
 export default {
   props: ["options"],
   data() {
     return {
       showPopup: true,
+      showAuthorizePoppup: true,
+      showCompanyList: false,
+      companyList: [],
       userInfo: {},
       companyInfo: {},
       systemSteup: {}
     };
+  },
+  onShow() {
+    this.showAuthorizePoppup = true
+    this.showCompanyList = false
   },
   mounted() {
     this._onLoad(this.options);
@@ -55,6 +68,9 @@ export default {
     window() {
       return window;
     }
+  },
+  components: {
+    selectCompany
   },
   methods: {
     rand(min, max) {
@@ -115,6 +131,9 @@ export default {
     login() {
       if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
         wx.showLoading()
+        if (window.isPublic) {
+          return staffLogin()
+        }
         staff_login().then((staff_res) => {
           wx.hideLoading()
           if(!staff_res) {
@@ -123,16 +142,28 @@ export default {
           enterStaff(staff_res)
         })
       }
-      if(store.state.isLogin) {
+      if(wx.getStorageSync("isLogin")) {
         return
       }
-      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey")) {
+      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey") && !window.isPublic) {
         getUserInfo().then((member_res) => {
           enterMember(member_res)
         })
       }
     },
     _getPhoneNumber(e) {
+      if(window.isPublic) {
+        return getPhoneNumber_staff(e).then(res => {
+          this.showAuthorizePoppup = false
+          this.companyList = res.data.data.map(e => {
+            return {
+              companyName: e.companyName,
+              companyId: e.companyId
+            }
+          })
+          this.showCompanyList = true
+        })
+      }
       getPhoneNumber(e, "../homepage/main", true);
     }
   }

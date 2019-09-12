@@ -43,6 +43,10 @@ Component({
       type: Boolean,
       value: false
     },
+    isFixed: {
+      type: Boolean,
+      value: true
+    }
     // onLongPressDelete: {
     //   type: Function,
     //   value: () => { }
@@ -123,7 +127,6 @@ Component({
     },
     vehicleTap: function (event) {
       let val = event.target.dataset.value;
-      console.log(val)
       switch (val) {
         case 'delete':
           this.triggerEvent("onIputdelete");

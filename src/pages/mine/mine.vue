@@ -42,7 +42,7 @@
         :key="index"
         @click="navTo(item.navigatorUrl)"
       >
-        <img alt :src="item.imgUrl">
+        <img alt :src="item.imgUrl" />
         <span class="detail_title">{{item.navName}}</span>
         <span class="detail_contrnt" v-if="isLogin">{{item.hit}}{{item.text}}</span>
       </div>
@@ -54,7 +54,7 @@
       v-if="isLogin"
     >解除绑定</div>
     <!-- <div class="mineExit" @click="singIn" v-else>去登录</div> -->
-    <van-popup
+    <!-- <van-popup
       :show="showBindBox"
       @close="showBindBox = false"
       :duration="200"
@@ -72,8 +72,10 @@
         </div>
         <span class="showTooltips" @click="bind">绑定</span>
       </div>
-    </van-popup>
-    <login-popup :options="options" v-if="!isLogin"></login-popup>
+    </van-popup>-->
+
+    <select-company v-if="showCompanyList" :companyList="companyList"></select-company>
+    <!-- <login-popup :options="options" v-if="!isLogin"></login-popup> -->
     <page-footer></page-footer>
   </div>
 </template>
@@ -85,11 +87,17 @@ import {
   // wxLogin,
   HttpRequest
 } from "COMMON/js/common.js";
-import {getPhoneNumber} from "COMMON/js/merge_login.js";
+import { getPhoneNumber } from "COMMON/js/merge_login.js";
 import store from "../../utils/store";
-import pageFooter from "COMPS/pageFooter.vue"
-import colorMixin from "COMPS/colorMixin.vue"
-import loginPopup from "COMPS/loginPopup.vue"
+import pageFooter from "COMPS/pageFooter.vue";
+import colorMixin from "COMPS/colorMixin.vue";
+import selectCompany from "COMPS/selectCompany.vue";
+// import loginPopup from "COMPS/loginPopup.vue";
+
+import {
+  getPhoneNumber_staff,
+  staffLogin
+} from "COMMON/js/only_staff_login.js";
 
 export default {
   data() {
@@ -122,7 +130,7 @@ export default {
           navigatorUrl: "../checkInRecord/main",
           hit: "",
           text: "次"
-        },
+        }
         // {
         //   imgUrl: "https://www.pojun-tech.cn/assets/img/comeCost.png",
         //   navName: "商户端",
@@ -155,7 +163,7 @@ export default {
       // 临时的用户数据
       userInfo: {},
       phone: "",
-      showBindBox: false,
+      // showBindBox: false,
       companyList: [],
       // 选择的公司
       curCompany: {},
@@ -164,17 +172,22 @@ export default {
       // 积分
       myPoints: "",
       // 消费次数
-      FreeCount:"",
+      FreeCount: "",
+      showCompanyList: false,
+      isLogin: false
       // themeColor: ""
     };
   },
   components: {
-    pageFooter
+    pageFooter,
+    selectCompany
   },
-  mixins:[colorMixin],
+  mixins: [colorMixin],
   onShow() {
+    this.showCompanyList = false
+    this.isLogin = wx.getStorageSync("isLogin")
     this.getTimes();
-    // if(store.state.isLogin == false) {
+    // if(wx.getStorageSync("isLogin") == false) {
     //   wxLogin();
     // }
     if (this.themeColor != window.color) {
@@ -186,8 +199,8 @@ export default {
   },
   mounted() {
     setNavTab();
-    // this.isLogin = store.state.isLogin;
-    this.themeColor = window.color
+    // this.isLogin = wx.getStorageSync("isLogin");
+    this.themeColor = window.color;
   },
   onPullDownRefresh() {
     setTimeout(() => {
@@ -195,9 +208,6 @@ export default {
     }, 1000);
   },
   computed: {
-    isLogin() {
-      return store.state.isLogin;
-    },
     encryptPhone() {
       if (this.userInfo.phone) {
         return (
@@ -211,11 +221,22 @@ export default {
   },
   methods: {
     _getPhoneNumber(e) {
-      getPhoneNumber(e,"../mine/main",true)
+      if (window.isPublic) {
+        return getPhoneNumber_staff(e).then(res => {
+          this.companyList = res.data.data.map(e => {
+            return {
+              companyName: e.companyName,
+              companyId: e.companyId
+            };
+          });
+          this.showCompanyList = true;
+        });
+      }
+      getPhoneNumber(e, "../mine/main", true);
     },
     navTo(url) {
       // TODO:
-      if (!store.state.isLogin) {
+      if (!wx.getStorageSync("isLogin")) {
         return wx.showToast({
           title: "请登录",
           icon: "none",
@@ -244,12 +265,14 @@ export default {
                   // });
                   wx.removeStorageSync("userInfo");
                   wx.removeStorageSync("phone");
-                  store.commit("changeLogin", false);
+                  wx.setStorageSync("isLogin", false)
                   wx.showToast({
                     title: "解绑成功",
                     icon: "success",
                     duration: 1000
                   });
+                  that.cardNum = ''
+                  that.FreeCount = ''
                   wx.reLaunch({
                     url: "./main"
                   });
@@ -274,25 +297,25 @@ export default {
         method: "POST",
         success(res) {
           if (res.data.code === 200) {
-            that.myPoints = res.data.data.selfIntegral || '';
-            that.FreeCount = res.data.data.attendClassCount || '';
-            that.cardNum = res.data.data.cardCount || '';
+            that.myPoints = res.data.data.selfIntegral || "";
+            that.FreeCount = res.data.data.attendClassCount || "";
+            that.cardNum = res.data.data.cardCount || "";
             that.mineNav.forEach(function(e) {
               if (e.navName == "会员卡") {
-                e.hit = res.data.data.cardCount || '';
+                e.hit = res.data.data.cardCount || "";
               } else if (e.navName == "上课次数") {
-                e.hit = res.data.data.attendClassCount || '';
+                e.hit = res.data.data.attendClassCount || "";
               } else if (e.navName == "预约记录") {
-                e.hit = res.data.data.appointCount || '';
+                e.hit = res.data.data.appointCount || "";
               } else if (e.navName == "签到记录") {
-                e.hit = res.data.data.consumeLogCount || '';
+                e.hit = res.data.data.consumeLogCount || "";
               }
               // else if (e.navName == "我的积分") {
               //   e.hit = res.data.data.selfIntegral;
               // }
             });
           } else {
-            store.commit("changeLogin", false);
+            wx.setStorageSync("isLogin", false)
             // wx.navigateTo({
             //   url: "../authorizeLogin/main"
             //   // url: "../login/main"
@@ -300,30 +323,30 @@ export default {
           }
         }
       });
-    },
+    }
     // 选择公司
-    selectCompany(item) {
-      this.curCompany = item;
-    },
+    // selectCompany(item) {
+    //   this.curCompany = item;
+    // },
     // 绑定公司
-    bind() {
-      this.showBindBox = false;
-      this.userInfo = this.curCompany;
-      store.commit("saveUserInfo", this.curCompany);
-      wx.setStorage({
-        key: "userInfo",
-        data: this.curCompany
-      });
-      wx.setStorage({
-        key: "companyId",
-        data: this.curCompany.companyId
-      });
-      wx.setStorage({
-        key: "companyName",
-        data: this.curCompany.companyName
-      });
-      this.bindMethod();
-    },
+    // bind() {
+    //   this.showBindBox = false;
+    //   this.userInfo = this.curCompany;
+    //   store.commit("saveUserInfo", this.curCompany);
+    //   wx.setStorage({
+    //     key: "userInfo",
+    //     data: this.curCompany
+    //   });
+    //   wx.setStorage({
+    //     key: "companyId",
+    //     data: this.curCompany.companyId
+    //   });
+    //   wx.setStorage({
+    //     key: "companyName",
+    //     data: this.curCompany.companyName
+    //   });
+    //   this.bindMethod();
+    // }
   }
 };
 </script>

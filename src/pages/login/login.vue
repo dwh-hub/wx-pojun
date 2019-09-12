@@ -194,7 +194,7 @@ export default {
               icon: "success",
               duration: 1000
             });
-            store.commit("changeLogin", true);
+            wx.setStorageSync("isLogin", true)
             getThemeColor()
             setTimeout(() => {
               wx.reLaunch({

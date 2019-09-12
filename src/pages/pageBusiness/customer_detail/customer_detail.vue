@@ -408,6 +408,17 @@ export default {
           action: () => {
             this.toAppoint();
           }
+        },
+        {
+          text: "上传头像",
+          iconUrl: "/static/images/staff/face.svg",
+          class: 'operate icon-shangke',
+          hasAuth: true,
+          action: () => {
+            wx.navigateTo({
+              url: `../face_collect/main?id=${this.id}&phone=${this.userInfo.phone}`
+            })
+          }
         }
       ],
       checkInPage: 1,
@@ -468,7 +479,7 @@ export default {
       wx.stopPullDownRefresh();
     }, 2000);
   },
-  mounted() {
+  onShow() {
     setNavTab();
     this.computedScrollHeight();
     this.getDetail();
@@ -579,7 +590,7 @@ export default {
             _data.starLevel = _data.starLevel ? _data.starLevel + "星" : "暂无";
             _data.headImgPath = _data.headImgPath
               ? window.api + _data.headImgPath
-              : "http://pojun-tech.cn/assets/img/morenTo.png";
+              : window.api + "/assets/img/morenTo.png";
             that.userInfo = _data;
             that.storeId = _data.storeId;
             that.getTrackusertype();
@@ -1011,9 +1022,10 @@ export default {
 
 <style lang="less">
 @import "~COMMON/less/common.less";
+@import "../common/less/staff_common.less";
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
 }
 .customer {
   .customer-base-info {
@@ -1038,7 +1050,7 @@ page {
       >image {
         width: 100%;
         height: 100%;
-        border-radius: 12px;
+        border-radius: 4px;
         background-color: #eee;
       }
     }

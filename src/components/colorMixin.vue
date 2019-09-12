@@ -11,7 +11,7 @@ export default {
     };
   },
   mounted() {
-    if (window.color && window.color != "#2a82e4") {
+    if (window.color && window.color != window.defaultColor) {
       this.themeColor = window.color;
     } else {
       getThemeColor().then(color => {

@@ -31,7 +31,7 @@
       <div class="common-services icon-wrapper">
         <div
           class="services-item icon-item"
-          :class="{hidden: !item2.hasAuth}"
+          :class="{hidden: !item2.hasAuth || !item2.isOpen}"
           @click="toNav(item2, index, index2)"
           v-for="(item2,index2) in item.list"
           :key="index2"
@@ -60,8 +60,8 @@ export default {
     };
   },
   onLoad(options) {
-    filterAuth()
-    this.iconList = service
+    // this.iconList = service
+    this.iconList = filterAuth()
     this.serviceList = wx.getStorageSync("serviceList") || [];
     if (options.type == "edit") {
       setNavTab("设置常用服务");

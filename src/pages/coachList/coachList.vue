@@ -54,7 +54,6 @@
 import { setNavTab, window, HttpRequest, debounce } from "COMMON/js/common.js";
 import coachItem from "COMPS/coachItem.vue";
 import noneResult from "COMPS/noneResult";
-import store from "../../utils/store";
 import pageFooter from "COMPS/pageFooter.vue"
 import colorMixin from "COMPS/colorMixin.vue"
 export default {
@@ -210,7 +209,7 @@ export default {
           this.curCoachList = this.coachList;
         });
       } else if (index === 2) {
-        if (!store.state.isLogin) {
+        if (!wx.getStorageSync("isLogin")) {
           return wx.showToast({
             title: "请先登录",
             icon: "none",

@@ -183,6 +183,7 @@ export default {
             let _data = res.data.data.result.map(e => {
               return {
                 anotherName: e.projectName,
+                masterImg: e.coachHeadImg,
                 userId: e.coachId,
                 coachAppointId: e.coachAppointId,
                 timeStart: e.timeStart,
@@ -214,7 +215,11 @@ export default {
           success(res) {
             if(that.page == 1) {that.list = []}
             if (res.data.code === 200) {
-              that.list = res.data.data.result;
+              let _data = res.data.data.result
+              _data.forEach(e => {
+                  e['masterImg'] = e.coachHeadImg
+              });
+              that.list = _data;
               resolve();
             }
           }

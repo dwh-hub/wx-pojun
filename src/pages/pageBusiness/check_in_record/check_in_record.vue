@@ -5,20 +5,22 @@
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
-      <header-data :headerData="headerData"></header-data>
+      <header-data :isOverlap="true" :headerData="headerData"></header-data>
       <filter-nav :nav="nav"></filter-nav>
     </div>
-    <div class="check-in-list">
+    <div class="check-in-list common-list">
       <staff-coach-item
         v-for="(item, index) in list"
         :key="index"
+        :showSlot="item.status == 0"
         @clickIcon="clickIcon(item)"
         @clickItem="toDetail(item,index)"
         :info="item"
       >
-        <div class="operate" :style="{border: '1px solid '+themeColor,color: themeColor}">撤销</div>
+        <div class="operate" :style="{border: '1px solid '+themeColor,color: themeColor}">撤销{{index}}{{item}}</div>
         <img src="/static/images/staff/right-arrow.svg" alt />
       </staff-coach-item>
       <van-loading :color="themeColor" v-if="isLoading"/>
@@ -53,7 +55,6 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
-import store from "@/utils/store.js";
 import listPageMixin from "../components/list-page-mixin.vue";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -138,15 +139,15 @@ export default {
       ],
       headerData: [
         {
+          dataText: "签到总计",
+          dataNum: "0"
+        },
+        {
           dataText: "签到人数",
           dataNum: "0"
         },
         {
-          dataText: "数据二",
-          dataNum: "0"
-        },
-        {
-          dataText: "数据三",
+          dataText: "签到次数",
           dataNum: "0"
         }
       ],
@@ -171,18 +172,23 @@ export default {
     noneResult
   },
   mounted() {
-    this.refreshList();
+    this.nav[0].navTitle = "今日"
+    this.filterDate(1);
     this._getVenueList()
   },
   methods: {
     searchChange(event) {
       this.filter.namePhoneCardHandCard = event;
     },
-    filterDate() {},
     toDetail(item, index) {
       wx.navigateTo({
         url: "../customer_detail/main?id=" + item.id
       });
+    },
+    selectStore(item) {
+      this.selectedStore = item
+      this._getVenueList()
+      this.refreshList()
     },
     clickIcon(item) {
       this.showRevokeDialog = true
@@ -195,10 +201,20 @@ export default {
           {},
           {
             page: that.page,
+            pageNo: that.page,
             storeId: that.selectedStore.storeId
           },
           that.filter
         );
+        HttpRequest({
+          url: '/consumption/log/statistics/nomalsign',
+          data: _data,
+          success(res) {
+            that.headerData[0].dataNum = res.data.data.nomalSignPeople
+            that.headerData[1].dataNum = res.data.data.nomalSignNumber
+            that.headerData[2].dataNum = res.data.data.nomalSignTimes
+          }
+        })
         HttpRequest({
           url: "/consumption/log/pages",
           data: _data,
@@ -208,7 +224,6 @@ export default {
             }
             let _res = res.data.data;
             let _data;
-            that.headerData[0].dataNum = _res.recCount || 0;
             _data = _res.result.map(async e => {
               if (e.headImgPath) {
                 if (e.headImgPath.indexOf(".jsp") != -1) {
@@ -228,7 +243,7 @@ export default {
                 phone: e.phone,
                 cover: e.headImgPath
                   ? e.headImgPath
-                  : "http://pojun-tech.cn/assets/img/morenTo.png",
+                  : winddow.api + "/assets/img/morenTo.png",
                 first_1: e.customerName,
                 first_2: e.phone,
                 second_1: `${e.venueName}  ${e.secondCardClassName}(${
@@ -301,9 +316,10 @@ export default {
 </script>
 
 <style lang="less">
+@import "../common/less/staff_common.less";
 .check-in-record {
   .staff-coach-item {
-    border-top: 1rpx solid #eee;
+    border-bottom: 1rpx solid #eee;
     flex: 1;
     .coach-info {
       >div {

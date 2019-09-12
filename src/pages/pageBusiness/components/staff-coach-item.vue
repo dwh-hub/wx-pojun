@@ -33,7 +33,7 @@
           class="right-block"
           :style="{'background-color': info.color}"
         >{{info.rightBlock}}</div>
-        <slot></slot>
+        <slot v-if="showSlot"></slot>
       </div>
     </div>
     <div class="coach-skeleton" v-else>
@@ -71,6 +71,10 @@ export default {
           third_2: ""
         };
       }
+    },
+    showSlot: {
+      type: Boolean,
+      default: true
     }
   },
   computed: {
@@ -126,7 +130,7 @@ export default {
     .avatar {
       width: 60px;
       height: 60px;
-      border-radius: 12px;
+      border-radius: 4px;
       background-color: #eee;
       background-size: 100% auto;
       background-repeat: no-repeat;

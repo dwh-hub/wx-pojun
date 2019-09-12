@@ -9,7 +9,12 @@
       ></header-search>
     </div>
     <div class="common-services icon-wrapper">
-      <div class="services-item icon-item" @click="toNav(item.navUrl)" v-for="(item,index) in typeList" :key="index">
+      <div
+        class="services-item icon-item"
+        @click="toNav(item.navUrl)"
+        v-for="(item,index) in typeList"
+        :key="index"
+      >
         <image mode="aspectFit" :src="item.iconUrl" :class="item.class"></image>
         <div class="services-icon icon-text">{{item.text}}</div>
       </div>
@@ -20,14 +25,38 @@
         <image class="icon" src="/static/images/arrow-bottom.png"></image>
       </div>
     </picker>
-    <div class="check_in-input-wrapper">
-      <input type="text" v-model="checkInNum" class="check_in-input" placeholder="请输入手机号或卡号确认签到" disabled>
-      <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
-    </div> 
-    <keyboard :isShow="true" :bottom="42" :isAdaptive="isPhoneX" @onInputChange="keyboardInput" @onIputdelete="keyboardDelete" @onLongPressDelete="keyboardDeleteAll"></keyboard>
-    <div class="bottom-btn" @click="confirmCheckIn" :style="{'background-color': themeColor}">
-      确认签到
-      <div class="block" v-if="isPhoneX"></div>
+    <div class="record-list">
+      <p class="record-sum">今日入场人次：{{recordSum}}</p>
+      <scroll-view scroll-x style="widtgh: 100%;" @scrolltolower="scrolltolower">
+        <div class="record-item" v-for="(item, index) in recordList" :key="index">
+          <img :src="item.cover"  @error="loadFail(index)"/>
+          <div class="name">{{item.name}}</div>
+        </div>
+      </scroll-view>
+    </div>
+    <div class="bottom-wrapper">
+      <div class="check_in-input-wrapper">
+        <input
+          type="text"
+          v-model="checkInNum"
+          class="check_in-input"
+          placeholder="请输入手机号或卡号确认签到"
+          disabled
+        />
+        <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
+      </div>
+      <keyboard
+        :isShow="true"
+        :isFixed="false"
+        :isAdaptive="isPhoneX"
+        @onInputChange="keyboardInput"
+        @onIputdelete="keyboardDelete"
+        @onLongPressDelete="keyboardDeleteAll"
+      ></keyboard>
+      <div class="bottom-btn" @click="confirmCheckIn" :style="{'background-color': themeColor}">
+        确认签到
+        <div class="block" v-if="isPhoneX"></div>
+      </div>
     </div>
     <check-popup></check-popup>
   </div>
@@ -47,23 +76,32 @@ import {
 import checkPopup from "../components/check_popup/check_popup.vue";
 import { getVenueList } from "../common/js/http.js";
 import store from "@/utils/store.js";
-import colorMixin from "COMPS/colorMixin.vue"
+import colorMixin from "COMPS/colorMixin.vue";
 import headerSearch from "../components/header-search.vue";
 
 export default {
   data() {
     return {
-      typeList: [{
-        iconUrl: "/static/images/staff/face.svg",
-        text: "人脸签到",
-        navUrl: "face",
-        class: 'icon-lg'
-      },{
-        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_2.svg",
-        text: "签到记录",
-        navUrl: "../check_in_record/main",
-        class: ''
-      }],
+      typeList: [
+        {
+          iconUrl: "/static/images/staff/face.svg",
+          text: "人脸签到",
+          navUrl: "face",
+          class: "icon-lg"
+        },
+        {
+          iconUrl: "/static/images/staff/workbench_icon/workbench_icon_2.svg",
+          text: "签到记录",
+          navUrl: "../check_in_record/main",
+          class: ""
+        },
+        {
+          iconUrl: "/static/images/staff/face.svg",
+          text: "人脸采集",
+          navUrl: "../face_collect/main",
+          class: "icon-lg"
+        }
+      ],
       storeList: [],
       selectedStore: {},
       venueIndex: 0,
@@ -71,141 +109,176 @@ export default {
       venueList: [],
       checkInNum: "",
       frontSign: "",
-      brushCardSwich: 0 // 是否开启快速签到
-    }
+      brushCardSwich: 0, // 是否开启快速签到
+      recordList: [],
+      logPage: 1,
+      recordSum: 0
+    };
   },
   components: {
     headerSearch,
     checkPopup
   },
-  mixins:[colorMixin],
+  mixins: [colorMixin],
   computed: {
     isPhoneX() {
       return store.state.isIphoneX;
     }
   },
   mounted() {
-    setNavTab()
-    this.checkInNum = ""
-    let allStore = store.state.allStore
+    setNavTab();
+    this.checkInNum = "";
+    let allStore = store.state.allStore;
     this.storeList = allStore.filter(e => e.storeId);
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
-    this.changeCommonStore()
-    this._getVenueList()
-    this.getSetting()
+    this.selectedStore =
+      this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
+    this.changeCommonStore();
+    this._getVenueList();
+    this.getSetting();
   },
   methods: {
     toNav(url) {
-      if(url == "face") {
-        url = `../face/main?type=checkIn&storeId=${this.selectedStore.storeId}&venueId=${this.venueList[this.venueIndex].venueId}`
+      if (url == "face") {
+        url = `../face/main?type=checkIn&storeId=${
+          this.selectedStore.storeId
+        }&venueId=${this.venueList[this.venueIndex].venueId}`;
       }
       wx.navigateTo({
         url: url
       });
     },
-    searchChange(e) {
+    searchChange(e) {},
+    getRecord() {
+      let that = this;
+      HttpRequest({
+        url: "/consumption/log/pages",
+        data: {
+          page: that.logPage,
+          pageNo: that.logPage,
+          storeId: that.selectedStore.storeId,
+          venueId: checkPopupData.venueId
+        },
+        success(res) {
+          if(res.data.code != 200 && res.data.data.result.lenght) {
+            return
+          }
+          that.recordSum = res.data.data.recCount
+          that.logPage++
+          that.recordList = that.recordList.concat(
+            res.data.data.result.map(e => {return {name: e.customerName,cover: window.api + (e.headImgPath ? e.headImgPath : '/assets/img/morenTo.png') }})
+          );
+        }
+      });
     },
     changeCommonStore() {
-      checkPopupData.storeId = this.selectedStore.storeId
-      checkPopupData.storeName = this.selectedStore.storeName
+      checkPopupData.storeId = this.selectedStore.storeId;
+      checkPopupData.storeName = this.selectedStore.storeName;
     },
     changeCommonVenue() {
-      checkPopupData.venueId = this.venueList[this.venueIndex].venueId
-      checkPopupData.venueName = this.venueList[this.venueIndex].venueName
+      checkPopupData.venueId = this.venueList[this.venueIndex].venueId;
+      checkPopupData.venueName = this.venueList[this.venueIndex].venueName;
     },
     onVenueChange(e) {
-      this.venueIndex = e.mp.detail.value
-      this.changeCommonVenue()
+      this.venueIndex = e.mp.detail.value;
+      this.changeCommonVenue();
+      this.logPage = 1
+      this.getRecord();
     },
     selectStore(item) {
-      this.selectedStore = item
-      this.changeCommonStore()
-      this._getVenueList()
-      this.getSetting()
+      this.selectedStore = item;
+      this.changeCommonStore();
+      this._getVenueList();
+      this.getSetting();
     },
     _getVenueList() {
-      getVenueList(this.selectedStore.storeId).then((res) => {
-        this.venueList = res
-        this.changeCommonVenue()
-        let nameList = []
+      getVenueList(this.selectedStore.storeId).then(res => {
+        this.venueList = res;
+        this.changeCommonVenue();
+        let nameList = [];
         res.forEach(e => {
-          nameList.push(e.venueName)
-        })
-        this.venueNameList = nameList
-      })
+          nameList.push(e.venueName);
+        });
+        this.venueNameList = nameList;
+        this.logPage = 1
+        this.getRecord();
+      });
     },
     // 获取门店设置
     getSetting() {
-      let that = this
+      let that = this;
       HttpRequest({
-        url: '/consumption/log/sign/getsetting',
+        url: "/consumption/log/sign/getsetting",
         data: {
           storeId: that.selectedStore.storeId
         },
         success(res) {
-          that.brushCardSwich = res.data.data.brushCardSwich
+          that.brushCardSwich = res.data.data.brushCardSwich;
         }
-      })
+      });
     },
     // 校验
     confirmCheckIn() {
-      let that = this
-      if(!this.checkInNum) {
+      let that = this;
+      if (!this.checkInNum) {
         return wx.showToast({
-          title: '卡号/手机号为空',
-          icon: 'none'
-        })
+          title: "卡号/手机号为空",
+          icon: "none"
+        });
       }
       HttpRequest({
-        url: '/customer/register/compact/querycard',
+        url: "/customer/register/compact/querycard",
         data: {
           cardId: that.checkInNum
         },
         success(res) {
-          if(res.data.code == 500 && that.brushCardSwich == 1) { // 为卡号
-            that.frontSign = ""
-            checkPopupData.physicsCardNo = that.checkInNum
-            checkMethods.getCardCost()
-          } else { // 不为卡号,查询客户
-            that.frontSign = 1
-            that.getCustomerList()
+          if (res.data.code == 500 && that.brushCardSwich == 1) {
+            // 为卡号
+            that.frontSign = "";
+            checkPopupData.physicsCardNo = that.checkInNum;
+            checkMethods.getCardCost();
+          } else {
+            // 不为卡号,查询客户
+            that.frontSign = 1;
+            that.getCustomerList();
           }
         }
-      })
+      });
     },
     // 获取卡号/手机号的用户信息
     getCustomerList() {
-      let that = this
-      wx.showLoading()
+      let that = this;
+      wx.showLoading();
       HttpRequest({
-        url: '/consumption/general/customerforcost',
+        url: "/consumption/general/customerforcost",
         data: {
           nameOrPhone: that.checkInNum,
           customerClass: 3
         },
         success(res) {
-          let list = res.data.data.result
-          wx.hideLoading()
-          if(!list.length) {
+          let list = res.data.data.result;
+          wx.hideLoading();
+          if (!list.length) {
             return wx.showModal({
               title: "提示",
               content: "未查询到信息",
               showCancel: false
             });
           }
-          if(list.length > 1) {
+          if (list.length > 1) {
             // 处理phone-1的情况
-            let isSame = false
+            let isSame = false;
             list.forEach(e => {
               if (e.phone == that.checkInNum) {
-                isSame = true
+                isSame = true;
                 wx.navigateTo({
-                  url: `../check_in_customer/main?id=${e.id}&storeId=${that.selectedStore.storeId}&venueId=${that.venueList[that.venueIndex].venueId}`
-                })
+                  url: `../check_in_customer/main?id=${e.id}&storeId=${
+                    that.selectedStore.storeId
+                  }&venueId=${that.venueList[that.venueIndex].venueId}`
+                });
               }
-            })
-            if(isSame) {
-              return
+            });
+            if (isSame) {
+              return;
             }
             return wx.showModal({
               title: "提示",
@@ -214,23 +287,31 @@ export default {
             });
           }
           if (list.length == 1) {
-            let info = list[0]
+            let info = list[0];
             wx.navigateTo({
-              url: `../check_in_customer/main?id=${info.id}&storeId=${that.selectedStore.storeId}&venueId=${that.venueList[that.venueIndex].venueId}`
-            })
+              url: `../check_in_customer/main?id=${info.id}&storeId=${
+                that.selectedStore.storeId
+              }&venueId=${that.venueList[that.venueIndex].venueId}`
+            });
           }
         }
-      })
+      });
     },
     // 自定义键盘事件
     keyboardInput(e) {
-      this.checkInNum += e.mp.detail
+      this.checkInNum += e.mp.detail;
     },
     keyboardDelete() {
-      this.checkInNum = this.checkInNum.substr(0, this.checkInNum.length-1);
+      this.checkInNum = this.checkInNum.substr(0, this.checkInNum.length - 1);
     },
     keyboardDeleteAll() {
-      this.checkInNum = ""
+      this.checkInNum = "";
+    },
+    loadFail(index) {
+      this.recordList[index].cover = window.api + "/assets/img/morenTo.png";
+    },
+    scrolltolower() {
+      this.getRecord()
     }
     // 获取卡号含有的项目
     // getCardCost() {
@@ -263,7 +344,7 @@ export default {
     //   })
     // }
   }
-}
+};
 </script>
 
 <style lang="less">
@@ -274,7 +355,7 @@ export default {
   .icon-item {
     padding: 0;
     margin-top: 5px;
-    >image {
+    > image {
       width: 50px;
       height: 50px;
     }
@@ -284,32 +365,66 @@ export default {
       margin: 10px;
     }
     .icon-text {
-      margin-top: -12px; 
+      margin-top: -12px;
       font-size: 12px;
     }
   }
-  .check_in-input-wrapper {
-    position: relative;
-    margin-top: 15px;
-    .check_in-input {
-      padding: 0 20px;
-      font-size: 16px;
-      box-sizing: border-box;
-      height: 70px;
+  .record-list {
+    white-space: nowrap;
+    .record-sum {
       text-align: center;
-      background-color: #e7e7e7;
+      color: #505050;
+      font-size: 10px;
+      margin-top: 5px;
     }
-    .search-icon {
-      position: absolute;
-      top: 24px;
-      right: 10px;
-      width: 22px;
-      height: 22px;
+    .record-item {
+      display: inline-block;
+      text-align: center;
+      margin-top: 10px;
+      width: 50px;
+      overflow: hidden;
+      > img {
+        width: 30px;
+        height: 30px;
+        margin: 0 auto;
+        border-radius: 4px;
+        background-color: #eee;
+      }
+      .name {
+        font-size: 10px;
+        color: #505050;
+      }
     }
   }
-  .bottom-btn {
-    font-size: 14px;
-    z-index: 1001;
+  .bottom-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    .check_in-input-wrapper {
+      position: relative;
+      margin-top: 15px;
+      .check_in-input {
+        padding: 0 20px;
+        font-size: 16px;
+        box-sizing: border-box;
+        height: 50px;
+        text-align: center;
+        background-color: #e7e7e7;
+      }
+      .search-icon {
+        position: absolute;
+        top: 24px;
+        right: 10px;
+        width: 22px;
+        height: 22px;
+      }
+    }
+    .bottom-btn {
+      position: static;
+      font-size: 14px;
+      z-index: 98;
+    }
   }
   .venue {
     box-sizing: border-box;

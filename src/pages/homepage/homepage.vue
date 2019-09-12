@@ -89,7 +89,7 @@
         </div>
       <coach-item :color="themeColor" :info="item" v-for="(item, index) in recommendCoach" :key="index"></coach-item>
     </div>
-    <login-popup :options="options" v-if="!isLogin"></login-popup>
+    <!-- <login-popup :options="options" v-if="!isLogin"></login-popup> -->
 
     <page-footer></page-footer>
   </div>
@@ -121,6 +121,7 @@ import {
   enterMember,
   enterStaff
 } from "COMMON/js/merge_login.js";
+import { staffLogin } from "COMMON/js/only_staff_login.js";
 
 export default {
   data() {
@@ -136,7 +137,8 @@ export default {
       companyId: "",
       nearbyStoreList: [{},{}],
       // themeColor: "",
-      options: null
+      options: null,
+      isLogin: false
     };
   },
   mixins:[colorMixin],
@@ -150,14 +152,15 @@ export default {
   mounted() {
   },
   onShow() {
+    this.isLogin = wx.getStorageSync("isLogin")
     // wxLogin();
     let that = this;
     // 场景值为公众号自定义菜单进入时，无法触发组件的mounted钩子，在这里自动登录
-    if (wx.getLaunchOptionsSync().scene == 1035 && !store.state.isLogin) {
+    // if (wx.getLaunchOptionsSync().scene == 1035 && !wx.getStorageSync("isLogin")) {
       getCompanyColor().then(() => {
         this.login();
       });
-    }
+    // }
     wx.getLocation({
       type: "wgs84",
       success(res) {
@@ -199,9 +202,6 @@ export default {
     // this.getCompanyInfo()
   },
   computed: {
-    isLogin() {
-      return store.state.isLogin
-    },
     window() {
       return window
     }
@@ -224,13 +224,16 @@ export default {
   methods: {
     // 自动登录的逻辑
     login() {
-      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey")) {
+      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey") && !window.isPublic && !wx.getStorageSync("isLogin")) {
         getUserInfo().then((member_res) => {
           enterMember(member_res)
         })
       }
       if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
         wx.showLoading()
+        if(window.isPublic) {
+          return staffLogin()
+        }
         staff_login().then((staff_res) => {
           wx.hideLoading()
           if(!staff_res) {
@@ -264,7 +267,7 @@ export default {
           duration: 1000
         });
       }
-      if (url.indexOf("memberCard") > -1 && !store.state.isLogin) {
+      if (url.indexOf("memberCard") > -1 && !wx.getStorageSync("isLogin")) {
         return wx.showToast({
           title: "请先登录",
           icon: "none",

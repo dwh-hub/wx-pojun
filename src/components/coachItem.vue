@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import store from "../utils/store";
 import {getPhoneNumber} from "COMMON/js/api.js";
 import { window } from "COMMON/js/common";
 export default {
@@ -75,16 +74,21 @@ export default {
       type: String
     }
   },
+  data() {
+    return {
+      isLogin: false
+    }
+  },
   computed: {
-    isLogin() {
-      return store.state.isLogin
-    },
     imgUrl() {
       if (this.info.headImgPath) {
         return window.api + this.info.headImgPath;
       }
       return "http://pojun-tech.cn/assets/img/morenTo.png";
     }
+  },
+  mounted() {
+    this.isLogin = wx.getStorageSync("isLogin")
   },
   methods: {
     _getPhoneNumber(e) {
@@ -99,7 +103,7 @@ export default {
       this.$emit("clickCoach");
     },
     toAppoint() {
-      if (!store.state.isLogin) {
+      if (!wx.getStorageSync("isLogin")) {
         return wx.showToast({
           title: "请先登录",
           icon: "none",

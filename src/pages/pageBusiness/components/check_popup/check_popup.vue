@@ -11,12 +11,12 @@
           <div class="round" :class="item.class">{{item.cardType}}</div>
           <div class="name">{{item.projectName}}</div>
           <div class="stepper">
-            <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="addPrice(item)">+</span>
+            <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="decreasePrice(item)">-</span>
             <div class="stepper-input">
               <input type="number" v-model="item.projectPrice" v-if="item.isCanModifyFee == 1" />
               <div v-else>{{item.projectPrice}}元</div>
             </div>
-            <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="decreasePrice(item)">-</span>
+            <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="addPrice(item)">+</span>
           </div>
           <div class="select" :style="{'color': window.color}" @click="checkInTo(item)">签到</div>
         </div>
@@ -78,12 +78,10 @@ export default {
       if (item.valueCardType == 1) {
         // 会籍
         this.checkInMember(item);
-      }
-      if (item.valueCardType == 2) {
+      } else if (item.valueCardType == 2) {
         // 私教
         checkMethods.toCoachCheckIn()
-      }
-      if (item.valueCardType == 3) {
+      } else {
         // 团课
         checkMethods.getTeamSchedule();
       }
@@ -194,7 +192,9 @@ export default {
       align-items: center;
       border-top: 1rpx solid #ccc;
       .select {
+        flex: 0 0 50px;
         line-height: 25px;
+        margin-left: 10px;
         width: 50px;
         font-size: 12px;
         text-align: center;
@@ -205,10 +205,10 @@ export default {
   }
   .pro-list {
     .pro-item {
-      justify-content: space-around;
       height: 80px;
       padding: 0 10px;
       .round {
+        flex: 0 0 40px;
         width: 40px;
         height: 40px;
         line-height: 40px;
@@ -226,8 +226,13 @@ export default {
           background-color: #ff8d1a;
         }
       }
+      .name {
+        flex: 1;
+        text-align: center;
+      }
       .stepper {
         display: flex;
+        min-width: 130px;
         .stepper-doc {
           height: 30px;
           width: 30px;
@@ -238,7 +243,7 @@ export default {
           border: 1rpx solid #cccccc;
         }
         .stepper-input {
-          margin: 0 8px;
+          margin: 0 auto;
           border-radius: 6px;
           border: 1rpx solid #cccccc;
           > input {

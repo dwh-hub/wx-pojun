@@ -4,7 +4,7 @@
       <div class="nav-item" v-for="(item,index) in _nav" :key="index" @click="selectNav(index)">
         <span v-show="currentNav!=index">{{item.navTitle}}</span>
         <span v-show="currentNav==index" :style="{color: window.color}">{{item.navTitle}}</span>
-        <i class="triangle-icon"></i>
+        <i class="triangle-icon" :class="{active: (showSlideList && currentNav==index)}"></i>
         <cover-view
           v-if="isCoverView"
           class="mask"
@@ -52,8 +52,17 @@
         <span>详情</span>
         <img src="/static/images/staff/right-arrow.svg" alt />
       </div>
+      <div class="more-filter" v-if="hasMoreFilter" @click="moreFilter">
+        <span>筛选</span>
+        <i class="triangle-icon"></i>
+      </div>
     </div>
-    <div class="filter-text">{{filterText}}</div>
+
+    <div class="sidebar-filter" v-if="hasMoreFilter" :class="{sidebarTrans: showSidebar}">
+      <div class="sidebar-mask" @click="clickMask" v-show="showSidebar"></div>
+      <div class="sidebar-content"></div>
+    </div>
+    <!-- <div class="filter-text">{{filterText}}</div> -->
     <div v-if="!isCoverView" class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
   </div>
 </template>
@@ -117,6 +126,10 @@ export default {
       type: Boolean,
       default: false
     },
+    hasMoreFilter: {
+      type: Boolean,
+      default: false
+    },
     isCoverView: {
       type: Boolean,
       default: false
@@ -134,7 +147,8 @@ export default {
       showSlideList: false,
       date: "",
       _nav: [],
-      filterText: ""
+      filterText: "",
+      showSidebar: false
     };
   },
   computed: {
@@ -154,15 +168,22 @@ export default {
       this.showSlideList = false;
     });
     this._nav = this.nav;
-    this.computedFilterText()
+    this.computedFilterText();
   },
   methods: {
+    moreFilter() {
+      this.showSidebar = true;
+    },
     computedFilterText() {
-      let filterText = ""
+      let filterText = "";
       this._nav.forEach((e, index) => {
-        filterText += `${this._nav[index].name}：${this._nav[index].navTitle == this._nav[index].name ? '全部': this._nav[index].navTitle}，`
-      })
-      this.filterText = filterText.slice(0, filterText.length-1)
+        filterText += `${this._nav[index].name}：${
+          this._nav[index].navTitle == this._nav[index].name
+            ? "全部"
+            : this._nav[index].navTitle
+        }，`;
+      });
+      this.filterText = filterText.slice(0, filterText.length - 1);
     },
     // dateChange(e, item) {
     //   console.log(e);
@@ -184,7 +205,7 @@ export default {
     },
     clickSonNav(index, item) {
       this._nav[index].navTitle = item.sonText;
-      this.computedFilterText()
+      this.computedFilterText();
       this.maskShow = false;
       this.showSlideList = false;
       if (item.action) {
@@ -194,6 +215,7 @@ export default {
     clickMask() {
       this.maskShow = false;
       this.showSlideList = false;
+      this.showSidebar = false;
       EventBus.$emit("showFilterMask");
     },
     allFilter() {
@@ -208,21 +230,24 @@ export default {
 <style lang="less">
 @import "~COMMON/less/common.less";
 .filter-nav {
+  margin-bottom: 4px;
   .nav {
     display: flex;
     height: 42px;
     background-color: #fff;
     position: relative;
-    border-bottom: 1rpx solid #eee;
+    // border-bottom: 1rpx solid #eee;
     .triangle-icon {
       display: inline-block;
-      width: 10px;
-      height: 10px;
-      margin-left: 5px;
       vertical-align: middle;
+      width: 8px;
+      height: 6px;
+      margin-left: 5px;
+      margin-bottom: 2px;
       background-size: 100%;
-      background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNTU0ODg1MDMwOTQ5IiBjbGFzcz0iaWNvbiIgc3R5bGU9IiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjIxODgiIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB3aWR0aD0iMTYiIGhlaWdodD0iMTYiPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PC9zdHlsZT48L2RlZnM+PHBhdGggZD0iTTUxMS45OTk0ODggODE5LjQxMzQ2MiA3Mi44Mzc0IDIwNC41ODY1MzggOTUxLjE2MjYgMjA0LjU4NjUzOFoiIHAtaWQ9IjIxODkiIGZpbGw9IiM5OTk5OTkiPjwvcGF0aD48L3N2Zz4=");
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAMCAYAAABr5z2BAAAA8UlEQVQokX2STWoCURCEP8WdrsxRZq6QI+QEuU82CiELySZRcBW8gIRsBEvwEiEEJCQRIcSfCa0tM7Gd+VZDv6o3Xd2vliTJLXAFtIEVUKeaHdAEPoBhA3gCLoELoFVp/c+nee1vY+AGWARJOQv3jOuSfoG+d7IpteRsXNuXtD7m/QLugUmQRyauNc9hYJIyYOqd/ARLjg35wbTuySdu7Xhrj8GWs4/qWjhdmaQ3F82D9VAbSHovFs/t/BnoAstC7RvoAC+n4nCBpC0wKkSxrJZ7JClsqZZl+1kE0jRNgJ4fXEuandPZSyzjFbjzQ/uOAH/Q5FRf0oqbkAAAAABJRU5ErkJggg==");
       transition: transform 0.3s;
+      background-repeat: no-repeat;
       &.active {
         transform: rotate(-180deg);
       }
@@ -231,6 +256,9 @@ export default {
       flex: 1;
       line-height: 42px;
       text-align: center;
+      > span {
+        color: #0a0204;
+      }
     }
     .detail-to {
       flex: 0 0 50px;
@@ -239,6 +267,13 @@ export default {
       > img {
         width: 18px;
         height: 18px;
+      }
+    }
+    .more-filter {
+      .triangle-icon {
+        width: 8px;
+        height: 9px;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAASCAYAAABSO15qAAAA3ElEQVQ4jc3SMUoDURDG8V+MrTewzA32CgoWNnaCaEpvYCGk8Bq2amunpQi2Eqs0KZJAQCySJhaCQpCFXfLYt5GXrfyqYWa+/8DMtLIsu8Q5tmymJW5ywBS7G5pLzfKpoyidrkkO6OKtgXmAkxwwwT5eopb1esUehuXi5jjE41rLSk84wIfK5hc4wl1kWem+GDQvM9XTfeMM15GVWxzjK0zW3X5Z/MVzkOvjFD/V5jpAqXEQT6NqAmA7iNtRNQGQpP8NCHfQCPCeAvhrylXxNBfYaQL4RA8P6NR24Bfn5iSJzQj1iQAAAABJRU5ErkJggg==);
       }
     }
     // .nav-item {
@@ -291,7 +326,7 @@ export default {
     }
     .list-warpper {
       position: absolute;
-      top: 42px;
+      top: 38px;
       left: 0px;
       width: 100%;
       height: 0px;
@@ -339,6 +374,34 @@ export default {
     background-color: #f6f6f6;
     border-bottom: 1rpx solid #eee;
     .Mult-line(1);
+  }
+}
+
+.sidebar-filter {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 98;
+  &.sidebarTrans {
+    top: 0;
+    .sidebar-content {
+      right: 0;
+    }
+  }
+  .sidebar-mask {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+  .sidebar-content {
+    position: absolute;
+    right: -80%;
+    top: 0;
+    width: 80%;
+    height: 100%;
+    background-color: #fff;
+    transition: right 0.3s;
   }
 }
 

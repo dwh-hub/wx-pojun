@@ -370,8 +370,26 @@
       </div>
       <div class="card-group">
         <div v-for="(item, index) in filterCardList" :key="index">
-          <staff-coach-item v-if="filterCardType == 3 ? true : (item.authorityUnit == filterCardType)" :info="item" @clickItem="selectCard(item)">
-          </staff-coach-item>
+          <!-- <staff-coach-item v-if="filterCardType == 3 ? true : (item.authorityUnit == filterCardType)" :info="item" @clickItem="selectCard(item)">
+          </staff-coach-item> -->
+          <div
+            class="cards-popup-item"
+            @click="selectCard(item)"
+            v-if="filterCardType == 3 ? true : (item.authorityUnit == filterCardType)"
+          >
+            <div class="cover" :style="{'background-image': item.linearColor}">
+              <img :src="item.backImg">
+              <div class="cover-desc">{{item.cardName}}</div>
+            </div>
+            <div class="cards-info">
+              <div class="name">
+                {{item.first_1}}
+              </div>
+              <div class="times">有效期：{{item.second_1 || '--'}}</div>
+              <div class="date">{{item.third_1}}</div>
+            </div>
+            <div class="right-block" :style="{'background-color': item.color}">{{item.rightBlock}}</div>
+          </div>
         </div>
       </div> 
     </van-popup>
@@ -664,18 +682,24 @@ export default {
               e.unit = "元"
               e.cellValue = "金额"
               TermOfValidity_2 = ` | ${e.buyAuthority}元`
+              e.backImg = window.api + "/assets/img/yuanka.png";
+              e.linearColor = 'linear-gradient(to left top, #37d8a9, #0dbbc9)'
             } else if (e.authorityUnit == 1){
               e.rightBlock = "时期卡"
               e.color = "#ff9f56"
               e.unit = "天"
               e.cellValue = "天数"
               TermOfValidity_2 = ""
+              e.backImg = window.api + "/assets/img/qixianka.png";
+              e.linearColor = 'linear-gradient(to left top, #ffc66c, #ff7f44)'
             } else {
               e.rightBlock = "次卡"
               e.color = "#49afff"
               e.unit = "次"
               e.cellValue = "次数"
               TermOfValidity_2 = ` | ${e.buyAuthority}次`
+              e.backImg = window.api + "/assets/img/cardImg.png";
+              e.linearColor = 'linear-gradient(to left top, #87c6ff, #159bff)'
             }
 
             // }
@@ -735,31 +759,47 @@ export default {
     },
     // 获取办理销售
     getSaleList() {
-      let that = this
-      HttpRequest({
-        url: '/customer/register/userofrole2',
-        data: {
-          storeId: that.selectedStore.storeId,
-          isTeachCard: 1, // 开单时 1
-          phone: that.selectedCustomer.phone
-        },
-        success(res) {
-           let _data = res.data.data.map(async (e) => {
-            e.headImgPath = await transformJspImg(e.headImgPath)
-            return {
-              userId: e.userId,
-              userName: e.userName,
-              sex: e.sex == 0 ? '' : (e.sex == 1 ? '男' : '女'),
-              cover: e.headImgPath
-            }
-          })
-          Promise.all(_data).then(result => {
-            that.saleList = result
-            that.filterSaleList = result
-            that.selectedSale = that.saleList[0]
-          });
-        }
+      getUserofrole(this.selectedStore.storeId, 2).then((data) => {
+        let _data = data.map(async (e) => {
+          e.headImgPath = await transformJspImg(e.headImgPath)
+          return {
+            userId: e.userId,
+            userName: e.userName,
+            sex: e.sex == 0 ? '' : (e.sex == 1 ? '男' : '女'),
+            cover: e.headImgPath
+          }
+        })
+        Promise.all(_data).then(result => {
+          that.saleList = result
+          that.filterSaleList = result
+          that.selectedSale = that.saleList[0]
+        });
       })
+      let that = this
+      // HttpRequest({
+      //   url: '/customer/register/userofrole2',
+      //   data: {
+      //     storeId: that.selectedStore.storeId,
+      //     isTeachCard: 1, // 开单时 1
+      //     phone: that.selectedCustomer.phone
+      //   },
+      //   success(res) {
+      //      let _data = res.data.data.map(async (e) => {
+      //       e.headImgPath = await transformJspImg(e.headImgPath)
+      //       return {
+      //         userId: e.userId,
+      //         userName: e.userName,
+      //         sex: e.sex == 0 ? '' : (e.sex == 1 ? '男' : '女'),
+      //         cover: e.headImgPath
+      //       }
+      //     })
+      //     Promise.all(_data).then(result => {
+      //       that.saleList = result
+      //       that.filterSaleList = result
+      //       that.selectedSale = that.saleList[0]
+      //     });
+      //   }
+      // })
     },
     // 获取上课教练
     getCoachList() {
@@ -1729,8 +1769,55 @@ export default {
       }
     }
     .card-group {
-      .staff-coach-item {
+      .cards-popup-item {
+        display: flex;
+        padding: 15px 15px;
         border-top: 1rpx solid #eee;
+        .cover {
+          position: relative;
+          flex: 0 0 60px;
+          margin-right: 10px;
+          border-radius: 4px;
+          > img {
+            width: 100%;
+            height: 60px;
+            border-radius: 4px;
+          }
+          .cover-desc {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            text-align: center;
+            font-size: 12px;
+            color: #fff;
+          }
+        }
+        .cards-info {
+          flex: 1;
+          .name {
+            line-height: 20px;
+          }
+          .times,
+          .date {
+            line-height: 20px;
+            color: #bababa;
+            font-size: 14px;
+            .Mult-line(1);
+          }
+        }
+        .right-block {
+          line-height: 24px;
+          height: 24px;
+          width: 50px;
+          text-align: center;
+          margin-top: 18px;
+          margin-right: 10px;
+          color: #fff;
+          border-radius: 2px;
+          font-size: 14px;
+        }
       }
     }
   }

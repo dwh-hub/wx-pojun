@@ -1,5 +1,4 @@
 // cookie失效后根据公司id 自动登录
-import store from "../../utils/store.js"
 import {
   window
 } from "COMMON/js/common.js";
@@ -13,7 +12,8 @@ function login() {
     // wx.navigateTo({
     //   url: '../authorizeLogin/main'
     // })
-    return store.commit("changeLogin", false);
+    wx.setStorageSync("isLogin", false)
+    return
   }
   wx.request({
     url: window.api + "/wxcustomer/bindCard",
@@ -28,10 +28,10 @@ function login() {
         data: res.header["Set-Cookie"]
       });
       if (res.data.code === 200) {
-        store.commit("changeLogin", true);
+        wx.setStorageSync("isLogin", true)
         wx.hideLoading()
       } else {
-        store.commit("changeLogin", false);
+        wx.setStorageSync("isLogin", false)
         wx.hideLoading()
         // wx.navigateTo({
         //   url: '../authorizeLogin/main'

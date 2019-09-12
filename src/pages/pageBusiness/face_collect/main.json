@@ -1,0 +1,6 @@
+{
+    "navigationBarTitleText": "人脸采集",
+    "usingComponents": {
+      "keyboard": "/static/keyboard/keyboard"
+    }
+}

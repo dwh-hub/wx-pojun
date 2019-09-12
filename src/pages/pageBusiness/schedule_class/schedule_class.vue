@@ -190,7 +190,7 @@ export default {
 @import "../common/less/staff_common.less";
 page {
   height: 100%;
-  background-color: #f6f6f6;
+  background-color: @pageColor;
 }
 .schedule-class {
   .item-group {

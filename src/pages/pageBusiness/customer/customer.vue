@@ -14,7 +14,7 @@
         @selectStore="selectStore"
       ></header-search>
       <header-data :headerData="headerData" :isOverlap="true"></header-data>
-      <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
+      <filter-nav @allFilter="showFilter" :nav="nav" :hasMoreFilter="true"></filter-nav>
     </div>
 
     <van-popup

@@ -62,7 +62,7 @@
       <div class="sidebar-mask" @click="clickMask" v-show="showSidebar"></div>
       <div class="sidebar-content"></div>
     </div>
-    <!-- <div class="filter-text">{{filterText}}</div> -->
+    <div class="filter-text">{{filterText}}</div>
     <div v-if="!isCoverView" class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
   </div>
 </template>

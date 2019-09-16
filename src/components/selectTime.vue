@@ -197,18 +197,20 @@ export default {
           });
         }
       }
-
       // 比对当前格子是否被占用
       for (let i in target) {
         let hourEle = target[i];
-        if (this.isUsed(hourEle.start, hourEle.end)) {
-          hourEle.disable = true;
-        }
+        // if (this.isUsed(hourEle.start, hourEle.end)) {
+        //   hourEle.disable = true;
+        // }
         for (let j = 0; j < 12; ++j) {
           let element = target[i].arr[j];
           if (this.isUsed(element.start, element.end)) {
             element.disable = true;
           }
+        }
+        if (!hourEle.arr.filter(e => {return !e.disable}).length) {
+          hourEle.disable = true;
         }
       }
       this.dayTime = target;
@@ -245,7 +247,12 @@ export default {
       _item = item.hour;
       this.curTime = _item;
       this.curHourIndex = index;
-      this.curSecondIndex = 0;
+      for(let k in item.arr) {
+        if (!item.arr[k].disable) {
+          this.curSecondIndex = k;
+          break
+        }
+      }
       let hour = _item.slice(0, 2);
       let _curEndtime =
         Number(_item.split(":")[0]) + 1 + ":" + _item.split(":")[1];

@@ -42,13 +42,13 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 9,
+			"current": 0,
 			"list": [
 				{
 					"id": 0,
-					"name": "pages/pageBusiness/check_in_customer/main",
-					"pathName": "pages/pageBusiness/check_in_customer/main",
-					"query": "id=144911&storeId=126&venueId=90",
+					"name": "pages/pageBusiness/c",
+					"pathName": "pages/pageBusiness/customer/main",
+					"query": "",
 					"scene": null
 				},
 				{

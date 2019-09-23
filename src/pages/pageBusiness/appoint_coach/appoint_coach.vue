@@ -394,7 +394,8 @@ export default {
       modifyPrice: 0,
       showModifyPrice: false,
       // 是否是储值卡
-      isStoredValueCard: false
+      isStoredValueCard: false,
+      isOpenHandwrittenBoard: null // 是否开启手写板确认
     };
   },
   components: {
@@ -408,6 +409,7 @@ export default {
     setNavTab(this.appointType);
     this.userInfo = wx.getStorageSync("staff_info");
     this.curDate = formatDate(new Date(), "yyyy-MM-dd");
+    
     if (this.appointType == "改约") {
       this.isRevision = true
       this.revision();
@@ -422,12 +424,12 @@ export default {
       this.venueCellText = options.venueName
       this.getStudentDetail();
       this.getStoreQuery()
-      this._getUserofrole()
+      this.getCoachList()
       this.getProList()
     } else {
       this.isRevision = false
-      this.isCheckIn = false
       // this.computedTime();
+      this.appointType == "私教代约" ? this.isCheckIn = true : this.isCheckIn = false
       this.getStudentDetail();
       this.getCardList();
       this.getPeriodTime();
@@ -473,7 +475,7 @@ export default {
     },
     // 显示合同弹窗
     showCardPopop() {
-      if(this.isRevision || this.isCheckIn) {
+      if(this.isRevision || this.appointType == "前台代签") {
         return
       }
       if (!this.cardList.length) {
@@ -487,7 +489,7 @@ export default {
     },
     // 显示门店弹窗
     showStorePopup() {
-      if(this.isRevision || this.isCheckIn) {
+      if(this.isRevision || this.appointType == "前台代签") {
         return
       }
       if (!this.selectCardId) {
@@ -508,7 +510,7 @@ export default {
     },
     // 显示场馆弹窗
     showVenuePopup() {
-      if(this.isRevision || this.isCheckIn) {
+      if(this.isRevision || this.appointType == "前台代签") {
         return
       }
       if (!this.selectStoreId || !this.selectCardId) {
@@ -553,8 +555,13 @@ export default {
       }
       this.isProjectPopup = true;
     },
-    showCoachPopop() {
-      this.isCoachPopup = true;
+    showCoachPopup() {
+      if (!this.selectStoreId) {
+        return wx.showToast({
+          title: '请先选择门店'
+        })
+      }
+      this.isCoachPopup = true
     },
     // 选择时间
     // selectHour(item, index) {
@@ -731,6 +738,9 @@ export default {
         this.selectedCoachId = item.userId
         this.isCoachPopup = false
         this.getPeriodTime()
+        if(this.appointType == '私教代约') {
+          this.isTimePopup = true
+        }
       })
     },
     // 选择门店
@@ -745,6 +755,9 @@ export default {
       this.selectStoreId = item.storeId;
       if (this.selectStoreId && this.selectCardId) {
         this.getVenueList();
+      }
+      if(this.appointType == "私教代约") {
+        this.getCoachList()
       }
       this.getStoreQuery();
     },
@@ -964,7 +977,7 @@ export default {
             that.$nextTick(function () {
               that.$refs.selectTime.computedTime()
             })
-            if(that.isCheckIn) {
+            if(that.appointType == "前台代签") {
               that.isTimePopup = true;
             }
           } else {
@@ -984,6 +997,7 @@ export default {
           },
           success(res) {
             if (res.data.code == 200) {
+              that.isOpenHandwrittenBoard = res.data.data.isOpenHandwrittenBoard;
               that.openTimeStart = res.data.data.openingHoursStart || "00";
               that.openTimeEnd = res.data.data.openingHoursEnd || "24";
               // that.computedTime();
@@ -1041,7 +1055,7 @@ export default {
           duration: 1000
         });
       }
-      if (this.appointType == "前台代签" && !this.selectedCoachId) {
+      if ((this.appointType == "前台代签" || this.appointType == "私教代约") && !this.selectedCoachId) {
         return wx.showToast({
           title: "请选择上课教练",
           icon: "none",
@@ -1067,7 +1081,7 @@ export default {
         valueCardFee: this.modifyPrice
       };
       wx.hideLoading();
-      if (this.appointType == "预约") {
+      if (this.appointType == "预约" || this.appointType == "私教代约") {
         this.confirmAppoint(params);
       } else if (this.appointType == "一键上课" || this.appointType == "前台代签") {
         this.confirmAttendClass(params);
@@ -1087,7 +1101,7 @@ export default {
             let _appointId = res.data.data;
             console.log("_appointId:" + _appointId);
             // 入场签到时为前台代签
-            if(that.isCheckIn) {
+            if(that.appointType == "前台代签") {
               that.allograph(_appointId)
             } else {
               that.attendClassWay(_appointId);
@@ -1156,7 +1170,8 @@ export default {
               studentId: that.studentInfo.id,
               appointId: appointId,
               storeId: that.selectStoreId,
-              venueId: that.venueId
+              venueId: that.venueId,
+              isOpenHandwrittenBoard: that.isOpenHandwrittenBoard
             };
 
             if (way == 1) {
@@ -1309,7 +1324,7 @@ export default {
       }
     },
     // 获取教练
-    _getUserofrole() {
+    getCoachList() {
       getUserofrole(this.selectStoreId, 1).then((data) => {
         this.coachList = data.map(e => {
           return {

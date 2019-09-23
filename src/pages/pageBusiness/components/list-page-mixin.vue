@@ -32,10 +32,14 @@ export default {
   },
   mounted() {
     this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
     this.unLoading = false
     EventBus.$emit('selectedStore', this.selectedStore)
     setNavTab();
+    console.log("mixin-end")
+    wx.showShareMenu({
+      withShareTicket: true
+    })
   },
   onReachBottom() {
     this.getList();

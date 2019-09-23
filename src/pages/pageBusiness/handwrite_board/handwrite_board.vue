@@ -174,7 +174,7 @@ export default {
                     });
                     setTimeout(() => {
                       wx.redirectTo({
-                        url: "../../appointmentResult/main?coachAppointId=" + that.id
+                        url: `../../appointmentResult/main?coachAppointId=${that.id}&type=staff`
                       });
                     }, 1000);
                   }

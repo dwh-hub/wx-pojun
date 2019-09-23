@@ -198,11 +198,17 @@ export default {
               });
               attendclass(that.params.appointId, 1)
                 .then(res => {
-                  wx.redirectTo({
-                    url: `../../appointmentResult/main?coachAppointId=${
-                      that.params.appointId
-                    }&type=staff`
-                  });
+                  if(that.params.isOpenHandwrittenBoard) {
+                    wx.redirectTo({
+                      url: "/pages/pageBusiness/handwrite_board/main?id=" + that.params.appointId
+                    });
+                  } else {
+                    wx.redirectTo({
+                      url: `../../appointmentResult/main?coachAppointId=${
+                        that.params.appointId
+                      }&type=staff`
+                    });
+                  }
                 })
                 .catch(res => {
                   wx.hideLoading();

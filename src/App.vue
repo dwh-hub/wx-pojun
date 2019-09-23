@@ -1,6 +1,8 @@
 <script>
+import autoLogin from "./common/js/autoLogin";
 export default {
   onLaunch() {
+    console.log("onLaunch");
     const updateManager = wx.getUpdateManager();
     updateManager.onCheckForUpdate(function(res) {
       // 请求完新版本信息的回调
@@ -21,6 +23,10 @@ export default {
     updateManager.onUpdateFailed(function() {
       // 新版本下载失败
     });
+  },
+  onShow() {
+    console.log("App-onShow");
+    // autoLogin()
   },
   created() {
     // 调用API从本地缓存中获取数据

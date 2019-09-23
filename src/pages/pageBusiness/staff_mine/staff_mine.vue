@@ -36,7 +36,7 @@
       <van-tabbar-item icon="setting-o">我的</van-tabbar-item>
     </van-tabbar>
 
-    <van-popup
+    <!-- <van-popup
       :show="showQR"
       @close="showQR = false"
       :duration="200"
@@ -57,7 +57,7 @@
         <img class="qr-code" :src="QRSrc">
         <p class="qr-code-tip">扫一扫上面二维码，浏览俱乐部实景信息</p>
       </div>
-    </van-popup>
+    </van-popup> -->
 
     <van-action-sheet
       :show="showStore"
@@ -76,11 +76,11 @@ import store from "@/utils/store.js";
 export default {
   data() {
     return {
-      showQR: false,
+      // showQR: false,
       showStore: false,
       storeList: [],
       selectedStore: {},
-      QRSrc: "",
+      // QRSrc: "",
       userInfo: {}
     };
   },
@@ -190,38 +190,42 @@ export default {
     selectStore(e) {
       this.showStore = false;
       this.selectedStore = e.mp.detail;
-      this.getQRCode().then(() => {
-        this.showQR = true;
-      });
+      let that = this
+      wx.navigateTo({
+        url: `../my_qrcode/main?storeId=${that.selectedStore.storeId}&storeName=${that.selectedStore.storeName}`
+      })
+      // this.getQRCode().then(() => {
+      //   this.showQR = true;
+      // });
       // this.getQRCode()
     },
-    getQRCode() {
-      let that = this;
-      wx.showLoading();
-      return new Promise(resolve => {
-        HttpRequest({
-          url: window.api + "/mini/getCodeUnlimit",
-          data: {
-            scene: `${that.userInfo.companyId}-${that.selectedStore.storeId}-${
-              that.userInfo.userId
-            }`
-          },
-          success(res) {
-            wx.hideLoading();
-            if (res.data.code == 200) {
-              that.QRSrc = window.api + res.data.data;
-              resolve();
-            } else {
-              wx.showModal({
-                title: "提示",
-                content: res.data.message,
-                showCancel: false
-              });
-            }
-          }
-        });
-      });
-    },
+    // getQRCode() {
+    //   let that = this;
+    //   wx.showLoading();
+    //   return new Promise(resolve => {
+    //     HttpRequest({
+    //       url: window.api + "/mini/getCodeUnlimit",
+    //       data: {
+    //         scene: `${that.userInfo.companyId}-${that.selectedStore.storeId}-${
+    //           that.userInfo.userId
+    //         }`
+    //       },
+    //       success(res) {
+    //         wx.hideLoading();
+    //         if (res.data.code == 200) {
+    //           that.QRSrc = window.api + res.data.data;
+    //           resolve();
+    //         } else {
+    //           wx.showModal({
+    //             title: "提示",
+    //             content: res.data.message,
+    //             showCancel: false
+    //           });
+    //         }
+    //       }
+    //     });
+    //   });
+    // },
     // navTo(url) {
     //   // TODO:
     //   wx.switchTab({
@@ -267,43 +271,43 @@ page {
     line-height: 50px;
     vertical-align: middle;
   }
-  .qr-code-popup {
-    padding: 20px;
-    .popup-header {
-      display: flex;
-      padding-bottom: 15px;
-      color: #333;
-      .avatar {
-        margin-right: 15px;
-        width: 50px;
-        height: 50px;
-      }
-      .info {
-        vertical-align: top;
-        font-size: 14px;
-        color: #333;
-      }
-      .sex {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        margin-left: 5px;
-        vertical-align: middle;
-        background-size: 100%;
-        background-repeat: no-repeat;
-      }
-    }
-    .qr-code {
-      width: 70vw;
-      height: 70vw;
-    }
-    .qr-code-tip {
-      text-align: center;
-      margin: 15px 0;
-      font-size: 12px;
-      color: #999;
-    }
-  }
+  // .qr-code-popup {
+  //   padding: 20px;
+  //   .popup-header {
+  //     display: flex;
+  //     padding-bottom: 15px;
+  //     color: #333;
+  //     .avatar {
+  //       margin-right: 15px;
+  //       width: 50px;
+  //       height: 50px;
+  //     }
+  //     .info {
+  //       vertical-align: top;
+  //       font-size: 14px;
+  //       color: #333;
+  //     }
+  //     .sex {
+  //       display: inline-block;
+  //       width: 12px;
+  //       height: 12px;
+  //       margin-left: 5px;
+  //       vertical-align: middle;
+  //       background-size: 100%;
+  //       background-repeat: no-repeat;
+  //     }
+  //   }
+  //   .qr-code {
+  //     width: 70vw;
+  //     height: 70vw;
+  //   }
+  //   .qr-code-tip {
+  //     text-align: center;
+  //     margin: 15px 0;
+  //     font-size: 12px;
+  //     color: #999;
+  //   }
+  // }
   .mineExit {
     position: absolute;
     bottom: 65px;

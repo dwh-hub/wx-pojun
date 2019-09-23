@@ -1,0 +1,7 @@
+{
+    "navigationBarTitleText": "私教代约",
+    "usingComponents": {
+      "van-loading": "../../../../static/vant/loading/index"
+    }
+  }
+  

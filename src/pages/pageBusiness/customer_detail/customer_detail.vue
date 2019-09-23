@@ -691,6 +691,8 @@ export default {
           that.isCardLoading = false;
           if (res.data.code == 200) {
             if (!res.data.data.result.length) {
+              that.cardData[0].dataNum = 0
+              that.cardList = []
               return;
             }
             that.cardpage++;
@@ -1168,6 +1170,9 @@ page {
       width: 100%;
       height: 100%;
     }
+  }
+  .header-data {
+    margin: 10px;
   }
   .day-item {
     .flex-middle {

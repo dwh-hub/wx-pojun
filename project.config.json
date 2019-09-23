@@ -42,20 +42,20 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 1,
 			"list": [
 				{
 					"id": 0,
-					"name": "pages/pageBusiness/c",
+					"name": "pages/pageBusiness/customer/main",
 					"pathName": "pages/pageBusiness/customer/main",
 					"query": "",
 					"scene": null
 				},
 				{
 					"id": 1,
-					"name": "pages/pageBusiness/check_in_customer/main",
-					"pathName": "pages/pageBusiness/check_in_customer/main",
-					"query": "id=144899&storeId=123&venueId=81",
+					"name": "pages/pageBusiness/my_qrcode/main",
+					"pathName": "pages/pageBusiness/my_qrcode/main",
+					"query": "storeId=126&userId=1521&storeName=瑞景店",
 					"scene": 1035,
 					"referrerInfo": {}
 				},
@@ -102,9 +102,9 @@
 					"scene": null
 				},
 				{
-					"id": -1,
-					"name": "pages/appointmentCoach/main",
-					"pathName": "pages/appointmentCoach/main",
+					"id": 8,
+					"name": "pages/pageBusiness/allograph_class/main",
+					"pathName": "pages/pageBusiness/allograph_class/main",
 					"query": "coachId=1507",
 					"scene": null
 				},

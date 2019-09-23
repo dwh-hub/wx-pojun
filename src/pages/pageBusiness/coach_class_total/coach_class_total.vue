@@ -283,10 +283,10 @@ export default {
                     : "http://pojun-tech.cn/assets/img/morenTo.png",
                   sex: e.sex,
                   first_1: e.name,
-                  first_2: e.phone,
+                  first_2: e.phone.slice(0,3) + '****' + e.phone.slice(7),
                   second_tip_1: "上课时间：",
                   second_1:
-                    e.realTimeStart.slice(0, 16) +
+                    e.realTimeStart.slice(0, 16).replace(/-/g, "/") +
                     "-" +
                     e.realTimeEnd.split(" ")[1].slice(0, 5),
                   third_tip_1: "服务项目：",
@@ -331,7 +331,7 @@ export default {
                     : "http://pojun-tech.cn/assets/img/morenTo.png",
                   sex: e.sex,
                   first_1: e.customerName,
-                  first_2: e.phone,
+                  first_2: e.phone.slice(0,3) + '****' + e.phone.slice(7),
                   second_tip_1: "上课数：",
                   second_1: e.finishClassNum + "节，",
                   second_tip_2: "上课总额：",

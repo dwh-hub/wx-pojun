@@ -57,13 +57,9 @@
         <div class="none">
           <span class="none-block"></span>
           <span>不可预约</span>
-        </div> -->
+        </div>-->
       </div>
-      <div
-        class="confirm-date"
-        :style="{'background-color': themeColor}"
-        @click="selectDate"
-      >确定</div>
+      <div class="confirm-date" :style="{'background-color': themeColor}" @click="selectDate">确定</div>
     </div>
   </div>
 </template>
@@ -120,7 +116,7 @@ export default {
       return "";
     },
     _confirDate() {
-      return this.confirmDate.replace(/-/g, "/")
+      return this.confirmDate.replace(/-/g, "/");
     }
   },
   methods: {
@@ -193,7 +189,8 @@ export default {
             second: String(j * 5).length == 2 ? j * 5 : "0" + j * 5,
             disable: false,
             start: target[i].start + j * TIME_SPLIT,
-            end: target[i].start + (j + 1) * TIME_SPLIT
+            // end: target[i].start + (j + 1) * TIME_SPLIT
+            end: target[i].start + HOUR
           });
         }
       }
@@ -209,7 +206,11 @@ export default {
             element.disable = true;
           }
         }
-        if (!hourEle.arr.filter(e => {return !e.disable}).length) {
+        if (
+          !hourEle.arr.filter(e => {
+            return !e.disable;
+          }).length
+        ) {
           hourEle.disable = true;
         }
       }
@@ -225,7 +226,6 @@ export default {
     isUsed(start, end) {
       for (let i in this.todayPeriodTime) {
         let element = this.todayPeriodTime[i];
-
         if (
           // 开始时间在预约时间内
           (element.timeStart - 60 * 60 * 1000 <= start &&
@@ -247,12 +247,6 @@ export default {
       _item = item.hour;
       this.curTime = _item;
       this.curHourIndex = index;
-      for(let k in item.arr) {
-        if (!item.arr[k].disable) {
-          this.curSecondIndex = k;
-          break
-        }
-      }
       let hour = _item.slice(0, 2);
       let _curEndtime =
         Number(_item.split(":")[0]) + 1 + ":" + _item.split(":")[1];
@@ -260,6 +254,12 @@ export default {
         this.curEndTime = "0" + String(_curEndtime);
       } else {
         this.curEndTime = _curEndtime;
+      }
+      for (let k in item.arr) {
+        if (!item.arr[k].disable) {
+          this.selectSecond(item.arr[k], k);
+          break;
+        }
       }
     },
     selectSecond(item, index) {

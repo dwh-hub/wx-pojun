@@ -391,14 +391,17 @@ export default {
       // });
       // setTimeout(() => {
       this.cancelHit();
-      wx.redirectTo({
-        // url: `../appoint_result/main?coachAppointId=${
-        //   this.params.appointId
-        // }&type=attend`
-        url: `../../appointmentResult/main?coachAppointId=${
-          this.params.appointId
-        }&type=staff`
-      });
+      if(this.params.isOpenHandwrittenBoard) {
+        wx.redirectTo({
+          url: "/pages/pageBusiness/handwrite_board/main?id=" + this.params.appointId
+        });
+      } else {
+        wx.redirectTo({
+          url: `../../appointmentResult/main?coachAppointId=${
+            this.params.appointId
+          }&type=staff`
+        });
+      }
       // }, 500);
     }
   }

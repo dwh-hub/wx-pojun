@@ -1,6 +1,6 @@
 const window = {}
 window.isPublic = false // 是否是公用的小程序
-window.DEBUGGING = false
+window.DEBUGGING = true
 // 榴莲: https://club.lirenos.com test: https://test.lirenos.com cn: https://www.pojun-tech.cn com: https://www.pojun-tech.com
 window.api = window.DEBUGGING ? "http://192.168.1.18" : "https://test.lirenos.com"
 window.defaultColor = "#0c9cf0"
@@ -195,7 +195,7 @@ export function HttpRequest(obj) {
     obj.success = function (res) {
       let curPageRoute = getCurrentPages()[getCurrentPages().length - 1].route
       let type = curPageRoute.indexOf('pageBusiness') > -1 ? "staff" : "member"
-      if (JSON.stringify(res.data).indexOf('利刃-登入') > -1) {
+      if (JSON.stringify(res.data).indexOf('登入') > -1) {
         if (type == "member") {
           wx.setStorageSync("isLogin", false)
         } else {
@@ -410,7 +410,7 @@ export function WechatMenuisLogin(type) { // 1035 1043
 
 /**
  * 筛选日期段
- * @param {String} timer 筛选时间段
+ * @param {String | Number} timer 筛选时间段
  */
 export function filterDateMethod(timer) {
   let obj = {
@@ -421,38 +421,43 @@ export function filterDateMethod(timer) {
     return obj;
   }
   let date = new Date();
-  const DAY = 24 * 60 * 60 * 1000;
-  const HOUR8 = 8 * 60 * 60 * 1000;
-  let nowStamp = date.getTime();
   let today = date.getDate() - 1;
   let weekday = date.getDay() - 1;
   let month = date.getMonth() + 1
   let year = date.getFullYear()
   let monthDay = 0
-  let todayStamp = parseInt(nowStamp / DAY) * DAY - HOUR8 // 东八区今天0点的时间戳
-  if (timer == 'day') {
-    obj.startTime = formatDate(new Date(todayStamp), "yyyy-MM-dd hh:mm:ss");
-    obj.endTime = formatDate(new Date(todayStamp + DAY - 1), "yyyy-MM-dd hh:mm:ss");
-  }
-  if (timer == 'week') {
-    obj.startTime = formatDate(new Date(todayStamp - weekday * DAY), "yyyy-MM-dd hh:mm:ss");
-    obj.endTime = formatDate(new Date(todayStamp + (7 - weekday) * DAY - 1), "yyyy-MM-dd hh:mm:ss");
-  }
+  if (timer == 'day') obj = computeTimer(0, 1)
+  if (timer == 'week') obj = computeTimer(weekday, 7 - weekday)
+  if (timer == 'lastWeek') obj = computeTimer(weekday + 7, weekday, false)
   if (timer == 'month') {
     monthDay = getMonthDay(year, month)
-    obj.startTime = formatDate(new Date(todayStamp - today * DAY), "yyyy-MM-dd hh:mm:ss");
-    obj.endTime = formatDate(new Date(todayStamp + (monthDay - today) * DAY - 1), "yyyy-MM-dd hh:mm:ss");
+    obj = computeTimer(today, monthDay - today)
   }
   if (timer == 'lastMonth') {
-    monthDay = getMonthDay(year, month-1)
-    obj.startTime = formatDate(new Date(todayStamp - (monthDay + today) * DAY), "yyyy-MM-dd hh:mm:ss");
-    obj.endTime = formatDate(new Date(todayStamp - today * DAY - 1), "yyyy-MM-dd hh:mm:ss");
+    monthDay = getMonthDay(year, month - 1)
+    obj = computeTimer(monthDay + today, today, false)
+  }
+  if (typeof timer == 'number') {
+    obj = computeTimer(timer, 1)
   }
   return obj;
 }
 
+function computeTimer(startDay, endDay, isAdd = true, fmt = 'yyyy-MM-dd hh:mm:ss') {
+  let date = new Date();
+  const DAY = 24 * 60 * 60 * 1000;
+  const HOUR8 = 8 * 60 * 60 * 1000;
+  let nowStamp = date.getTime();
+  let todayStamp = parseInt(nowStamp / DAY) * DAY - HOUR8 // 东八区今天0点的时间戳
+
+  let timer = {}
+  timer.startTime = formatDate(new Date(todayStamp - startDay * DAY), fmt);
+  timer.endTime = formatDate(new Date(todayStamp + (isAdd ? endDay : -endDay) * DAY - 1), fmt);
+  return timer
+}
+
 // 获取月的天数
-function getMonthDay(year, month){
+function getMonthDay(year, month) {
   var d = new Date(year, month, 0);
   return d.getDate();
 }

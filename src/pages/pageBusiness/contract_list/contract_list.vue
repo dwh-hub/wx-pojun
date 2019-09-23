@@ -10,7 +10,7 @@
       ></header-search>
       <filter-date @changeDate="setDate"></filter-date>
       <header-data :headerData="headerData"></header-data>
-      <filter-nav :nav="nav"></filter-nav>
+      <filter-nav :nav="nav" :hasMoreFilter="true" @submitFilter="getFilter" :moreFilterList="moreFilter"></filter-nav>
     </div>
     <div class="card-list common-list">
       <staff-coach-item
@@ -119,7 +119,7 @@ export default {
       classStoreId: "", // 团课的门店
       nav: [
         {
-          navTitle: "全部",
+          navTitle: "办理日期",
           name: "办理日期",
           children: [
             {
@@ -164,8 +164,8 @@ export default {
           ]
         },
         {
-          navTitle: "卡类型",
-          name: "卡类型",
+          navTitle: "合同类型",
+          name: "合同类型",
           children: [
             {
               sonText: "全部",
@@ -199,6 +199,74 @@ export default {
             }
           ]
         }
+      ],
+      moreFilter: [
+        {
+          name: "卡过期",
+          isRadio: true,
+          isParmas: true,
+          isTimer: true,
+          param: "doomsdayStart",
+          param_2: "doomsdayEnd",
+          value: "",
+          value_2: "",
+          children: [
+            {
+              name: "今日过期",
+              dateValue: "day",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本周过期",
+              dateValue: "week",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本月过期",
+              dateValue: "month",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "昨日过期",
+              dateValue: 1,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上周过期",
+              dateValue: "lastWeek",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上月过期",
+              dateValue: "lastMonth",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近300天过期",
+              dateValue: 300,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近90天过期",
+              dateValue: 90,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近半年过期",
+              dateValue: 180,
+              value: "",
+              value_2: ""
+            }
+          ]
+        },
       ],
       headerData: [
         {
@@ -366,7 +434,7 @@ export default {
       this.setDate(obj);
     },
     setDate(obj) {
-      console.log(obj)
+      console.log(obj);
       this.filter.transactTimeStart = obj.startTime;
       this.filter.transactTimeEnd = obj.endTime;
     },
@@ -511,6 +579,9 @@ export default {
           ].concat(list);
         }
       });
+    },
+    getFilter(parmas) {
+      this.filter = Object.assign({}, this.filter, parmas);
     }
   }
 };

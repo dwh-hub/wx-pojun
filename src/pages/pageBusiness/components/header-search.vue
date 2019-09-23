@@ -1,6 +1,6 @@
 <template>
   <div class="header-search">
-    <div v-if="storeList.length" class="store" :style="{background: color,height: isOverlap ? '88px' : '44px'}" @click="toggleStore">
+    <div v-if="storeList.length" class="store" :style="{background: color,height: isOverlap ? '176rpx' : '88rpx'}" @click="toggleStore">
       <sapn class="store-text">{{selectedStore.storeName || '门店'}}</sapn>
       <i class="triangle-icon"></i>
     </div>
@@ -23,7 +23,7 @@
         :key="index"
       >{{item.storeName}}</div>
     </div>
-    <div class="search-wrapper" :style="{background: color,height: isOverlap ? '88px' : '44px'}">
+    <div class="search-wrapper" :style="{background: color,height: isOverlap ? '176rpx' : '88rpx'}">
       <div class="input-wrapper">
         <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
         <input

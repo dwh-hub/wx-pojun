@@ -31,7 +31,8 @@ function getPhoneNumber_staff(e) {
                 data: {
                   phone: wx.getStorageSync("phone"),
                   companyId: wx.getStorageSync("companyId"),
-                  authAppId: 'wxb3aa4f2e2276ecb6'
+                  authAppId: 'wxb3aa4f2e2276ecb6',
+                  miniOpenId: wx.getStorageSync("openId")
                 },
                 success(res) {
                   if (res.data.code == 200) {
@@ -70,7 +71,8 @@ function getPhoneNumber_staff(e) {
                   data: {
                     phone: wx.getStorageSync("phone"),
                     companyId: wx.getStorageSync("companyId"),
-                    authAppId: 'wxb3aa4f2e2276ecb6'
+                    authAppId: 'wxb3aa4f2e2276ecb6',
+                    miniOpenId: wx.getStorageSync("openId")
                   },
                   success(res) {
                     if (res.data.code == 200) {

@@ -571,7 +571,8 @@ export default {
               sex: e.sex,
               second_tip_1: "客户状态：",
               second_1: e.customerClassChar,
-              third_1: e.phone
+              phone: e.phone,
+              third_1: e.phone.slice(0,3) + '****' + e.phone.slice(7)
             }
           })
           Promise.all(_data).then(result => {
@@ -595,7 +596,7 @@ export default {
       HttpRequest({
         url: '/customer/register/latent/queryphone2',
         data: {
-          phone: item.third_1,
+          phone: item.phone,
           storeId: that.selectedStore.storeId
         },
         success(res) {

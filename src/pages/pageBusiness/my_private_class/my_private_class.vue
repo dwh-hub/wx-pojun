@@ -244,7 +244,7 @@ export default {
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 first_1: e.name,
-                second_1: e.lastTrackTime || "--",
+                second_1: e.lastTrackTime ? formatDate(new Date(e.lastTrackTime), 'yyyy/MM/dd hh:mm') : "--",
                 second_tip_1: "最近回访时间："
               };
             });

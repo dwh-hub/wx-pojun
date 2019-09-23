@@ -60,7 +60,51 @@
 
     <div class="sidebar-filter" v-if="hasMoreFilter" :class="{sidebarTrans: showSidebar}">
       <div class="sidebar-mask" @click="clickMask" v-show="showSidebar"></div>
-      <div class="sidebar-content"></div>
+      <div class="sidebar-content">
+        <div class="filter-main" :style="{'padding-bottom': isPhoneX ? '160rpx' : '92rpx'}">
+          <div class="filter-item" v-for="(item, index) in filterList" :key="index">
+            <div class="filter-item-title">{{item.name}}（{{isRadio ? '单选' : '多选'}}）</div>
+            <div class="filter-options">
+              <div
+                class="filter-option"
+                v-for="(option, key) in item.children"
+                :key="key"
+                :style="option.isSelect ? selectedStyle : ''"
+                @click="selectOption(item, index, option, key)"
+              >{{option.name}}</div>
+              <div class="filter-time" v-if="item.isTimer">
+                <picker
+                  mode="date"
+                  class="filter-picker"
+                  @change="changeTime(...arguments, item, 'value')"
+                >
+                  <view class="filter-option">{{item.value ? item.value : '请选择日期'}}</view>
+                </picker>
+                <div class="line"></div>
+                <picker
+                  mode="date"
+                  class="filter-picker"
+                  @change="changeTime(...arguments, item, 'value_2')"
+                >
+                  <view class="filter-option">{{item.value_2 ? item.value_2 : '请选择日期'}}</view>
+                </picker>
+              </div>
+              <div class="filter-input filter-option" v-if="item.isInput">
+                <input type="number" @input="inputFilterDay(...arguments, item)" />
+                <span>天未{{item.name}}</span>
+              </div>
+            </div>
+          </div>
+          <div class="sidebar-btn" v-if="showSidebar">
+            <span :style="{color: window.color}" @click="resetFilter">重置</span>
+            <span
+              :style="{'background-color': window.color,color: '#fff'}"
+              @click="confirmFilter"
+            >确定</span>
+            <div class="block" v-if="isPhoneX"></div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="filter-text">{{filterText}}</div>
     <div v-if="!isCoverView" class="mask" v-show="maskShow" @click.prevent="clickMask"></div>
@@ -68,8 +112,9 @@
 </template>
 
 <script>
-import { window } from "COMMON/js/common.js";
+import { window, filterDateMethod } from "COMMON/js/common.js";
 import { EventBus } from "../common/js/eventBus.js";
+import store from "@/utils/store";
 export default {
   props: {
     nav: {
@@ -130,6 +175,416 @@ export default {
       type: Boolean,
       default: false
     },
+    moreFilterList: {
+      type: Array,
+      default: () => {
+        return [
+          // {
+          //   name: "客户性别",
+          //   isRadio: true,
+          //   isParmas: false,
+          //   isTimer: false,
+          //   param: "sex",
+          //   value: "",
+          //   children: [
+          //     {
+          //       name: "男",
+          //       value: "1"
+          //     },
+          //     {
+          //       name: "女",
+          //       value: "2"
+          //     }
+          //   ]
+          // },
+          // // {
+          // //   name: "卡类型",
+          // //   isRadio: false,
+          // //   isParmas: true,
+          // //   isTimer: false,
+          // //   param: "cardType",
+          // //   value: "",
+          // //   children: [
+          // //     {
+          // //       name: "会籍卡",
+          // //       value: "1"
+          // //     },
+          // //     {
+          // //       name: "私教卡",
+          // //       value: "4"
+          // //     },
+          // //     {
+          // //       name: "团课卡",
+          // //       value: "3"
+          // //     },
+          // //     {
+          // //       name: "充值卡",
+          // //       value: "5"
+          // //     }
+          // //   ]
+          // // },
+          // // {
+          // //   name: "卡状态",
+          // //   isRadio: false,
+          // //   isParmas: true,
+          // //   isTimer: false,
+          // //   param: "cardStatus",
+          // //   value: "",
+          // //   children: [
+          // //     {
+          // //       name: "过期",
+          // //       value: "6"
+          // //     },
+          // //     {
+          // //       name: "使用中",
+          // //       value: "2"
+          // //     },
+          // //     {
+          // //       name: "未激活",
+          // //       value: "1"
+          // //     },
+          // //     {
+          // //       name: "耗尽",
+          // //       value: "5"
+          // //     }
+          // //   ]
+          // // },
+          // {
+          //   name: "卡过期",
+          //   isRadio: true,
+          //   isParmas: true,
+          //   isTimer: true,
+          //   param: "doomsdayStart",
+          //   param_2: "doomsdayEnd",
+          //   value: "",
+          //   value_2: "",
+          //   children: [
+          //     {
+          //       name: "今日过期",
+          //       dateValue: "day",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本周过期",
+          //       dateValue: "week",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本月过期",
+          //       dateValue: "month",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "昨日过期",
+          //       dateValue: 1,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上周过期",
+          //       dateValue: "lastWeek",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上月过期",
+          //       dateValue: "lastMonth",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近300天过期",
+          //       dateValue: 300,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近90天过期",
+          //       dateValue: 90,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近半年过期",
+          //       dateValue: 180,
+          //       value: "",
+          //       value_2: ""
+          //     }
+          //   ]
+          // },
+          // // {
+          // //   name: "办卡",
+          // //   isRadio: true,
+          // //   isParmas: true,
+          // //   isTimer: true,
+          // //   param: "transactTimeEnd",
+          // //   param_2: "transactTimeStart",
+          // //   value: "",
+          // //   value_2: "",
+          // //   children: [
+          // //     {
+          // //       name: "今日办卡",
+          // //       dateValue: "day",
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "本周办卡",
+          // //       dateValue: "week",
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "本月办卡",
+          // //       dateValue: "month",
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "昨日办卡",
+          // //       dateValue: 1,
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "上周办卡",
+          // //       dateValue: "lastWeek",
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "上月办卡",
+          // //       dateValue: "lastMonth",
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "近300天办卡",
+          // //       dateValue: 300,
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "近90天办卡",
+          // //       dateValue: 90,
+          // //       value: "",
+          // //       value_2: ""
+          // //     },
+          // //     {
+          // //       name: "近半年办卡",
+          // //       dateValue: 180,
+          // //       value: "",
+          // //       value_2: ""
+          // //     }
+          // //   ]
+          // // },
+          // {
+          //   name: "跟进回访",
+          //   isRadio: true,
+          //   isParmas: true,
+          //   isTimer: true,
+          //   isInput: true,
+          //   param: "searchTrackTimeStart",
+          //   param_2: "searchTrackTimeEnd",
+          //   value: "",
+          //   value_2: "",
+          //   children: [
+          //     {
+          //       name: "今日回访",
+          //       dateValue: "day",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本周回访",
+          //       dateValue: "week",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本月回访",
+          //       dateValue: "month",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "昨日回访",
+          //       dateValue: 1,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上周回访",
+          //       dateValue: "lastWeek",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上月回访",
+          //       dateValue: "lastMonth",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近300天回访",
+          //       dateValue: 300,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近90天回访",
+          //       dateValue: 90,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近半年回访",
+          //       dateValue: 180,
+          //       value: "",
+          //       value_2: ""
+          //     }
+          //   ]
+          // },
+          // {
+          //   name: "约访",
+          //   isRadio: true,
+          //   isParmas: true,
+          //   isTimer: true,
+          //   isInput: true,
+          //   param: "nextTrackTimeStart",
+          //   param_2: "nextTrackTimeEnd",
+          //   value: "",
+          //   value_2: "",
+          //   children: [
+          //     {
+          //       name: "今日约访",
+          //       dateValue: "day",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本周约访",
+          //       dateValue: "week",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本月约访",
+          //       dateValue: "month",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "昨日约访",
+          //       dateValue: 1,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上周约访",
+          //       dateValue: "lastWeek",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上月约访",
+          //       dateValue: "lastMonth",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近300天约访",
+          //       dateValue: 300,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近90天约访",
+          //       dateValue: 90,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近半年约访",
+          //       dateValue: 180,
+          //       value: "",
+          //       value_2: ""
+          //     }
+          //   ]
+          // },
+          // {
+          //   name: "活跃日期",
+          //   isRadio: true,
+          //   isParmas: true,
+          //   isTimer: true,
+          //   isInput: true,
+          //   param: "lastConsumedTimeStart",
+          //   param_2: "lastConsumedTimeEnd",
+          //   value: "",
+          //   value_2: "",
+          //   children: [
+          //     {
+          //       name: "今日活跃",
+          //       dateValue: "day",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本周活跃",
+          //       dateValue: "week",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "本月活跃",
+          //       dateValue: "month",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "昨日活跃",
+          //       dateValue: 1,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上周活跃",
+          //       dateValue: "lastWeek",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "上月活跃",
+          //       dateValue: "lastMonth",
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近300天活跃",
+          //       dateValue: 300,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近90天活跃",
+          //       dateValue: 90,
+          //       value: "",
+          //       value_2: ""
+          //     },
+          //     {
+          //       name: "近半年活跃",
+          //       dateValue: 180,
+          //       value: "",
+          //       value_2: ""
+          //     }
+          //   ]
+          // }
+        ];
+      }
+    },
     isCoverView: {
       type: Boolean,
       default: false
@@ -147,8 +602,12 @@ export default {
       showSlideList: false,
       date: "",
       _nav: [],
+      filterList: [], // 详情筛选列表
       filterText: "",
-      showSidebar: false
+      showSidebar: false,
+      selectedStyle: `background-color:#fff;border: 1rpx solid ${
+        window.color
+      };color: ${window.color}`
     };
   },
   computed: {
@@ -160,6 +619,18 @@ export default {
         return "42px";
       }
       return (42 + this._nav[this.currentNav].children.length * 50) * 2 + "rpx";
+    },
+    isPhoneX() {
+      return store.state.isIphoneX;
+    }
+  },
+  watch: {
+    nav: {
+      handler(val) {
+        this._nav = val;
+        console.log(this._nav)
+      },
+      deep: true
     }
   },
   mounted() {
@@ -168,6 +639,17 @@ export default {
       this.showSlideList = false;
     });
     this._nav = this.nav;
+    this.filterList = this.moreFilterList.map((e, index) => {
+      e.children.forEach(k => {
+        k.isSelect = false;
+        if (e.isTimer && k.dateValue) {
+          let time = filterDateMethod(k.dateValue);
+          k.value = time.startTime.split(" ")[0];
+          k.value_2 = time.endTime.split(" ")[0];
+        }
+      });
+      return e;
+    });
     this.computedFilterText();
   },
   methods: {
@@ -222,6 +704,64 @@ export default {
       this.maskShow = false;
       this.showSlideList = false;
       this.$emit("allFilter");
+    },
+    selectOption(parents, parentsIndex, option, index) {
+      let _options = this.filterList[parentsIndex].children;
+      if (!parents.isRadio) {
+        _options[index].isSelect = !_options[index].isSelect;
+        this.$set(_options, index, _options[index]);
+      } else {
+        _options.forEach(e => {
+          e.isSelect = false;
+        });
+        _options[index].isSelect = true;
+        this.$set(_options, index, _options[index]);
+      }
+      parents.value = option.isSelect ? option.value : "";
+      if (parents.isTimer) {
+        parents.value_2 = option.isSelect ? option.value_2 : "";
+      }
+    },
+    inputFilterDay(e, item) {
+      item.children.forEach(e => {
+        e.isSelect = false;
+      });
+      let time = filterDateMethod(Number(e.mp.detail.value));
+      item.value = time.startTime.split(" ")[0];
+      item.value_2 = time.endTime.split(" ")[0];
+    },
+    changeTime(event, item, value) {
+      item.children.forEach(e => {
+        e.isSelect = false;
+      });
+      item[value] = event.mp.detail.value;
+    },
+    resetFilter() {
+      this.filterList.forEach(parent => {
+        parent.value = "";
+        if (parent.isTimer) {
+          parent.value_2 = "";
+        }
+        parent.children.forEach(e => {
+          e.isSelect = false;
+        });
+        // 触发视图层更新
+        this.$set(this.filterList, 0, this.filterList[0]);
+      });
+    },
+    confirmFilter() {
+      this.showSidebar = false;
+      let params = {};
+      this.filterList.forEach(e => {
+        if (e.param) {
+          params[e.param] = e.value;
+          if (e.isTimer) {
+            params[e.param] = e.value ? e.value + " 00:00:00" : "";
+            params[e.param_2] = e.value_2 ? e.value_2 + " 23:59:59" : "";
+          }
+        }
+      });
+      this.$emit("submitFilter", params);
     }
   }
 };
@@ -402,6 +942,94 @@ export default {
     height: 100%;
     background-color: #fff;
     transition: right 0.3s;
+    .filter-main {
+      position: relative;
+      height: 100%;
+      overflow-y: scroll;
+      padding-left: 10px;
+      padding-right: 3px;
+      box-sizing: border-box;
+      .filter-item {
+        .filter-item-title {
+          color: #a6a6a6;
+          font-size: 10px;
+          line-height: 15px;
+          margin: 8px 0;
+        }
+        .filter-options {
+          display: grid;
+          grid-template-columns: repeat(3, 33.33%);
+          grid-row-gap: 8px;
+          .filter-option {
+            background-color: #e5e5e5;
+            line-height: 29px;
+            height: 30px;
+            margin-right: 7px;
+            text-align: center;
+            color: #505050;
+            font-size: 12px;
+            border-radius: 5px;
+            box-sizing: border-box;
+          }
+          .filter-time {
+            display: flex;
+            grid-column-start: span 3;
+            .filter-picker {
+              flex: 0 0 40%;
+              .filter-option {
+                padding: 0 5px;
+              }
+            }
+            .line {
+              flex: 1;
+              margin: 14px 10px 0 10px;
+              height: 1px;
+              background-color: #999;
+            }
+          }
+          .filter-input {
+            grid-column-start: span 3;
+            text-align: right;
+            padding-right: 10px;
+            > input {
+              display: inline-block;
+              vertical-align: middle;
+              padding: 0 5px;
+              width: 40px;
+              font-size: 12px;
+              color: #505050;
+              border: 1rpx solid #999;
+              border-radius: 2px;
+              height: 22px;
+            }
+            > span {
+              vertical-align: middle;
+              margin-left: 5px;
+              color: #505050;
+              font-size: 12px;
+            }
+          }
+        }
+      }
+      .sidebar-btn {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 80%;
+        display: flex;
+        flex-wrap: wrap;
+        background-color: #fff;
+        > span {
+          flex: 1;
+          text-align: center;
+          line-height: 36px;
+        }
+        .block {
+          flex-grow: 1;
+          width: 100%;
+        }
+      }
+    }
   }
 }
 

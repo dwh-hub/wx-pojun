@@ -388,7 +388,7 @@ export default {
                 first_1: e.name,
                 second_1: e.serviceCoachName || "--",
                 second_tip_1: "服务教练：",
-                third_1: e.lastTrackTime || "--",
+                third_1: e.lastTrackTime ? formatDate(new Date(e.lastTrackTime), 'yyyy/MM/dd hh:mm') : "--",
                 third_tip_1: "最后签到时间："
               };
             });

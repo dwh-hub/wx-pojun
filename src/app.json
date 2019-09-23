@@ -71,7 +71,9 @@
       "check_in_record/main",
       "entry_registration/main",
       "check_in_customer/main",
-      "face_collect/main"
+      "face_collect/main",
+      "allograph_class/main",
+      "my_qrcode/main"
     ]
   }],
   "permission": {

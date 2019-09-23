@@ -4,7 +4,7 @@
       <!-- <div class="tabs" :style="{background: themeColor}">
         <span class="student" :class="{underline: tabIndex == 1}" @click="tabIndex = 1">列表</span>
         <span class="customer" :class="{underline: tabIndex == 2}">汇总</span>
-      </div> -->
+      </div>-->
       <header-search
         :storeList="storeList"
         :color="themeColor"
@@ -14,7 +14,13 @@
         @selectStore="selectStore"
       ></header-search>
       <header-data :headerData="headerData" :isOverlap="true"></header-data>
-      <filter-nav @allFilter="showFilter" :nav="nav" :hasMoreFilter="true"></filter-nav>
+      <filter-nav
+        @allFilter="showFilter"
+        @submitFilter="getFilter"
+        :nav="nav"
+        :moreFilterList="moreFilter"
+        :hasMoreFilter="true"
+      ></filter-nav>
     </div>
 
     <van-popup
@@ -28,33 +34,39 @@
       <div class="customer-item-wrapper" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">
-            <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect">
+            <img src="/static/images/staff/select-icon.png" alt v-show="item.isSelect" />
           </div>
         </div>
         <div class="customer-item" v-if="item.id" @click="toDetail(item,index)">
           <div class="cover">
             <div class="tag" :style="{background: item.statusColor}">{{item.customerClassChar}}</div>
-            <img :src="item.cover">
+            <img :src="item.cover" />
           </div>
           <div class="customer-info">
             <div class="customer-base-info">
-              <img class="customer-sex" :src="item.sexSrc">
+              <img class="customer-sex" :src="item.sexSrc" />
               <span class="customer-name">{{item.name}}</span>
             </div>
             <div class="customer-service">
-              <span>服务教练: </span><span class="service-text">{{item.serviceCoachName}}</span>
-              <span>服务销售: </span><span class="service-text">{{item.serviceUserName}}</span>
+              <span>服务教练:</span>
+              <span class="service-text">{{item.serviceCoachName}}</span>
+              <span>服务销售:</span>
+              <span class="service-text">{{item.serviceUserName}}</span>
             </div>
           </div>
           <div class="customer-operate">
-            <img class="phone" @click.stop="clickIcon(...arguments,item)" src="/static/images/staff/phone.png" alt>
-            <img src="/static/images/staff/right-arrow.svg" alt>
+            <img
+              class="phone"
+              @click.stop="clickIcon(...arguments,item)"
+              src="/static/images/staff/phone.png"
+              alt
+            />
+            <img src="/static/images/staff/right-arrow.svg" alt />
           </div>
         </div>
-        
+
         <div class="coach-skeleton" v-else>
-          <div class="cover">
-          </div>
+          <div class="cover"></div>
           <div class="skeleton-wrapper">
             <div class="skeleton-name"></div>
             <div class="skeleton-desc"></div>
@@ -67,9 +79,9 @@
             <img src="/static/images/staff/phone.svg" alt>
             <img src="/static/images/staff/right-arrow.svg" alt>
           </div>
-        </staff-coach-item> -->
+        </staff-coach-item>-->
       </div>
-      <van-loading :color="themeColor" v-if="isLoading"/>
+      <van-loading :color="themeColor" v-if="isLoading" />
       <none-result text="暂无客户" v-if="!list.length && !isLoading"></none-result>
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
@@ -77,7 +89,7 @@
     <div class="operate-bottom" v-if="isOperate">
       <div class="left" @click="selectAll">
         <div class="icon-wrapper" :class="{border: !isAllSelect}">
-          <img src="/static/images/staff/select-icon.png" alt v-show="isAllSelect">
+          <img src="/static/images/staff/select-icon.png" alt v-show="isAllSelect" />
         </div>
         <span class="left-text">全选</span>
       </div>
@@ -90,7 +102,14 @@
     </div>
 
     <div class="bottom-operate-btn" v-if="!isOperate">
-      <div v-for="(item, index) in operateList" :key="index" class="operate-item" :style="item.style" @click="item.action" :class="{hidde: item.hasAuth}">{{item.text}}</div>
+      <div
+        v-for="(item, index) in operateList"
+        :key="index"
+        class="operate-item"
+        :style="item.style"
+        @click="item.action"
+        :class="{hidde: item.hasAuth}"
+      >{{item.text}}</div>
       <div class="block" v-if="isPhoneX"></div>
     </div>
     <van-popup
@@ -98,7 +117,8 @@
       @close="showSalesPopup = false"
       :duration="200"
       position="bottom"
-      custom-style="width:100%">
+      custom-style="width:100%"
+    >
       <div class="sales-list">
         <div
           class="sales-item"
@@ -120,7 +140,8 @@
       :show="showFollowUpPopup"
       @close="showFollowUpPopup = false;trackContent=''"
       :duration="200"
-      custom-style="width:85vw;border-radius:5px;top: 40%;">
+      custom-style="width:85vw;border-radius:5px;top: 40%;"
+    >
       <div class="followUp-popup">
         <div class="content">
           <van-cell
@@ -129,8 +150,8 @@
             :value="selectedResult.name"
             is-link
           />
-          <van-cell title="下次跟进时间" :value="trackTime" @click="isResultDateShow = true" is-link/>
-          <textarea class="textarea" v-model="trackContent" @focus="onFocus" placeholder="请输入跟进内容"/>
+          <van-cell title="下次跟进时间" :value="trackTime" @click="isResultDateShow = true" is-link />
+          <textarea class="textarea" v-model="trackContent" @focus="onFocus" placeholder="请输入跟进内容" />
         </div>
         <div class="popup-bottom-btn">
           <div class="cancel" :style="{color: themeColor}" @click="showFollowUpPopup = false">取消</div>
@@ -145,8 +166,18 @@
       @close="showTrackResult = false"
       @select="selectResult"
     />
-    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
-    <timePicker :pickerShow="isResultDateShow" :config="resultDateConfig" @hidePicker="isResultDateShow = false" @setPickerTime="setResultTime"></timePicker>
+    <timePicker
+      :pickerShow="isPickerShow"
+      :config="pickerConfig"
+      @hidePicker="hidePicker"
+      @setPickerTime="setPickerTime"
+    ></timePicker>
+    <timePicker
+      :pickerShow="isResultDateShow"
+      :config="resultDateConfig"
+      @hidePicker="isResultDateShow = false"
+      @setPickerTime="setResultTime"
+    ></timePicker>
     <!-- <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window> -->
   </div>
 </template>
@@ -159,7 +190,7 @@ import {
   formatDate,
   debounce
 } from "COMMON/js/common.js";
-import {checkAuth} from "../common/js/service_config.js";
+import { checkAuth } from "../common/js/service_config.js";
 import store from "@/utils/store.js";
 import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
@@ -208,9 +239,10 @@ export default {
             {
               sonText: "自定义",
               isDiyDate: true,
+              date: '',
               action: () => {
-                this.timePickerType = ""
-                this.showPicker()
+                this.timePickerType = "";
+                this.showPicker();
               }
             }
           ]
@@ -246,9 +278,10 @@ export default {
             {
               sonText: "自定义",
               isDiyDate: true,
+              date: '',
               action: () => {
-                this.timePickerType = "consumed"
-                this.showPicker()
+                this.timePickerType = "consumed";
+                this.showPicker();
               }
             }
           ]
@@ -290,6 +323,227 @@ export default {
           ]
         }
       ],
+      moreFilter: [
+        {
+          name: "客户性别",
+          isRadio: true,
+          isParmas: false,
+          isTimer: false,
+          param: "sex",
+          value: "",
+          children: [
+            {
+              name: "男",
+              value: "1"
+            },
+            {
+              name: "女",
+              value: "2"
+            }
+          ]
+        },
+        {
+          name: "跟进回访",
+          isRadio: true,
+          isParmas: true,
+          isTimer: true,
+          isInput: true,
+          param: "searchTrackTimeStart",
+          param_2: "searchTrackTimeEnd",
+          value: "",
+          value_2: "",
+          children: [
+            {
+              name: "今日回访",
+              dateValue: "day",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本周回访",
+              dateValue: "week",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本月回访",
+              dateValue: "month",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "昨日回访",
+              dateValue: 1,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上周回访",
+              dateValue: "lastWeek",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上月回访",
+              dateValue: "lastMonth",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近300天回访",
+              dateValue: 300,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近90天回访",
+              dateValue: 90,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近半年回访",
+              dateValue: 180,
+              value: "",
+              value_2: ""
+            }
+          ]
+        },
+        {
+          name: "约访",
+          isRadio: true,
+          isParmas: true,
+          isTimer: true,
+          isInput: true,
+          param: "nextTrackTimeStart",
+          param_2: "nextTrackTimeEnd",
+          value: "",
+          value_2: "",
+          children: [
+            {
+              name: "今日约访",
+              dateValue: "day",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本周约访",
+              dateValue: "week",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本月约访",
+              dateValue: "month",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "昨日约访",
+              dateValue: 1,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上周约访",
+              dateValue: "lastWeek",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上月约访",
+              dateValue: "lastMonth",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近300天约访",
+              dateValue: 300,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近90天约访",
+              dateValue: 90,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近半年约访",
+              dateValue: 180,
+              value: "",
+              value_2: ""
+            }
+          ]
+        },
+        {
+          name: "活跃日期",
+          isRadio: true,
+          isParmas: true,
+          isTimer: true,
+          isInput: true,
+          param: "lastConsumedTimeStart",
+          param_2: "lastConsumedTimeEnd",
+          value: "",
+          value_2: "",
+          children: [
+            {
+              name: "今日活跃",
+              dateValue: "day",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本周活跃",
+              dateValue: "week",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本月活跃",
+              dateValue: "month",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "昨日活跃",
+              dateValue: 1,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上周活跃",
+              dateValue: "lastWeek",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上月活跃",
+              dateValue: "lastMonth",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近300天活跃",
+              dateValue: 300,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近90天活跃",
+              dateValue: 90,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近半年活跃",
+              dateValue: 180,
+              value: "",
+              value_2: ""
+            }
+          ]
+        }
+      ],
       headerData: [
         {
           dataText: "总客户",
@@ -313,20 +567,21 @@ export default {
           hasAuth: checkAuth(58),
           style: `color:${window.color};`,
           action: () => {
-            this.distributeSale()
+            this.distributeSale();
           }
           // class: 'operate icon-fenpei',
           // iconUrl: "/static/images/staff/close.svg"
-        },{
+        },
+        {
           text: "新增客户",
           hasAuth: checkAuth(26),
           style: `background-color:${window.color};color:#fff;`,
           action: () => {
             wx.navigateTo({
-              url: '../customer_register/main'
-            })
+              url: "../customer_register/main"
+            });
           }
-        },
+        }
         // {
         //   text: "分配教练",
         //   iconUrl: "/static/images/staff/calendar.svg"
@@ -349,7 +604,7 @@ export default {
         endDate: false,
         column: "second",
         dateLimit: true,
-        initStartTime: formatDate(new Date(),'yyyy-MM-dd hh:mm:ss'),
+        initStartTime: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"),
         initEndTime: "2019-12-01",
         limitStartTime: "2015-05-06",
         limitEndTime: "2055-05-06"
@@ -357,7 +612,7 @@ export default {
       curCustomer: {},
       showTrackResult: false,
       isResultDateShow: false,
-      trackTime: formatDate(new Date(), 'yyyy-MM-dd hh:mm:ss'),
+      trackTime: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"),
       selectedResult: { id: 1, name: "继续跟进" },
       trackResult: [{ id: 1, name: "继续跟进" }, { id: 3, name: "不确定" }],
       actionList: [],
@@ -375,15 +630,16 @@ export default {
     };
   },
   mounted() {
+    console.log("客户列表");
     this.refreshList();
   },
   onLoad(options) {
-    if(options.searchText) {
-      this.filter.namePhone = options.searchText
-      this.selectedStore = JSON.parse(options.store)
+    if (options.searchText) {
+      this.filter.namePhone = options.searchText;
+      this.selectedStore = JSON.parse(options.store);
     }
   },
-  mixins: [colorMixin,listPageMixin],
+  mixins: [colorMixin, listPageMixin],
   components: {
     headerData,
     filterNav,
@@ -407,7 +663,7 @@ export default {
     },
     isPhoneX() {
       return store.state.isIphoneX;
-    },
+    }
   },
   onPullDownRefresh() {
     this.isOperate = false;
@@ -415,8 +671,8 @@ export default {
   },
   methods: {
     selectResult(item) {
-      this.selectedResult = item.mp.detail
-      this.showTrackResult = false
+      this.selectedResult = item.mp.detail;
+      this.showTrackResult = false;
     },
     clearFilter() {
       for (let key in this.filter) {
@@ -425,7 +681,7 @@ export default {
     },
     setResultTime(val) {
       let data = val.mp.detail;
-      this.trackTime = data.startTime
+      this.trackTime = data.startTime;
     },
     saveFollowUp() {
       if (!this.trackContent.length) {
@@ -443,7 +699,7 @@ export default {
         });
       }
       let that = this;
-      wx.showLoading()
+      wx.showLoading();
       HttpRequest({
         url: window.api + "/customer/track/inserttrack",
         data: {
@@ -456,7 +712,7 @@ export default {
           TrackUserType: "1"
         },
         success(res) {
-          wx.hideLoading()
+          wx.hideLoading();
           if (res.data.code == 200) {
             wx.showToast({
               title: res.data.message || "跟进成功",
@@ -475,33 +731,37 @@ export default {
       });
     },
     onFocus(e) {
-      e.mp.detail.height
+      e.mp.detail.height;
     },
     loadData() {
+      console.log("客户列表-loadData");
       let that = this;
       return new Promise(function(resolve) {
         var _data = Object.assign(
           {},
           {
             page: that.page,
-            searchStore: that.selectedStore.storeId
+            searchStore: that.selectedStore.storeId || ''
           },
           that.filter
         );
         HttpRequest({
-          url: '/customer/list/static/count',
+          url: "/customer/list/static/count",
           data: _data,
           success(res) {
-            that.headerData[1].dataNum = res.data.data.prospectiveCount;
-            that.headerData[2].dataNum = res.data.data.existingCount;
+            if (res.data.code != 200) {
+              return;
+            }
+            that.headerData[1].dataNum = res.data.data.prospectiveCount || "";
+            that.headerData[2].dataNum = res.data.data.existingCount || "";
           }
-        })
+        });
         HttpRequest({
           url: "/customer/list/search",
           data: _data,
           success(res) {
             if (res.data.code !== 200) {
-              return that.list = [];
+              return (that.list = []);
             }
             let _res = res.data.data;
             let _data;
@@ -516,21 +776,36 @@ export default {
                   e.headImgPath = window.api + e.headImgPath;
                 }
               }
-              let curStoreService = e.customerInfoList.filter(e => {return e.storeName == that.selectedStore.storeName})[0] || {}
+              let curStoreService =
+                e.customerInfoList.filter(e => {
+                  return e.storeName == that.selectedStore.storeName;
+                })[0] || {};
               return {
                 isSelect: false,
                 id: e.id,
                 sex: e.sex,
-                sexSrc: e.sex == '男' ? '/static/images/staff/man.png' : (e.sex == '女' ? '/static/images/staff/women.png' : ''),
+                sexSrc:
+                  e.sex == "男"
+                    ? "/static/images/staff/man.png"
+                    : e.sex == "女"
+                      ? "/static/images/staff/women.png"
+                      : "",
                 phone: e.phone,
                 cover: e.headImgPath
                   ? e.headImgPath
-                  : "http://pojun-tech.cn/assets/img/morenTo.png",
-                serviceCoachName: curStoreService.serviceCoachName || e.customerInfoList[0].serviceCoachName || '--',
-                serviceUserName: curStoreService.serviceUserName || e.customerInfoList[0].serviceUserName || '--',
+                  : window.api + "/assets/img/morenTo.png",
+                serviceCoachName:
+                  curStoreService.serviceCoachName ||
+                  e.customerInfoList[0].serviceCoachName ||
+                  "--",
+                serviceUserName:
+                  curStoreService.serviceUserName ||
+                  e.customerInfoList[0].serviceUserName ||
+                  "--",
                 name: e.name,
                 customerClassChar: e.customerClassChar,
-                statusColor: e.customerClassChar == "现有" ? '#119bf0' : '#f25642',
+                statusColor:
+                  e.customerClassChar == "现有" ? "#119bf0" : "#f25642",
                 // first_1: e.name,
                 // first_2: e.customerClassChar,
                 // second_1: e.cardNum || 0,
@@ -559,9 +834,11 @@ export default {
             positionType: type
           },
           success(res) {
-            res.data.data.forEach((e) => {
-              e.headImgPath = e.headImgPath ? window.api + e.headImgPath : 'https://pojun-tech.cn/assets/img/morenTo.png'
-            })
+            res.data.data.forEach(e => {
+              e.headImgPath = e.headImgPath
+                ? window.api + e.headImgPath
+                : window.api + "/assets/img/morenTo.png";
+            });
             resolve(res);
           }
         });
@@ -570,7 +847,7 @@ export default {
     // 分配教练
     allotCoach() {
       let _customerIdStr = "";
-      console.log(this.list)
+      console.log(this.list);
       this.list.forEach(e => {
         if (e.isSelect) {
           _customerIdStr = _customerIdStr + e.id + ",";
@@ -588,12 +865,12 @@ export default {
           },
           success(res) {
             HttpRequest({
-              url: '/sendmsg/user/allotsCoachMsg',
+              url: "/sendmsg/user/allotsCoachMsg",
               data: {
                 allotRandom: res.data.data,
                 storeId: that.selectedStore.storeId
               }
-            })
+            });
             resolve(res);
           }
         });
@@ -620,12 +897,12 @@ export default {
           success(res) {
             // 推送消息
             HttpRequest({
-              url: '/sendmsg/user/allotsCustomerMsg',
+              url: "/sendmsg/user/allotsCustomerMsg",
               data: {
                 allotRandom: res.data.data,
                 storeId: that.selectedStore.storeId
               }
-            })
+            });
             resolve(res);
           }
         });
@@ -650,11 +927,11 @@ export default {
       this.filter.namePhone = event;
     },
     distributeSale() {
-      if(!this.selectedStore.storeId) {
+      if (!this.selectedStore.storeId) {
         return wx.showToast({
           title: "请选择门店",
-          icon: 'none'
-        })
+          icon: "none"
+        });
       }
       this.operateText = "分配销售";
       this.isOperate = true;
@@ -692,17 +969,17 @@ export default {
     //   if (param == "发送手机短信") {
     //   }
     // },
-    clickIcon(event,item) {
-      if (event.mp.target.dataset.type == 'follow-up') {
-        if(!that.selectedStore.storeId) {
+    clickIcon(event, item) {
+      if (event.mp.target.dataset.type == "follow-up") {
+        if (!that.selectedStore.storeId) {
           return wx.showToast({
-            title: '请先选择门店',
-            icon: 'none'
-          })
+            title: "请先选择门店",
+            icon: "none"
+          });
         }
-        this.curCustomer = item
-        this.showFollowUpPopup = true
-        return
+        this.curCustomer = item;
+        this.showFollowUpPopup = true;
+        return;
       }
       wx.makePhoneCall({
         phoneNumber: item.phone
@@ -801,22 +1078,28 @@ export default {
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);
-      this.timePickerType = ""
-      this.setDate(obj)
+      this.timePickerType = "";
+      this.setDate(obj);
     },
     filterConsumedDate(day) {
       let obj = this.filterDateMethod(day);
-      this.timePickerType = "consumed"
-      this.setDate(obj)
+      this.timePickerType = "consumed";
+      this.setDate(obj);
     },
     setDate(obj) {
-      if(this.timePickerType == "consumed") {
-        this.filter.lastConsumedTimeStart = obj.startTime
-        this.filter.lastConsumedTimeEnd = obj.endTime
-        return
+      let date = `${obj.startTime.split(' ')[0]}~${obj.endTime.split(' ')[0]}`.replace(/-/g, "/")
+      if (this.timePickerType == "consumed") {
+        this.filter.lastConsumedTimeStart = obj.startTime;
+        this.filter.lastConsumedTimeEnd = obj.endTime;
+        this.nav[1].children[4].date = date
+        return;
       }
       this.filter.addTimeStart = obj.startTime;
       this.filter.addTimeEnd = obj.endTime;
+      this.nav[0].children[4].date = date
+    },
+    getFilter(parmas) {
+      this.filter = Object.assign({}, this.filter, parmas);
     }
   }
 };
@@ -887,7 +1170,7 @@ page {
             background-color: red;
             color: #fff;
           }
-          >img {
+          > img {
             width: 100%;
             height: 100%;
           }
@@ -906,7 +1189,7 @@ page {
             }
           }
           .customer-service {
-            >span {
+            > span {
               font-size: 12px;
               color: #999;
             }

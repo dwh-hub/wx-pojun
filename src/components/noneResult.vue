@@ -1,7 +1,7 @@
 <template>
   <div class="none-result">
     <!-- <i></i>  http://pojun-tech.cn/assets/img/none-result.png-->
-    <image mode="aspectFit" src="https://pojun-tech.cn/assets/img/none-result.png"></image>
+    <image mode="aspectFit" :src="window.api + '/assets/img/none-result.png'"></image>
     <p>{{text}}</p>
     <div class="result-btn" :style="{'background-color': themeColor}" v-if="buttonText" @click="tapBtn">{{buttonText}}</div>
   </div>
@@ -24,8 +24,8 @@ export default {
     return {}
   },
   computed: {
-    themeColor() {
-      return window.color;
+    window() {
+      return window;
     }
   },
   methods: {

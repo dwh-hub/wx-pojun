@@ -6,7 +6,7 @@ import {
   wxLogin
 } from "COMMON/js/common.js";
 import store from "../../utils/store.js"
-
+console.log("merge_login.js")
 let storeId
 let url = ""
 let isTab = true
@@ -76,7 +76,8 @@ export function staff_login() {
       url: window.api + '/user/login/mini',
       data: {
         phone: wx.getStorageSync("phone"),
-        companyId: wx.getStorageSync("companyId")
+        companyId: wx.getStorageSync("companyId"),
+        miniOpenId: wx.getStorageSync("openId")
       },
       success(res) {
         if (res.data.code == 200 || res.data.code == 201) {
@@ -196,7 +197,7 @@ export function enterMember(res) {
 }
 
 // 进入商户端的处理
-export function enterStaff(res) {
+export function enterStaff(res, isRefresh) {
   // 调一次登录接口没法获取登录状态
   // staff_login().then((res) => {
   wx.showLoading({
@@ -280,9 +281,21 @@ export function enterStaff(res) {
     })
     wx.setStorageSync("authInto", authList);
     wx.hideLoading()
+    if(isRefresh) return refreshPage()
     wx.reLaunch({
       url: "../pageBusiness/workbench/main"
     })
+  })
+}
+
+function refreshPage() {
+  let options = getCurrentPages()[getCurrentPages().length - 1].options
+  let params = Object.keys(options).map(item=>{
+    return (item) + "=" + (options[item]);
+  }).join("&");
+
+  return wx.redirectTo({
+    url: './main?' + params
   })
 }
 
@@ -340,6 +353,8 @@ function bindMethod() {
         wx.setStorageSync("isLogin", true)
         getThemeColor();
         let _url = url ? url : './main'
+        console.log('url:'+url)
+        console.log('isTab:'+isTab)
         if (isTab) {
           setTimeout(() => {
             wx.reLaunch({
@@ -410,14 +425,16 @@ function getAllStore() {
     });
   })
 }
-getAllStore().then((res) => {
-  if (res.data.code === 200) {
-    let data = res.data.data
-    data[0].isDefault = true
-    store.commit("saveAllStore", data);
-    storeId = data[0].storeId
-  }
-})
+if (window) {
+  getAllStore().then((res) => {
+    if (res.data.code === 200) {
+      let data = res.data.data
+      data[0].isDefault = true
+      store.commit("saveAllStore", data);
+      storeId = data[0].storeId
+    }
+  })
+}
 
 export function getMessage() {
   HttpRequest({

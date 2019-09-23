@@ -334,7 +334,7 @@ export default {
                 second_1: e.totalCardCount || 0,
                 second_tip_1: "合同数：",
                 second_2: "",
-                third_1: e.lastTrackTime || '--',
+                third_1: e.lastTrackTime ? e.lastTrackTime.replace(/-/g, "/") : '--',
                 third_tip_1: "最后签到时间："
               };
             });

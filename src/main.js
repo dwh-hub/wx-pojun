@@ -16,6 +16,8 @@ const app = new Vue(App)
 app.$mount()
 Vue.prototype.globalData = getApp().globalData
 
+console.log("src/main.js")
+
 if (!wx.getStorageSync("Cookie")) {
   wx.request({
     url: window.api + '/loginPage',

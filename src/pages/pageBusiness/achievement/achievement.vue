@@ -141,8 +141,8 @@ export default {
           ]
         },
         {
-          navTitle: "所有销售",
-          name: "销售/教练名",
+          navTitle: "业绩归属人",
+          name: "业绩归属人",
           children: []
         },
         {

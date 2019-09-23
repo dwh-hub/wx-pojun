@@ -68,7 +68,8 @@ function staff_login() {
       url: window.api + '/user/login/mini',
       data: {
         phone: wx.getStorageSync("phone"),
-        companyId: wx.getStorageSync("companyId")
+        companyId: wx.getStorageSync("companyId"),
+        miniOpenId: wx.getStorageSync("openId")
       },
       success(res) {
         if (res.data.code == 200 || res.data.code == 201) {

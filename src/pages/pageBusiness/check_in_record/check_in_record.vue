@@ -245,7 +245,7 @@ export default {
                   ? e.headImgPath
                   : winddow.api + "/assets/img/morenTo.png",
                 first_1: e.customerName,
-                first_2: e.phone,
+                first_2: e.phone.slice(0,3) + '****' + e.phone.slice(7),
                 second_1: `${e.venueName}  ${e.secondCardClassName}(${
                   e.passModeValue
                 })`,

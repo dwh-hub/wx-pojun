@@ -116,6 +116,14 @@ let service = [{
         navUrl: "../private_coach_class/main",
         isOpen: true,
         class: "iconfont icon-class_icon_2"
+      },
+      {
+        iconUrl: "/static/images/staff/workbench_icon/coach_service_icon_3.svg",
+        text: "私教代约",
+        navUrl: "../allograph_class/main",
+        isOpen: true,
+        hasAuth: true,
+        class: "iconfont icon-coach_service_icon_2"
       }
     ]
   },

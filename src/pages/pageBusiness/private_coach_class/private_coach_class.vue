@@ -238,7 +238,8 @@ export default {
         calendarStart: "",
         status: "" // 3 完成课程
       },
-      curSelectClass: {}
+      curSelectClass: {},
+      isOpenHandwrittenBoard: null
     };
   },
   mounted() {
@@ -267,6 +268,11 @@ export default {
     },
     searchChange(event) {
       this.filter.nameOrPhone = event;
+    },
+    selectStore(item) {
+      this.selectedStore = item;
+      this.getSetting()
+      this.refreshList()
     },
     toDetail() {
       wx.navigateTo({
@@ -333,7 +339,7 @@ export default {
                 color: that.transformColor(e.status),
                 first_1: e.name,
                 second_1: e.cardClassName,
-                third_1: e.timeStart,
+                third_1: e.timeStart ? formatDate(new Date(e.timeStart), 'yyyy/MM/dd hh:mm') : "--",
                 rightText: e.statusChar || ""
               };
             });
@@ -579,11 +585,19 @@ export default {
           showCancel: false,
           success(model_res) {
             if (model_res.confirm) {
-              wx.navigateTo({
-                url: `../../appointmentResult/main?coachAppointId=${
-                  that.curSelectClass.coachAppointId
-                }&type=staff`
-              });
+              console.log(that.isOpenHandwrittenBoard)
+              if (that.isOpenHandwrittenBoard) {
+              console.log("that.isOpenHandwrittenBoard")
+                wx.navigateTo({
+                  url: "/pages/pageBusiness/handwrite_board/main?id=" + this.curSelectClass.coachAppointId
+                });
+              } else {
+                wx.navigateTo({
+                  url: `../../appointmentResult/main?coachAppointId=${
+                    that.curSelectClass.coachAppointId
+                  }&type=staff`
+                });
+              }
             }
           }
         });
@@ -684,7 +698,19 @@ export default {
           }
         }
       })
-    }
+    },
+    getSetting() {
+      let that = this;
+      HttpRequest({
+        url: "/system/setup/store/query",
+        data: {
+          storeId: that.selectedStore.storeId
+        },
+        success(res) {
+          that.isOpenHandwrittenBoard = res.data.data.isOpenHandwrittenBoard;
+        }
+      });
+    },
   }
 };
 </script>

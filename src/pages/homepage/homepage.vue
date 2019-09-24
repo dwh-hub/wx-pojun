@@ -121,7 +121,6 @@ import {
   enterMember,
   enterStaff
 } from "COMMON/js/merge_login.js";
-import { staffLogin } from "COMMON/js/only_staff_login.js";
 
 export default {
   data() {
@@ -224,16 +223,13 @@ export default {
   methods: {
     // 自动登录的逻辑
     login() {
-      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey") && !window.isPublic && !wx.getStorageSync("isLogin")) {
+      if (wx.getStorageSync("phone") && wx.getStorageSync("openId") && !wx.getStorageSync("instMsgSubKey") && !wx.getStorageSync("isLogin")) {
         getUserInfo().then((member_res) => {
           enterMember(member_res)
         })
       }
       if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
         wx.showLoading()
-        if(window.isPublic) {
-          return staffLogin()
-        }
         staff_login().then((staff_res) => {
           wx.hideLoading()
           if(!staff_res) {

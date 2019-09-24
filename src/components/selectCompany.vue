@@ -20,12 +20,15 @@
 
 <script>
 import { window, HttpRequest } from "COMMON/js/common.js";
-import { staffLogin } from "COMMON/js/only_staff_login.js";
+import { staffLogin, enterStaff, enterMember } from "COMMON/js/only_staff_login.js";
 export default {
   props: {
     companyList: {
       type: Array,
       default: []
+    },
+    role: {
+      type: "String"
     }
   },
   data() {
@@ -41,13 +44,21 @@ export default {
   },
   methods: {
     selectCompany(item, index) {
+      console.log(this.role);
       this.tabIndex = index;
     },
     confirm() {
-      console.log(this.companyList)
-      wx.setStorageSync('companyId', this.companyList[this.tabIndex].companyId)
-      staffLogin()
-      this.showCompanyPopup = false
+      console.log(this.companyList[this.tabIndex]);
+      wx.setStorageSync("companyId", this.companyList[this.tabIndex].companyId);
+      if (this.role == "staff") {
+        staffLogin().then(res => {
+          enterStaff(res)
+        });
+      }
+      if (this.role == "member") {
+        enterMember(this.companyList[this.tabIndex])
+      }
+      this.showCompanyPopup = false;
     }
   }
 };

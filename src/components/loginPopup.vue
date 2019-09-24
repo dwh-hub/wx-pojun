@@ -39,8 +39,7 @@ import {
   enterStaff
 } from "COMMON/js/merge_login.js";
 import { 
-  getPhoneNumber_staff,
-  staffLogin
+  getPhoneNumber_staff
 } from "COMMON/js/only_staff_login.js";
 
 export default {
@@ -131,9 +130,6 @@ export default {
     login() {
       if (wx.getStorageSync("instMsgSubKey") && wx.getStorageSync("phone")) {
         wx.showLoading()
-        if (window.isPublic) {
-          return staffLogin()
-        }
         staff_login().then((staff_res) => {
           wx.hideLoading()
           if(!staff_res) {

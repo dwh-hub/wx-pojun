@@ -53,28 +53,8 @@
       @click="singOut"
       v-if="isLogin"
     >解除绑定</div>
-    <!-- <div class="mineExit" @click="singIn" v-else>去登录</div> -->
-    <!-- <van-popup
-      :show="showBindBox"
-      @close="showBindBox = false"
-      :duration="200"
-      custom-style="width:85%;border-radius: 5px;"
-    >
-      <div class="companyList">
-        <p>请选择你要绑定的公司</p>
-        <div class="companyMain">
-          <span
-            v-for="(item, index) in companyList"
-            :key="index"
-            :class="{active: item.companyId == curCompany.companyId}"
-            @click="selectCompany(item)"
-          >{{item.companyName}}</span>
-        </div>
-        <span class="showTooltips" @click="bind">绑定</span>
-      </div>
-    </van-popup>-->
 
-    <select-company v-if="showCompanyList" :companyList="companyList"></select-company>
+    <select-company v-if="showCompanyList" :companyList="companyList" :role="role"></select-company>
     <!-- <login-popup :options="options" v-if="!isLogin"></login-popup> -->
     <page-footer></page-footer>
   </div>
@@ -94,10 +74,7 @@ import colorMixin from "COMPS/colorMixin.vue";
 import selectCompany from "COMPS/selectCompany.vue";
 // import loginPopup from "COMPS/loginPopup.vue";
 
-import {
-  getPhoneNumber_staff,
-  staffLogin
-} from "COMMON/js/only_staff_login.js";
+import { getPhoneNumber_staff } from "COMMON/js/only_staff_login.js";
 
 export default {
   data() {
@@ -163,10 +140,7 @@ export default {
       // 临时的用户数据
       userInfo: {},
       phone: "",
-      // showBindBox: false,
       companyList: [],
-      // 选择的公司
-      curCompany: {},
       // 会员卡张数
       cardNum: "",
       // 积分
@@ -174,8 +148,8 @@ export default {
       // 消费次数
       FreeCount: "",
       showCompanyList: false,
-      isLogin: false
-      // themeColor: ""
+      isLogin: false,
+      role: ''
     };
   },
   components: {
@@ -223,12 +197,8 @@ export default {
     _getPhoneNumber(e) {
       if (window.isPublic) {
         return getPhoneNumber_staff(e).then(res => {
-          this.companyList = res.data.data.map(e => {
-            return {
-              companyName: e.companyName,
-              companyId: e.companyId
-            };
-          });
+          this.role = res.role
+          this.companyList = res.companyList
           this.showCompanyList = true;
         });
       }
@@ -259,10 +229,6 @@ export default {
               url: window.api + "/wxcustomer/exit",
               success(res) {
                 if (res.data.code === 200) {
-                  // wx.removeStorage({
-                  //   key: "userInfo",
-                  //   success(res) {}
-                  // });
                   wx.removeStorageSync("userInfo");
                   wx.removeStorageSync("phone");
                   wx.setStorageSync("isLogin", false)
@@ -324,29 +290,6 @@ export default {
         }
       });
     }
-    // 选择公司
-    // selectCompany(item) {
-    //   this.curCompany = item;
-    // },
-    // 绑定公司
-    // bind() {
-    //   this.showBindBox = false;
-    //   this.userInfo = this.curCompany;
-    //   store.commit("saveUserInfo", this.curCompany);
-    //   wx.setStorage({
-    //     key: "userInfo",
-    //     data: this.curCompany
-    //   });
-    //   wx.setStorage({
-    //     key: "companyId",
-    //     data: this.curCompany.companyId
-    //   });
-    //   wx.setStorage({
-    //     key: "companyName",
-    //     data: this.curCompany.companyName
-    //   });
-    //   this.bindMethod();
-    // }
   }
 };
 </script>
@@ -456,44 +399,6 @@ page {
     &:active {
       opacity: 0.8;
     }
-  }
-  .companyList {
-    padding: 15px;
-    background: white;
-    .companyMain {
-      > span {
-        &.active {
-          color: @theme-color;
-          border: 1rpx solid @theme-color;
-        }
-      }
-    }
-    > p {
-      width: 100%;
-      text-align: center;
-    }
-    span {
-      display: block;
-      height: 40px;
-      line-height: 40px;
-      width: 100%;
-      text-align: center;
-      border-radius: 5px;
-      border: 1px solid #cccccc;
-      margin-top: 20px;
-    }
-  }
-  .showTooltips {
-    background-color: #1aad19;
-    display: block;
-    width: 90%;
-    margin: auto;
-    text-align: center;
-    height: 45px;
-    line-height: 45px;
-    color: white;
-    border-radius: 5px;
-    margin-top: 15px;
   }
 }
 </style>

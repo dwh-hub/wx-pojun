@@ -1,5 +1,5 @@
 const window = {}
-window.isPublic = false // 是否是公用的小程序
+window.isPublic = true // 是否是公用的小程序
 window.DEBUGGING = true
 // 榴莲: https://club.lirenos.com test: https://test.lirenos.com cn: https://www.pojun-tech.cn com: https://www.pojun-tech.com
 window.api = window.DEBUGGING ? "http://192.168.1.18" : "https://test.lirenos.com"

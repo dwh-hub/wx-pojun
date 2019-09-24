@@ -1,5 +1,6 @@
-// 值负责商户端登录
+// 公共小程序登录逻辑
 import store from "../../utils/store.js"
+import regeneratorRuntime from "@/libs/regenerator-runtime/runtime.js";
 import {
   window, HttpRequest, formatDate, wxLogin
 } from "COMMON/js/common.js";
@@ -25,71 +26,27 @@ function getPhoneNumber_staff(e) {
           wx.setStorage({
             key: "phone",
             data: res.data.data,
-            success: function () {
-              wx.request({
-                url: window.api + '/user/login/mini',
-                data: {
-                  phone: wx.getStorageSync("phone"),
-                  companyId: wx.getStorageSync("companyId"),
-                  authAppId: 'wxb3aa4f2e2276ecb6',
-                  miniOpenId: wx.getStorageSync("openId")
-                },
-                success(res) {
-                  if (res.data.code == 200) {
-                    enterStaff(res)
-                  } else if (res.data.code == 201) {
-                    // 多公司
-                    wx.hideLoading()
-                    resolve(res)
-                  } else {
-                    wx.showModal({
-                      title: "提示",
-                      content: res.data.message,
-                      showCancel: false
-                    });
-                  }
-                }
-              })
+            success: async function () {
+              // const staff_res = await staffLogin(true)
+              // resolve(staff_res.data.data)
+              const result = await publicLogin()
+              if (result && result.companyList.length > 1) {
+                resolve(result)
+              }
             }
           });
-          // wx.setStorage({
-          //   key: "phone",
-          //   data: "13073618012", //"18759888263",
-          //   success: function () {
-          //     login(url, isTab);
-          //   }
-          // });
         } else {
-          // TODO:
           if (window.DEBUGGING) {
             return wx.setStorage({
               key: "phone",
               data: "18000241486", // "13285923990",
-              success: function () {
-                wx.request({
-                  url: window.api + '/user/login/mini',
-                  data: {
-                    phone: wx.getStorageSync("phone"),
-                    companyId: wx.getStorageSync("companyId"),
-                    authAppId: 'wxb3aa4f2e2276ecb6',
-                    miniOpenId: wx.getStorageSync("openId")
-                  },
-                  success(res) {
-                    if (res.data.code == 200) {
-                      enterStaff(res)
-                    } else if (res.data.code == 201) {
-                      // 多公司
-                      wx.hideLoading()
-                      resolve(res)
-                    } else {
-                      wx.showModal({
-                        title: "提示",
-                        content: res.data.message,
-                        showCancel: false
-                      });
-                    }
-                  }
-                })
+              success: async function () {
+                // const staff_res = await staffLogin(true)
+                // resolve(staff_res.data.data)
+                const result = await publicLogin()
+                if (result && result.companyList.length > 1) {
+                  resolve(result)
+                }
               }
             });
           }
@@ -105,22 +62,154 @@ function getPhoneNumber_staff(e) {
   })
 }
 
-// function getCustomerCompanyList() {
-//   return new Promise((resolve) => {
-//     wx.request({
-//       url: window.api + '/user/login/mini',
-//       data: {
-//         phone: wx.getStorageSync("phone"),
-//         companyId: wx.getStorageSync("companyId"),
-//         authAppid: 'wxb3aa4f2e2276ecb6'
-//       },
-//       success(res) {
-//         resolve()
-//       }
-//     })
-//   })
-// }
+async function publicLogin() {
+  const member = await checkMember()
+  const staff = await staffLogin(true)
+  let loginData = {
+    role: '',
+    companyList: []
+  }
 
+  // 会员 商户 xx
+  if (!member && !staff) {
+    return wx.showModal({
+      title: "提示",
+      content: "无用户信息",
+      showCancel: false
+    });
+  }
+  // 会员 x 
+  if (!member) {
+    // 商户单公司
+    loginData.role = 'staff'
+    if (staff.data.code == 200) enterStaff(staff)
+    // 商户多公司 返回公司列表
+    if (staff.data.code == 201) loginData.companyList = staff.data.data
+  }
+
+  // 商户 x
+  if (!staff) {
+    loginData.role = 'member'
+    // 会员单公司
+    if (member.data.data.length == 1) enterMember(member.data.data[0])
+    // 会员多公司
+    if (member.data.data.length > 1) loginData.companyList = member.data.data
+  }
+
+  // TODO: 会员、商户 ok
+  if (member && staff) {
+    wx.showModal({
+      title: "提示",
+      content: "检测到您是工作人员，请选择当次浏览的信息",
+      cancelText: "留在会员",
+      confirmText: "前往商户",
+      success(res) {
+        if (res.confirm) {
+          // 进商户
+          loginData.role = 'staff'
+          if (staff.data.code == 200) enterStaff(staff)
+          if (staff.data.code == 201) loginData.companyList = staff.data.data
+        } else if (res.cancel) {
+          // 进会员
+          loginData.role = 'member'
+          if (member.data.data.length == 1) enterMember(member.data.data[0])
+          if (member.data.data.length > 1) loginData.companyList = member.data.data
+        }
+      }
+    });
+  }
+
+  return loginData
+}
+
+
+// 查询该手机号是否有会员
+export function checkMember() {
+  return new Promise(function (resolve) {
+    wx.request({
+      url: window.api + "/wxcustomer/findCustomerStore",
+      data: {
+        phone: wx.getStorageSync("phone")
+      },
+      success(res) {
+        if (res.data.code == 200) {
+          resolve(res)
+        } else {
+          resolve(false)
+        }
+      }
+    });
+  });
+}
+
+// 会员登录成功后
+function enterMember(data) {
+  // 清除商户登录信息
+  HttpRequest({
+    url: window.api + '/user/exit'
+  })
+  wx.setStorageSync("staffIsLogin", false);
+  wx.hideLoading();
+
+  store.commit("saveUserInfo", data);
+  wx.setStorage({
+    key: "userInfo",
+    data: data
+  });
+  wx.setStorage({
+    key: "companyId",
+    data: data.companyId
+  });
+  wx.setStorage({
+    key: "companyName",
+    data: data.companyName
+  });
+  bindMember()
+}
+
+// 会员绑定
+function bindMember() {
+  wx.showLoading({
+    title: "登录中..."
+  });
+  wx.request({
+    url: window.api + "/wxcustomer/bindCard",
+    data: {
+      phone: wx.getStorageSync("phone"),
+      companyId: wx.getStorageSync("companyId"),
+      miniOpenId: wx.getStorageSync("openId")
+    },
+    success(res) {
+      wx.setStorage({
+        key: "Cookie",
+        data: res.header["Set-Cookie"]
+      });
+      if (res.data.code === 200) {
+        wx.hideLoading();
+        wx.showToast({
+          title: "登录成功",
+          icon: "success",
+          duration: 1000
+        });
+        wx.removeStorageSync("storeId");
+        wx.setStorageSync("isLogin", true)
+        setTimeout(() => {
+          wx.reLaunch({
+            url: './main'
+          });
+        }, 1000);
+      } else {
+        return wx.showModal({
+          title: "提示",
+          content: res.data.message,
+          showCancel: false
+        });
+      }
+    }
+  });
+}
+
+// 商户登录
 function staffLogin(hasAppid) {
   wx.showLoading({
     title: "登录中..."
@@ -134,25 +223,32 @@ function staffLogin(hasAppid) {
         authAppId: hasAppid ? 'wxb3aa4f2e2276ecb6' : ''
       },
       success(res) {
-        if (res.data.code == 200) {
-          enterStaff(res)
-        } else if (res.data.code == 201) {
-          // 多公司
-          wx.hideLoading()
+        // if (res.data.code == 200) {
+        //   enterStaff(res)
+        // } else if (res.data.code == 201) {
+        //   // 多公司
+        //   wx.hideLoading()
+        //   resolve(res)
+        // } else {
+        //   wx.hideLoading()
+        //   wx.showModal({
+        //     title: "提示",
+        //     content: res.data.message,
+        //     showCancel: false
+        //   });
+        // }
+         wx.hideLoading()
+        if (res.data.code == 200 || res.data.code == 201) {
           resolve(res)
         } else {
-          wx.hideLoading()
-          wx.showModal({
-            title: "提示",
-            content: res.data.message,
-            showCancel: false
-          });
+          resolve(false)
         }
       }
     })
   })
 }
 
+// 商户登录成功后
 function enterStaff(res) {
   let staff_info = res.data.data
   staff_info.authList = {}
@@ -217,6 +313,7 @@ function enterStaff(res) {
   })
 }
 
+// 获取权限列表
 function getAuthList() {
   return new Promise(function (resolve) {
     HttpRequest({
@@ -239,5 +336,7 @@ function getAuthList() {
 
 export {
   getPhoneNumber_staff,
-  staffLogin
+  staffLogin,
+  enterStaff,
+  enterMember
 }

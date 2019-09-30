@@ -4,11 +4,21 @@
       <img class="screening-icon" src="/static/images/staff/title-icon.svg" />
       <span class="subtitle-text">确认收款</span>
     </div>
-    <div class="order-info">
-      <div class="order-pactId">合同编号：{{TemplateBillingData.pactId}}</div>
-      <div class="order-desc">合同详细：{{orderDesc}}</div>
+    <div class="customer-card shadow-block-item">
+      <user-item-s :info="customerInfo">
+        <van-icon name="arrow" color="#666" />
+      </user-item-s>
     </div>
-    <div class="price-type-form">
+    <div class="order-info shadow-block-item">
+      <div class="order-pactId"><span>合同编号:</span> {{TemplateBillingData.pactId}}</div>
+      <div class="order-desc"><span>合同详细:</span> {{orderDesc}}</div>
+    </div>
+    <div class="notice-bar">
+      <van-icon name="warning-o" color="#fa9e14"/>
+      <div class="notice">请输入付款方式金额</div>
+      <!-- <van-icon name="cross" color="#f95d51"/> -->
+    </div>
+    <div class="price-type-form shadow-block-item">
       <div class="subtitle" style="border-bottom: 1rpx solid #eee;" v-if="TemplateBillingData != 4">
         <img class="screening-icon" src="/static/images/staff/title-icon.svg" />
         <span class="subtitle-text">确认收款方式与金额（应付金额：{{payablePrice}}）</span>
@@ -16,31 +26,31 @@
       <div class="input-cell-wrapper">
         <div class="cell-value">现金</div>
         <div class="cell-content">
-          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.cashPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.cashPay" />元
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">银行卡</div>
         <div class="cell-content">
-          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.cardPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.cardPay" />元
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">支付宝</div>
         <div class="cell-content">
-          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.aliPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.aliPay" />元
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">微信</div>
         <div class="cell-content">
-          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.wechatPay" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.wechatPay" />元
         </div>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">转账</div>
         <div class="cell-content">
-          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.transferAccounts" />
+          <input class="cell-input pay-cell" type="number" v-model="reqBaseData.transferAccounts" />元
         </div>
       </div>
       <div class="input-cell-wrapper" v-if="TemplateBillingData.billingType != 4">
@@ -83,16 +93,16 @@
           @click="selectDed(item, index)"
         >
           <!-- <div> -->
-            <span>姓名：{{item.name}}</span>
-            <span>手机：{{item.phone}}</span>
-            <span>合同编号：{{item.pactId}}</span>
-            <span>购买金额：{{item.sellingPrice}}</span>
-            <span>办理时间：{{item.transactTimeFmt}}</span>
+          <span>姓名：{{item.name}}</span>
+          <span>手机：{{item.phone}}</span>
+          <span>合同编号：{{item.pactId}}</span>
+          <span>购买金额：{{item.sellingPrice}}</span>
+          <span>办理时间：{{item.transactTimeFmt}}</span>
           <!-- </div> -->
           <!-- <div>
             <span>购买金额:{{item.sellingPrice}}</span>
             <span>办理时间:{{item.transactTimeFmt}}</span>
-          </div> -->
+          </div>-->
           <div class="icon" v-if="item.isSelect">
             <van-icon name="checked" :color="themeColor" size="2em" />
           </div>
@@ -108,6 +118,7 @@ import { setNavTab, HttpRequest, formatDate } from "COMMON/js/common.js";
 import billingData from "../common/js/billingData";
 import colorMixin from "COMPS/colorMixin.vue";
 import headerSearch from "../components/header-search.vue";
+import userItemS from "../components/user-item-s.vue";
 export default {
   data() {
     return {
@@ -117,11 +128,13 @@ export default {
       showCardList: false,
       reqBaseData: {},
       deductionlist: [],
-      dedFilterPhone: ""
+      dedFilterPhone: "",
+      customerInfo: {}
     };
   },
   components: {
-    headerSearch
+    headerSearch,
+    userItemS
   },
   mixins: [colorMixin],
   onLoad() {
@@ -147,6 +160,7 @@ export default {
       token: billingData.token,
       referrerPhone: ""
     };
+    this.customerInfo = billingData.selectedCustomer
   },
   onUnload() {
     Object.assign(this.$data, this.$options.data());
@@ -195,9 +209,10 @@ export default {
       }
       return `${this.billingText}-客户：${billingData.selectedCustomer.name}(${
         billingData.selectedCustomer.phone
-      })，${billingData.selectedCard.first_1}，${
-        billingData.selectedCard.salePrice || 0
-      }元，${this.payCardType}(${billingData.payCardStartDate} -
+      })，${billingData.selectedCard.first_1}，${billingData.selectedCard
+        .salePrice || 0}元，${this.payCardType}(${
+        billingData.payCardStartDate
+      } -
         ${billingData.payCardEndDate})，办理销售：${
         billingData.selectedSale.userName
       }，卡号：${billingData.cardNum || "无"}`;
@@ -210,11 +225,11 @@ export default {
       }
     },
     dedTip() {
-      let pact = ""
-      this.deductionArray.forEach((e) => {
-        pact += e.pactId + ','
-      })
-      return `合同编号为${pact}将被用于抵扣`
+      let pact = "";
+      this.deductionArray.forEach(e => {
+        pact += e.pactId + ",";
+      });
+      return `合同编号为${pact}将被用于抵扣`;
     },
     payCost() {
       return Number(
@@ -226,7 +241,7 @@ export default {
       );
     },
     isIphoneX() {
-      return billingData.isIphoneX
+      return billingData.isIphoneX;
     }
   },
   methods: {
@@ -265,20 +280,23 @@ export default {
     // 新增合同
     addCompact() {
       wx.showLoading({
-        title: '加载中..'
-      })
+        title: "加载中.."
+      });
       let that = this;
       let data;
       let _deductionArray = this.deductionArray.map(e => {
         return String(e.cardId);
       });
-      let _periodOfValidity = 0
-      if(billingData.selectedCard.authorityUnit == 1) {
-        _periodOfValidity = Number(billingData.selectedCard.buyAuthority) + Number(billingData.curCardSet.giveAwayAuthority)
+      let _periodOfValidity = 0;
+      if (billingData.selectedCard.authorityUnit == 1) {
+        _periodOfValidity =
+          Number(billingData.selectedCard.buyAuthority) +
+          Number(billingData.curCardSet.giveAwayAuthority);
       } else {
-        _periodOfValidity = billingData.selectedCard.periodOfValidity
+        _periodOfValidity = billingData.selectedCard.periodOfValidity;
       }
-      billingData.curCardSet.isCanTransCard = billingData.curCardSet.canTransCard
+      billingData.curCardSet.isCanTransCard =
+        billingData.curCardSet.canTransCard;
       let basaData = {
         mainUser: billingData.selectedCustomer.name,
         cardClassId: billingData.selectedCard.cardId,
@@ -315,7 +333,7 @@ export default {
         url: "/customer/register/compact",
         data: data,
         success(res) {
-          wx.hideLoading()
+          wx.hideLoading();
           if (res.data.code == 200) {
             that.addWorkLog(that.billingText, res.data.message);
             that.msgPush(res.data.data);
@@ -330,7 +348,7 @@ export default {
             setTimeout(() => {
               wx.navigateBack({
                 delta: 2
-              })
+              });
             }, 1000);
           }
         }
@@ -339,8 +357,8 @@ export default {
     // 新增定金合同
     addAubscription() {
       wx.showLoading({
-        title: '加载中..'
-      })
+        title: "加载中.."
+      });
       let that = this;
       let data = Object.assign(
         {
@@ -356,7 +374,7 @@ export default {
         url: "/customer/register/subscription/save",
         data: data,
         success(res) {
-          wx.hideLoading()
+          wx.hideLoading();
           if (res.data.code == 200) {
             that.addWorkLog("购买订金合同", res.data.message);
             that.deductionMsgPush(res.data.data);
@@ -368,7 +386,7 @@ export default {
             setTimeout(() => {
               wx.navigateBack({
                 delta: 2
-              })
+              });
             }, 1000);
           }
         }
@@ -387,9 +405,8 @@ export default {
             billingData.pactId
           }）,有效天数：${billingData.selectedCard.periodOfValidity}天,赠送${
             billingData.curCardSet.giveAwayAuthority
-          }${billingData.selectedCard.unit},购卡金额:${
-            billingData.selectedCard.salePrice || 0
-          },销售员:${billingData.selectedSale.userName},微信:${
+          }${billingData.selectedCard.unit},购卡金额:${billingData.selectedCard
+            .salePrice || 0},销售员:${billingData.selectedSale.userName},微信:${
             this.reqBaseData.wechatPay
           },支付宝:${this.reqBaseData.aliPay},刷卡:${
             this.reqBaseData.cardPay
@@ -476,7 +493,7 @@ export default {
             that.deductionlist = res.data.data.result.map(e => {
               e.transactTimeFmt = formatDate(
                 new Date(e.transactTime),
-                "yyyy-MM-dd"
+                "yyyy/MM/dd"
               );
               e.isSelect = false;
               return e;
@@ -492,13 +509,14 @@ export default {
     },
     // 选择抵扣合同
     selectDed(item) {
-      if (!this.deductionArray.filter(e => e.cardId == item.cardId).length) {
-        item.isSelect = true;
-        // this.deductionArray.push(item);
-      } else {
-        item.isSelect = false;
-        // this.deductionArray.splice(index, 1);
-      }
+      item.isSelect = !item.isSelect
+      // if (!this.deductionArray.filter(e => e.cardId == item.cardId).length) {
+      //   item.isSelect = true;
+      //   this.deductionArray.push(item);
+      // } else {
+      //   item.isSelect = false;
+      //   this.deductionArray.splice(index, 1);
+      // }
       // let sum = 0
       // this.deductionArray.forEach(e => {
       //   sum += e.sellingPrice;
@@ -506,16 +524,16 @@ export default {
       // this.deductionMoney = sum
     },
     closeDedPopup() {
-      let dedArr = []
-      let sum = 0
-      this.deductionlist.forEach((e) => {
+      let dedArr = [];
+      let sum = 0;
+      this.deductionlist.forEach(e => {
         if (e.isSelect) {
-          dedArr.push(e)
-          sum += e.sellingPrice
+          dedArr.push(e);
+          sum += e.sellingPrice;
         }
-      })
-      this.deductionArray = dedArr
-      this.deductionMoney = sum
+      });
+      this.deductionArray = dedArr;
+      this.deductionMoney = sum;
       this.showCardList = false;
     },
     confirmSelect() {
@@ -537,8 +555,21 @@ export default {
 @import "../common/less/form.less";
 
 .receivable {
+  padding-bottom: 40px;
   .subtitle-text {
     font-weight: bold;
+  }
+  .customer-card {
+    .right-content {
+      padding: 5px 5px 5px 10px;
+      border-left: 1px solid #ffae08;
+      span {
+        font-size: 12px;
+        margin-right: 5px;
+        font-weight: bold;
+        color: #666;
+      }
+    }
   }
   .input-cell-wrapper {
     .cell-value {
@@ -547,16 +578,17 @@ export default {
     .cell-content {
       display: flex;
       .cell-input {
-        position: relative;
+        // position: relative;
         flex: 1;
+        padding-right: 5px;
       }
       .pay-cell {
-        &:after {
-          content: "元";
-          position: absolute;
-          top: 0;
-          right: 0;
-        }
+        // &:after {
+        //   content: "元";
+        //   position: absolute;
+        //   top: 0;
+        //   right: 0;
+        // }
       }
       .add-ded {
         width: 46px;
@@ -573,11 +605,22 @@ export default {
     padding: 0 15px;
     padding-bottom: 10px;
     border-bottom: 1rpx solid #eee;
+    span {
+      color: #999;
+    }
     .order-pactId {
       line-height: 30px;
+      color: #666;
+      border-bottom: 1px solid #e4eaec;
     }
     .order-desc {
-      line-height: 20px;
+      >span {
+        font-size: 12px;
+      }
+      font-size: 12px;
+      padding-top: 5px;
+      color: #666;
+      line-height: 18px;
     }
   }
   .receivable-bottom {
@@ -586,13 +629,16 @@ export default {
     left: 0px;
     display: flex;
     width: 100%;
-    line-height: 48px;
-    height: 48px;
+    line-height: 42px;
+    height: 42px;
     border-top: 1rpx solid #eee;
+    background-color: #fff;
     .price {
       font-size: 16px;
       padding: 0 10px;
       font-weight: bold;
+      color: #fff;
+      background-color: #ffae08;
     }
     .receivable-btn {
       flex: 1;
@@ -623,7 +669,7 @@ export default {
         border-top: 1rpx solid #eee;
         display: flex;
         flex-wrap: wrap;
-        >span {
+        > span {
           line-height: 30px;
           margin-right: 20px;
         }
@@ -654,7 +700,7 @@ export default {
   }
   .cell-tip {
     box-sizing: border-box;
-    padding: 0 15px;
+    padding: 5px 10px;
   }
 }
 </style>

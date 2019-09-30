@@ -141,14 +141,14 @@ export default {
     },
     changeTabbar(e) {
       if (e.mp.detail == 0) {
-        wx.redirectTo({
-          url: "../index/main"
-        });
+        // wx.redirectTo({
+        //   url: "../index/main"
+        // });
       }
       if (e.mp.detail == 1) {
-        wx.navigateTo({
-          url: "../service_web/main"
-        });
+        // wx.navigateTo({
+        //   url: "../service_web/main"
+        // });
       }
       if (e.mp.detail == 2) {
         wx.redirectTo({

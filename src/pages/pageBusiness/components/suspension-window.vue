@@ -2,7 +2,7 @@
   <div class="suspension_window" v-if="operateListLength || operateListLength > 0">
     <div class="suspension" :style="{'right': right + 'px','bottom': bottom + 'px'}" @touchmove.stop="setTouchMove">
       <div class="operate-wrapper" v-show="showOperate">
-        <div class="operate-item" v-for="(item, index) in operateList" :key="index" :class="{hidden: item.hasAuth == undefined ? false : !item.hasAuth}" @click.stop="operate(item)">
+        <div class="operate-item" v-for="(item, index) in _operateList" :key="index" :class="{hidden: item.hasAuth == undefined ? false : !item.hasAuth}" @click.stop="operate(item)">
           <span>{{item.text}}</span>
           <i :class="item.class" v-if="item.class" :style="{'color': themeColor}"></i>
           <image mode="aspectFit" v-else :src="item.iconUrl"></image>
@@ -17,6 +17,7 @@
 
 <script>
 import { window } from "COMMON/js/common.js";
+import {checkAuth} from "../common/js/service_config.js";
 export default {
   props: {
     operateList: {
@@ -31,7 +32,16 @@ export default {
       bottom: 40,
       windowH: wx.getSystemInfoSync().windowHeight,
       windowW: wx.getSystemInfoSync().windowWidth,
+      _operateList: []
     };
+  },
+  mounted() {
+    this._operateList = this.operateList.map(e => {
+      if(e.authorityId) {
+        e.hasAuth = checkAuth(e.authorityId)
+      }
+      return e
+    })
   },
   computed: {
     themeColor() {

@@ -88,6 +88,7 @@ import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
 import { getUserofrole } from "../common/js/http.js";
+import achieveData from "../common/js/achievement.js";
 
 export default {
   data() {
@@ -194,8 +195,8 @@ export default {
           ]
         },
         {
-          navTitle: "本周",
-          name: "时间",
+          navTitle: "本月",
+          name: "办理日期",
           children: [
             {
               sonText: "今日",
@@ -244,8 +245,15 @@ export default {
   mounted() {
     setNavTab();
     this._getUserofrole();
-    this.nav[2].navTitle = "本周";
-    this.filterDate("week");
+    if(achieveData.nav.length) {
+      this.nav.forEach((e, index) => {
+        e.navTitle = achieveData.nav[index].navTitle
+      })
+      this.filter = JSON.parse(JSON.stringify(achieveData.filter))
+    } else {
+      this.nav[2].navTitle = "本月"
+      this.filterDate('month');
+    }
   },
   mixins: [colorMixin, listPageMixin],
   methods: {
@@ -368,7 +376,7 @@ export default {
       this.refreshList();
     },
     _getUserofrole() {
-      getUserofrole(this.selectedStore.storeId, 2).then(data => {
+      getUserofrole(this.selectedStore.storeId, 0).then(data => {
         let list = data.map(e => {
           return {
             sonText: e.userName,

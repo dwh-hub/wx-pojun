@@ -2,20 +2,27 @@
   <div class="qrcode-sign">
     <div class="class-info">教练{{params.coachName}}正在准备为学员{{params.studentName}}上课</div>
     <div class="class-time">上课时间：{{nowTime}}</div>
-    <div class="qrcode-wrapper" v-if="params.way == 2 || params.way == 3">
-      <van-icon
-        @click="replayQrCode()"
-        name="replay"
-        color="#666666"
-        size="25px"
-        custom-class="replay"
-      />
-      <image v-if="params.canFace" class="to-face" src="/static/images/staff/camera.svg" @click="toFace"></image>
-       <!--  -->
-      <div class="qrcode">
-        <img :src="qrcodeURL" alt>
+    <div class="qrcode-wrapper" v-if="(params.way == 2 || params.way == 3) && !faceWay">
+      <template v-if="params.signWay == 1 || selectedSignWay == 2">
+        <van-icon
+          @click="replayQrCode()"
+          name="replay"
+          color="#666666"
+          size="25px"
+          custom-class="replay"
+        />
+        <!-- <image v-if="params.signWay" class="to-face" src="/static/images/staff/camera.svg" @click="toFace"></image> -->
+        <!--  -->
+        <div class="qrcode">
+          <img :src="qrcodeURL" alt>
+        </div>
+        <div class="tip">{{tip}}</div>
+      </template>
+      <div class="select-way" v-if="params.signWay == 2 && selectedSignWay == 0">
+        <h1>请选择会员确认方式</h1>
+        <div class="qr-way select-way-btn" @click="selectQrWay">扫码确认</div>
+        <div class="face-way select-way-btn" @click="selectFaceWay">人脸识别确认</div>
       </div>
-      <div class="tip">{{tip}}</div>
     </div>
     <div class="sure-group">
       <div class="sure-item" v-if="params.way == 2 || params.way == 3">
@@ -42,18 +49,18 @@ import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 import { EventBus } from "../common/js/eventBus.js";
 
-Vue.prototype.globalData.normalCoachCourse = new GoEasy({
-  appkey: wx.getStorageSync("instMsgSubKey"),
-  onConnected: function() {
-    console.log("on connected...");
-  },
-  onDisconnected: function() {
-    console.log("on disconnected...");
-  },
-  onConnectFailed: function (error) {
-    console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
-  }
-});
+// Vue.prototype.globalData.normalCoachCourse = new GoEasy({
+//   appkey: wx.getStorageSync("instMsgSubKey"),
+//   onConnected: function() {
+//     console.log("on connected...");
+//   },
+//   onDisconnected: function() {
+//     console.log("on disconnected...");
+//   },
+//   onConnectFailed: function (error) {
+//     console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
+//   }
+// });
 
 export default {
   data() {
@@ -65,17 +72,35 @@ export default {
         // studentName: '',
         // studentId: '',
         // appointId: ''
+        // signWay 0 人脸 1 二维码 2 都是
       },
-      nowTime: formatDate(new Date(), "hh:mm"),
+      nowTime:'',
       qrcodeURL: "",
       studentText: "正在等待学员确认...",
       receptionText: "正在等待前台确认...",
-      timer: null,
+      // timer: null,
       // normalCoachCourse: null,
-      checkQRStatus: null
+      checkQRStatus: null,
+      faceWay: false,
+      selectedSignWay: 0 // 1 人脸 2 二维码
     };
   },
   onLoad(options) {
+    if(!this.globalData.normalCoachCourse) {
+      console.log("初始化Goeasy")
+      Vue.prototype.globalData.normalCoachCourse = new GoEasy({
+        appkey: wx.getStorageSync("instMsgSubKey"),
+        onConnected: function() {
+          console.log("on connected...");
+        },
+        onDisconnected: function() {
+          console.log("on disconnected...");
+        },
+        onConnectFailed: function (error) {
+          console.log("与GoEasy连接失败，错误编码："+error.code+"错误信息："+error.content);
+        }
+      });
+    }
     wx.setNavigationBarColor({
       backgroundColor: "#43424d",
       frontColor: "#ffffff"
@@ -87,13 +112,15 @@ export default {
     // this.timer = setInterval(() => {
     //   this.getNowTime();
     // }, 60000);
-    this.timer;
+    // this.timer;
     if (this.params.way == 2 || this.params.way == 3) {
-      this.getQrCode();
-      this.checkQRStatus = setInterval(() => {
-        this.getQRCodeResult();
-      }, 1000);
-      this.checkQRStatus;
+      if (this.params.signWay == 1) {
+        this.watchQR()
+      }
+      if (this.params.signWay == 0) {
+        this.faceWay = true
+        this.toFace()
+      }
     }
     if (this.params.way == 4) {
       this.pushMsg();
@@ -101,6 +128,7 @@ export default {
   },
   onShow() {
     this.addHit();
+    this.getNowTime()
   },
   mounted() {
     EventBus.$on("confirmed", () => {
@@ -110,6 +138,8 @@ export default {
   },
   onUnload() {
     this.clear()
+    this.selectedSignWay = 0
+    this.faceWay = false
   },
   onHide() {
     this.clear()
@@ -132,12 +162,30 @@ export default {
       this.studentText = "正在等待学员确认...";
       this.receptionText = "正在等待前台确认...";
       this.nowTime = ""
-      clearInterval(this.timer);
+      // clearInterval(this.timer);
       clearInterval(this.checkQRStatus);
+    },
+    selectQrWay() {
+      this.selectedSignWay = 2
+      this.watchQR()
+    },
+    selectFaceWay() {
+      this.selectedSignWay = 1
+      this.faceWay = true
+      this.toFace()
     },
     getNowTime() {
       this.nowTime = formatDate(new Date(), "hh:mm");
     },
+    // 获取并监听码状态
+    watchQR() {
+      this.getQrCode();
+      this.checkQRStatus = setInterval(() => {
+        this.getQRCodeResult();
+      }, 1000);
+      this.checkQRStatus
+    },
+    // 绘制码
     drawImg(url) {
       var imgData = QR.drawImg(url, {
         typeNumber: 4,
@@ -157,6 +205,7 @@ export default {
         }
       })
     },
+    // 获取码地址
     getQrCode() {
       let that = this;
       HttpRequest({
@@ -170,10 +219,12 @@ export default {
         }
       });
     },
+    // 刷新码
     replayQrCode() {
       this.qrcodeURL = "";
       this.getQrCode();
     },
+    // 获取扫码结果
     getQRCodeResult() {
       let that = this;
       HttpRequest({
@@ -432,6 +483,22 @@ page {
     padding-bottom: 20px;
     border-radius: 3px;
     background-color: #fff;
+    .select-way {
+      >h1 {
+        line-height: 30px;
+        font-size: 16px;
+      }
+      .select-way-btn {
+        width: 100px;
+        line-height: 30px;
+        margin: 10px auto;
+        border-radius: 4px;
+        border: 1rpx solid #43424d;
+        &:active {
+          background-color: #43424d;
+        }
+      }
+    }
     .replay {
       position: absolute;
       top: 10px;

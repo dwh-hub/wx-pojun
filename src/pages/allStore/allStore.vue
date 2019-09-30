@@ -26,6 +26,9 @@ export default {
     pageFooter
   },
   onLoad() {
+    wx.showShareMenu({
+      withShareTicket: true
+    })
     setNavTab();
     this.companyId = wx.getStorageSync("companyId");
   },
@@ -73,9 +76,7 @@ export default {
                 storeId: e.storeId
               };
             });
-            console.log(_storeList)
             _storeList.sort(that.compare("range"));
-            console.log(_storeList)
             that.storeList = _storeList;
           } else {
             that.storeList = []

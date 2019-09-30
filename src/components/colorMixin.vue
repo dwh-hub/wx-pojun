@@ -11,7 +11,10 @@ export default {
     };
   },
   mounted() {
-    if (window.color && window.color != window.defaultColor) {
+    wx.showShareMenu({
+      withShareTicket: true
+    })
+    if (window.color) {
       this.themeColor = window.color;
     } else {
       getThemeColor().then(color => {

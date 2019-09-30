@@ -58,6 +58,9 @@ export default {
     // if (wx.getStorageSync("userInfo")) {
     //   this.companyId = wx.getStorageSync("userInfo").companyId;
     // }
+    wx.showShareMenu({
+      withShareTicket: true
+    })
     setNavTab();
     this.companyId = wx.getStorageSync("companyId");
     this.getActiveList();

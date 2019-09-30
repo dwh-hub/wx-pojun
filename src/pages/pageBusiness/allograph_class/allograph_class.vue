@@ -236,7 +236,7 @@ export default {
       this._getUserofrole(1, 'serviceCoachId', 2)
     },
     getSalehList() {
-      this._getUserofrole(2, 'serviceUserId', 1)
+      this._getUserofrole(0, 'serviceUserId', 1)
     },
     _getUserofrole(positionType, param, index) {
       getUserofrole(this.selectedStore.storeId, positionType).then((data) => {

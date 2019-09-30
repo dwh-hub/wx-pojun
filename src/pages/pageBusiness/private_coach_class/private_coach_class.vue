@@ -541,14 +541,15 @@ export default {
             let params;
             params = {
               way: way,
-              canFace: res.data.data.privateSignWayByCustomer == 1,
+              signWay: res.data.data.privateSignWayByCustomer,
               coachName: that.curSelectClass.coachName,
               coachId: that.curSelectClass.coachId,
               studentName: that.curSelectClass.studentName,
               studentId: that.curSelectClass.id,
               appointId: that.curSelectClass.coachAppointId,
               storeId: that.curSelectClass.storeId,
-              venueId: that.curSelectClass.venueId
+              venueId: that.curSelectClass.venueId,
+              isOpenHandwrittenBoard: that.isOpenHandwrittenBoard
             };
             wx.hideLoading()
             if (way == 1) {
@@ -585,9 +586,7 @@ export default {
           showCancel: false,
           success(model_res) {
             if (model_res.confirm) {
-              console.log(that.isOpenHandwrittenBoard)
               if (that.isOpenHandwrittenBoard) {
-              console.log("that.isOpenHandwrittenBoard")
                 wx.navigateTo({
                   url: "/pages/pageBusiness/handwrite_board/main?id=" + this.curSelectClass.coachAppointId
                 });

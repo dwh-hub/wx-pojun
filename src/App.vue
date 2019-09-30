@@ -26,7 +26,7 @@ export default {
   },
   onShow() {
     console.log("App-onShow");
-    // autoLogin()
+    autoLogin()
   },
   created() {
     // 调用API从本地缓存中获取数据

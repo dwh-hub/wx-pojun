@@ -70,12 +70,13 @@ export default {
       studentPage: 1,
       studentList: [],
       teamScheduleId: 0,
-      canModify: checkAuth(294),
+      canModify: false,
       // 可以提前下课
       canAhead: false
     };
   },
   onLoad(options) {
+    this.canModify = checkAuth(294)
     if (options.teamScheduleId) {
       this.teamScheduleId = options.teamScheduleId;
       this.getClassDetail();

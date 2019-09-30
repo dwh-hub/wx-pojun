@@ -44,6 +44,7 @@ import colorMixin from "COMPS/colorMixin.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import { initLine, getUserofrole } from "../common/js/http.js";
+import achieveData from "../common/js/achievement.js";
 
 export default {
   data() {
@@ -146,8 +147,8 @@ export default {
           children: []
         },
         {
-          navTitle: "本周",
-          name: "时间",
+          navTitle: "本月",
+          name: "办理日期",
           children: [
             {
               sonText: "今日",
@@ -220,8 +221,7 @@ export default {
   },
   watch: {
     filter: {
-      handler() {
-        console.log(this.filter);
+      handler(val) {
         this.refreshData();
       },
       deep: true
@@ -230,9 +230,9 @@ export default {
   mounted() {
     setNavTab();
     this.storeList = store.state.allStore;
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
-    this.nav[2].navTitle = "本周"
-    this.filterDate('week');
+    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
+    this.nav[2].navTitle = "本月"
+    this.filterDate('month');
     this.refreshData();
   },
   methods: {
@@ -279,6 +279,8 @@ export default {
       });
     },
     toDetail() {
+      achieveData.nav = this.nav
+      achieveData.filter = this.filter
       wx.navigateTo({
         url: "../achievement_list/main"
       });
@@ -324,7 +326,7 @@ export default {
       this.filter.timeEnd = obj.endTime;
     },
     _getUserofrole() {
-      getUserofrole(this.selectedStore.storeId, 2).then(data => {
+      getUserofrole(this.selectedStore.storeId, 0).then(data => {
         let list = data.map(e => {
           return {
             sonText: e.userName,

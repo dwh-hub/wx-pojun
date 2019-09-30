@@ -109,7 +109,7 @@ function getUserofrole(storeId, positionType) {
       url: "/customer/register/userofrole",
       data: {
         storeId: storeId,
-        positionType: positionType // 1 教练  2 销售
+        positionType: positionType // 1 教练  0 销售
       },
       success(res) {
         let data = res.data.data

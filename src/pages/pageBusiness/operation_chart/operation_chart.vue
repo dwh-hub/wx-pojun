@@ -736,7 +736,7 @@ export default {
       const HOUR8 = 8 * 60 * 60 * 1000;
       let nowStamp = date.getTime();
       let today = date.getDate() - 1;
-      let weekday = date.getDay() - 1;
+      let weekday = date.getDay() == 0 ? 6 : date.getDay() - 1;
       if (day == 1) {
         this.filter.timeStart = formatDate(
           new Date(parseInt(nowStamp / DAY) * DAY - HOUR8),

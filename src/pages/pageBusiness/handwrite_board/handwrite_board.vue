@@ -12,9 +12,9 @@
       binderror="error"
     ></canvas>
     <div class="handBtn">
-      <div @click="clearClick" class="delBtn">重写</div>
-      <!-- <div @click="saveClick" class="subBtn">保存到本地</div> -->
-      <div @click="uploadClick" class="subBtn" :style="{'background-color':window.color}">完成</div>
+      <div @click="skip">跳过</div>
+      <div @click="clear" class="delBtn">重写</div>
+      <div @click="upload" class="subBtn" :style="{'background-color':window.color}">完成</div>
     </div>
   </div>
 </template>
@@ -99,8 +99,14 @@ export default {
       this.content.stroke();
       this.content.draw(true);
     },
+    skip() {
+      let that = this
+      wx.redirectTo({
+        url: `../../appointmentResult/main?coachAppointId=${that.id}&type=staff`
+      });
+    },
     //清除操作
-    clearClick: function() {
+    clear: function() {
       //清除画布
       this.content.clearRect(0, 0, 750, 700);
       this.content.draw(true);
@@ -129,7 +135,7 @@ export default {
       });
     },
     // 上传
-    uploadClick() {
+    upload() {
       var that = this;
       wx.showModal({
         title: "提示",
@@ -208,6 +214,9 @@ export default {
       font-size: 16px;
       line-height: 50px;
       text-align: center;
+    }
+    .delBtn {
+      border-left: 1rpx solid #eee;
     }
     .subBtn {
       color: #fff;

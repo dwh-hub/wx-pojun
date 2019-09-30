@@ -80,7 +80,7 @@ export default {
         return;
       }
       wx.navigateTo({
-        url: `../modify_cell/main?type=oneself&name=${name}&value=${value}`
+        url: `../modify_cell/main?type=oneself&name=${name}&value=${value || ''}`
       });
     },
     getDetail() {

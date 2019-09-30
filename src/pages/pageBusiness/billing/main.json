@@ -5,6 +5,7 @@
     "van-action-sheet": "../../../../static/vant/action-sheet/index",
     "van-popup": "../../../../static/vant/popup/index",
     "van-loading": "../../../../static/vant/loading/index",
-    "time-picker": "/static/timePicker/timePicker"
+    "time-picker": "/static/timePicker/timePicker",
+    "van-icon": "/static/vant/icon/index"
   }
 }

@@ -2,8 +2,8 @@
   <div class="staff-coach-item" @click="clickItem">
     <div v-if="info.id">
       <div class="cover">
-        <!-- <image class="avatar" :src="info.cover" mode="aspectFill"></image> -->
-        <div class="avatar" :style="{'background-image':'url('+info.cover+')'}"></div>
+        <image class="avatar" :src="info.cover" mode="aspectFill" @error="loadFail"></image>
+        <!-- <div class="avatar" :style="{'background-image':'url('+info.cover+')'}"></div> -->
         <!-- <img :src="sexSrc" class="sex"> -->
       </div>
       <div class="coach-info">
@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import { window } from "COMMON/js/common.js";
 export default {
   name: "coach-item",
   props: {
@@ -103,7 +104,10 @@ export default {
     },
     clickItem() {
       this.$emit("clickItem");
-    }
+    },
+    loadFail(index) {
+      this.info.cover = window.api + "/assets/img/morenTo.png";
+    },
   }
 };
 </script>
@@ -132,9 +136,9 @@ export default {
       height: 60px;
       border-radius: 4px;
       background-color: #eee;
-      background-size: 100% auto;
-      background-repeat: no-repeat;
-      background-position: 50% 50%;
+      // background-size: 100% auto;
+      // background-repeat: no-repeat;
+      // background-position: 50% 50%;
     }
     // .sex {
     //   position: absolute;

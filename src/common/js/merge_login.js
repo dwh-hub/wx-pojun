@@ -41,7 +41,7 @@ export function getPhoneNumber(e, url, isTab) {
         });
         // wx.setStorage({
         //   key: "phone",
-        //   data: "13285923990", //"18759888263",
+        //   data: "15180006767", //"18759888263",
         //   success: function () {
         //     login(url, isTab);
         //   }
@@ -77,7 +77,8 @@ export function staff_login() {
       data: {
         phone: wx.getStorageSync("phone"),
         companyId: wx.getStorageSync("companyId"),
-        miniOpenId: wx.getStorageSync("openId")
+        miniOpenId: wx.getStorageSync("openId"),
+        unionId: wx.getStorageSync("unionId")
       },
       success(res) {
         if (res.data.code == 200 || res.data.code == 201) {
@@ -145,9 +146,9 @@ export function login(url, isTab) {
 // 进入会员的逻辑
 export function enterMember(res) {
   // 清除商户登录信息
-  HttpRequest({
-    url: window.api + '/user/exit'
-  })
+  // HttpRequest({
+  //   url: window.api + '/user/exit'
+  // })
   wx.setStorageSync("staffIsLogin", false);
   // 微信授权
   // HttpRequest({
@@ -204,9 +205,9 @@ export function enterStaff(res, isRefresh) {
     title: '正在进入..'
   });
   // 清除会员登录信息
-  HttpRequest({
-    url: window.api + '/wxcustomer/exit'
-  })
+  // HttpRequest({
+  //   url: window.api + '/wxcustomer/exit'
+  // })
   // 微信授权
   // HttpRequest({
   //   url: '/mini/login/after/user',
@@ -334,7 +335,8 @@ function bindMethod() {
     data: {
       phone: wx.getStorageSync("phone"),
       companyId: wx.getStorageSync("companyId"),
-      miniOpenId: wx.getStorageSync("openId")
+      miniOpenId: wx.getStorageSync("openId"),
+      unionId: wx.getStorageSync("unionId")
     },
     success(res) {
       wx.setStorage({

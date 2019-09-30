@@ -16,7 +16,8 @@
 			"ignore": [],
 			"disablePlugins": [],
 			"outputPath": ""
-		}
+		},
+		"enhance": true
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
@@ -42,20 +43,20 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 1,
+			"current": 8,
 			"list": [
 				{
 					"id": 0,
-					"name": "pages/pageBusiness/customer/main",
-					"pathName": "pages/pageBusiness/customer/main",
-					"query": "",
+					"name": "pages/pageBusiness/QRCodeSignIn/main",
+					"pathName": "pages/pageBusiness/QRCodeSignIn/main",
+					"query": "params={\"way\":3,\"signWay\":2,\"coachName\":\"董文浩\",\"coachId\":1516,\"studentName\":\"11112\",\"studentId\":145040,\"appointId\":\"7299\",\"storeId\":126,\"venueId\":90,\"isOpenHandwrittenBoard\":1}",
 					"scene": null
 				},
 				{
 					"id": 1,
-					"name": "pages/pageBusiness/my_qrcode/main",
-					"pathName": "pages/pageBusiness/my_qrcode/main",
-					"query": "storeId=126&userId=1521&storeName=瑞景店",
+					"name": "pages/pageBusiness/face_collect/main",
+					"pathName": "pages/pageBusiness/face_collect/main",
+					"query": "id=145051&phone=13874537832",
 					"scene": 1035,
 					"referrerInfo": {}
 				},
@@ -103,9 +104,9 @@
 				},
 				{
 					"id": 8,
-					"name": "pages/pageBusiness/allograph_class/main",
-					"pathName": "pages/pageBusiness/allograph_class/main",
-					"query": "coachId=1507",
+					"name": "pages/pageBusiness/operation_chart/main",
+					"pathName": "pages/pageBusiness/operation_chart/main",
+					"query": "",
 					"scene": null
 				},
 				{

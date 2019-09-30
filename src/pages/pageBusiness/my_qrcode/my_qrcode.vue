@@ -13,7 +13,7 @@
       <img class="qr-code" :src="QRSrc" />
       <p class="qr-code-bottom-tip">微信扫一扫二维码加入</p>
     </div>-->
-    <canvas id="myCanvas" canvas-id="myCanvas"></canvas>
+    <canvas id="myCanvas" canvas-id="myCanvas" @click="seeQR"></canvas>
     <div class="share-wrapper">
       <div class="share-text">
         <span :style="{'background-color':themeColor}">分享邀请</span>
@@ -92,11 +92,11 @@ export default {
             }`
           },
           success(res) {
-            wx.hideLoading();
             if (res.data.code == 200) {
               that.QRSrc = window.api + res.data.data;
               resolve();
             } else {
+              wx.hideLoading();
               wx.showModal({
                 title: "提示",
                 content: res.data.message,
@@ -124,6 +124,13 @@ export default {
             }
           });
         }
+      });
+    },
+    seeQR() {
+      let that = this
+      wx.previewImage({
+        current: that.QRSrc, // 当前显示图片的http链接
+        urls: [that.QRSrc] // 需要预览的图片http链接列表
       });
     },
     canvasDraw() {
@@ -258,6 +265,7 @@ export default {
       ctx.setTextAlign("center");
       ctx.fillText("微信扫一扫二维码加入", center, tip_y);
       ctx.draw();
+      wx.hideLoading();
     },
     canvasToImage() {
       var that = this;
@@ -266,11 +274,10 @@ export default {
         y: 0,
         canvasId: "myCanvas",
         success: function(res) {
-          console.log("朋友圈分享图生成成功");
           wx.saveImageToPhotosAlbum({
             filePath: res.tempFilePath,
             success(res) {
-              console.log("朋友圈分享图保存成功")
+              wx.showToast({ title: "海报下载成功" });
             }
           })
           // wx.previewImage({
@@ -381,10 +388,12 @@ export default {
           margin: 0 auto;
           border-radius: 2px;
           background-color: #fff;
+          display: flex;
+          justify-content: center;
+          align-items: center;
           > img {
             width: 15px;
             height: 15px;
-            margin-bottom: 8px;
           }
         }
         .share {

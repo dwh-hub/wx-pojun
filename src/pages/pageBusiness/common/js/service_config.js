@@ -101,7 +101,7 @@ let service = [{
     hasAuth: true,
     list: [{
         iconUrl: "/static/images/staff/workbench_icon/class_icon_1.svg",
-        text: "团课",
+        text: "团课预约",
         authorityId: 275,
         hasAuth: true,
         navUrl: "../staff_team_class/main",
@@ -110,7 +110,7 @@ let service = [{
       },
       {
         iconUrl: "/static/images/staff/workbench_icon/class_icon_2.svg",
-        text: "私教",
+        text: "私教预约",
         authorityId: 152,
         hasAuth: true,
         navUrl: "../private_coach_class/main",

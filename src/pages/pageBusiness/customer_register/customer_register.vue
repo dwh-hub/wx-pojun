@@ -1,6 +1,11 @@
 <template>
   <div class="customer_register" :class="{'safe-bottom': isIphoneX}">
-    <div class="check-in-block">
+    <div class="notice-bar">
+      <van-icon name="warning-o" color="#fa9e14"/>
+      <div class="notice">请输入客户手机号，按提示填写客户信息，*必填</div>
+      <!-- <van-icon name="cross" color="#f95d51"/> -->
+    </div>
+    <div class="check-in-block shadow-block-item">
       <div class="input-cell-wrapper">
         <div class="cell-value">登记门店</div>
         <div
@@ -9,7 +14,7 @@
         >{{selectedStore.storeName}}</div>
       </div>
       <div class="input-cell-wrapper">
-        <div class="cell-value">手机号码</div>
+        <div class="cell-value must-input">手机号码</div>
         <div class="cell-content">
           <input
             class="cell-input"
@@ -31,7 +36,7 @@
       </span>
     </div>
 
-    <div class="register-content" v-if="phoneType == 201 || phoneType == '202-1'">
+    <div class="register-content shadow-block-item" v-if="phoneType == 201 || phoneType == '202-1'">
       <div class="input-cell-wrapper">
         <div class="cell-value must-input">姓名</div>
         <div class="cell-content">
@@ -40,25 +45,36 @@
             type="text"
             :disabled="phoneType == '202-1'"
             v-model="name"
-            placeholder="请输入姓名"
+            placeholder="请输入客户姓名"
             placeholder-class="placeholder"
           />
         </div>
       </div>
       <div class="input-cell-wrapper" v-if="phoneType == 201">
         <div class="cell-value must-input">性别</div>
-        <div class="cell-content">
+        <!-- <div class="cell-content">
           <radio-group class="radio-group" @change="onChangeSex">
             <radio value="1" :color="themeColor" :checked="sex == 1" />
             <span class="radio-span">男</span>
             <radio value="2" :color="themeColor" :checked="sex == 2" />
             <span class="radio-span">女</span>
           </radio-group>
+        </div> -->
+        <div class="cell-content" @click="showAction = true;actionList = sexList;">
+          <input
+            class="cell-input"
+            type="text"
+            :value="sex ? sexList[sex-1].name : ''"
+            placeholder="请选择客户性别"
+            placeholder-class="placeholder"
+            disabled
+          />
         </div>
+        <van-icon name="arrow" color="#999" v-if="!sex"/>
       </div>
       <div class="input-cell-wrapper">
-        <div class="cell-value">服务销售</div>
-        <div class="cell-content" @click="showAction = true;actionList = saleListAction;positionType=2">
+        <div class="cell-value must-input">服务销售</div>
+        <div class="cell-content" @click="showAction = true;actionList = saleListAction;positionType=0">
           <input
             class="cell-input"
             type="text"
@@ -68,6 +84,7 @@
             disabled
           />
         </div>
+        <van-icon name="arrow" color="#999" v-if="!selectedSale.userName"/>
       </div>
       <div class="input-cell-wrapper">
         <div class="cell-value">服务教练</div>
@@ -81,19 +98,31 @@
             disabled
           />
         </div>
+        <van-icon name="arrow" color="#999" v-if="!selectedCoach.userName"/>
       </div>
       <div v-show="phoneType == 201">
         <div class="input-cell-wrapper">
           <div class="cell-value">客户来源</div>
+          <div class="cell-content" @click="showAction = true;actionList = sourceList;">
+            <input
+              class="cell-input"
+              type="text"
+              :value="source ? sourceList[source-1].name : ''"
+              placeholder="请选择客户来源"
+              placeholder-class="placeholder"
+              disabled
+            />
+          </div>
+          <van-icon name="arrow" color="#999" v-if="!source"/>
         </div>
-        <div class="input-cell-wrapper">
+        <!-- <div class="input-cell-wrapper">
           <radio-group class="radio-group" @change="selectSource">
             <label class="radio" v-for="(item, index) in sourceList" :key="index">
               <radio :color="themeColor" :value="item.value" />
               <span class="radio-span">{{item.name}}</span>
             </label>
           </radio-group>
-        </div>
+        </div> -->
         <div class="input-cell-wrapper">
           <div class="cell-value">身份证</div>
           <div class="cell-content">
@@ -126,14 +155,24 @@
         </div>
         <div class="input-cell-wrapper">
           <div class="cell-value">健身历史</div>
-          <div class="cell-content">
+          <div class="cell-content" @click="showAction = true;actionList = fitness;">
+            <input
+              class="cell-input"
+              type="text"
+              :value="fitness[isFitness].name"
+              placeholder="请选择健身历史"
+              placeholder-class="placeholder"
+              disabled
+            />
+          </div>
+          <!-- <div class="cell-content">
             <radio-group class="radio-group" @change="onChangeFitness">
               <radio value="1" :color="themeColor" :checked="isFitness == 1" />
               <span class="radio-span">有</span>
               <radio value="0" :color="themeColor" />
               <span class="radio-span">无</span>
             </radio-group>
-          </div>
+          </div> -->
         </div>
         <div class="input-cell-wrapper">
           <div class="cell-value">健身目的</div>
@@ -207,7 +246,7 @@
       :actions="actionList"
       :safe-area-inset-bottom="false"
       @close="showAction = false"
-      @select="selectStore"
+      @select="selectAction"
     ></van-action-sheet>
   </div>
 </template>
@@ -255,34 +294,61 @@ export default {
         "不喜欢健身",
         "对私教有兴趣"
       ],
+      sexList: [
+        {
+          name: '男',
+          action: () => { this.sex = 1 }
+        },
+        {
+          name: '女',
+          action: () => { this.sex = 2 }
+        }
+      ],
       sourceList: [
         {
           name: "AS邀约到场",
-          value: 1
+          value: 1,
+          action: () => { this.source = 1 }
         },
         {
           name: "BR会员转介",
-          value: 2
+          value: 2,
+          action: () => { this.source = 2 }
         },
         {
           name: "DI发单潜在",
-          value: 3
+          value: 3,
+          action: () => { this.source = 3 }
         },
         {
           name: "WI轮排到访",
-          value: 4
+          value: 4,
+          action: () => { this.source = 4 }
         },
         {
           name: "GP单页到访",
-          value: 5
+          value: 5,
+          action: () => { this.source = 5 }
         },
         {
           name: "TI电话咨询",
-          value: 6
+          value: 6,
+          action: () => { this.source = 6 }
         },
         {
           name: "其他",
-          value: 7
+          value: 7,
+          action: () => { this.source = 7 }
+        }
+      ],
+      fitness: [
+        {
+          name: '无',
+          action: () => { this.isFitness = 0}
+        },
+        {
+          name: '有',
+          action: () => { this.isFitness = 1}
         }
       ],
       name: "", // 姓名
@@ -295,18 +361,19 @@ export default {
       isFitness: 0, // 是否健身过
       FitnessPurpose: [], // 健身目的 1 减肥 2 塑性 3 增肌 4 其他
       interest: [], // 喜好
-      source: [], // 客户来源
+      source: '', // 客户来源
       followUpContent: "",
       phoneType: 0, // 200 客户信息已存在 201 正常录入 202 客户在其他门店有录入 405 在公海中
       successCustomerId: 0,
       customerId: "", // 已存在的客户id
-      isCanPay: checkAuth(346),
+      isCanPay: false,
       isIphoneX: store.state.isIphoneX
     };
   },
   mixins: [colorMixin],
   onLoad() {
     Object.assign(this.$data, this.$options.data());
+    this.isCanPay = checkAuth(346)
     setNavTab();
     let allStore = store.state.allStore.map(e => {
       e.name = e.storeName;
@@ -319,14 +386,16 @@ export default {
     this.actionList = this.storeActions;
   },
   methods: {
-    selectStore(e) {
-      if (e.mp.detail.storeName) {
+    selectAction(e) {
+      if (e.mp.detail.action) {
+        e.mp.detail.action()
+      } else if (e.mp.detail.storeName) {
         this.phoneType = 0;
         this.phone = "";
         this.selectedStore = e.mp.detail;
       } else if (this.positionType == 1) {
         this.selectedCoach = e.mp.detail;
-      } else if (this.positionType == 2) {
+      } else if (this.positionType == 0) {
         this.selectedSale = e.mp.detail;
       }
       this.showAction = false;
@@ -414,7 +483,7 @@ export default {
     // 服务销售
     getServiceSaleList() {
       let curSaleId = wx.getStorageSync("staff_info").userId
-      getUserofrole(this.selectedStore.storeId, 2).then((data) => {
+      getUserofrole(this.selectedStore.storeId, 0).then((data) => {
         this.saleListAction = data.map(e => {
           e.name = e.userName;
           return e;
@@ -519,7 +588,7 @@ export default {
             remarks: that.followUpContent,
             starLevel: that.rateValue,
             isFitness: that.isFitness,
-            source: String(that.source),
+            source: that.source,
             name: that.name,
             sex: that.sex,
             interest: String(that.interest),
@@ -631,11 +700,10 @@ export default {
 @import "~COMMON/less/common.less";
 @import "../common/less/form.less";
 page {
-  background-color: #f6f6f6;
+  background-color: #f4f5f6;
 }
 .customer_register {
   .register-content {
-    padding-bottom: 15px;
     .textarea-wrapper {
       > textarea {
         height: 130px;
@@ -662,68 +730,13 @@ page {
       }
     }
     .register {
-      width: 90%;
-      margin: 0 auto;
       color: #fff;
       text-align: center;
-      font-size: 16px;
-      line-height: 46px;
-      border-radius: 5px;
-    }
-  }
-  .input-cell-wrapper {
-    padding-left: 20px;
-    padding-right: 15px;
-    display: flex;
-    line-height: 46px;
-    // height: 46px;
-    background-color: #fff;
-    border-bottom: 1rpx solid #eee;
-    .radio {
-      margin: 0;
-    }
-    .radio-group {
-      border: none;
-    }
-    .radio-span {
-      margin-right: 5px;
-    }
-    .cell-value {
-      flex: 0 0 20vw;
-      text-align: left;
-      font-size: 15px;
-    }
-    .must-input {
-      position: relative;
-      &:before {
-        content: "*";
-        position: absolute;
-        left: -10px;
-        color: red;
-        line-height: 48px;
-      }
-    }
-    .cell-content {
-      flex: 1;
-      .cell-input {
-        padding-left: 5px;
-        height: 46px;
-        line-height: 46px;
-      }
-      .radio-span {
-        margin-right: 15px;
-      }
-      .check-span {
-        margin-right: 5px;
-      }
-    }
-    .van-icon-star-o,
-    .van-icon-star {
-      margin-top: 12px;
+      line-height: 42px;
     }
   }
   .check-in-block {
-    margin-bottom: 10px;
+    margin-top: 0px;
   }
   .success-popup {
     padding: 15px;

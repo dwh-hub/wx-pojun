@@ -40,7 +40,7 @@
         <div class="customer-item" v-if="item.id" @click="toDetail(item,index)">
           <div class="cover">
             <div class="tag" :style="{background: item.statusColor}">{{item.customerClassChar}}</div>
-            <img :src="item.cover" />
+            <img :src="item.cover" @error="loadFail(index)"/>
           </div>
           <div class="customer-info">
             <div class="customer-base-info">
@@ -373,7 +373,7 @@ export default {
             },
             {
               name: "昨日回访",
-              dateValue: 1,
+              dateValue: "yesterday",
               value: "",
               value_2: ""
             },
@@ -564,8 +564,9 @@ export default {
       operateList: [
         {
           text: "分配销售",
+          authorityId: 58,
           hasAuth: checkAuth(58),
-          style: `color:${window.color};`,
+          style: `color:themeColor;`,
           action: () => {
             this.distributeSale();
           }
@@ -574,8 +575,9 @@ export default {
         },
         {
           text: "新增客户",
+          authorityId: 26,
           hasAuth: checkAuth(26),
-          style: `background-color:${window.color};color:#fff;`,
+          style: `background-color:themeColor;color:#fff;`,
           action: () => {
             wx.navigateTo({
               url: "../customer_register/main"
@@ -638,6 +640,10 @@ export default {
       this.filter.namePhone = options.searchText;
       this.selectedStore = JSON.parse(options.store);
     }
+    this.operateList.forEach(e => {
+      e.hasAuth = checkAuth(e.authorityId)
+      e.style = e.style.replace('themeColor', window.color)
+    })
   },
   mixins: [colorMixin, listPageMixin],
   components: {
@@ -670,6 +676,9 @@ export default {
     this.showSalesPopup = false;
   },
   methods: {
+    loadFail(index) {
+      this.list[index].cover = window.api + "/assets/img/morenTo.png";
+    },
     selectResult(item) {
       this.selectedResult = item.mp.detail;
       this.showTrackResult = false;

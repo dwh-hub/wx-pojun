@@ -124,7 +124,6 @@ export default {
         },
         success(res) {
           that.customer = res.data.data
-          console.log(that.customer)
         }
       })
     }

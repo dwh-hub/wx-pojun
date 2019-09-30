@@ -230,7 +230,6 @@ export default {
           } else {
             that.isNoneResult = true;
           }
-          console.log(that.cardInfoList);
         }
       });
     },

@@ -1,10 +1,12 @@
+import store from '@/utils/store.js'
+
 const window = {}
-window.isPublic = true // 是否是公用的小程序
-window.DEBUGGING = true
+window.isPublic = false // 是否是公用的小程序
+window.DEBUGGING = false
 // 榴莲: https://club.lirenos.com test: https://test.lirenos.com cn: https://www.pojun-tech.cn com: https://www.pojun-tech.com
-window.api = window.DEBUGGING ? "http://192.168.1.18" : "https://test.lirenos.com"
+window.api = window.DEBUGGING ? "http://192.168.1.126" : "https://test.lirenos.com"
 window.defaultColor = "#0c9cf0"
-window.color = window.defaultColor // "#0c9cf0"
+window.color = "" // "#0c9cf0"
 // 获取 ext.json 配置信息
 const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
 const spareCompany = "55"
@@ -40,6 +42,9 @@ export {
 // 获取公司主题色
 export function getThemeColor() {
   return new Promise(function (resolve) {
+    if (store.state.companyInfo.companyId && store.state.companyInfo.companyId == wx.getStorageSync('companyId')) {
+      return resolve(JSON.parse(store.state.companyInfo.baseInfo).themeColor)
+    }
     HttpRequest({
       url: window.api + '/system/set/wxcompanyinfo',
       data: {
@@ -47,6 +52,7 @@ export function getThemeColor() {
       },
       success(res) {
         if (res.data.code == 200) {
+          store.commit('changeCompanyInfo', res.data.data)
           window.color = JSON.parse(res.data.data.baseInfo).themeColor || window.defaultColor
         } else {
           window.color = window.defaultColor
@@ -90,14 +96,9 @@ export function wxLogin() {
               companyId: wx.getStorageSync("companyId")
             },
             success(data) {
-              wx.setStorage({
-                key: "sessionKey",
-                data: data.data.data.sessionKey
-              });
-              wx.setStorage({
-                key: "openId",
-                data: data.data.data.openId
-              });
+              wx.setStorageSync("sessionKey", data.data.data.sessionKey);
+              wx.setStorageSync("openId", data.data.data.openId);
+              wx.setStorageSync("unionId", data.data.data.unionId);
               resolve()
             }
           })
@@ -192,42 +193,42 @@ export function HttpRequest(obj) {
       }
     }
 
-    obj.success = function (res) {
-      let curPageRoute = getCurrentPages()[getCurrentPages().length - 1].route
-      let type = curPageRoute.indexOf('pageBusiness') > -1 ? "staff" : "member"
-      if (JSON.stringify(res.data).indexOf('登入') > -1) {
-        if (type == "member") {
-          wx.setStorageSync("isLogin", false)
-        } else {
-          wx.setStorageSync("staffIsLogin", false)
-        }
-        if (curPageRoute.indexOf('mine') == -1 && curPageRoute.indexOf('homepage') == -1 && !isShowModal) {
-          isShowModal = true
-          return wx.showModal({
-            title: "提示",
-            content: "当前状态为未登录，请先登录!",
-            confirmText: '前往登录',
-            showCancel: false,
-            success(res) {
-              if (res.confirm) {
-                wx.switchTab({
-                  url: "/pages/mine/main"
-                });
-              }
-            },
-            complete() {
-              isShowModal = false
-            }
-          });
-        }
-      }
-      if (type == "staff") {
-        WechatMenuisLogin("staff")
-      }
-      if (success) {
-        success(res)
-      }
-    }
+    // obj.success = function (res) {
+    //   let curPageRoute = getCurrentPages()[getCurrentPages().length - 1].route
+    //   let type = curPageRoute.indexOf('pageBusiness') > -1 ? "staff" : "member"
+    //   if (JSON.stringify(res.data).indexOf('DOCTYPE html') > -1) {
+    //     if (type == "member") {
+    //       wx.setStorageSync("isLogin", false)
+    //     } else {
+    //       wx.setStorageSync("staffIsLogin", false)
+    //     }
+    //     if (curPageRoute.indexOf('mine') == -1 && curPageRoute.indexOf('homepage') == -1 && !isShowModal) {
+    //       isShowModal = true
+    //       return wx.showModal({
+    //         title: "提示",
+    //         content: "当前状态为未登录，请先登录!",
+    //         confirmText: '前往登录',
+    //         showCancel: false,
+    //         success(res) {
+    //           if (res.confirm) {
+    //             wx.switchTab({
+    //               url: "/pages/mine/main"
+    //             });
+    //           }
+    //         },
+    //         complete() {
+    //           isShowModal = false
+    //         }
+    //       });
+    //     }
+    //   }
+    //   if (type == "staff") {
+    //     WechatMenuisLogin("staff")
+    //   }
+    //   if (success) {
+    //     success(res)
+    //   }
+    // }
 
     wx.request(obj)
   });
@@ -381,31 +382,31 @@ export function getRange(lat1, lng1, lat2, lng2) {
 
 // 公共号进来判断是否登录
 export function WechatMenuisLogin(type) { // 1035 1043
-  if (isShowModal) {
-    return
-  }
-  if (wx.getStorageSync("isLogin") && type != "staff") {
-    return
-  }
-  if (wx.getStorageSync("staffIsLogin") && type == "staff") {
-    return
-  }
-  isShowModal = true
-  return wx.showModal({
-    title: "提示",
-    content: "当前状态为未登录，请前往登录",
-    showCancel: false,
-    success(res) {
-      if (res.confirm) {
-        wx.switchTab({
-          url: "/pages/mine/main"
-        });
-      }
-    },
-    complete() {
-      isShowModal = false
-    }
-  });
+  // if (isShowModal) {
+  //   return
+  // }
+  // if (wx.getStorageSync("isLogin") && type != "staff") {
+  //   return
+  // }
+  // if (wx.getStorageSync("staffIsLogin") && type == "staff") {
+  //   return
+  // }
+  // isShowModal = true
+  // return wx.showModal({
+  //   title: "提示",
+  //   content: "当前状态为未登录，请前往登录",
+  //   showCancel: false,
+  //   success(res) {
+  //     if (res.confirm) {
+  //       wx.switchTab({
+  //         url: "/pages/mine/main"
+  //       });
+  //     }
+  //   },
+  //   complete() {
+  //     isShowModal = false
+  //   }
+  // });
 }
 
 /**
@@ -422,13 +423,14 @@ export function filterDateMethod(timer) {
   }
   let date = new Date();
   let today = date.getDate() - 1;
-  let weekday = date.getDay() - 1;
+  let weekday = date.getDay() == 0 ? 6 : date.getDay() - 1;
   let month = date.getMonth() + 1
   let year = date.getFullYear()
   let monthDay = 0
   if (timer == 'day') obj = computeTimer(0, 1)
   if (timer == 'week') obj = computeTimer(weekday, 7 - weekday)
   if (timer == 'lastWeek') obj = computeTimer(weekday + 7, weekday, false)
+  if (timer == 'yesterday') obj = computeTimer(1, 0)
   if (timer == 'month') {
     monthDay = getMonthDay(year, month)
     obj = computeTimer(today, monthDay - today)

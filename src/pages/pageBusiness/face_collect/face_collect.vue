@@ -2,7 +2,8 @@
   <div class="face-collect">
     <!-- <button @click="takePhoto">拍照</button> -->
     <div class="camera-button">
-      <image src="/static/images/staff/camera_1.svg" v-if="!isCamera"></image>
+      <image class="camera-icon" src="/static/images/staff/camera_1.svg" v-if="!isCamera && !uploadImgSrc"></image>
+      <image class="upload-img" :src="uploadImgSrc" v-if="!isCamera && uploadImgSrc"></image>
       <camera class="camera" v-if="isCamera" :device-position="device?'back':'front'" flash="off"></camera>
       <!-- <div class="camera-text">拍照</div> -->
     </div>
@@ -14,7 +15,7 @@
     </div> -->
     <div class="bottom-wrapper">
       <div class="check_in-input-wrapper" v-if="hasKeyboard">
-        <input type="text" v-model="checkInNum" class="check_in-input" placeholder="请输入手机号或卡号确认签到" disabled>
+        <input type="text" v-model="checkInNum" class="check_in-input" placeholder="请输入手机号或卡号确认信息" disabled>
         <image class="search-icon" mode="aspectFit" src="/static/images/staff/search.svg"></image>
       </div> 
       <keyboard :isShow="hasKeyboard" :isFixed="false" :isAdaptive="isPhoneX" @onInputChange="keyboardInput" @onIputdelete="keyboardDelete" @onLongPressDelete="keyboardDeleteAll"></keyboard>
@@ -25,6 +26,8 @@
       </div>
       <div class="keyboard-mask" v-if="isCamera"></div>
     </div>
+
+    <canvas canvas-id='photo_canvas' :style="{width: '688rpx', height: canvas_h+'px'}" id='photo_canvas'></canvas>
   </div>
 </template>
 
@@ -42,13 +45,15 @@ export default {
       id: "",
       phone: "",
       isOpenFaceRule: 1,
-      hasKeyboard: false,
+      hasKeyboard: false, // 是否显示键盘
       checkInNum: "",
       customerName: "",
       device: false,
       isCamera: false,
       faceTimer: null,
+      uploadImgSrc: '',
       crx: {},
+      canvas_h: ''
     };
   },
   onShow() {
@@ -98,6 +103,16 @@ export default {
     // this.resetData()
   },
   methods: {
+    resetData() {
+      clearInterval(this.faceTimer);
+      this.id = ''
+      this.phone = ''
+      this.type = ''
+      this.isCamera = false
+      this.device = false
+      this.customerName = ''
+      this.uploadImgSrc = ''
+    },
     // 拍照上传
     takePhoto() {
       // if(!this.id) {
@@ -110,27 +125,59 @@ export default {
       this.searchCustomer().then(() => {
         wx.chooseImage({
           count: 1, // 默认9
-          success: function(res) {
-            // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
-            var tempFilePath = res.tempFilePaths[0];
+          sizeType: ['compressed'],
+          success: function(photo) {
+            // 返回选定照片的本地文件路径列表
+            var tempFilePath = photo.tempFilePaths[0];
             console.log("本地图片的路径:", tempFilePath);
 
-            wx.getFileSystemManager().readFile({
-              filePath: tempFilePath,
-              encoding: "base64",
-              success(res) {
-                // console.log(res);
-                // if (that.isOpenFaceRule) {
-                //   that.faceDetect(res.data, tempFilePath).then(() => {
-                //     that.upload(res.data, tempFilePath);
-                //   });
-                // } else {
-                //   that.upload(res.data, tempFilePath);
-                // }
-                that.isOpenFaceRule = 0
-                that.upload(res.data, tempFilePath);
+            wx.getImageInfo({
+              src: tempFilePath,
+              success: function (res) {
+                var ctx = wx.createCanvasContext('photo_canvas');
+                //设置canvas尺寸
+                var towidth = 344;  //按宽度344px的比例压缩
+                var toheight = Math.trunc(344 * res.height / res.width); //根据图片比例换算出图片高度
+                that.canvas_h = toheight
+                ctx.drawImage(tempFilePath, 0, 0, res.width, res.height, 0, 0, towidth, toheight)
+                ctx.draw(false, function () {
+                  // canvas绘制图片
+                  wx.canvasToTempFilePath({
+                    canvasId: 'photo_canvas',
+                    fileType: "jpg",
+                    success: function (canvasRes) {
+                      // 获去图片base64
+                      wx.getFileSystemManager().readFile({
+                        filePath: canvasRes.tempFilePath,
+                        encoding: "base64",
+                        success(base64Res) {
+                          that.isOpenFaceRule = 0
+                          that.uploadImgSrc = canvasRes.tempFilePath
+                          that.upload(base64Res.data, canvasRes.tempFilePath);
+                        }
+                      });
+                    }
+                  })
+                })
               }
-            });
+            })
+
+            // wx.getFileSystemManager().readFile({
+            //   filePath: tempFilePath,
+            //   encoding: "base64",
+            //   success(res) {
+            //     // console.log(res);
+            //     // if (that.isOpenFaceRule) {
+            //     //   that.faceDetect(res.data, tempFilePath).then(() => {
+            //     //     that.upload(res.data, tempFilePath);
+            //     //   });
+            //     // } else {
+            //     //   that.upload(res.data, tempFilePath);
+            //     // }
+            //     that.isOpenFaceRule = 0
+            //     that.upload(res.data, tempFilePath);
+            //   }
+            // });
           }
         });
       })
@@ -144,6 +191,7 @@ export default {
       //   })
       // }
       this.searchCustomer().then(() => {
+        console.log('faceCollect')
         this.isOpenFaceRule = 1
         this.isCamera = true
         setTimeout(() => {
@@ -187,7 +235,7 @@ export default {
         });
       });
     },
-    // 上传人脸
+    // 上传人脸 wxPathBase64 base64文件 tempFilePath 图片本地路径
     upload(wxPathBase64, tempFilePath) {
       console.log("upload")
       wx.showLoading({
@@ -296,7 +344,7 @@ export default {
       let that = this
       return new Promise((resolve) => {
         if(!that.hasKeyboard) {
-          resolve()
+          return resolve()
         }
         wx.showLoading({
           title: '查询中...'
@@ -356,12 +404,6 @@ export default {
     },
     keyboardDeleteAll() {
       this.checkInNum = ""
-    },
-    resetData() {
-      clearInterval(this.faceTimer);
-      this.id = ''
-      this.phone = ''
-      this.type = ''
     }
   }
 };
@@ -391,9 +433,14 @@ export default {
     align-items: center;
     flex-direction: column;
     justify-content: center;
-    >image {
+    .camera-icon {
       width: 50%;
       height: 50%;
+    }
+    .upload-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 10px;
     }
     >camera {
       width: 100%;
@@ -467,6 +514,11 @@ export default {
       z-index: 999;
       background-color: rgba(255,255,255,0.6);
     }
+  }
+  #photo_canvas {
+    position: absolute;
+    left: -1000px;
+    top: -1000px;
   }
 }
 </style>

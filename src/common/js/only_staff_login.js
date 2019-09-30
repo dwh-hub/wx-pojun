@@ -145,9 +145,9 @@ export function checkMember() {
 // 会员登录成功后
 function enterMember(data) {
   // 清除商户登录信息
-  HttpRequest({
-    url: window.api + '/user/exit'
-  })
+  // HttpRequest({
+  //   url: window.api + '/user/exit'
+  // })
   wx.setStorageSync("staffIsLogin", false);
   wx.hideLoading();
 

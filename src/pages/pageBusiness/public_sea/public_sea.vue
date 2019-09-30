@@ -194,6 +194,7 @@ export default {
       operateList: [
         {
           text: "认领",
+          authorityId: 55,
           hasAuth: checkAuth(55),
           class: 'operate icon-renling',
           iconUrl: "/static/images/staff/close.svg"
@@ -298,8 +299,8 @@ export default {
           url: '/customer/public/static/count',
           data: _data,
           success(res) {
-            that.headerData[1].dataNum = res.data.data.existingCount
-            that.headerData[2].dataNum = res.data.data.prospectiveCount
+            that.headerData[1].dataNum = res.data.data.prospectiveCount
+            that.headerData[2].dataNum = res.data.data.existingCount
           }
         })
         HttpRequest({

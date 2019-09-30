@@ -156,9 +156,10 @@ export default {
     let that = this;
     // 场景值为公众号自定义菜单进入时，无法触发组件的mounted钩子，在这里自动登录
     // if (wx.getLaunchOptionsSync().scene == 1035 && !wx.getStorageSync("isLogin")) {
-      getCompanyColor().then(() => {
-        this.login();
-      });
+      // TODO: 
+      // getCompanyColor().then(() => {
+      //   this.login();
+      // });
     // }
     wx.getLocation({
       type: "wgs84",
@@ -197,6 +198,19 @@ export default {
   onLoad(options) {
     this.setTheme()
     this._mounted()
+    wx.showShareMenu({
+      withShareTicket: true
+    })
+    if (options.scene) {
+      var scene = decodeURIComponent(options.scene);
+      let sceneArr = scene.split("-")
+      var companyId = sceneArr[0];
+      var storeId = sceneArr[1];
+      var serviceUserId = sceneArr[2];
+      wx.setStorageSync("companyId", companyId);
+      wx.setStorageSync("storeId", storeId);
+      wx.setStorageSync("serviceUserId", serviceUserId);
+    }
     this.options = options
     // this.getCompanyInfo()
   },

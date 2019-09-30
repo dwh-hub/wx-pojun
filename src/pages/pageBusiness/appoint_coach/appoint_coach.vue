@@ -733,14 +733,19 @@ export default {
     },
     // 选择教练
     selectCoach(item) {
+      if(this.appointType == '私教代约') {
+        this.coachCellText = item.userName
+        this.selectedCoachId = item.userId
+        this.isCoachPopup = false
+        this.getPeriodTime()
+        this.isTimePopup = true
+        return
+      }
       checkAttendStatus(item.userId).then(() => {
         this.coachCellText = item.userName
         this.selectedCoachId = item.userId
         this.isCoachPopup = false
         this.getPeriodTime()
-        if(this.appointType == '私教代约') {
-          this.isTimePopup = true
-        }
       })
     },
     // 选择门店
@@ -1163,7 +1168,7 @@ export default {
             let params;
             params = {
               way: way,
-              canFace: res.data.data.privateSignWayByCustomer == 1,
+              signWay: res.data.data.privateSignWayByCustomer,
               coachName: that.userInfo.userName,
               coachId: that.userInfo.userId,
               studentName: that.studentInfo.name,

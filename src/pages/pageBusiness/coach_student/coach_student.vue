@@ -251,8 +251,9 @@ export default {
         // }
         {
           text: "分配教练",
+          authorityId: 69,
           hasAuth: checkAuth(69),
-          style: `color:${window.color};`,
+          style: `color:themeColor;`,
           action: () => {
             this.distributeCoach();
           }
@@ -261,8 +262,9 @@ export default {
         },
         {
           text: "新增客户",
+          authorityId: 26,
           hasAuth: checkAuth(26),
-          style: `background-color:${window.color};color:#fff;`,
+          style: `background-color:themeColor;color:#fff;`,
           action: () => {
             wx.navigateTo({
               url: "../customer_register/main"
@@ -304,6 +306,10 @@ export default {
   },
   mounted() {
     this.refreshList();
+    this.operateList.forEach(e => {
+      e.hasAuth = checkAuth(e.authorityId)
+      e.style = e.style.replace('themeColor', window.color)
+    })
   },
   mixins: [colorMixin, listPageMixin],
   components: {

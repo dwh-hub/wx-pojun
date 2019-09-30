@@ -119,5 +119,8 @@
       "iconPath": "static/tabs/mine.png",
       "selectedIconPath": "static/tabs/mine-active.png"
     }]
+  },
+  "networkTimeout": {
+    "request": 60000
   }
 }

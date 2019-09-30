@@ -30,8 +30,7 @@
         >{{storeInfo.range || ''}}</span>
       </div>
       <div class="address-detail" @click="toMap()">
-        <span>{{storeInfo.address || '暂无地址信息'}}</span>
-        <img v-if="storeInfo.address" src="/static/images/address.png">
+        <span>{{storeInfo.address || '暂无地址信息'}}<img v-if="storeInfo.address" src="/static/images/address.png"></span>
       </div>
     </div>
     <div class="business-hours">
@@ -101,6 +100,9 @@ export default {
     pageFooter
   },
   onLoad(option) {
+    wx.showShareMenu({
+      withShareTicket: true
+    })
     // 进页面前先清空数据
     Object.assign(this.$data, this.$options.data());
     this.storeId = option.storeId;
@@ -312,7 +314,7 @@ export default {
         display: inline-block;
         vertical-align: middle;
       }
-      > img {
+      img {
         display: inline-block;
         vertical-align: middle;
         width: 15px;

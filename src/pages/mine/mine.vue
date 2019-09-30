@@ -227,6 +227,9 @@ export default {
           if (res.confirm) {
             HttpRequest({
               url: window.api + "/wxcustomer/exit",
+              data: {
+                disBindSub: 1
+              },
               success(res) {
                 if (res.data.code === 200) {
                   wx.removeStorageSync("userInfo");

@@ -135,7 +135,10 @@ export default {
         success(res) {
           if (res.confirm) {
             HttpRequest({
-              url: window.api + '/user/exit'
+              url: window.api + '/user/exit',
+              data: {
+                disBindSub: 1
+              }
             })
             wx.removeStorageSync("instMsgSubKey");
             wx.removeStorageSync("phone");
@@ -166,16 +169,16 @@ export default {
       });
     },
     changeTabbar(e) {
-      if (e.mp.detail == 0) {
-        wx.redirectTo({
-          url: "../index/main"
-        });
-      }
-      if (e.mp.detail == 1) {
-        wx.navigateTo({
-          url: "../service_web/main"
-        });
-      }
+      // if (e.mp.detail == 0) {
+      //   wx.redirectTo({
+      //     url: "../index/main"
+      //   });
+      // }
+      // if (e.mp.detail == 1) {
+      //   wx.navigateTo({
+      //     url: "../service_web/main"
+      //   });
+      // }
       if (e.mp.detail == 2) {
         wx.redirectTo({
           url: "../workbench/main"

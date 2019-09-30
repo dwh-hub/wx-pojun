@@ -231,7 +231,7 @@ export default {
             },
             {
               name: "昨日过期",
-              dateValue: 1,
+              dateValue: "yesterday",
               value: "",
               value_2: ""
             },

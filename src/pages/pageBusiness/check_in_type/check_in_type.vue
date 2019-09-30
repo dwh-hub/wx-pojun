@@ -156,7 +156,9 @@ export default {
           page: that.logPage,
           pageNo: that.logPage,
           storeId: that.selectedStore.storeId,
-          venueId: checkPopupData.venueId
+          venueId: checkPopupData.venueId,
+          timeStart: formatDate(new Date(), 'yyyy-MM-dd') + ' 00:00:00',
+          timeEnd: formatDate(new Date(), 'yyyy-MM-dd') + ' 23:59:59'
         },
         success(res) {
           if(res.data.code != 200 && res.data.data.result.lenght) {

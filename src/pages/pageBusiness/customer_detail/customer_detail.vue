@@ -377,6 +377,7 @@ export default {
           text: "一键上课",
           iconUrl: "/static/images/staff/close.svg",
           class: 'operate icon-yijian',
+          authorityId: 168,
           hasAuth: checkAuth(168),
           action: () => {
             this.checkAttendStatus();
@@ -386,6 +387,7 @@ export default {
           text: "客户跟进",
           iconUrl: "/static/images/staff/close.svg",
           class: 'operate icon-genjin',
+          authorityId: 27,
           hasAuth: checkAuth(27),
           action: () => {
             this.followUp();
@@ -395,6 +397,7 @@ export default {
           text: "来访预约",
           iconUrl: "/static/images/staff/close.svg",
           class: 'operate icon-yuyue',
+          authorityId: 207,
           hasAuth: checkAuth(207),
           action: () => {
             this.appoint();
@@ -404,6 +407,7 @@ export default {
           text: "预约上课",
           iconUrl: "/static/images/staff/close.svg",
           class: 'operate icon-shangke',
+          authorityId: 168,
           hasAuth: checkAuth(168),
           action: () => {
             this.toAppoint();
@@ -481,18 +485,18 @@ export default {
   },
   onShow() {
     setNavTab();
-    this.computedScrollHeight();
     this.getDetail();
-    this.getAppointList();
-    this.getCheckInList();
-    this.getFollowUpList();
-    this.getCardList();
     EventBus.$on('modifyCell', (obj) => {
       this.modifyInfo(obj.name, obj.value)
     })
   },
   onLoad(options) {
     this.id = options.id;
+    this.computedScrollHeight();
+    this.getAppointList();
+    this.getCheckInList();
+    this.getFollowUpList();
+    this.getCardList();
   },
   onUnload() {
     this.clearData();
@@ -978,7 +982,7 @@ export default {
     },
     toInfoCell(name, value) {
       wx.navigateTo({
-        url: `../modify_cell/main?type=customer&name=${name}&value=${value}`
+        url: `../modify_cell/main?type=customer&name=${name}&value=${value || ''}`
       });
     },
     // 修改信息

@@ -8,6 +8,7 @@
         <cover-view
           v-if="isCoverView"
           class="mask"
+          style="top: 160px;"
           v-show="(maskShow && currentNav==index)"
           @click.prevent.stop="clickMask"
         >
@@ -63,7 +64,7 @@
       <div class="sidebar-content">
         <div class="filter-main" :style="{'padding-bottom': isPhoneX ? '160rpx' : '92rpx'}">
           <div class="filter-item" v-for="(item, index) in filterList" :key="index">
-            <div class="filter-item-title">{{item.name}}（{{isRadio ? '单选' : '多选'}}）</div>
+            <div class="filter-item-title">{{item.name}}（{{item.isRadio ? '单选' : '多选'}}）</div>
             <div class="filter-options">
               <div
                 class="filter-option"
@@ -627,8 +628,7 @@ export default {
   watch: {
     nav: {
       handler(val) {
-        this._nav = val;
-        console.log(this._nav)
+        this._nav = val
       },
       deep: true
     }

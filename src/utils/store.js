@@ -17,7 +17,8 @@ const store = new Vuex.Store({
     classStartTime: "",
     classEndTime: "",
     schedulingWeekArr: [],
-    authInto: {}
+    authInto: {},
+    companyInfo: {}
   },
   mutations: {
     changeCount(state, value) {
@@ -58,6 +59,9 @@ const store = new Vuex.Store({
     },
     saveAuthInto(state, value) {
       state.authInto = value
+    },
+    changeCompanyInfo(state, value) {
+      state.companyInfo = value
     }
   }
 })

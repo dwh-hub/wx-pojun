@@ -30,14 +30,18 @@
     </div>
 
     <div class="bulling-content" v-if="!showSearch">
-      <div class="customer-info" v-if="showCustomerInfo">
-        <div class="cover"><image mode="aspectFill" :src="selectedCustomer.headImgPath || ''"></image></div>
+      <div class="customer-info shadow-block-item" v-if="showCustomerInfo">
+        <div class="customer-card-tip">会员购卡信息</div>
+        <user-item-s :info="selectedCustomer" @iconevent="delCurSelect">
+          <van-icon name="cross" color="#f95d51"/>
+        </user-item-s>
+        <!-- <div class="cover"><image mode="aspectFill" :src="selectedCustomer.headImgPath || ''"></image></div>
         <div class="customer-middle">
           <div><span>{{selectedCustomer.name}}</span><span class="verify" :class="selectedCustomer.colorClass">{{selectedCustomer.phoneVerifyText}}</span></div>
           <div>性别：{{selectedCustomer.sex}}</div>
           <div>{{selectedCustomer.phone}}</div>
         </div>
-        <img src="/static/images/staff/delete.png" class="del" @click="delCurSelect">
+        <img src="/static/images/staff/delete.png" class="del" @click="delCurSelect"> -->
       </div>
 
       <div class="verify-wrapper" v-if="showVerify">
@@ -53,10 +57,11 @@
         </div>
       </div>
 
-      <div class="card-form" v-show="showCardForm">
+      <div class="card-form shadow-block-item" v-show="showCardForm">
         <div class="subtitle" style="border-bottom: 1rpx solid #eee;" v-if="billingType != 4">
           <img class="screening-icon" src="/static/images/staff/title-icon.svg">
           <span class="subtitle-text">选择要购买的卡种</span>
+          <span class="more-set" @click="toMore" v-if="billingType != 4">更多设置选项</span>
         </div>
         <div class="input-cell-wrapper" v-if="billingType != 4">
           <div class="cell-value must-input">办卡卡种</div>
@@ -92,7 +97,6 @@
           <div class="input-cell-wrapper" v-if="billingType != 4">
             <div class="cell-value">合同标签</div>
             <div class="cell-content">
-              
                 <!-- @click="actionsList = cardLabelList;showActionsList = true;actionType='label'" -->
               <input
                 class="cell-input"
@@ -165,7 +169,7 @@
             </div>
           </div>
           <div class="input-cell-wrapper" v-if="billingType != 4">
-            <div class="cell-value must-input">{{selectedCard.cellValue}}</div>
+            <div class="cell-value must-input">{{selectedCard.cellValue}}(可修改)</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
@@ -175,11 +179,11 @@
                 v-model="selectedCard.buyAuthority"
               />
               <div>{{selectedCard.unit}}</div>
-              <div class="modify-text">可修改</div>
+              <!-- <div class="modify-text">可修改</div> -->
             </div>
           </div>
           <div class="input-cell-wrapper" v-if="billingType != 4">
-            <div class="cell-value must-input">会员卡总价</div>
+            <div class="cell-value must-input">会员卡总价({{(curCardSet.canModifyPrice == 1 && curCardSet.modifiableMinValue==0)?'不可修改':'可修改'}})</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
@@ -190,12 +194,12 @@
                 v-model="selectedCard.salePrice"
               />
               <div>元</div>
-              <div class="modify-text">{{(curCardSet.canModifyPrice == 1 && curCardSet.modifiableMinValue==0)?'不可修改':'可修改'}}</div>
+              <!-- <div class="modify-text">{{(curCardSet.canModifyPrice == 1 && curCardSet.modifiableMinValue==0)?'不可修改':'可修改'}}</div> -->
             </div>
           </div>
           <div class="limt-cell" v-if="isShowSalePriceTip">会员卡单价的范围是{{constCardInfo.salePrice - 20}}-{{constCardInfo.salePrice+20}}</div>
           <div class="input-cell-wrapper" v-if="billingType != 4">
-            <div class="cell-value must-input">赠送{{selectedCard.cellValue}}</div>
+            <div class="cell-value must-input">赠送{{selectedCard.cellValue}}(可修改)</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
@@ -205,12 +209,12 @@
                 v-model="curCardSet.giveAwayAuthority"
               />
               <div>{{selectedCard.unit}}</div>
-              <div class="modify-text">可修改</div>
+              <!-- <div class="modify-text">可修改</div> -->
             </div>
           </div>
           <div class="limt-cell" v-if="isShowGifTip">赠送权益的范围是{{curCardSet.theHighestGiftInterest}}</div>
           <div class="input-cell-wrapper" v-if="selectedCard.authorityUnit != 1 && billingType != 4">
-            <div class="cell-value must-input">有效天数</div>
+            <div class="cell-value must-input">有效天数({{(curCardSet.canModifyTheValidDate == 1 && curCardSet.modifiableValidDateThreshold == 0)?'不可修改':'可修改'}})</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-short"
@@ -221,23 +225,51 @@
                 v-model="selectedCard.periodOfValidity"
               />
               <div>天</div>
-              <div class="modify-text">{{(curCardSet.canModifyTheValidDate == 1 && curCardSet.modifiableValidDateThreshold == 0)?'不可修改':'可修改'}}</div>
+              <!-- <div class="modify-text">{{(curCardSet.canModifyTheValidDate == 1 && curCardSet.modifiableValidDateThreshold == 0)?'不可修改':'可修改'}}</div> -->
             </div>
           </div>
           <div class="limt-cell" v-if="isShowlimtDate">修改有效天数浮动值不能超过{{curCardSet.modifiableValidDateThreshold}}</div>
           <div class="input-cell-wrapper pay-card-type-wrapper" v-if="billingType != 4">
             <div class="cell-value">开卡方式</div>
             <div class="cell-content">
-              <div class="pay-card-type-btn-wrapper">
+              <radio-group class="radio-group" @change="onPayCardType">
+                <radio class="radio" value="3" :checked="payCardType == 3">手动开卡</radio>
+                <radio class="radio" value="2" :checked="payCardType == 2">立即开卡</radio>
+                <radio class="radio" value="1" :checked="payCardType == 1">定期开卡</radio>
+              </radio-group>
+              <!-- <div class="pay-card-type-btn-wrapper">
                 <div class="pay-card-type-btn" :class="{'payActive': payCardType == 3}" @click="payCardType = 3">手动开卡</div>
                 <div class="pay-card-type-btn" :class="{'payActive': payCardType == 2}" @click="payCardType = 2">立即开卡</div>
                 <div class="pay-card-type-btn" :class="{'payActive': payCardType == 1}" @click="payCardType = 1">定期开卡</div>
-              </div>
+              </div> -->
             </div>
           </div>
-          <div class="input-cell-wrapper pay-card-date" v-if="billingType != 4">
+          <div class="input-cell-wrapper" v-if="(payCardType == 2 || payCardType == 1) && billingType != 4">
+            <div class="cell-value must-input">开始日期</div>
+            <div class="cell-content">
+              <picker 
+                @change="onPayCardStartDate" 
+                :value="payCardStartDate"
+                :disabled="payCardType == 2"
+                mode="date">
+                <view class="picker">{{payCardStartDate}}</view>
+              </picker>
+            </div>
+          </div>
+          <div class="input-cell-wrapper" v-if="(payCardType == 2 || payCardType == 1) && billingType != 4">
+            <div class="cell-value must-input">结束日期</div>
+            <div class="cell-content">
+              <picker 
+                @change="onPayCardEndDate"
+                :value="payCardEndDate" 
+                mode="date"
+                :disabled="payCardType == 2 || (curCardSet.canModifyTheValidDate == 1 && curCardSet.modifiableValidDateThreshold == 0)">
+                <view class="picker">{{payCardEndDate}}</view>
+              </picker>
+            </div>
+          </div>
+          <!-- <div class="input-cell-wrapper pay-card-date" v-if="billingType != 4">
             <div class="pay-card-timePicker" v-if="payCardType == 1">
-              <!-- <input type="text" disabled @click="showPayCardRimePicker = true" :value="payCardStartDate"> -->
               <picker 
                 @change="onPayCardStartDate" 
                 :value="payCardStartDate" 
@@ -253,21 +285,21 @@
               </picker>
             </div>
             <div class="date-tip" v-if="payCardType == 2 || payCardType == 1">将于{{payCardStartDate}}自动激活,于{{payCardEndDate}}时结束</div>
-          </div>
+          </div> -->
           <div class="input-cell-wrapper" v-if="billingType != 4"> 
             <div class="cell-value must-input">实体卡号</div>
             <div class="cell-content">
               <input
                 class="cell-input cell-input-lang"
-                v-show="isNeedCardNum"
                 v-model="cardNum"
-                :placeholder="isNeedCardNum ? '请输入卡号' : '无需卡号'"
+                placeholder="请输入卡号，无需卡号可不填"
                 placeholder-class="placeholder"
               />
-              <div class="card-num-btn">
+              <div class="random-card-num" @click="randomCardId">随机</div>
+              <!-- <div class="card-num-btn">
                 <div class="no-card-num" @click="unwantedCardNum" v-if="isNeedCardNum">无需卡号</div>
                 <div class="random-card-num" @click="randomCardId">随机卡号</div>
-              </div>
+              </div> -->
             </div>
           </div>
           <div class="cell-subtitle" v-if="billingType != 4">合同照片</div>
@@ -284,7 +316,7 @@
           <div class="carRemark" v-show="!showEntryBox">
             <textarea v-model="remarks" maxlength="120" cursor-spacing="50" placeholder="备注不能超过120个字" placeholder-class="placeholder"></textarea>
           </div>
-          <div class="cell-subtitle" @click="toMore" v-if="billingType != 4">更多设置选项</div>
+          <!-- <div class="cell-subtitle" @click="toMore" v-if="billingType != 4">更多设置选项</div> -->
           <div class="submit-wrapper" :class="{'safe-bottom': isIphoneX}">
             <div class="submit-btn clear" :style="{'color': themeColor}" @click="clearForm">清空</div>
             <div class="submit-btn submit" @click="submitCashier" :style="{'color': themeColor}">提交收银台</div>
@@ -343,7 +375,7 @@
       <div class="sale-list">
         <div v-for="(item, index) in filterSaleList" :key="index">
           <div class="sale-item"  @click="selectAction(item)">
-            <img :src="item.cover">
+            <img :src="item.cover" @error="loadFail(index)">
             <span>{{item.userName}}</span>
             <span>{{item.sex}}</span>
           </div>
@@ -428,6 +460,7 @@ import {
 } from "COMMON/js/common.js";
 import colorMixin from "COMPS/colorMixin.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
+import userItemS from "../components/user-item-s.vue";
 import store from "@/utils/store.js";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
 import { transformJspImg,getStoreSet,getUserofrole,qiniuUpload } from "../common/js/http.js";
@@ -448,6 +481,7 @@ export default {
     staffCoachItem,
     headerSearch,
     noneResult,
+    userItemS
     // filterNav
   },
   onLoad(options) {
@@ -506,6 +540,9 @@ export default {
         this.getCardLabelList()
         this.getCardSetList()
       }
+    },
+    loadFail(index) {
+      this.filterSaleList[index].cover = window.api + "/assets/img/morenTo.png";
     },
     searchSale: debounce(function(text) {
       this.filterSaleList = this.saleList.filter(e => e.userName.indexOf(text) > -1)
@@ -572,7 +609,8 @@ export default {
               second_tip_1: "客户状态：",
               second_1: e.customerClassChar,
               phone: e.phone,
-              third_1: e.phone.slice(0,3) + '****' + e.phone.slice(7)
+              third_1: e.phone.slice(0,3) + '****' + e.phone.slice(7),
+              customerClassChar: e.customerClassChar
             }
           })
           Promise.all(_data).then(result => {
@@ -605,7 +643,7 @@ export default {
           if(info.code == 200 || info.code == 405) {
             info.data.headImgPath = item.cover
             // info.data.customerPhone = item.second_1
-            info.data.sex = item.second_1
+            // info.data.sex = item.second_1
             if(info.data.phoneVerifyStatus == 0) {
               info.data.phoneVerifyText = '未验证'
               info.data.colorClass = 'gray'
@@ -616,6 +654,7 @@ export default {
               info.data.phoneVerifyText = '电话验证'
               info.data.colorClass = 'phoneV'
             }
+            info.data.customerClassChar = item.customerClassChar
             that.selectedCustomer = info.data
             that.getSaleList()
             that.showCustomerInfo = true
@@ -623,11 +662,13 @@ export default {
             if(that.billingType == 4) {
               that.isSelectCard = true
             }
+            if(that.billingType != 4) {
+              that.showCardList = true
+            }
             if(that.storeSetting.isAddCardCode) {
               return that.showVerify = true
             }
             that.showCardForm = true
-            that.showCardList = true
           } else {
             wx.showModal({
               title: "提示",
@@ -642,7 +683,7 @@ export default {
     delCurSelect() {
       this.showSearch = true
       this.showCustomerInfo = false
-      this.resetPage()
+      return this.resetPage()
     },
     // 获取卡列表
     getCardList() {
@@ -760,7 +801,7 @@ export default {
     },
     // 获取办理销售
     getSaleList() {
-      getUserofrole(this.selectedStore.storeId, 2).then((data) => {
+      getUserofrole(this.selectedStore.storeId, 0).then((data) => {
         let _data = data.map(async (e) => {
           e.headImgPath = await transformJspImg(e.headImgPath)
           return {
@@ -860,6 +901,9 @@ export default {
         return this.isShowGifTip = true
       }
       this.isShowGifTip = false
+    },
+    onPayCardType(e) {
+      this.payCardType = e.mp.detail.value
     },
     // 发送短信
     sendCode() {
@@ -1049,16 +1093,17 @@ export default {
               duration: 1000
             });
           }
-          if (!this.cardNum && this.isNeedCardNum) {
-            return wx.showToast({
-              title: "请填写卡号",
-              icon: "none",
-              duration: 1000
-            });
+          if (!this.cardNum) {
+            this.randomCardId()
+            // return wx.showToast({
+            //   title: "请填写卡号",
+            //   icon: "none",
+            //   duration: 1000
+            // });
           }
         }
         this.checkInPactId().then(res => {
-          if(this.billingType == 4 || !this.isNeedCardNum) {
+          if(this.billingType == 4) {
             return this.getToken().then(() => {
               resolve()
             })
@@ -1162,13 +1207,13 @@ export default {
       })
     },
     // 无需卡号，设置一个随机卡号
-    unwantedCardNum() {
-      this.randomCardId()
-      this.isNeedCardNum = false;
-    },
+    // unwantedCardNum() {
+    //   this.randomCardId()
+    //   this.isNeedCardNum = false;
+    // },
     // 随机卡号
     randomCardId() {
-      this.isNeedCardNum = true
+      // this.isNeedCardNum = true
       let cardNum = "";
       let mydate = new Date();
       cardNum ="" + mydate.getDay() + mydate.getHours()+ mydate.getMinutes()+mydate.getSeconds()+mydate.getMilliseconds();
@@ -1418,26 +1463,30 @@ export default {
 @import "../common/less/form.less";
 @import "~COMMON/less/common";
 @import "../common/less/staff_common.less";
+page {
+  background-color: #f4f5f6;
+}
 .billing {
   .input-cell-wrapper {
     line-height: 42px;
-    .cell-value {
-      flex: 0 0 30%;
-    }
+    // .cell-value {
+    //   flex: 0 0 30%;
+    // }
     .cell-content {
       display: flex;
       flex-wrap: wrap;
+      justify-content: flex-end;
       .cell-input {
-        width: 100%;
+        flex: 1;
         height: 42px;
         line-height: 42px;
       }
-      .cell-input-short {
-        width: 30%;
-      }
-      .cell-input-lang {
-        width: 100%;
-      }
+      // .cell-input-short {
+      //   width: 30%;
+      // }
+      // .cell-input-lang {
+      //   width: 100%;
+      // }
       .card-num-btn {
         >div {
           display: inline-block;
@@ -1449,6 +1498,11 @@ export default {
           border: 1px solid #eee;
           color: #333333;
         }
+      }
+      .random-card-num {
+        font-size: 12px;
+        color: #119bf0;
+        margin-left: 5px;
       }
       .pay-card-type-btn-wrapper {
         display: flex;
@@ -1467,11 +1521,10 @@ export default {
           color: #00ced8;
         }
       }
-      .modify-text {
-        flex: 1;
-        text-align: right;
-        color: #999999;
-      }
+      // .modify-text {
+      //   text-align: right;
+      //   color: #999999;
+      // }
     }
   }
   .limt-cell {
@@ -1577,6 +1630,7 @@ export default {
   .billing-header {
     display: flex;
     border-bottom: 1rpx solid #eee;
+    background-color: #fff;
     .subtitle {
       width: 30%;
     }
@@ -1614,60 +1668,70 @@ export default {
   }
   .bulling-content {
     .customer-info {
-      position: relative;
-      display: flex;
-      padding: 10px;
-      border-bottom: 1rpx solid #eee;
-      .cover {
-        flex: 0 0 60px;
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        background-color: #eee;
-        >image {
-          width: 100%;
-          height: 100%;
-          border-radius: 12px;
-        }
-      }
-      .customer-middle {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        padding-left: 12px;
-        >div {
-          line-height: 20px;
-          font-size: 12px;
-          color: #505050;
-        }
-        .verify {
-          line-height: 20px;
-          padding: 0 5px;
-          margin-left: 10px;
-          color: #fff;
-          border-radius: 3px;
-          &.gray {
-            background-color: #d3d3d3;
-          }
-          &.noteV {
-            background-color: #67c87b;
-          }
-          &.phoneV {
-            background-color: #ebc445;
-          }
-        }
-      }
-      .del {
-        position: absolute;
-        top: 50%;
-        right: 15px;
-        transform: translateY(-50%);
-        width: 18px;
-        height: 20px;
-        padding: 15px;
+      background-color: #fff;
+      .customer-card-tip {
+        padding-left: 10px;
+        padding-top: 5px;
+        font-size: 13px;
+        color: #666;
       }
     }
+    // .customer-info {
+    //   position: relative;
+    //   display: flex;
+    //   padding: 10px;
+    //   border-bottom: 1rpx solid #eee;
+    //   background-color: #fff;
+    //   .cover {
+    //     flex: 0 0 60px;
+    //     width: 60px;
+    //     height: 60px;
+    //     border-radius: 12px;
+    //     background-color: #eee;
+    //     >image {
+    //       width: 100%;
+    //       height: 100%;
+    //       border-radius: 12px;
+    //     }
+    //   }
+    //   .customer-middle {
+    //     flex: 1;
+    //     display: flex;
+    //     flex-direction: column;
+    //     justify-content: center;
+    //     padding-left: 12px;
+    //     >div {
+    //       line-height: 20px;
+    //       font-size: 12px;
+    //       color: #505050;
+    //     }
+    //     .verify {
+    //       line-height: 20px;
+    //       padding: 0 5px;
+    //       margin-left: 10px;
+    //       color: #fff;
+    //       border-radius: 3px;
+    //       &.gray {
+    //         background-color: #d3d3d3;
+    //       }
+    //       &.noteV {
+    //         background-color: #67c87b;
+    //       }
+    //       &.phoneV {
+    //         background-color: #ebc445;
+    //       }
+    //     }
+    //   }
+    //   .del {
+    //     position: absolute;
+    //     top: 50%;
+    //     right: 15px;
+    //     transform: translateY(-50%);
+    //     width: 18px;
+    //     height: 20px;
+    //     padding: 15px;
+    //   }
+    // }
     .verify-wrapper {
       .verify-phone {
         display: flex;
@@ -1705,6 +1769,19 @@ export default {
   }
   .card-form {
     padding-bottom: 50px;
+    .subtitle {
+      padding: 5px 10px 5px 5px;
+      line-height: 30px;
+      .subtitle-text {
+        color: #666;
+        font-size: 12px;
+      }
+      .more-set {
+        float: right;
+        font-size: 12px;
+        color: #119bf0;
+      }
+    }
     .submit-wrapper {
       position: fixed;
       bottom: 0;
@@ -1717,7 +1794,7 @@ export default {
       .submit-btn {
         flex: 1;
         text-align: center;
-        line-height: 48px;
+        line-height: 40px;
         background-color: #fff;
       }
       .clear {

@@ -60,6 +60,9 @@ export default function autoLogin() {
             wx.showLoading({
               title: '登录中...'
             })
+            let _data = res.data.data
+            _data.authList = {}
+            wx.setStorageSync("staff_info", _data);
             getAuthList().then((data) => {
               let authList = []
               data.forEach((store) => {

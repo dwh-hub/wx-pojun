@@ -3,7 +3,7 @@
     <!-- <i></i>  http://pojun-tech.cn/assets/img/none-result.png-->
     <image mode="aspectFit" :src="window.api + '/assets/img/none-result.png'"></image>
     <p>{{text}}</p>
-    <div class="result-btn" :style="{'background-color': themeColor}" v-if="buttonText" @click="tapBtn">{{buttonText}}</div>
+    <div class="result-btn" :style="{'background-color': window.color}" v-if="buttonText" @click="tapBtn">{{buttonText}}</div>
   </div>
 </template>
 

@@ -204,13 +204,14 @@ function bindMethod(url, isTab) {
 
 // 注册
 function register() {
+  let _userInfo = wx.getStorageSync("userInfo")
   HttpRequest({
     url: window.api + "/wxcustomer/addCustomer",
     data: {
-      id: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").id : 0,
+      id: _userInfo ? _userInfo.id : 0,
       companyId: wx.getStorageSync("companyId"),
       phone: wx.getStorageSync("phone"),
-      name: wx.getStorageSync("userInfo") ? wx.getStorageSync("userInfo").name : ("微信用户" + rand(1000, 9999)),
+      name: _userInfo ? _userInfo.name : ("微信用户" + rand(1000, 9999)),
       storeId: wx.getStorageSync("storeId") ? wx.getStorageSync("storeId") : storeId,
       serviceUserId: wx.getStorageSync("serviceUserId") ? wx.getStorageSync("serviceUserId") : '',
       sex: 0

@@ -22,10 +22,10 @@
       <van-cell title="上课日期" :value="classDetail.classStartTime" />
       <van-cell title="上课时间" :value="classDetail.classStartDate" />
       <van-cell title="是否预约" :value="classDetail.isNeedAppointText" />
-      <van-cell title="最小上课人数" :value="classDetail.minPeople" />
-      <van-cell title="最大上课人数" :value="classDetail.maxPeople" />
-      <van-cell title="预约截止时间" :value="classDetail.stopAppoint" />
-      <van-cell title="预约开始时间" :value="classDetail.advanceAppoint+'分钟'" />
+      <van-cell title="最小上课人数" :value="classDetail.minPeople || '不限'" />
+      <van-cell title="最大上课人数" :value="classDetail.maxPeople || '不限'" />
+      <van-cell title="预约截止时间" :value="classDetail.stopAppoint || '不限'" />
+      <van-cell title="预约开始时间" :value="(classDetail.advanceAppoint || '--')+'分钟'" />
     </van-cell-group>
     <div class="cell-title">上课列表</div>
     <div class="student-list">

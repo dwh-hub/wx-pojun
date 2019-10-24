@@ -32,7 +32,7 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, 0, 4)"
     ></timePicker>
 
     <van-dialog
@@ -63,7 +63,7 @@ import staffCoachItem from "../components/staff-coach-item.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
-import { getVenueList } from "../common/js/http.js";
+import { getVenueList, recordUpdate } from "../common/js/http.js";
 
 export default {
   data() {
@@ -243,7 +243,7 @@ export default {
                 phone: e.phone,
                 cover: e.headImgPath
                   ? e.headImgPath
-                  : winddow.api + "/assets/img/morenTo.png",
+                  : window.api + "/assets/img/morenTo.png",
                 first_1: e.customerName,
                 first_2: e.phone.slice(0,3) + '****' + e.phone.slice(7),
                 second_1: `${e.venueName}  ${e.secondCardClassName}(${
@@ -253,7 +253,10 @@ export default {
                 second_2: "",
                 status: e.status,
                 rightText: statusText,
-                color: statusText == '已入场' ? '#00baad' : '#808080'
+                color: statusText == '已入场' ? '#00baad' : '#808080',
+                storeId: e.storeId,
+                venueId: e.venueId,
+                startTime: e.startTime
               };
             });
             Promise.all(_data).then(result => {
@@ -265,11 +268,16 @@ export default {
     },
     confirmPwd() {
       let that = this
+      console.log(this.selectedCustomer)
+      if (!that.pwd) {
+        return
+      }
       HttpRequest({
         url: `/consumption/general/withraw/${that.selectedCustomer.consumptionLogId}/${that.pwd}`,
         success(res) {
           that.pwd = ""
           if(res.data.code == 200)  {
+            recordUpdate(that.selectedCustomer.id, that.selectedCustomer.storeId, that.selectedCustomer.venueId, that.selectedCustomer.startTime)
             that.refreshList()
             wx.showToast({
               title: res.data.message,

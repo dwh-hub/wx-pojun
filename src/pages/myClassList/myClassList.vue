@@ -49,7 +49,7 @@ export default {
   },
   onLoad(options) {
     setNavTab();
-    this.customerId = this.userInfo = wx.getStorageSync("userInfo").id;
+    this.customerId = wx.getStorageSync("userInfo").id;
     console.log(options);
     // type 1 团课 2 私教课
     this.options = options;

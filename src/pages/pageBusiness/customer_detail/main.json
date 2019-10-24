@@ -11,6 +11,7 @@
       "van-popup": "../../../../static/vant/popup/index",
       "van-icon": "../../../../static/vant/icon/index",
       "van-datetime-picker": "../../../../static/vant/datetime-picker/index",
-      "van-loading": "../../../../static/vant/loading/index"
+      "van-loading": "../../../../static/vant/loading/index",
+      "van-rate": "../../../../static/vant/rate/index"
     }
   }

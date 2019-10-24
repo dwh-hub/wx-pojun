@@ -10,11 +10,14 @@ import F2 from '@antv/wx-f2';
 
 // 获取常用服务列表，并根据配置文件过滤添加
 function getUseServiceList() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // resolve([])
     HttpRequest({
       url: '/mini/commonSet/get',
       success(res) {
+        if (JSON.stringify(res.data).includes('DOCTYPE html') && wx.getStorageSync('instMsgSubKey')) {
+          return resolve([])
+        }
         let data = JSON.parse(res.data.data)
         let list = []
         if (!data || !data.length) {
@@ -102,14 +105,14 @@ function getVenueList(storeId) {
   })
 }
 
-// 获取教练/销售
+// 获取教练/销售  positionType 1 教练  0 销售
 function getUserofrole(storeId, positionType) {
   return new Promise((resolve) => {
     HttpRequest({
       url: "/customer/register/userofrole",
       data: {
         storeId: storeId,
-        positionType: positionType // 1 教练  0 销售
+        positionType: positionType
       },
       success(res) {
         let data = res.data.data
@@ -312,6 +315,20 @@ function checkAttendStatus(coachId) {
   })
 }
 
+// 消费/撤消/反撤消后的出勤记录更新
+function recordUpdate(customerId,storeId,venueId,startTime) {
+  HttpRequest({
+    url: '/attendance/record/cost/after',
+    data: {
+      companyId: wx.getStorageSync('companyId'),
+      customerId,
+      storeId,
+      venueId,
+      startTime
+    }
+  })
+}
+
 export {
   getUseServiceList,
   transformJspImg,
@@ -321,5 +338,6 @@ export {
   attendclass,
   getVenueList,
   initLine,
-  checkAttendStatus
+  checkAttendStatus,
+  recordUpdate
 }

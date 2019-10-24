@@ -1,10 +1,7 @@
 {
   "pages": [
     "pages/homepage/main",
-    "pages/authorizeLogin/main",
-    "pages/register/main",
     "pages/mine/main",
-    "pages/login/main",
     "pages/appointmentClass/main",
     "pages/myClassList/main",
     "pages/coachList/main",
@@ -30,7 +27,6 @@
     "pages": [
       "workbench/main",
       "index/main",
-      "staff_appoint_teamclass/main",
       "allServices/main",
       "customer/main",
       "appoint_coach/main",

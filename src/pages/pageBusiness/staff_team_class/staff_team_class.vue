@@ -5,11 +5,12 @@
         :storeList="storeList"
         :color="themeColor"
         :search="searchChange"
+        placeholder="请输入团课名称查询"
         :isOverlap="true"
         @selectStore="selectStore"
       ></header-search>
       <header-data :isOverlap="true" :headerData="headerData"></header-data>
-      <filter-nav :nav="nav"></filter-nav>
+      <filter-nav :nav="nav" @submitFilter="getFilter" :hasMoreFilter="true" :moreFilterList="moreFilter"></filter-nav>
     </div>
     <div class="class-list common-list">
       <team-class-item
@@ -45,9 +46,9 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, 0, 4)"
     ></timePicker>
-    <suspension-window v-if="!isOperate" :operateList="operateList"></suspension-window>
+    <suspension v-if="!isOperate" :operateList="operateList"></suspension>
   </div>
 </template>
 
@@ -66,7 +67,8 @@ import teamClassItem from "COMPS/teamClassItem.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
-import suspensionWindow from "../components/suspension-window.vue";
+import suspension from "../components/suspension.vue";
+import { getUserofrole } from "../common/js/http"
 export default {
   data() {
     return {
@@ -140,6 +142,37 @@ export default {
           ]
         }
       ],
+      moreFilter: [
+        {
+          name: "是否需要预约",
+          isRadio: true,
+          isParmas: false,
+          isTimer: false,
+          param: "isNeedAppoint",
+          value: "",
+          children: [
+            {
+              name: "需要预约",
+              value: "1,2"
+            },
+            {
+              name: "无需预约",
+              value: "0"
+            }
+          ]
+        },
+        {
+          name: "上课教练",
+          // type: 3,
+          isShowAll: false,
+          isRadio: false,
+          isParmas: false,
+          isTimer: false,
+          param: "coachId",
+          value: "",
+          children: []
+        }
+      ],
       headerData: [
         {
           dataText: "课程数",
@@ -206,6 +239,7 @@ export default {
       isOperate: false,
       filter: {
         namePhone: "",
+        anotherName: "",
         calendarStart: "",
         calendarEnd: "",
         scheduleldStatus: "",
@@ -217,6 +251,14 @@ export default {
     this.nav[0].navTitle = "今日";
     this.getVenueList()
     this.filterDate(1);
+    getUserofrole(this.selectedStore.storeId, 1).then((data) => {
+      this.moreFilter[1].children = data.map(e => {
+        return {
+          name: e.userName,
+          value: e.userId
+        }
+      })
+    })
   },
   onShow() {
     if (this.selectedStore.storeId) {
@@ -230,7 +272,7 @@ export default {
     teamClassItem,
     headerSearch,
     noneResult,
-    suspensionWindow
+    suspension
   },
   methods: {
     selectStore(item) {
@@ -279,7 +321,7 @@ export default {
       });
     },
     searchChange(event) {
-      this.filter.namePhone = event;
+      this.filter.anotherName = event;
     },
     filterDate(day) {
       let obj = this.filterDateMethod(day);

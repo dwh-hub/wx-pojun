@@ -1,135 +1,42 @@
 <template>
   <div class="customer">
-    <div class="customer-base-info">
-      <div class="cover">
-        <!-- <div class="avatar"></div> -->
-        <image :src="userInfo.headImgPath" mode="aspectFill"></image>
+    <div class="sticky-block">
+      <div class="customer-base-info" :style="{'background-color': themeColor}">
+        <div class="cover">
+          <!-- <div class="avatar"></div> -->
+          <image :src="userInfo.headImgPath" mode="aspectFill"></image>
+        </div>
+        <div class="coach-info">
+          <div class="coach-name">{{userInfo.name}}</div>
+          <div class="coach-phone">{{userInfo.phone}}</div>
+        </div>
+        <div class="icon-right" @click="call">
+          <img src="/static/images/staff/phone_2.png" alt>
+        </div>
       </div>
-      <div class="coach-info">
-        <div class="coach-name">{{userInfo.name}}</div>
-        <div class="coach-phone">{{userInfo.phone}}</div>
+      <div class="surface">
+        <div class="circular" :style="{'background-color': themeColor}"></div>
       </div>
-      <div class="icon-right" @click="call">
-        <img src="/static/images/staff/phone.svg" alt>
-      </div>
+      <header-data :headerData="customerSumData"></header-data>
+      <van-tabs :active="tabIndex" @change="changeTab" tab-class="van-tab-class" line-height="1" :color="themeColor">
+        <van-tab title="基本资料"></van-tab>
+        <van-tab title="出勤信息"></van-tab>
+        <van-tab title="跟进回访"></van-tab>
+        <van-tab title="合同"></van-tab>
+      </van-tabs>
     </div>
-    <van-tabs :active="tabIndex" @change="changeTab" :color="themeColor">
-      <van-tab title="出勤信息">
-        <!-- <header-data :headerData="checkInData"></header-data>
-        <scroll-view
-          scroll-y
-          :style="{height: scrollViewHeight + 'px'}"
-          @scrolltolower="getCheckInList()"
-        >
-          <list-day-item :info="item" v-for="(item,index) in checkInList" :key="index"></list-day-item>
-          <none-result text="暂无出勤记录" v-if="!checkInList.length && !isCheckInLoading"></none-result>
-          <van-loading :color="themeColor" v-if="isCheckInLoading"/>
-        </scroll-view> -->
-      </van-tab>
-      <van-tab title="跟进回访">
-        <!-- <header-data :headerData="FollowUpData"></header-data>
-        <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
-          <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item>
-          <none-result text="暂无跟进回访" v-if="!followUpList.length && !isFollowUpLoading"></none-result>
-          <van-loading :color="themeColor" v-if="isFollowUpLoading"/>
-        </scroll-view> -->
-      </van-tab>
-      <van-tab title="合同">
-        <!-- <header-data :headerData="cardData"></header-data>
-        <scroll-view
-          scroll-y
-          :style="{height: scrollViewHeight + 'px'}"
-          @scrolltolower="getCardList()"
-        >
-          <div class="card-list">
-            <card
-              v-for="(item,index) in cardList"
-              :info="item"
-              :key="index"
-              @hasClick="toCardDetail(item)"
-            ></card>
-          </div>
-          <none-result text="暂无合同" v-if="!cardList.length && !isCardLoading"></none-result>
-          <van-loading :color="themeColor" v-if="isCardLoading"/>
-        </scroll-view> -->
-      </van-tab>
-      <van-tab title="更多信息">
-        <!-- <div class="info">
-          <van-cell-group custom-class="van-cell-group">
-            <van-cell title="基本信息" is-link @click="toUserInfo"/>
-          </van-cell-group>
-          <van-cell title="服务教练" @click="showCoachList()">
-            <div slot="right-icon">
-              <div class="tab-cover" v-for="(item, index) in serviceCoachList" :key="index">
-                <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
-              </div>
-              <van-icon name="arrow" color="#999"/>
-            </div>
-          </van-cell>
-          <van-cell title="服务销售" @click="showSaleList()">
-            <div slot="right-icon">
-              <div class="tab-cover" v-for="(item, index) in serviceSaleList" :key="index">
-                <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
-              </div>
-              <van-icon name="arrow" color="#999"/>
-            </div>
-          </van-cell>
-          <van-cell title="预约记录" is-link @click="toAppointList"/>
-          <van-cell title="健身目的" is-link value="未填写"/>
-          <van-cell title="客户星级" :value="userInfo.starLevel" is-link/>
-        </div> -->
-      </van-tab>
-    </van-tabs>
     
-    <swiper :indicator-dots="false" duration="500" :style="{height: scrollViewHeight+68+'px'}" :current="tabIndex" @change="swiperTab">
-      <swiper-item>
-        <header-data :headerData="checkInData"></header-data>
-        <scroll-view
-          scroll-y
-          :style="{height: scrollViewHeight + 'px'}"
-          @scrolltolower="getCheckInList()"
-        >
-          <list-day-item :info="item" v-for="(item,index) in checkInList" :key="index"></list-day-item>
-          <none-result text="暂无出勤记录" v-if="!checkInList.length && !isCheckInLoading"></none-result>
-          <van-loading :color="themeColor" v-if="isCheckInLoading"/>
-        </scroll-view>
-      </swiper-item>
-      <swiper-item>
-        <header-data :headerData="FollowUpData"></header-data>
-        <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
-          <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item>
-          <none-result text="暂无跟进回访" v-if="!followUpList.length && !isFollowUpLoading"></none-result>
-          <van-loading :color="themeColor" v-if="isFollowUpLoading"/>
-        </scroll-view>
-      </swiper-item>
-      <swiper-item>
-        <header-data :headerData="cardData"></header-data>
-        <scroll-view
-          scroll-y
-          :style="{height: scrollViewHeight + 'px'}"
-          @scrolltolower="getCardList()"
-        >
-          <div class="card-list">
-            <card
-              v-for="(item,index) in cardList"
-              :info="item"
-              :key="index"
-              @hasClick="toCardDetail(item)"
-            ></card>
-          </div>
-          <none-result text="暂无合同" v-if="!cardList.length && !isCardLoading"></none-result>
-          <van-loading :color="themeColor" v-if="isCardLoading"/>
-        </scroll-view>
-      </swiper-item>
-      <swiper-item>
-        <div class="info">
+    <swiper :indicator-dots="false" duration="500" :style="{height: scrollViewHeight+'px'}" :current="tabIndex" @change="swiperTab">
+      <swiper-item style="overflow: scroll">
+        <div class="info shadow-block-item">
           <van-cell-group custom-class="van-cell-group">
             <!-- <van-cell title="基本信息" is-link @click="toUserInfo"/> -->
             <van-cell title="姓名" is-link :value="userInfo.name" @click="toInfoCell('name', userInfo.name)"></van-cell>
             <van-cell title="性别" is-link :value="userInfo.sexChar" @click="showSexAction"/>
             <van-cell title="手机号" :value="userInfo.phone" @click="toInfoCell('phone', userInfo.phone)" is-link/>
           </van-cell-group>
-          <van-cell title="服务教练" @click="showCoachList()">
+           <!-- ↓↓旧版 -->
+          <!-- <van-cell title="服务教练" @click="showCoachList()">
             <div slot="right-icon">
               <div class="tab-cover" v-for="(item, index) in serviceCoachList" :key="index">
                 <img src="http://pojun-tech.cn/assets/img/manimg.jpg" alt>
@@ -144,7 +51,9 @@
               </div>
               <van-icon name="arrow" color="#999"/>
             </div>
-          </van-cell>
+          </van-cell> -->
+          <van-cell title="服务教练" :value="serviceCoachText || '无'" />
+          <van-cell title="服务销售" :value="serviceSaleText || '无'" />
           <van-cell title="预约记录" @click="toAppointList" :value="appointList.length+'条'" is-link/>
           <van-cell title="身份证号" :value="userInfo.identityCard || '未填写'" @click="toInfoCell('identityCard', userInfo.identityCard)" is-link />
           <van-cell title="出生日期" is-link>
@@ -158,9 +67,101 @@
           </van-cell>
           <van-cell title="客户备注" :value="userInfo.remarks || '未填写'"/>
           <van-cell title="健身目的" :value="userInfo.purpose || '未填写'"/>
-          <van-cell title="客户星级" :value="userInfo.starLevel"/>
+          <van-cell title="客户星级">
+            <van-rate :value="userInfo.starLevel" v-if="userInfo.starLevel" readonly/>
+            <div style="color: #999;" v-else>未填写</div>
+          </van-cell>
+          <!-- <van-cell title="客户星级" :value="userInfo.starLevel"/> -->
           <van-cell title="喜好" :value="userInfo.interest || '未填写'"/>
         </div>
+      </swiper-item>
+      <swiper-item>
+        <header-data :headerData="checkInData"></header-data>
+        <scroll-view
+          scroll-y
+          :style="{height: scrollViewHeight + 'px'}"
+          @scrolltolower="getCheckInList()"
+        >
+          <!-- <list-day-item :info="item" v-for="(item,index) in checkInList" :key="index"></list-day-item> -->
+          <div class="check-in-list shadow-block-item">
+            <div class="check-in-item" v-for="(item,index) in checkInList" :key="index">
+              <div class="check-in-content">
+                <div class="name">{{item.name}}</div>
+                <div class="time">{{item.date}}</div>
+              </div>
+              <div class="check-in-type">{{item.type}}</div>
+            </div>
+          </div>
+          <none-result text="暂无出勤记录" v-if="!checkInList.length && !isCheckInLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isCheckInLoading"/>
+        </scroll-view>
+      </swiper-item>
+      <swiper-item>
+        <!-- <header-data :headerData="FollowUpData"></header-data> -->
+        <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}">
+          <!-- <list-day-item :info="item" v-for="(item,index) in followUpList" :key="index"></list-day-item> -->
+          <div class="scroll-cell-list">
+            <div class="cell-block shadow-block-item" v-for="(item,index) in followUpList" :key="index">
+              <div class="time"><img class="clock" src="/static/images/clock-icon.png"><span>{{item.trackTime}}</span></div>
+              <div class="cell-item">
+                <div class="cell-text">跟进内容</div>
+                <div class="cell-value">{{item.content || '无'}}</div>
+              </div>
+              <div class="cell-item">
+                <div class="cell-text">跟进人</div>
+                <div class="cell-value">{{item.userName}}</div>
+              </div>
+            </div>
+          </div> 
+          <none-result text="暂无跟进回访" v-if="!followUpList.length && !isFollowUpLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isFollowUpLoading"/>
+        </scroll-view>
+      </swiper-item>
+      <swiper-item>
+        <!-- <header-data :headerData="cardData"></header-data> -->
+        <scroll-view
+          scroll-y
+          :style="{height: scrollViewHeight + 'px'}"
+          @scrolltolower="getCardList()"
+        >
+          <div class="card-list shadow-block-item">
+            <!-- <card
+              v-for="(item,index) in cardList"
+              :info="item"
+              :key="index"
+              @hasClick="toCardDetail(item)"
+            ></card> -->
+            <div class="card-item" v-for="(item,index) in cardList" :key="index" @click="toCardDetail(item)">
+              <div class="card-wrapper">
+                <div class="time"><img class="clock" src="/static/images/clock-icon.png"><span>{{item.buyCardTime}}</span></div>
+                <div class="card-new" :style="{'background-color': item.color}">
+                  <div class="card-top">
+                    <div class="card-info">
+                      <div class="card-name">{{item.cardClassName}}</div>
+                      <div class="card-equity">{{item.doomsday}}到期  {{item.totalAuthority}}{{item.authorityUnit}}  余{{item.balanceAuthority}}{{item.authorityUnit}}</div>
+                    </div>
+                    <div class="card-type">
+                      <img src="/static/images/staff/card.png" alt="">
+                      <span>次卡</span>
+                    </div>
+                  </div>
+                  <div class="card-bottom">
+                    <div class="card-use">
+                      <div class="use-people">
+                        <img :src="userInfo.headImgPath" class="avatar" alt="">
+                      </div>
+                      <div class="use-NO">NO:{{item.physicsCardNo || '--'}}</div>
+                    </div>
+                    <div class="card-status" :style="{'color': item.color}">{{item.cardStatusChar}}</div>
+                  </div>
+                </div>
+              </div>
+              <van-icon name="arrow"></van-icon>
+            </div>
+          </div>
+          <none-result text="暂无合同" v-if="!cardList.length && !isCardLoading"></none-result>
+          <van-loading :color="themeColor" v-if="isCardLoading"/>
+        </scroll-view>
       </swiper-item>
     </swiper>
 
@@ -276,7 +277,7 @@
       />
     </van-popup>
 
-    <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
+    <suspension :operateList="operateList" @operate="getOperate"></suspension>
   </div>
 </template>
 
@@ -291,7 +292,7 @@ import {checkAuth} from "../common/js/service_config.js";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import listDayItem from "../components/list-day-item.vue";
-import suspensionWindow from "../components/suspension-window.vue";
+import suspension from "../components/suspension.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import card from "COMPS/card";
 import noneResult from "COMPS/noneResult.vue";
@@ -307,11 +308,23 @@ export default {
       tabIndex: 0,
       id: 0,
       storeId: 0,
-      isOperate: false,
+      customerSumData: [
+        {
+          dataText: "消费总额",
+          dataNum: "0",
+          color: '#ff9e17'
+        },
+        {
+          dataText: "活跃次数(次)",
+          dataNum: "0",
+          color: '#14c88b'
+        },
+      ],
       checkInData: [
         {
           dataText: "签到",
-          dataNum: "0"
+          dataNum: "0",
+          color: '#119bf0'
         },
         {
           dataText: "团课",
@@ -350,22 +363,7 @@ export default {
           dataNum: "0"
         }
       ],
-      // appointData: [
-      //   {
-      //     dataText: "预约数",
-      //     dataNum: "12"
-      //   },
-      //   {
-      //     dataText: "数据一",
-      //     dataNum: "0"
-      //   },
-      //   {
-      //     dataText: "数据二",
-      //     dataNum: "0"
-      //   }
-      // ],
       appointList: [],
-      // isAppointLoading: true,
       followUpList: [],
       isFollowUpLoading: true,
       checkInList: [],
@@ -385,8 +383,8 @@ export default {
         },
         {
           text: "客户跟进",
-          iconUrl: "/static/images/staff/close.svg",
-          class: 'operate icon-genjin',
+          iconUrl: "/static/images/staff/genjin.png",
+          class: '',
           authorityId: 27,
           hasAuth: checkAuth(27),
           action: () => {
@@ -426,10 +424,7 @@ export default {
         }
       ],
       checkInPage: 1,
-      // followUpPage: 1,
       cardpage: 1,
-      // appointPage: 1,
-      // 姓名、电话、性别 、出身月份、身份证
       customerInfo: {
         baseInfo: {
           name: "王小明",
@@ -441,6 +436,8 @@ export default {
       },
       serviceCoachList: [],
       serviceSaleList: [],
+      serviceCoachText: '',
+      serviceSaleText: '',
       trackusertype: [],
       trackResult: [{ id: 1, text: "继续跟进" }, { id: 3, text: "不确定" }],
       appointObjective: [
@@ -474,7 +471,7 @@ export default {
     headerData,
     filterNav,
     listDayItem,
-    suspensionWindow,
+    suspension,
     card,
     noneResult
   },
@@ -553,12 +550,12 @@ export default {
       });
 
       let query = wx.createSelectorQuery();
-      query.select(".customer-base-info").boundingClientRect();
-      let tabsFixedHeight = 110; //164;
+      query.select(".sticky-block").boundingClientRect();
+      // let tabsFixedHeight = 110; //164;
 
       query.exec(res => {
-        let infoHeight = res[0].height;
-        let scrollViewHeight = this.windowHeight - infoHeight - tabsFixedHeight;
+        let stickyHeight = res[0].height;
+        let scrollViewHeight = this.windowHeight - stickyHeight;
         this.scrollViewHeight = scrollViewHeight;
       });
     },
@@ -590,8 +587,12 @@ export default {
             let _data = res.data.data;
             let _serviceCoachList = [];
             let _serviceSaleList = [];
+            let _serviceCoachText = '';
+            let _serviceSaleText = '';
+            that.customerSumData[0].dataNum = res.data.data.totalSellingPrice || 0
+            that.customerSumData[1].dataNum = res.data.data.enterNum || 0
 
-            _data.starLevel = _data.starLevel ? _data.starLevel + "星" : "暂无";
+            // _data.starLevel = _data.starLevel ? _data.starLevel + "星" : "暂无";
             _data.headImgPath = _data.headImgPath
               ? window.api + _data.headImgPath
               : window.api + "/assets/img/morenTo.png";
@@ -599,8 +600,8 @@ export default {
             that.storeId = _data.storeId;
             that.getTrackusertype();
             _data.customerStoreArrays.forEach(e => {
-              console.log(e.headImgPath)
               if (e.serviceCoachId) {
+                _serviceCoachText += `${e.storeName}  ${e.serviceCoachName}`
                 _serviceCoachList.push({
                   storeId: e.storeId,
                   storeName: e.storeName,
@@ -610,6 +611,7 @@ export default {
                 });
               }
               if (e.serviceUserId) {
+                _serviceSaleText += `${e.storeName}  ${e.serviceUserName}`
                 _serviceSaleList.push({
                   storeId: e.storeId,
                   storeName: e.storeName,
@@ -620,6 +622,8 @@ export default {
               }
             });
 
+            that.serviceCoachText = _serviceCoachText
+            that.serviceSaleText = _serviceSaleText
             that.serviceCoachList = _serviceCoachList;
             that.serviceSaleList = _serviceSaleList;
           }
@@ -670,10 +674,13 @@ export default {
             that.followUpList = res.data.data.map(e => {
               return {
                 id: e.trackUserId,
-                day: e.trackTime.substring(8, 10),
-                month: e.trackTime.substring(5, 7),
-                bottomText: "操作人：" + e.userName,
-                topText: "内容：" + e.content
+                content: e.content.replace(/&nbsp;/g, '').replace(/null/g, ''),
+                userName: e.userName,
+                trackTime: e.trackTime.replace(/-/g, '/')
+                // day: e.trackTime.substring(8, 10),
+                // month: e.trackTime.substring(5, 7),
+                // bottomText: "操作人：" + e.userName,
+                // topText: "内容：" + e.content
               };
             });
           }
@@ -694,17 +701,34 @@ export default {
         success: function(res) {
           that.isCardLoading = false;
           if (res.data.code == 200) {
-            if (!res.data.data.result.length) {
-              that.cardData[0].dataNum = 0
-              that.cardList = []
+            let list = res.data.data.result
+            if (!list.length) {
               return;
             }
+            that.cardData[0].dataNum = 0
             that.cardpage++;
             that.cardData[0].dataNum = res.data.data.pageSize;
-            that.cardList = that.cardList.concat(res.data.data.result);
+            list = list.map(e => {
+              for (let k in e) {
+                if (undefined == e[k] || null == e[k]) {
+                  delete e[k]
+                }
+              }
+              e.color = that.transCardColor(e)
+              e.buyCardTime = e.buyCardTime.split(' ')[0].replace(/-/g, '/')
+              e.doomsday = e.doomsday ? e.doomsday.split(' ')[0].replace(/-/g, '/') : '--'
+              return e
+            })
+            that.cardList = that.cardList.concat(list);
           }
         }
       });
+    },
+    transCardColor(info) {
+      if(info.cardStatus != 2) return '#999'
+      if(info.authorityUnit == '次' || info.authorityUnit == '2') return '#9061fc'
+      if(info.authorityUnit == '元' || info.authorityUnit == '0') return '#13bfc4'
+      if(info.authorityUnit == '天' || info.authorityUnit == '1') return '#ff924f'
     },
     // 预约列表
     getAppointList() {
@@ -748,6 +772,7 @@ export default {
     getCheckInList() {
       let that = this;
       this.isCheckInLoading = true;
+      let week = ['日','一','二','三','四','五','六']
       HttpRequest({
         url: window.api + "/consumption/log/pages",
 
@@ -764,12 +789,17 @@ export default {
             }
             that.checkInPage++;
             let _data = res.data.data.result.map(e => {
+              let date = e.startTime.replace(/-/g, '/')
+              let _week = '星期'+week[new Date(date).getDay()]
               return {
                 id: e.consumptionLogId,
-                day: e.startTime.substring(8, 10),
-                month: e.startTime.substring(5, 7),
-                topText: e.secondCardClassName,
-                bottomText: e.passModeValue
+                name: e.secondCardClassName,
+                type: e.passModeValue,
+                date: date.substring(0, 16)+' '+_week
+                // day: e.startTime.substring(8, 10),
+                // month: e.startTime.substring(5, 7),
+                // topText: e.secondCardClassName,
+                // bottomText: e.passModeValue
               };
             });
             that.checkInList = that.checkInList.concat(_data);
@@ -1034,47 +1064,71 @@ page {
   background-color: @pageColor;
 }
 .customer {
-  .customer-base-info {
-    display: flex;
+  .sticky-block {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     background-color: #fff;
-    padding: 10px 0;
-    padding-right: 15px;
-    .cover {
-      flex: 0 0 52px;
-      width: 52px;
-      height: 52px;
-      padding-left: 12px;
-      // .avatar {
-      //   width: 100%;
-      //   height: 100%;
-      //   border-radius: 12px;
-      //   background-color: #eee;
-      //   background-size: 100% auto;
-      //   background-repeat: no-repeat;
-      //   background-position: 50% 50%;
-      // }
-      >image {
-        width: 100%;
-        height: 100%;
-        border-radius: 4px;
-        background-color: #eee;
+    .customer-base-info {
+      display: flex;
+      background-color: #fff;
+      padding: 10px 0 35px 15px;
+      .cover {
+        flex: 0 0 52px;
+        width: 52px;
+        height: 52px;
+        padding-left: 12px;
+        // .avatar {
+        //   width: 100%;
+        //   height: 100%;
+        //   border-radius: 12px;
+        //   background-color: #eee;
+        //   background-size: 100% auto;
+        //   background-repeat: no-repeat;
+        //   background-position: 50% 50%;
+        // }
+        >image {
+          width: 100%;
+          height: 100%;
+          border-radius: 4px;
+          background-color: #eee;
+        }
+      }
+      .coach-info {
+        flex: 1;
+        padding-left: 12px;
+        > div {
+          line-height: 26px;
+          color: #fff;
+          .Mult-line(1);
+        }
+      }
+      .icon-right {
+        margin-top: 10px;
+        margin-right: 15px; 
+        img {
+          width: 30px;
+          height: 30px;
+        }
       }
     }
-    .coach-info {
-      flex: 1;
-      padding-left: 12px;
-      color: #505050;
-      > div {
-        line-height: 26px;
-        .Mult-line(1);
+    .surface {
+      position: relative;
+      height: 25px;
+      overflow: hidden;
+      z-index: -1;
+      .circular {
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        transform: translateX(-50%);
+        width: 500px;
+        height: 100px;
+        border-radius: 50%;
       }
     }
-    .icon-right {
-      margin-top: 20px;
-      img {
-        width: 18px;
-        height: 18px;
-      }
+    .header-data {
+      margin-top: -50px;
     }
   }
   .filter-nav {
@@ -1082,17 +1136,120 @@ page {
       top: 240px;
     }
   }
+  .van-hairline--top-bottom::after {
+    border-width: 0px 0;
+  }
   .card-list {
-    padding: 0 20px;
-    padding-bottom: 15px;
-    .card {
-      margin-top: 15px;
+    .card-item {
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      border-bottom: 1rpx solid #f6f6f6;
+      padding-bottom: 10px;
+      ._van-icon {
+        padding-top: 30px;
+      }
+      .card-wrapper {
+        flex: 1;
+        margin-right: 5px;
+      }
+      .card-new {
+        position: relative;
+        padding: 10px;
+        border-radius: 4px;
+        .card-top {
+          display: flex;
+          justify-content: space-between;
+          border-bottom: 1px solid #fff;
+          padding-bottom: 10px;
+          .card-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+          }
+          .card-equity {
+            font-size: 10px;
+            color: #fff;
+          }
+          .card-type {
+            margin-top: 5px;
+            >img {
+              width: 10px;
+              height: 8px;
+            }
+            >span {
+              display: inline-block;
+              vertical-align: middle;
+              margin-left: 5px;
+              font-size: 10px;
+              color: #fff;
+            }
+          }
+        }
+        .card-bottom {
+          margin-top: 30px;
+          .card-use {
+            .use-people {
+              .avatar {
+                height: 20px;
+                width: 20px;
+                border-radius: 50%;
+                margin-right: 5px;
+                background-color: #fff;
+              }
+            }
+            .use-NO {
+              margin-top: 5px;
+              font-size: 10px;
+              color: #fff;
+            }
+          }
+          .card-status {
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+            width: 50px;
+            line-height: 20px;
+            text-align: center;
+            font-size: 10px;
+            background-color: #fff;
+            border-radius: 2px;
+          }
+        }
+      }
+    }
+    // .card {
+    //   margin-top: 15px;
+    // }
+  }
+  .check-in-list {
+    padding: 0 10px;
+    .check-in-item {
+      display: flex;
+      height: 64px;
+      align-items: center;
+      border-bottom: 1rpx solid #f6f6f6;
+      .check-in-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .name {
+          color: #333;
+        }
+        .time {
+          margin-top: 6px;
+          font-size: 13p;
+          color: #119bf0;
+        }
+      }
+      .check-in-type {
+        flex-shrink: 0;
+        font-size: 13px;
+        color: #ff9e17;
+      }
     }
   }
-  ._van-cell-group {
-    margin-bottom: 5px;
-  }
-
   .list {
     .item {
       padding-right: 15px;
@@ -1175,15 +1332,79 @@ page {
       height: 100%;
     }
   }
-  .header-data {
-    margin: 10px;
-  }
-  .day-item {
-    .flex-middle {
-      .middle-2 {
-        color: #999;
+  // .header-data {
+  //   margin: 10px;
+  // } 
+  // .day-item {
+  //   &:last-of-type {
+  //     border-bottom: 1px solid #eee;
+  //   }
+  //   .flex-middle {
+  //     .middle-2 {
+  //       color: #999;
+  //     }
+  //   }
+  // }
+  .scroll-cell-list {
+    padding: 0 5px;
+    .cell-block {
+      padding: 0 10px;
+      .time {
+        font-size: 12px;
+        color: #666;
+        line-height: 30px;
+      }
+      .cell-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1rpx solid #f6f6f6;
+        .cell-text {
+          color: #333;
+          flex-shrink: 0;
+        }
+        .cell-value {
+          text-align: right;
+          font-size: 13px;
+          color: #666;
+          line-height: 22px;
+        }
       }
     }
+  }
+  .time {
+    .clock {
+      width: 10px;
+      height: 10px;
+      margin-right: 5px;
+    }
+    >span {
+      display: inline-block;
+      vertical-align: middle;
+      font-size: 12px;
+      color: #666;
+      line-height: 30px;
+    }
+  }
+  ._swiper-item {
+    .header-data {
+      margin-top: 10px;
+    }
+  }
+  .van-tab-class {
+    height: 34px;
+    line-height: 34px;
+  }
+  .van-tabs--line {
+    margin-top: 15px;
+    padding-top: 34px;
+    .van-tabs__wrap {
+      height: 34px;
+    }
+  }
+  ._van-cell-group {
+    margin-bottom: 5px;
   }
   .van-icon {
     display: inline-block;

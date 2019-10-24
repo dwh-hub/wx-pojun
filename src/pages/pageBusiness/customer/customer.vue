@@ -170,7 +170,7 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, timePickerType == 'consumed' ? 1 : 0, 4)"
     ></timePicker>
     <timePicker
       :pickerShow="isResultDateShow"
@@ -196,7 +196,7 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 // import staffCoachItem from "../components/staff-coach-item.vue";
-import suspensionWindow from "../components/suspension-window.vue";
+// import suspensionWindow from "../components/suspension-window.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import noneResult from "COMPS/noneResult.vue";
@@ -584,18 +584,6 @@ export default {
             });
           }
         }
-        // {
-        //   text: "分配教练",
-        //   iconUrl: "/static/images/staff/calendar.svg"
-        // }
-        // {
-        //   text: "发送手机短信",
-        //   iconUrl: "/static/images/staff/calendar.svg"
-        // },
-        // {
-        //   text: "关注",
-        //   iconUrl: "/static/images/staff/calendar.svg"
-        // }
       ],
       isOperate: false,
       isAllSelect: false,
@@ -650,7 +638,7 @@ export default {
     headerData,
     filterNav,
     // staffCoachItem,
-    suspensionWindow,
+    // suspensionWindow,
     headerSearch,
     noneResult
   },
@@ -743,7 +731,6 @@ export default {
       e.mp.detail.height;
     },
     loadData() {
-      console.log("客户列表-loadData");
       let that = this;
       return new Promise(function(resolve) {
         var _data = Object.assign(

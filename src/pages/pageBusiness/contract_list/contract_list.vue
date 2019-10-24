@@ -19,7 +19,7 @@
         :info="item"
         @clickItem="toCardDetail(item)"
       >
-        <div>
+        <div class="slot">
           <img src="/static/images/staff/right-arrow.svg" alt />
         </div>
       </staff-coach-item>
@@ -87,7 +87,7 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, 0, 4)"
     ></timePicker>
   </div>
 </template>
@@ -267,6 +267,81 @@ export default {
             }
           ]
         },
+        {
+          name: "合同标签",
+          isRadio: false,
+          isParmas: false,
+          isTimer: false,
+          param: "labelName",
+          value: "",
+          children: []
+        },
+        {
+          name: "激活日期",
+          isRadio: true,
+          isParmas: true,
+          isTimer: true,
+          param: "activateDateStart",
+          param_2: "activateDateEnd",
+          value: "",
+          value_2: "",
+          children: [
+            {
+              name: "今日激活",
+              dateValue: "day",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本周激活",
+              dateValue: "week",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "本月激活",
+              dateValue: "month",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "昨日激活",
+              dateValue: "yesterday",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上周激活",
+              dateValue: "lastWeek",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "上月激活",
+              dateValue: "lastMonth",
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近300天激活",
+              dateValue: 300,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近90天激活",
+              dateValue: 90,
+              value: "",
+              value_2: ""
+            },
+            {
+              name: "近半年激活",
+              dateValue: 180,
+              value: "",
+              value_2: ""
+            }
+          ]
+        },
       ],
       headerData: [
         {
@@ -292,7 +367,8 @@ export default {
         transactTimeEnd: "",
         transactTimeStart: "",
         cardType: "",
-        cardStatus: ""
+        cardStatus: "",
+        labelName: ""
       },
       selectedCard: {},
       showProjectPopup: false,
@@ -318,6 +394,7 @@ export default {
   mounted() {
     // this.nav[0].navTitle = "今日";
     this.refreshList();
+    this.getLabels()
   },
   components: {
     headerSearch,
@@ -329,6 +406,11 @@ export default {
   },
   mixins: [colorMixin, listPageMixin],
   methods: {
+    selectStore(item) {
+      this.selectedStore = item;
+      this.refreshList()
+      this.getLabels()
+    },
     searchChange(event) {
       this.filter.nameOrPhone = event;
     },
@@ -398,12 +480,17 @@ export default {
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 rightText: e.cardStatusChar,
+                rightBlock: `${e.masterCradClass}/${e.authorityUnitChar}`,
+                blockColor: that.transBlockColor(e.teachCardType),
+                color: that.transStatusColor(e.cardStatus),
                 cardClassId: e.cardClassId || "",
                 storeId: e.storeId,
                 first_1: e.name,
-                second_1: e.pactId,
-                second_tip_1: "合同编号：",
-                third_1: e.secondCardClass
+                // second_1: e.pactId,
+                // second_tip_1: "合同编号：",
+                second_1: e.secondCardClass,
+                third_1: e.activateDate?e.activateDate.split(' ')[0].replace(/-/g, '/')+'-'+e.doomsday.split(' ')[0].replace(/-/g, '/'):'暂未激活',
+                third_tip_1: "定期开卡：",
               };
             });
             Promise.all(_data).then(result => {
@@ -412,6 +499,51 @@ export default {
           }
         });
       });
+    },
+    // 获取合同标签
+    getLabels() {
+      let that = this
+      HttpRequest({
+        url: '/card/label/pages',
+        method: 'POST',
+        data: {
+          storeId: that.selectedStore.storeId,
+          isAllData: true
+        },
+        success(res) {
+          that.moreFilter[1].children = res.data.data.result.map(e => {
+            return {
+              name: e.labelName,
+              value: e.cardLabelId
+            }
+          })
+        }
+      })
+    },
+    transBlockColor(teachCardType) {
+      // NORMAL(0,"会籍"),TEAM(1, "团课"),PRIVATE(2, "私教"),VALUE_CARD(3, "储值卡");
+      switch (teachCardType) {
+        case 0: 
+          return '#00baad'
+        case 1: 
+          return '#7948ea'
+        case 2: 
+          return '#000000'
+        case 3: 
+          return '#ff8d1a'
+      }
+    },
+    transStatusColor(status) {
+      switch (status) {
+        case 2: 
+          return '#46c77b'
+        case 5: 
+          return '#f18d3b'
+        case 6: 
+          return '#e92444'
+        default: 
+          return '#666'
+      }
     },
     // getCardstatuslist() {
     //   let that = this;
@@ -434,7 +566,7 @@ export default {
       this.setDate(obj);
     },
     setDate(obj) {
-      console.log(obj);
+      // console.log(obj);
       this.filter.transactTimeStart = obj.startTime;
       this.filter.transactTimeEnd = obj.endTime;
     },
@@ -596,11 +728,33 @@ page {
 .contract-list {
   .staff-coach-item {
     border-bottom: 1rpx solid #eee;
+    .second-1 {
+      color: #999;
+    }
     .icon-right {
       display: flex;
-      img {
-        width: 18px;
-        height: 18px;
+      flex-direction: column;
+      flex-wrap: wrap;
+      padding-right: 10px;
+      .right-text {
+        font-size: 10px;
+      }
+      .right-block {
+        // min-width: 58px;
+        line-height: 22px;
+        font-size: 10px;
+        margin: 0;
+        margin-top: 5px;
+      }
+      .slot {
+        height: 100%;
+        padding-left: 5px;
+        display: flex; 
+        align-items: center;
+        img {
+          width: 18px;
+          height: 18px;
+        }
       }
     }
   }

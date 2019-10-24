@@ -85,6 +85,7 @@ async function publicLogin() {
     if (staff.data.code == 200) enterStaff(staff)
     // 商户多公司 返回公司列表
     if (staff.data.code == 201) loginData.companyList = staff.data.data
+    return loginData
   }
 
   // 商户 x
@@ -94,32 +95,35 @@ async function publicLogin() {
     if (member.data.data.length == 1) enterMember(member.data.data[0])
     // 会员多公司
     if (member.data.data.length > 1) loginData.companyList = member.data.data
+    return loginData
   }
 
   // TODO: 会员、商户 ok
   if (member && staff) {
-    wx.showModal({
-      title: "提示",
-      content: "检测到您是工作人员，请选择当次浏览的信息",
-      cancelText: "留在会员",
-      confirmText: "前往商户",
-      success(res) {
-        if (res.confirm) {
-          // 进商户
-          loginData.role = 'staff'
-          if (staff.data.code == 200) enterStaff(staff)
-          if (staff.data.code == 201) loginData.companyList = staff.data.data
-        } else if (res.cancel) {
-          // 进会员
-          loginData.role = 'member'
-          if (member.data.data.length == 1) enterMember(member.data.data[0])
-          if (member.data.data.length > 1) loginData.companyList = member.data.data
+    return new Promise((resolve) => {
+      wx.showModal({
+        title: "提示",
+        content: "检测到您是工作人员，请选择当次浏览的信息",
+        cancelText: "留在会员",
+        confirmText: "前往商户",
+        success(res) {
+          if (res.confirm) {
+            // 进商户
+            loginData.role = 'staff'
+            if (staff.data.code == 200) enterStaff(staff)
+            if (staff.data.code == 201) loginData.companyList = staff.data.data
+          } else if (res.cancel) {
+            // 进会员
+            loginData.role = 'member'
+            if (member.data.data.length == 1) enterMember(member.data.data[0])
+            if (member.data.data.length > 1) loginData.companyList = member.data.data
+          }
         }
-      }
-    });
+      });
+      resolve(loginData)
+    })
   }
 
-  return loginData
 }
 
 

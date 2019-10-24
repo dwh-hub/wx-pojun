@@ -52,6 +52,7 @@ export default {
   },
   methods: {
     selectDate(item, index) {
+      console.log("clickkkkkkk")
       this.dateIndex = index
       let dateObj = filterDateMethod(item.key)
       this.$emit('changeDate', dateObj)
@@ -71,6 +72,7 @@ export default {
   background-color: #fff;
   border: 1rpx solid;
   overflow: hidden;
+  z-index: 1;
   .filter-date-item {
     display: inline-block;
     width: 40px;

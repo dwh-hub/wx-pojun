@@ -198,6 +198,7 @@ export default {
               });
               attendclass(that.params.appointId, 1)
                 .then(res => {
+                  recordUpdate(that.params.studentId, that.params.storeId, that.params.venueId, formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"))
                   if(that.params.isOpenHandwrittenBoard) {
                     wx.redirectTo({
                       url: "/pages/pageBusiness/handwrite_board/main?id=" + that.params.appointId

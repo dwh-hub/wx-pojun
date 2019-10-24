@@ -48,6 +48,7 @@ import Vue from 'vue'
 import QR from "@/libs/weapp-qrcode.js";
 import GoEasy from "../common/js/goeasy-wx.0.0.1.min";
 import { EventBus } from "../common/js/eventBus.js";
+import { recordUpdate } from "../common/js/http.js";
 
 // Vue.prototype.globalData.normalCoachCourse = new GoEasy({
 //   appkey: wx.getStorageSync("instMsgSubKey"),
@@ -403,15 +404,17 @@ export default {
     // 上课
     attendclassMethod() {
       let that = this;
+      let _nowTime = formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
       HttpRequest({
         url: window.api + "/mobile/coach/appoint/attendclass",
         data: {
           coachAppointId: that.params.appointId,
           customerSignWay: 0,
-          realTimeStart: formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
+          realTimeStart: _nowTime
         },
         success(res) {
           if (res.data.code == 200) {
+            recordUpdate(that.params.studentId, that.params.storeId, that.params.venueId, _nowTime)
             let msgData = res.data.data;
             for (let k in msgData) {
               msgData[k] = msgData[k] ? msgData[k] : "";

@@ -28,7 +28,7 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, 0, 4)"
     ></timePicker>
   </div>
 </template>
@@ -255,7 +255,8 @@ export default {
                 first_1: e.visitorName,
                 second_1: e.appointmentPurposeChar || "无",
                 second_tip_1: "预约目的：",
-                third_1: e.appointmentTime ? formatDate(new Date(e.appointmentTime), 'yyyy/MM/dd hh:mm') : "--",
+                // third_1: e.appointmentTime ? formatDate(new Date(e.appointmentTime), 'yyyy/MM/dd hh:mm') : "--",
+                third_1: e.appointmentTime ? e.appointmentTime.replace(/-/g, '/').slice(0, 16) : "--",
                 third_tip_1: "最后签到时间：",
                 rightText: e.isVisitChar,
                 appointmentPurpose: e.appointmentPurpose,

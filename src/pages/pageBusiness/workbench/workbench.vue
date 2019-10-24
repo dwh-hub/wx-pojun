@@ -90,7 +90,11 @@ export default {
     this.getCompanyInfo()
     this.storeList = store.state.allStore;
     this.selectedStore = this.storeList.filter(e => e.isDefault)[0];
-    this.getLineView()
+    this.$nextTick(() =>{
+      setTimeout(() => {
+        this.getLineView()
+      }, 50)
+    })
     this.name = wx.getStorageSync('staff_info') ? wx.getStorageSync('staff_info').userName : ''
   },
   onShow() {
@@ -177,7 +181,7 @@ export default {
           timeEnd: formatDate(new Date(now_time), 'yyyy-MM-dd') + ' 23:59:59'
         },
         success(res) {
-          if(res.data.code == 500) {
+          if(res.data.code == 500 || JSON.stringify(res.data).includes('DOCTYPE html')) {
             return that.noAuthLineView = false
           }
           that.noAuthLineView = true

@@ -333,7 +333,6 @@ export default {
               //   statusText = "次卡";
               // }
               return {
-                // TODO: id
                 id: e.makeupCardId,
                 statusText: that.transClass(e.authorityUnit || "").name,
                 class: that.transClass(e.authorityUnit).class,

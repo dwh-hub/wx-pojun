@@ -38,6 +38,8 @@ export default function autoLogin() {
       companyId: wx.getStorageSync("companyId") || ''
     },
     success(res) {
+      // TODO: 仅限开发工具上用，记得注释掉
+      // wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
       let curPage = getCurrentPages()[getCurrentPages().length - 1]
       // let curPage = {
       //   route: 'pages/pageBusiness/workbench/main',
@@ -54,15 +56,18 @@ export default function autoLogin() {
       if (res.data.code == 200) {
         wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
         if (res.data.message == 'user') {
+          wx.removeStorageSync("userInfo")
           // 走商户登录之后流程
+          if (!wx.getStorageSync("staff_info")) {
+            let _data = res.data.data
+            _data.authList = {}
+            wx.setStorageSync("staff_info", _data);
+          }
           if (!wx.getStorageSync('authInto') && isUser)  {
             console.log("no-authInto")
             wx.showLoading({
               title: '登录中...'
             })
-            let _data = res.data.data
-            _data.authList = {}
-            wx.setStorageSync("staff_info", _data);
             getAuthList().then((data) => {
               let authList = []
               data.forEach((store) => {
@@ -81,6 +86,7 @@ export default function autoLogin() {
               })
               wx.setStorageSync("authInto", authList);
               wx.setStorageSync("staffIsLogin", true);
+              wx.setStorageSync("isLogin", false);
               wx.hideLoading()
               wx.reLaunch({
                 url: "/pages/pageBusiness/workbench/main"
@@ -92,10 +98,20 @@ export default function autoLogin() {
         }
         if (res.data.message == 'customer') {
           // 走会员登录之后流程
+          let info = res.data.data
+          for (let attr in info) {
+            if(info[attr] == null || info[attr] == undefined){
+              delete info[attr];
+            }
+          }
+          wx.setStorageSync("userInfo", info);
+          wx.setStorageSync("isLogin", true);
+          wx.setStorageSync("staffIsLogin", false);
           if (isUser) return loginTips('当前登录状态为会员!', '前往切换')
         }
       }
       if (res.data.code == 500) {
+        wx.removeStorageSync("userInfo")
         if (wx.getStorageSync('isLogin')) {
           // 走会员登录流程
           getUserInfo().then((member_res) => {
@@ -113,7 +129,7 @@ export default function autoLogin() {
           })
           return
         }
-        // TODO: 提示登录
+        // 提示登录
         if (!isOpenPage) return loginTips('当前状态为未登录，请先登录!', '前往登录')
       }
     }

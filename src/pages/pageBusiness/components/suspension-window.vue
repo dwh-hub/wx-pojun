@@ -1,4 +1,5 @@
 <template>
+  <!-- 悬浮窗组件-暂时未使用-改用suspension组件 -->
   <div class="suspension_window" v-if="operateListLength || operateListLength > 0">
     <div class="suspension" :style="{'right': right + 'px','bottom': bottom + 'px'}" @touchmove.stop="setTouchMove">
       <div class="operate-wrapper" v-show="showOperate">

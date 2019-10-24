@@ -166,11 +166,21 @@ export default {
     hidePicker() {
       this.isPickerShow = false;
     },
-    setPickerTime(val) {
+    setPickerTime(val, navIndex, childrenIndex) {
       let data = val.mp.detail;
       let date = data.endTime.split(' ')[0]
       data.endTime = date + " 23:59:59"
+      if (childrenIndex) {
+        // filter-text 自定义栏写入选择的时间
+        let timeStr = data.startTime.split(' ')[0].replace(/-/g, "/") + '-' +data.endTime.split(' ')[0].replace(/-/g, "/")
+        this.nav[navIndex].children[childrenIndex].sonText = timeStr
+        this.nav[navIndex].navTitle = timeStr
+      }
+
       this.setDate(data)
+    },
+    getFilter(parmas) {
+      this.filter = Object.assign({}, this.filter, parmas);
     }
   }
 };

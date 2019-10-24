@@ -1,7 +1,7 @@
 <template>
   <div class="customer_register" :class="{'safe-bottom': isIphoneX}">
     <div class="notice-bar">
-      <van-icon name="warning-o" color="#fa9e14"/>
+      <van-icon name="warning-o" color="#119bf0"/>
       <div class="notice">请输入客户手机号，按提示填写客户信息，*必填</div>
       <!-- <van-icon name="cross" color="#f95d51"/> -->
     </div>
@@ -472,9 +472,7 @@ export default {
         success(res) {
           if (res.data.code == 200) {
             wx.showToast({
-              title: res.data.message,
-              icon: "success",
-              duration: 1000
+              title: res.data.message
             });
           }
         }
@@ -710,7 +708,7 @@ page {
         width: 92%;
         margin: 0 auto;
         padding: 5px;
-        border: 1rpx solid #666;
+        border: 1rpx solid #eee;
       }
     }
     .placeholder {
@@ -752,7 +750,7 @@ page {
         margin-right: 5px;
         line-height: 22px;
         text-align: center;
-        border: 1rpx solid #cccccc;
+        border: 1rpx solid #ccc;
       }
     }
   }

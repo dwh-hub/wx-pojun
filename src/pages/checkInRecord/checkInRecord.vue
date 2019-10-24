@@ -41,7 +41,7 @@ export default {
   },
   onLoad() {
     setNavTab();
-    this.customerId = this.userInfo = wx.getStorageSync("userInfo").id;
+    this.customerId = wx.getStorageSync("userInfo").id;
     this.getConsumption();
   },
   onReachBottom() {

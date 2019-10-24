@@ -228,7 +228,8 @@ export default {
             HttpRequest({
               url: window.api + "/wxcustomer/exit",
               data: {
-                disBindSub: 1
+                unSubType: 2,
+                exitType: 2
               },
               success(res) {
                 if (res.data.code === 200) {

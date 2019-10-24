@@ -303,7 +303,7 @@ import titleCell from "COMPS/titleCell.vue";
 import selectDate from "COMPS/selectDate.vue";
 import store from "../../../utils/store";
 import selectTime from "COMPS/selectTime.vue";
-import { attendclass, checkAttendStatus, getUserofrole } from "../common/js/http.js";
+import { attendclass, checkAttendStatus, getUserofrole, recordUpdate } from "../common/js/http.js";
 
 export default {
   name: "appointment-coach",
@@ -1212,6 +1212,7 @@ export default {
     // 上课
     attendclass(appointId) {
       attendclass(appointId).then(() => {
+        recordUpdate(this.id, this.selectStoreId, this.venueId, formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"))
         wx.redirectTo({
           url: `../../appointmentResult/main?coachAppointId=${appointId}&type=staff`
         });
@@ -1229,6 +1230,7 @@ export default {
         },
         success(res) {
           if (res.data.code == 200) {
+            recordUpdate(that.id, that.selectStoreId, that.venueId, formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"))
             wx.showToast({
               title: res.data.message,
               icon: "success",

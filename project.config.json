@@ -43,7 +43,7 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 8,
+			"current": 2,
 			"list": [
 				{
 					"id": 0,
@@ -62,9 +62,9 @@
 				},
 				{
 					"id": 2,
-					"name": "pages/pageBusiness/check_in_type/main",
-					"pathName": "pages/pageBusiness/check_in_type/main",
-					"query": "",
+					"name": "pages/pageBusiness/customer_detail/main",
+					"pathName": "pages/pageBusiness/customer_detail/main",
+					"query": "id=144956",
 					"scene": null
 				},
 				{
@@ -104,8 +104,8 @@
 				},
 				{
 					"id": 8,
-					"name": "pages/pageBusiness/operation_chart/main",
-					"pathName": "pages/pageBusiness/operation_chart/main",
+					"name": "pages/pageBusiness/staff_appoint_teamclass/main",
+					"pathName": "pages/pageBusiness/staff_appoint_teamclass/main",
 					"query": "",
 					"scene": null
 				},

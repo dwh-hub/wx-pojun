@@ -288,7 +288,7 @@ export default {
 .select-time {
   width: 100%;
   box-shadow: 0px 2px 7px 0px rgba(1, 60, 97, 0.1);
-  border-radius: 5px;
+  border-radius: 2px;
   overflow: hidden;
   .specific-date {
     .date-hours {

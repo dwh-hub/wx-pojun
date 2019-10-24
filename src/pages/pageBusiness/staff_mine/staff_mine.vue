@@ -137,7 +137,8 @@ export default {
             HttpRequest({
               url: window.api + '/user/exit',
               data: {
-                disBindSub: 1
+                unSubType: 2,
+                exitType: 2
               }
             })
             wx.removeStorageSync("instMsgSubKey");

@@ -42,9 +42,9 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, timePickerType == 'consumed' ? 1 : 0, 4)"
     ></timePicker>
-    <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window>
+    <suspension v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension>
   </div>
 </template>
 
@@ -56,7 +56,7 @@ import headerSearch from "../components/header-search.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
-import suspensionWindow from "../components/suspension-window.vue";
+import suspension from "../components/suspension.vue";
 import noneResult from "COMPS/noneResult.vue";
 import listPageMinxin from "../components/list-page-mixin.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
@@ -225,7 +225,7 @@ export default {
     headerData,
     filterNav,
     staffCoachItem,
-    suspensionWindow,
+    suspension,
     headerSearch,
     noneResult
   },

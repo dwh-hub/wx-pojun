@@ -94,7 +94,7 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, timePickerType == 'consumed' ? 1 : 0, 4)"
     ></timePicker>
     <!-- <suspension-window v-if="!isOperate" :operateList="operateList" @operate="getOperate"></suspension-window> -->
   </div>
@@ -113,7 +113,7 @@ import headerSearch from "../components/header-search.vue";
 import headerData from "../components/header-data.vue";
 import filterNav from "../components/filter-nav.vue";
 import staffCoachItem from "../components/staff-coach-item.vue";
-import suspensionWindow from "../components/suspension-window.vue";
+// import suspensionWindow from "../components/suspension-window.vue";
 import listPageMixin from "../components/list-page-mixin.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
@@ -257,8 +257,6 @@ export default {
           action: () => {
             this.distributeCoach();
           }
-          // class: 'operate icon-fenpei',
-          // iconUrl: "/static/images/staff/calendar.svg"
         },
         {
           text: "新增客户",
@@ -271,14 +269,6 @@ export default {
             });
           }
         }
-        // {
-        //   text: "发送手机短信",
-        //   iconUrl: "/static/images/staff/calendar.svg"
-        // },
-        // {
-        //   text: "关注",
-        //   iconUrl: "/static/images/staff/calendar.svg"
-        // }
       ],
       // list: [{}, {}, {}, {}],
       // isLoading: true,
@@ -316,7 +306,7 @@ export default {
     headerData,
     filterNav,
     staffCoachItem,
-    suspensionWindow,
+    // suspensionWindow,
     headerSearch,
     noneResult
   },
@@ -394,7 +384,8 @@ export default {
                 first_1: e.name,
                 second_1: e.serviceCoachName || "--",
                 second_tip_1: "服务教练：",
-                third_1: e.lastTrackTime ? formatDate(new Date(e.lastTrackTime), 'yyyy/MM/dd hh:mm') : "--",
+                // third_1: e.lastTrackTime ? formatDate(new Date(e.lastTrackTime), 'yyyy/MM/dd hh:mm') : "--",
+                third_1: e.lastTrackTime ? e.lastTrackTime.replace(/-/g, '/').slice(0, 16) : "--",
                 third_tip_1: "最后签到时间："
               };
             });

@@ -1,15 +1,15 @@
 <template>
   <div class="operation_chart">
     <!-- <cover-view class="list-header"> -->
-      <filter-nav :nav="nav" :isCoverView="true"></filter-nav>
-      <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
-        <van-tab title="运营报表"></van-tab>
-        <van-tab title="课程报表"></van-tab>
-      </van-tabs>
-      <div class="sub-tab">
-        <div class="chart-list" :class="{active: subNavIndex==1}" @click="changeSubNavIndex(1)">汇总</div>
-        <div class="total-detail" :class="{active: subNavIndex==2}" @click="changeSubNavIndex(2)">明细</div>
-      </div>
+    <filter-nav :nav="nav" :isCoverView="true"></filter-nav>
+    <van-tabs :active="navIndex" @change="onChange" :color="themeColor" swipeable animated>
+      <van-tab title="运营报表"></van-tab>
+      <van-tab title="课程报表"></van-tab>
+    </van-tabs>
+    <div class="sub-tab">
+      <div class="chart-list" :class="{active: subNavIndex==1}" @click="changeSubNavIndex(1)">汇总</div>
+      <div class="total-detail" :class="{active: subNavIndex==2}" @click="changeSubNavIndex(2)">明细</div>
+    </div>
     <!-- </cover-view> -->
     <div class="operation" v-show="navIndex == 0">
       <!-- <scroll-view scroll-y :style="{height: scrollViewHeight + 'px'}"> -->
@@ -200,9 +200,7 @@ export default {
     staffCoachItem,
     filterNav
   },
-  onShow() {
-    WechatMenuisLogin("staff")
-  },
+  onShow() {},
   onLoad(options) {
     if (options.nav) {
       this.navIndex = options.nav;
@@ -225,9 +223,10 @@ export default {
     this.nav[0].navTitle = "今日";
     // this.storeList = store.state.allStore;
     // this.selectedStore = this.storeList[0];
-    this.storeList = store.state.allStore
-    this.selectedStore = this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
-    
+    this.storeList = store.state.allStore;
+    this.selectedStore =
+      this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
+
     this.nav[0].navTitle = this.selectedStore.storeName;
     this.filter.storeId = this.selectedStore.storeId;
     this.nav[0].children = this.storeList.map(e => {
@@ -239,13 +238,33 @@ export default {
       };
     });
 
-    this.filterDate(1);
+    this.waitLogin().then(() => {
+      this.filterDate(1);
+    })
     // this.getSellInfo();
     // this.getSellList();
     // this.getCoachList();
     // this.renderChart();
   },
   methods: {
+    waitLogin() {
+      return new Promise(resolve => {
+        wx.request({
+          url: window.api + "/mini/login/check",
+          data: {
+            miniOpenId: wx.getStorageSync("openId") || "",
+            unionId: wx.getStorageSync("unionId") || "",
+            companyId: wx.getStorageSync("companyId") || ""
+          },
+          success(res) {
+            if(res.data.code == 200) {
+              wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
+              return resolve()
+            }
+          }
+        });
+      });
+    },
     onChange(e) {
       this.navIndex = e.mp.detail.index;
       this.changeFilter();
@@ -529,8 +548,8 @@ export default {
         let hasCostLength = data.filter(e => e.cost > 0).length;
         if (hasCostLength >= 1) {
           colorArr = colorArr.slice(0, hasCostLength);
-          for (let i=0; i < (data.length - hasCostLength); i++) {
-            colorArr.push('#FFFFFF')
+          for (let i = 0; i < data.length - hasCostLength; i++) {
+            colorArr.push("#FFFFFF");
           }
         } else {
           colorArr = colorArr.slice(0, data.length.length);
@@ -574,11 +593,13 @@ export default {
           timeEnd: that.filter.timeEnd
         },
         success(res) {
-          if(null == res.data.data) {
-            that.customerLineData = [{
-              time:formatDate(new Date(), "yyyy-MM-dd"),
-              tem: 0
-            }]
+          if (null == res.data.data) {
+            that.customerLineData = [
+              {
+                time: formatDate(new Date(), "yyyy-MM-dd"),
+                tem: 0
+              }
+            ];
           } else {
             that.customerLineData = res.data.data.map(e => {
               return {

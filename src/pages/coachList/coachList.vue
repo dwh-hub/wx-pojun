@@ -149,6 +149,11 @@ export default {
   },
   methods: {
     selectNav(index) {
+      if(this.currentNav == index && this.showStoreList) {
+        this.maskShow = false
+        this.showStoreList = false
+        return;
+      }
       this.currentNav = index;
       index == 1 ? (this.showStoreList = true) : (this.showStoreList = false);
       index == 2 ? (this.showSigning = true) : (this.showSigning = false);
@@ -345,7 +350,7 @@ page {
     top: 0px;
     left: 0px;
     width: 100%;
-    height: 42px;
+    // height: 42px;
     background-color: #fff;
     z-index: 98;
     .nav-tab-left {

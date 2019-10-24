@@ -32,7 +32,7 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, timePickerType == 'track' ? 1 : 0, 4)"
     ></timePicker>
   </div>
 </template>

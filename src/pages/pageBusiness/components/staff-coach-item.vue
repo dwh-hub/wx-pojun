@@ -27,11 +27,11 @@
         <div class="coach-type">上课中</div>
       </div>
       <div class="icon-right" @click.stop="clickIcon">
-        <div v-if="info.rightText" :style="{color: info.color?info.color:'#333'}">{{info.rightText}}</div>
+        <div class="right-text" v-if="info.rightText" :style="{color: info.color?info.color:'#333'}">{{info.rightText}}</div>
         <div
           v-if="info.rightBlock"
           class="right-block"
-          :style="{'background-color': info.color}"
+          :style="{'background-color': info.blockColor}"
         >{{info.rightBlock}}</div>
         <slot v-if="showSlot"></slot>
       </div>
@@ -208,12 +208,13 @@ export default {
   }
   .right-block {
     line-height: 20px;
-    width: 50px;
+    // width: 50px;
+    padding: 0 5px;
     text-align: center;
     margin-top: 18px;
     margin-right: 10px;
     color: #fff;
-    border-radius: 2px;
+    border-radius: 5px;
   }
   .icon-right {
     display: flex;

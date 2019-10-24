@@ -1464,7 +1464,7 @@ export default {
 @import "~COMMON/less/common";
 @import "../common/less/staff_common.less";
 page {
-  background-color: #f4f5f6;
+  background-color: #fff;
 }
 .billing {
   .input-cell-wrapper {

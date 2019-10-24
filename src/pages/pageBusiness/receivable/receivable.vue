@@ -14,7 +14,7 @@
       <div class="order-desc"><span>合同详细:</span> {{orderDesc}}</div>
     </div>
     <div class="notice-bar">
-      <van-icon name="warning-o" color="#fa9e14"/>
+      <van-icon name="warning-o" color="#119bf0"/>
       <div class="notice">请输入付款方式金额</div>
       <!-- <van-icon name="cross" color="#f95d51"/> -->
     </div>

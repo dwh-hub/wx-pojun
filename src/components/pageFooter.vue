@@ -15,14 +15,9 @@ export default {
     }
   },
   mounted() {
-    if(this.userName != wx.getStorageSync("userInfo").name) {
-      this.userName = wx.getStorageSync("userInfo").name;
-    }
   },
   onShow() {
-    if(this.userName != wx.getStorageSync("userInfo").name) {
-      this.userName = wx.getStorageSync("userInfo").name;
-    }
+    this.userName = wx.getStorageSync("userInfo").name;
   },
   computed: {
     window() {

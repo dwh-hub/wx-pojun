@@ -43,7 +43,7 @@
       :pickerShow="isPickerShow"
       :config="pickerConfig"
       @hidePicker="hidePicker"
-      @setPickerTime="setPickerTime"
+      @setPickerTime="setPickerTime(...arguments, 0, 4)"
     ></timePicker>
   </div>
 </template>
@@ -63,7 +63,7 @@ import listPageMinxin from "../components/list-page-mixin.vue";
 import colorMixin from "COMPS/colorMixin.vue";
 import noneResult from "COMPS/noneResult.vue";
 import regeneratorRuntime from "../common/js/regenerator-runtime/runtime.js";
-import { attendclass } from "../common/js/http.js";
+import { attendclass, recordUpdate } from "../common/js/http.js";
 
 export default {
   data() {
@@ -273,6 +273,7 @@ export default {
       this.selectedStore = item;
       this.getSetting()
       this.refreshList()
+      this.getCoachList();
     },
     toDetail() {
       wx.navigateTo({
@@ -339,7 +340,8 @@ export default {
                 color: that.transformColor(e.status),
                 first_1: e.name,
                 second_1: e.cardClassName,
-                third_1: e.timeStart ? formatDate(new Date(e.timeStart), 'yyyy/MM/dd hh:mm') : "--",
+                // third_1: e.timeStart ? formatDate(new Date(e.timeStart), 'yyyy/MM/dd hh:mm') : "--",
+                third_1: e.timeStart.replace(/-/g, '/').slice(0, 16),
                 rightText: e.statusChar || ""
               };
             });
@@ -354,6 +356,9 @@ export default {
       let that = this;
       HttpRequest({
         url: window.api + "/mobile/coach/getcoach",
+        data: {
+          storeId: that.selectedStore.storeId,
+        },
         success(res) {
           if (res.data.data) {
             that.coachList = res.data.data.map(e => {
@@ -385,7 +390,9 @@ export default {
     },
     selectClass(item) {
       this.curSelectClass = item;
-      if (item.status != 1 && item.status != 2 && item.status != 0) {
+      let statusArr = [0, 1, 2, 9]
+      // item.status != 1 && item.status != 2 && item.status != 0
+      if (!statusArr.includes(item.status)) {
         this.toDetail();
         return;
       }
@@ -580,6 +587,7 @@ export default {
     attendclassMethod() {
       let that = this;
       attendclass(this.curSelectClass.coachAppointId).then(() => {
+        recordUpdate(that.curSelectClass.id,that.curSelectClass.storeId,that.curSelectClass.venueId,formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"))
         wx.showModal({
           title: "提示",
           content: "上课成功",

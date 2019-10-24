@@ -30,7 +30,7 @@
       <div class="no-more" v-if="isNoMore && list.length">暂无更多</div>
     </div>
 
-    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime"></timePicker>
+    <timePicker :pickerShow="isPickerShow" :config="pickerConfig" @hidePicker="hidePicker" @setPickerTime="setPickerTime(...arguments, 0, 4)"></timePicker>
   </div>
 </template>
 

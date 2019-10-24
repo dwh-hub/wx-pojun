@@ -1,6 +1,0 @@
-{
-    "navigationBarTitleText": "会员登录",
-    "usingComponents": {
-      "van-popup": "../../../static/vant/popup/index"
-    }
-  }

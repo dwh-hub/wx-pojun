@@ -6,9 +6,10 @@
         :color="themeColor"
         :search="searchChange"
         @selectStore="selectStore"
+        :isOverlap="true"
       ></header-search>
-      <filter-date @changeDate="setDate"></filter-date>
-      <header-data :headerData="headerData"></header-data>
+      <!-- <filter-date @changeDate="setDate"></filter-date> -->
+      <header-data :headerData="headerData" :isOverlap="true"></header-data>
       <filter-nav @allFilter="showFilter" :nav="nav"></filter-nav>
     </div>
     <div class="list common-list">

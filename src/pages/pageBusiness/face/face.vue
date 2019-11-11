@@ -23,7 +23,7 @@ import {
   HttpRequest,
   formatDate
 } from "COMMON/js/common.js";
-import { attendclass } from "../common/js/http.js";
+import { attendclass, recordUpdate } from "../common/js/http.js";
 import Toast from "../../../../static/vant/toast/toast";
 import { EventBus } from "../common/js/eventBus.js";
 
@@ -97,12 +97,12 @@ export default {
   onUnload() {
     clearInterval(this.faceTimer);
     this.flag = true;
-    this.type = ""
+    this.type = "";
   },
   onHide() {
     clearInterval(this.faceTimer);
     this.flag = true;
-    this.type = ""
+    this.type = "";
   },
   methods: {
     load(e) {
@@ -169,6 +169,33 @@ export default {
         }
       });
     },
+    _attendclass() {
+      attendclass(this.params.appointId, 1)
+        .then(res => {
+          recordUpdate(
+            this.params.studentId,
+            this.params.storeId,
+            this.params.venueId,
+            formatDate(new Date(), "yyyy-MM-dd hh:mm:ss")
+          );
+          if (this.params.isOpenHandwrittenBoard) {
+            wx.redirectTo({
+              url:
+                "/pages/pageBusiness/handwrite_board/main?id=" +
+                this.params.appointId
+            });
+          } else {
+            wx.redirectTo({
+              url: `../../appointmentResult/main?coachAppointId=${
+                this.params.appointId
+              }&type=staff`
+            });
+          }
+        })
+        .catch(res => {
+          wx.hideLoading();
+        });
+    },
     // 人脸搜索+消费
     searchFace(wxPathBase64) {
       let that = this;
@@ -196,31 +223,18 @@ export default {
               wx.showLoading({
                 title: "上课中..."
               });
-              attendclass(that.params.appointId, 1)
-                .then(res => {
-                  recordUpdate(that.params.studentId, that.params.storeId, that.params.venueId, formatDate(new Date(), "yyyy-MM-dd hh:mm:ss"))
-                  if(that.params.isOpenHandwrittenBoard) {
-                    wx.redirectTo({
-                      url: "/pages/pageBusiness/handwrite_board/main?id=" + that.params.appointId
-                    });
-                  } else {
-                    wx.redirectTo({
-                      url: `../../appointmentResult/main?coachAppointId=${
-                        that.params.appointId
-                      }&type=staff`
-                    });
-                  }
-                })
-                .catch(res => {
-                  wx.hideLoading();
-                });
+              that._attendclass()
             }
             if (that.params.way == 3) {
-              that.pushThreeMsg();
-              EventBus.$emit("confirmed");
-              wx.navigateBack({
-                delta: 1
-              });
+              if (that.params.isReceptionConfirm) {
+                that._attendclass()
+              } else {
+                that.pushThreeMsg();
+                EventBus.$emit("confirmed");
+                wx.navigateBack({
+                  delta: 1
+                });
+              }
             }
           } else {
             // Toast({
@@ -289,7 +303,7 @@ export default {
             }, 1000);
           } else if (res.data.code == 401) {
             let second = 3;
-            that.showCenterTip = true
+            that.showCenterTip = true;
             // let toast = Toast.loading({
             //   duration: 0, // 持续展示 toast
             //   forbidClick: true, // 禁用背景点击
@@ -299,13 +313,13 @@ export default {
             // });
             const timer = setInterval(() => {
               if (second) {
-                that.centerTips = `${res.data.message}\n${second} 秒后重新识别`
+                that.centerTips = `${res.data.message}\n${second} 秒后重新识别`;
                 second--;
                 // toast.setData({
                 //   message: `${res.data.message}\n${second} 秒后重新识别`
                 // });
               } else {
-                that.showCenterTip = false
+                that.showCenterTip = false;
                 that.flag = true;
                 clearInterval(timer);
                 // Toast.clear();

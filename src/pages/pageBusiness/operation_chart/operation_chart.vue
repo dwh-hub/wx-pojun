@@ -223,7 +223,14 @@ export default {
     this.nav[0].navTitle = "今日";
     // this.storeList = store.state.allStore;
     // this.selectedStore = this.storeList[0];
-    this.storeList = store.state.allStore;
+    let storeList = store.state.allStore
+    if (storeList[0].storeId) {
+      storeList.unshift({
+        storeName: "所有门店",
+        storeId: ""
+      })
+    }
+    this.storeList = storeList;
     this.selectedStore =
       this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
 
@@ -239,7 +246,9 @@ export default {
     });
 
     this.waitLogin().then(() => {
-      this.filterDate(1);
+      setTimeout(() => {
+        this.filterDate(1);
+      },200)
     })
     // this.getSellInfo();
     // this.getSellList();
@@ -886,7 +895,7 @@ export default {
     }
   }
   .mask {
-    top: 48px;
+    top: 42px !important;
   }
 }
 </style>

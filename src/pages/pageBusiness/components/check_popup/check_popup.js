@@ -16,7 +16,11 @@ let checkPopupData = {
   storeName: '',
   venueId: '',
   venueName: '',
+  canTeachCard: '',
+  teachCardType: '',
+  authorityUnit: '',
   selectProject: {},
+  selectTeam: {},
   physicsCardNo: '',
   projectList: [],
   teamClassList: []
@@ -47,12 +51,16 @@ let checkMethods = {
         } else if (code == 503 || code == 502) {
           // 含有多个项目，选择
           checkPopupData.projectList = data.map(e => {
-            e.cardType =
-              e.valueCardType == 1
-                ? "会籍"
-                : e.valueCardType == 2
-                  ? "私教"
-                  : "团课";
+            if (checkPopupData.teachCardType != 3) {
+              e.cardType = that.transTeachCardType(checkPopupData.teachCardType)
+            } else {
+              e.cardType =
+                e.valueCardType == 1
+                  ? "会籍"
+                  : e.valueCardType == 2
+                    ? "私教"
+                    : "团课";
+            }
             e.class =
               e.valueCardType == 1
                 ? "member"
@@ -160,6 +168,18 @@ let checkMethods = {
         checkPopupData.customerId
         }&type=前台代签`
     });
+  },
+  transTeachCardType(value) {
+    switch (value) {
+      case 0:
+        return '会籍';
+      case 1:
+        return '团课';
+      case 2:
+        return '私教';
+      case 3:
+        return '储值';
+    }
   }
 }
 

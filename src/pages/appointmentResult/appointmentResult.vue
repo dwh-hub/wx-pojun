@@ -9,7 +9,8 @@
     </div>
     <div class="class-info">
       <title-cell title="课程信息" moreText :moreSize="14" :titleSize="16"></title-cell>
-      <div class="class-date">上课日期：{{timeStart}}</div>
+      <div class="class-date">预约时间：{{appointTime}}</div>
+      <div class="class-date">上课时间：{{attendTime}}</div>
       <div class="class-name">课程名称：{{detail.anotherName || detail.projectName || ''}}</div>
       <div class="class-coach">上课教练：{{coachStr}}</div>
     </div>
@@ -91,15 +92,32 @@ export default {
     pageFooter
   },
   computed: {
-    timeStart() {
-      if (this.detail.timeStart) {
-        return formatDate(
-          new Date(this.detail.timeStart),
-          "yyyy/MM/dd hh:mm"
-        );
-      } else {
-        return "";
+    appointTime() {
+      if (typeof this.detail.timeStart === 'number') {
+        return formatDate(new Date(this.detail.timeStart), 'yyyy/MM/dd hh:mm') +' ~ '+ formatDate(new Date(this.detail.timeEnd), 'yyyy/MM/dd hh:mm')
       }
+      if (this.detail.timeStart) {
+        return this.detail.timeStart.replace(/-/g, '/').slice(0, 16) +' ~ '+this.detail.timeEnd.replace(/-/g, '/').slice(11, 16)
+      }
+      return "";
+    },
+    attendTime() {
+      let date = ""
+      if (typeof this.detail.realTimeStart === 'number') {
+        date = formatDate(new Date(this.detail.realTimeStart), 'yyyy/MM/dd hh:mm')
+        if (this.detail.realTimeEnd) {
+          date += ' ~ '+ formatDate(new Date(this.detail.realTimeEnd), 'yyyy/MM/dd hh:mm')
+        }
+        return date
+      }
+      if (this.detail.realTimeStart) {
+        date = this.detail.realTimeStart.replace(/-/g, '/').slice(0, 16)
+        if (this.detail.realTimeEnd) {
+          date += ' ~ '+this.detail.realTimeEnd.replace(/-/g, '/').slice(11, 16)
+        }
+        return date
+      }
+      return "暂未开始上课"
     },
     coachStr() {
       if (JSON.stringify(this.detail) == "{}") {

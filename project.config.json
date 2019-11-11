@@ -42,8 +42,12 @@
 			"currentL": -1,
 			"list": []
 		},
+		"gamePlugin": {
+			"current": -1,
+			"list": []
+		},
 		"miniprogram": {
-			"current": 2,
+			"current": 5,
 			"list": [
 				{
 					"id": 0,
@@ -62,9 +66,9 @@
 				},
 				{
 					"id": 2,
-					"name": "pages/pageBusiness/customer_detail/main",
-					"pathName": "pages/pageBusiness/customer_detail/main",
-					"query": "id=144956",
+					"name": "pages/pageBusiness/team_class_scheduling/main",
+					"pathName": "pages/pageBusiness/team_class_scheduling/main",
+					"query": "teamTempStoreId=91&storeId=126&type=batch",
 					"scene": null
 				},
 				{
@@ -83,8 +87,8 @@
 				},
 				{
 					"id": 5,
-					"name": "pages/pageBusiness/contract_list/main",
-					"pathName": "pages/pageBusiness/contract_list/main",
+					"name": "pages/pageBusiness/check_in_customer/main",
+					"pathName": "pages/pageBusiness/operation_chart/main",
 					"query": "",
 					"scene": null
 				},

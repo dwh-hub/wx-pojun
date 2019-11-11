@@ -269,7 +269,7 @@ export default {
         },
         {
           name: "合同标签",
-          isRadio: false,
+          isRadio: true,
           isParmas: false,
           isTimer: false,
           param: "labelName",
@@ -480,7 +480,7 @@ export default {
                   ? e.headImgPath
                   : "http://pojun-tech.cn/assets/img/morenTo.png",
                 rightText: e.cardStatusChar,
-                rightBlock: `${e.masterCradClass}/${e.authorityUnitChar}`,
+                rightBlock: e.masterCradClass + (e.authorityUnitChar ? `/${e.authorityUnitChar}` : ''),
                 blockColor: that.transBlockColor(e.teachCardType),
                 color: that.transStatusColor(e.cardStatus),
                 cardClassId: e.cardClassId || "",
@@ -514,7 +514,8 @@ export default {
           that.moreFilter[1].children = res.data.data.result.map(e => {
             return {
               name: e.labelName,
-              value: e.cardLabelId
+              value: e.labelName
+              // value: e.cardLabelId
             }
           })
         }
@@ -740,7 +741,8 @@ page {
         font-size: 10px;
       }
       .right-block {
-        // min-width: 58px;
+        min-width: 55px;
+        box-sizing: border-box;
         line-height: 22px;
         font-size: 10px;
         margin: 0;

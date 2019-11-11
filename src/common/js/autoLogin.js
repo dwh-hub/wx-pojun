@@ -57,6 +57,8 @@ export default function autoLogin() {
         wx.setStorageSync("Cookie", res.header["Set-Cookie"]);
         if (res.data.message == 'user') {
           wx.removeStorageSync("userInfo")
+          wx.setStorageSync("staffIsLogin", true);
+          wx.setStorageSync("isLogin", false);
           // 走商户登录之后流程
           if (!wx.getStorageSync("staff_info")) {
             let _data = res.data.data
@@ -85,8 +87,6 @@ export default function autoLogin() {
                 })
               })
               wx.setStorageSync("authInto", authList);
-              wx.setStorageSync("staffIsLogin", true);
-              wx.setStorageSync("isLogin", false);
               wx.hideLoading()
               wx.reLaunch({
                 url: "/pages/pageBusiness/workbench/main"

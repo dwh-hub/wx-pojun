@@ -95,6 +95,33 @@ export default {
   },
   mounted() {
     setNavTab();
+    wx.getSetting({
+      success(res) {
+        if (res.authSetting['scope.camera'] === undefined) {
+          wx.authorize({
+            scope: 'scope.camera'
+          })
+        }
+        if (res.authSetting['scope.camera'] === false) {
+          wx.showModal({
+            title: "授权",
+            content: "人脸采需调用摄像头，是否授权？",
+            success(res) {
+              if (res.confirm) {
+                wx.openSetting()
+              }
+            }
+          });
+        }
+        // if (!res.authSetting['scope.camera']) {
+        //   wx.authorize({
+        //     scope: 'scope.camera'
+        //   })
+        // }
+      }
+    })
+  },
+  onShow() {
   },
   onUnload() {
     this.resetData()
@@ -112,6 +139,7 @@ export default {
       this.device = false
       this.customerName = ''
       this.uploadImgSrc = ''
+      this.checkInNum = ''
     },
     // 拍照上传
     takePhoto() {

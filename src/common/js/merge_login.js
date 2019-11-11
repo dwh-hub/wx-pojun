@@ -108,39 +108,97 @@ export function getUserInfo() {
   });
 }
 
+// 判断用户账号信息
+function checkAccount() {
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: window.api + '/mini/checkAccount',
+      data: {
+        phone: wx.getStorageSync("phone"),
+        companyId: wx.getStorageSync("companyId")
+      },
+      success(res) {
+        // 查询成功：0都不存在，1都存在，2只有customer，3只有user
+        resolve(res.data.data)
+      }
+    })
+  })
+}
+
 // 登录
 export function login(url, isTab) {
   url = url || ''
   isTab = isTab || true
-  staff_login().then((staff_res) => {
-    getUserInfo().then((member_res) => {
-      if (!staff_res && !member_res) {
-        // 商户false、会员false => 进入会员
+  wx.showLoading({
+    title: "登录中..."
+  });
+  checkAccount().then((account) => {
+    console.log('account:'+account)
+    if (account == 2 || account == 0) {
+      getUserInfo().then((member_res) => {
         enterMember(member_res)
-      } else if (!staff_res && member_res) {
-        // 商户false、会员true => 进入会员
-        enterMember(member_res)
-      } else if (staff_res && !member_res) {
-        // 商户true、会员false => 进入商户
+      })
+    }
+    if (account == 3) {
+      staff_login().then((staff_res) => {
         enterStaff(staff_res)
-      } else if (staff_res && member_res) {
-        // 商户true、会员false
-        wx.showModal({
-          title: "提示",
-          content: "检测到您是工作人员，请选择当次浏览的信息",
-          cancelText: "留在会员",
-          confirmText: "前往商户",
-          success(res) {
-            if (res.confirm) {
+      })
+    }
+    if (account == 1) {
+      wx.hideLoading();
+      wx.showModal({
+        title: "提示",
+        content: "检测到您是工作人员，请选择当次浏览的信息",
+        cancelText: "留在会员",
+        confirmText: "前往商户",
+        success(res) {
+          wx.showLoading({
+            title: "登录中..."
+          });
+          if (res.confirm) {
+            staff_login().then((staff_res) => {
               enterStaff(staff_res)
-            } else if (res.cancel) {
+            })
+          } else if (res.cancel) {
+            getUserInfo().then((member_res) => {
               enterMember(member_res)
-            }
+            })
           }
-        });
-      }
-    })
+        }
+      });
+    }
   })
+  // url = url || ''
+  // isTab = isTab || true
+  // staff_login().then((staff_res) => {
+  //   getUserInfo().then((member_res) => {
+  //     if (!staff_res && !member_res) {
+  //       // 商户false、会员false => 进入会员
+  //       enterMember(member_res)
+  //     } else if (!staff_res && member_res) {
+  //       // 商户false、会员true => 进入会员
+  //       enterMember(member_res)
+  //     } else if (staff_res && !member_res) {
+  //       // 商户true、会员false => 进入商户
+  //       enterStaff(staff_res)
+  //     } else if (staff_res && member_res) {
+  //       // 商户true、会员false
+  //       wx.showModal({
+  //         title: "提示",
+  //         content: "检测到您是工作人员，请选择当次浏览的信息",
+  //         cancelText: "留在会员",
+  //         confirmText: "前往商户",
+  //         success(res) {
+  //           if (res.confirm) {
+  //             enterStaff(staff_res)
+  //           } else if (res.cancel) {
+  //             enterMember(member_res)
+  //           }
+  //         }
+  //       });
+  //     }
+  //   })
+  // })
 }
 
 // 进入会员的逻辑

@@ -4,7 +4,8 @@ const window = {}
 window.isPublic = false // 是否是公用的小程序
 window.DEBUGGING = false
 // 榴莲: https://club.lirenos.com test: https://test.lirenos.com cn: https://www.pojun-tech.cn com: https://www.pojun-tech.com
-window.api = window.DEBUGGING ? "http://192.168.1.126" : "https://test.lirenos.com"
+window.domain = "https://test.lirenos.com" // 服务器域名
+window.api = window.DEBUGGING ? "http://192.168.1.19" : window.domain
 window.defaultColor = "#0c9cf0"
 window.color = "" // "#0c9cf0"
 // 获取 ext.json 配置信息

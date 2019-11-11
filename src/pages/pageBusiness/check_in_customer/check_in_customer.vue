@@ -222,7 +222,8 @@ export default {
                 teachCardType: e.teachCardType,
                 cardId: e.id,
                 cardName: e.cardClassName,
-                cardClassId: e.cardClassId
+                cardClassId: e.cardClassId,
+                authorityUnit: e.authorityUnit
               };
             });
             resolve(list);
@@ -254,8 +255,9 @@ export default {
       checkPopupData.cardId = item.cardId;
       checkPopupData.cardName = item.cardName;
       checkPopupData.cardClassId = item.cardClassId;
-      console.log("canTeachCard:" + item.canTeachCard);
-      console.log("teachCardType:" + item.teachCardType);
+      checkPopupData.canTeachCard = item.canTeachCard;
+      checkPopupData.teachCardType = item.teachCardType;
+      checkPopupData.authorityUnit = item.authorityUnit
       checkMethods.getCardCost();
       // if (item.canTeachCard == 1) {
       //   if (item.teachCardType == 1) {

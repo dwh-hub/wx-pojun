@@ -108,6 +108,9 @@ export default {
     });
     if (options.params) {
       this.params = JSON.parse(options.params);
+      if (this.params.isReceptionConfirm) {
+        this.receptionText = '前台已确认'
+      }
       console.log(this.params);
     }
     // this.timer = setInterval(() => {
@@ -134,6 +137,9 @@ export default {
   mounted() {
     EventBus.$on("confirmed", () => {
       this.studentText = "学员已确认"
+      // if (this.params.isReceptionConfirm) {
+      //   this.attendclassMethod()
+      // }
     });
     this._nav = this.nav;
   },
@@ -237,7 +243,7 @@ export default {
           if (res.data.code == 200) {
             that.studentText = "学员已确认";
             clearInterval(that.checkQRStatus);
-            if (that.params.way == 2) {
+            if (that.params.way == 2 || that.params.isReceptionConfirm) {
               that.attendclassMethod();
             }
           }
@@ -355,6 +361,9 @@ export default {
             frontSures.coachAppointOut.coachAppointId == this.params.appointId
           ) {
             this.studentText = "学员已确认";
+            if (this.params.isReceptionConfirm) {
+              this.attendclassMethod()
+            }
             // this.pushMsg();
           }
         }

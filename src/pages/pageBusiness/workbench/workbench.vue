@@ -93,7 +93,7 @@ export default {
     this.$nextTick(() =>{
       setTimeout(() => {
         this.getLineView()
-      }, 50)
+      }, 200)
     })
     this.name = wx.getStorageSync('staff_info') ? wx.getStorageSync('staff_info').userName : ''
   },
@@ -192,9 +192,11 @@ export default {
               tem: e.cost
             };
           });
-          that.$mp.page
-            .selectComponent("#line-view")
-            .init(initLine, data);
+          that.$nextTick(() =>{
+            that.$mp.page
+              .selectComponent("#line-view")
+              .init(initLine, data);
+          })
         }
       });
     },

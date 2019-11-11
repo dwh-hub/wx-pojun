@@ -313,8 +313,9 @@
             <div class="img-btn img-item" @click="chooseImg">+</div>
           </div> 
           <div class="cell-subtitle">备注</div>
-          <div class="carRemark" v-show="!showEntryBox">
-            <textarea v-model="remarks" maxlength="120" cursor-spacing="50" placeholder="备注不能超过120个字" placeholder-class="placeholder"></textarea>
+          <div class="carRemark">
+            <textarea v-if="!hasPopup" v-model="remarks" maxlength="120" cursor-spacing="50" placeholder="备注不能超过120个字" placeholder-class="placeholder"></textarea>
+            <textarea v-else></textarea>
           </div>
           <!-- <div class="cell-subtitle" @click="toMore" v-if="billingType != 4">更多设置选项</div> -->
           <div class="submit-wrapper" :class="{'safe-bottom': isIphoneX}">
@@ -522,6 +523,9 @@ export default {
       if(this.billingType == 4) {
         return "预交定金"
       }
+    },
+    hasPopup() {
+      return this.showStoreList || this.showActionsList || this.showLabelList || this.showSaleList || this.showCardList || this.showEntryBox
     }
   },
   onUnload() {
@@ -1202,6 +1206,7 @@ export default {
       this.isSelectCard = false
       this.selectedCard = {}
       this.constCardInfo = {}
+      this.remarks = ""
       this.cardLabelList.forEach((e) => {
         e.checked = false
       })

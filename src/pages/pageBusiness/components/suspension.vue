@@ -1,6 +1,6 @@
 <template>
   <div class="suspension" v-if="_operateList || _operateList > 0">
-    <movable-area class="movable-area" v-show="!showOperate">
+    <movable-area class="movable-area" :class="[showOperate ? 'hidden' : '']">
       <movable-view
         class="movable-view"
         :style="{'background-color':themeColor}"
@@ -8,7 +8,8 @@
         @click="toggleOperate"
       >+</movable-view>
     </movable-area>
-    <div class="operate-wrapper" :style="{'z-index': showOperate ? 4 : -1}">
+    <div class="operate-wrapper" :style="{'z-index': operateWrapperZIndex}">
+      <!-- :style="{'z-index': showOperate ? 4 : -1}" -->
       <!-- :class="{hidden: item.hasAuth == undefined ? false : !item.hasAuth}" -->
       <div
         class="operate-item"
@@ -48,8 +49,20 @@ export default {
   data() {
     return {
       showOperate: false,
-      _operateList: []
+      _operateList: [],
+      operateWrapperZIndex: -1
     };
+  },
+  watch: {
+    showOperate(val) {
+      if (val) {
+        this.operateWrapperZIndex = 4
+      } else {
+        setTimeout(() => {
+          this.operateWrapperZIndex = -1
+        }, this._operateList.length * 30 * 2)
+      }
+    }
   },
   mounted() {
     let list = this.operateList.map((e, index) => {
@@ -121,6 +134,10 @@ export default {
     width: 38px;
     height: 100vh;
     z-index: 2;
+    pointer-events: none;
+    &.hidden {
+      visibility: hidden;
+    }
     .movable-view {
       position: absolute;
       top: 50vh;
@@ -132,6 +149,7 @@ export default {
       text-align: center;
       box-shadow: -1px 0px 3px 0px rgba(5, 40, 62, 0.1);
       border-radius: 15px 0 0 15px;
+      pointer-events: auto;
     }
   }
   .operate-wrapper {

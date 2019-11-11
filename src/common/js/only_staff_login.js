@@ -62,16 +62,32 @@ function getPhoneNumber_staff(e) {
   })
 }
 
+// 判断用户账号信息
+function checkAccount() {
+  return new Promise((resolve, reject) => {
+    wx.request({
+      url: window.api + '/mini/checkAccount',
+      data: {
+        phone: wx.getStorageSync("phone"),
+        companyId: wx.getStorageSync("companyId")
+      },
+      success(res) {
+        // 查询成功：0都不存在，1都存在，2只有customer，3只有user
+        resolve(res.data.data)
+      }
+    })
+  })
+}
+
 async function publicLogin() {
-  const member = await checkMember()
-  const staff = await staffLogin(true)
+  const account = await checkAccount()
   let loginData = {
     role: '',
     companyList: []
   }
 
   // 会员 商户 xx
-  if (!member && !staff) {
+  if (account == 0) {
     return wx.showModal({
       title: "提示",
       content: "无用户信息",
@@ -79,8 +95,9 @@ async function publicLogin() {
     });
   }
   // 会员 x 
-  if (!member) {
+  if (account == 3) {
     // 商户单公司
+    let staff = await staffLogin(true)
     loginData.role = 'staff'
     if (staff.data.code == 200) enterStaff(staff)
     // 商户多公司 返回公司列表
@@ -89,7 +106,8 @@ async function publicLogin() {
   }
 
   // 商户 x
-  if (!staff) {
+  if (account == 2) {
+    let member = await checkMember()
     loginData.role = 'member'
     // 会员单公司
     if (member.data.data.length == 1) enterMember(member.data.data[0])
@@ -99,21 +117,23 @@ async function publicLogin() {
   }
 
   // TODO: 会员、商户 ok
-  if (member && staff) {
+  if (account == 1) {
     return new Promise((resolve) => {
       wx.showModal({
         title: "提示",
         content: "检测到您是工作人员，请选择当次浏览的信息",
         cancelText: "留在会员",
         confirmText: "前往商户",
-        success(res) {
+        success: async function (res) {
           if (res.confirm) {
             // 进商户
+            let staff = await staffLogin(true)
             loginData.role = 'staff'
             if (staff.data.code == 200) enterStaff(staff)
             if (staff.data.code == 201) loginData.companyList = staff.data.data
           } else if (res.cancel) {
             // 进会员
+            let member = await checkMember()
             loginData.role = 'member'
             if (member.data.data.length == 1) enterMember(member.data.data[0])
             if (member.data.data.length > 1) loginData.companyList = member.data.data

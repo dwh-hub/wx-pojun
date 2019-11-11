@@ -206,12 +206,13 @@
       </div>
       <div class="textarea-wrapper">
         <textarea
-          v-show="!showPopup"
+          v-if="!hasPopup"
           v-model="followUpContent"
           placeholder="备注不能超过120字"
           maxlength="120"
           placeholder-style="placeholder"
         />
+        <textarea v-else/>
       </div>
       <div class="quick-tip-wrapper">
         <div
@@ -384,6 +385,11 @@ export default {
     this.selectedStore =
       this.storeList.filter(e => e.isDefault)[0] || this.storeList[0];
     this.actionList = this.storeActions;
+  },
+  computed: {
+    hasPopup() {
+      return this.showPopup || this.showAction
+    }
   },
   methods: {
     selectAction(e) {

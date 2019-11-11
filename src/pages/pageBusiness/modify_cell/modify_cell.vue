@@ -33,6 +33,13 @@ export default {
   },
   methods: {
     confirm() {
+      if (this.name == 'phone' && this.value.length != 11) {
+        return wx.showModal({
+          title: "提示",
+          content: '手机号长度需为11位',
+          showCancel: false
+        });
+      }
       if(this.type == "customer") {
         EventBus.$emit('modifyCell', {name: this.name, value: this.value})
         wx.navigateBack({

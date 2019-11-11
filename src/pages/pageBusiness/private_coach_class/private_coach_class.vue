@@ -217,6 +217,7 @@ export default {
           }
         }
       ],
+      // 9 前台已确认
       actionList_9: [
         {
           text: "上课",
@@ -556,11 +557,12 @@ export default {
               appointId: that.curSelectClass.coachAppointId,
               storeId: that.curSelectClass.storeId,
               venueId: that.curSelectClass.venueId,
-              isOpenHandwrittenBoard: that.isOpenHandwrittenBoard
+              isOpenHandwrittenBoard: that.isOpenHandwrittenBoard,
+              isReceptionConfirm: that.curSelectClass.status == 9
             };
             wx.hideLoading()
-            if (way == 1) {
-              // 教练自签
+            // 教练自签 || 前台+教练,前台已确认
+            if ((way == 1) || (way == 4 && that.curSelectClass.status == 9)) {
               that.attendclassMethod();
             } else if (way == 5) {
               that.showOperate = false;
@@ -636,6 +638,7 @@ export default {
           if (res.data.code == 200) {
             that.getAttendClassWay();
           }
+          // 教练正在上课状态
           if (res.data.code == 300) {
             wx.hideLoading()
             wx.showModal({
@@ -688,13 +691,15 @@ export default {
         },
         success(res) {
           if(res.data.code == 200) {
-            HttpRequest({
-              url: '/sendmsg/customer/affirmAppointMsg',
-              data: {
-                coachAppointId: that.curSelectClass.coachAppointId,
-                storeId: that.curSelectClass.storeId
-              }
-            })
+            if (!res.data.data.includes('请另约时间')) {
+              HttpRequest({
+                url: '/sendmsg/customer/affirmAppointMsg',
+                data: {
+                  coachAppointId: that.curSelectClass.coachAppointId,
+                  storeId: that.curSelectClass.storeId
+                }
+              })
+            }
             wx.showModal({
               title: "提示",
               content: res.data.data,

@@ -158,6 +158,7 @@ export default {
     }
   },
   onShow() {
+    console.log('onShow==message')
     if (!wx.getStorageSync("isLogin")) {
       return;
     }
@@ -173,6 +174,12 @@ export default {
     }
   },
   onPullDownRefresh() {
+    this.messageNpage = 1
+    this.messageNList = []
+    this.messageYPage = 1
+    this.messageYList = []
+    this.getMessage(0, 1);
+    this.getMessage(1, 1);
     setTimeout(() => {
       wx.stopPullDownRefresh();
     }, 1000);
@@ -199,7 +206,7 @@ export default {
         },
         success(res) {
           if (res.data.code === 200) {
-            if (!res.data.data.result.length) {
+            if (!res.data.data.result.length && status === 1) {
               return;
             }
             let _arrId = [];

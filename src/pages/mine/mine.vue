@@ -64,7 +64,7 @@
 import {
   setNavTab,
   window,
-  // wxLogin,
+  wxLogin,
   HttpRequest
 } from "COMMON/js/common.js";
 import { getPhoneNumber } from "COMMON/js/merge_login.js";
@@ -161,9 +161,9 @@ export default {
     this.showCompanyList = false
     this.isLogin = wx.getStorageSync("isLogin")
     this.getTimes();
-    // if(wx.getStorageSync("isLogin") == false) {
-    //   wxLogin();
-    // }
+    if(wx.getStorageSync("isLogin") == false) {
+      wxLogin();
+    }
     if (this.themeColor != window.color) {
       this.themeColor = window.color;
       setNavTab(wx.getStorageSync("companyName"));

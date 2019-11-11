@@ -36,7 +36,7 @@
         <div class="time">{{batchStartTime}} - {{batchEndTime}}</div>
         <div class="date">{{batchWeekStr}}</div>
       </div>
-      <div class="add-time-btn" @click="addSchedulingTime" :style="{color: themeColor}">新增课程时间</div>  
+      <div class="add-time-btn" @click="addSchedulingTime" :style="{color: themeColor}">{{batchStartTime ? '修改':'新增'}}课程时间</div>  
     </div>
     <van-cell-group custom-class="van-cell-group" v-else>
       <van-cell title="课程日期" @click="changeClassDate" :value="classDate" is-link/>
@@ -123,7 +123,7 @@
       <van-datetime-picker
         type="date"
         :value="currentDateStamp"
-        :min-date="currentDateStamp"
+        :min-date="minDate"
         @confirm="changeDate"
       />
     </van-popup>
@@ -177,7 +177,7 @@
       custom-style="width:100%"
       :z-index="101"
     >
-      <div class="action-list">
+      <div class="action-list" style="padding-bottom: 0px;">
         <div class="action-item" @click="selectVenue(item)" v-for="(item, index) in venueList" :key="index">
           <div class="text">{{item.venueName}}</div>
         </div>
@@ -219,6 +219,7 @@ export default {
       showCoachPopup: false,
       showVenuePopup: false,
       actionList: [],
+      minDate: new Date().getTime(),
       currentDateStamp: new Date().getTime(),
       timeType: "", // 控制时间选择
       dateType: "", // 控制日期选择
@@ -308,11 +309,16 @@ export default {
       this.showVenuePopup = true
     },
     changeDate(e) {
+      // console.log('e.mp.detail:'+formatDate(new Date(e.mp.detail), "yyyy-MM-dd"))
+      // console.log('this.classStartDate:'+this.classStartDate)
+      // console.log('e.mp.detail:'+new Date(e.mp.detail).getTime())
+      // console.log('this.classStartDate:'+new Date(this.classStartDate).getTime())
+
       if(this.dateType == 'startDate') {
         this.classStartDate =  formatDate(new Date(e.mp.detail), "yyyy-MM-dd");
       }
       if(this.dateType == 'endDate') {
-        if(new Date(e.mp.detail).getTime() < new Date(this.classStartDate).getTime()) {
+        if(new Date(e.mp.detail).getTime() < new Date(this.classStartDate+' 00:00:00').getTime()) {
           return wx.showModal({
             title: "提示",
             content: "结束时间必须大于开始时间",
@@ -519,7 +525,21 @@ export default {
       }
       let _timeStr
       if(this.type == "batch") {
+        if (!this.classEndDate) {
+          return wx.showModal({
+            title: "提示",
+            content: "请选择结束日期",
+            showCancel: false
+          });
+        }
         _timeStr = this.eachTime(this.batchStartTime,this.batchEndTime)
+        if (!_timeStr.length) {
+          return wx.showModal({
+            title: "提示",
+            content: "请选择课程时间",
+            showCancel: false
+          });
+        }
       } else {
         _timeStr = [
             {

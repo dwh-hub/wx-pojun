@@ -23,7 +23,7 @@
       custom-style="width:80%;height:100%"
     ></van-popup>
 
-    <div class="customer-list common-list">
+    <div class="customer-list common-list" :style="{'margin-bottom': isPhoneX ? '74px':'40px'}">
       <div class="customer-item" v-for="(item,index) in list" :key="index">
         <div class="item-left" @click="selectCustomer(item,index)" v-show="isOperate">
           <div class="icon-wrapper" :class="{border: !item.isSelect}">

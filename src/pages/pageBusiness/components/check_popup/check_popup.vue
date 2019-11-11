@@ -10,13 +10,13 @@
         <div class="pro-item pop-item" v-for="(item, index) in projectList" :key="index">
           <div class="round" :class="item.class">{{item.cardType}}</div>
           <div class="name">{{item.projectName}}</div>
-          <div class="stepper">
-            <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="decreasePrice(item)">-</span>
+          <div class="stepper" v-if="authorityUnit != '天'">
+            <!-- <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="decreasePrice(item)">-</span> -->
             <div class="stepper-input">
-              <input type="number" v-model="item.projectPrice" v-if="item.isCanModifyFee == 1" />
-              <div v-else>{{item.projectPrice}}元</div>
+              <!-- <input type="number" v-model="item.projectPrice" v-if="item.isCanModifyFee == 1" /> -->
+              <div>{{item.projectPrice}}{{authorityUnit}}</div>
             </div>
-            <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="addPrice(item)">+</span>
+            <!-- <span class="stepper-doc" v-if="item.isCanModifyFee == 1" @click="addPrice(item)">+</span> -->
           </div>
           <div class="select" :style="{'color': window.color}" @click="checkInTo(item)">签到</div>
         </div>
@@ -66,6 +66,7 @@ export default {
       this.showProject = false;
       this.showMask = false;
       this.showTeam = false;
+      this.selectProject = {}
     },
     addPrice(item) {
       item.projectPrice++;
@@ -75,16 +76,40 @@ export default {
     },
     checkInTo(item) {
       this.selectProject = item;
-      if (item.valueCardType == 1) {
-        // 会籍
-        this.checkInMember(item);
-      } else if (item.valueCardType == 2) {
-        // 私教
-        checkMethods.toCoachCheckIn()
+      console.log('canTeachCard:'+this.canTeachCard)
+      console.log('teachCardType:'+this.teachCardType)
+      console.log(item)
+      if (this.teachCardType == 3) {
+        // 储值卡判断
+        if (item.valueCardType == 1) this.checkInMember(item);
+        if (item.valueCardType == 2) checkMethods.toCoachCheckIn();
+        if (item.valueCardType == 3) this.attendTeamClass(this.selectTeam);
       } else {
-        // 团课
-        checkMethods.getTeamSchedule();
+        if (this.canTeachCard == 1) {
+          if (this.teachCardType == 1) {
+            //团课
+            this.attendTeamClass(this.selectTeam)
+          } else if (this.teachCardType == 2) {
+            //私教
+            checkMethods.toCoachCheckIn()
+          }
+        } else if (this.canTeachCard == 0) {
+          // 会籍
+          this.checkInMember(item);
+        }
       }
+
+      // if (item.valueCardType == 1) {
+      //   // 会籍
+      //   this.checkInMember(item);
+      // } else if (item.valueCardType == 2) {
+      //   // 私教
+      //   checkMethods.toCoachCheckIn()
+      // } else {
+      //   // 团课
+      //   // checkMethods.getTeamSchedule();
+      //   this.attendTeamClass(this.selectTeam)
+      // }
       this.touchMask();
     },
     // 会籍
@@ -116,6 +141,7 @@ export default {
     },
     // 团课上课
     attendTeamClass(item) {
+      this.selectTeam = item
       let that = this;
       wx.showLoading();
       HttpRequest({
@@ -134,7 +160,32 @@ export default {
           that.touchMask();
           if (res.data.code == 200) {
             checkMethods.successMethod("上课成功");
-          } else {
+          } 
+          else if (res.data.code == 502) {
+            // 含有多个项目，选择
+            that.projectList = res.data.data.map(e => {
+              if (that.teachCardType != 3) {
+                e.cardType = checkMethods.transTeachCardType(that.teachCardType)
+              } else {
+                e.cardType =
+                  e.valueCardType == 1
+                    ? "会籍"
+                    : e.valueCardType == 2
+                      ? "私教"
+                      : "团课";
+              }
+              e.class =
+                e.valueCardType == 1
+                  ? "member"
+                  : e.valueCardType == 2
+                    ? "private"
+                    : "team";
+              return e;
+            });
+            that.showMask = true;
+            that.showProject = true;
+          } 
+          else {
             checkMethods.failMethod(res.data.message);
           }
         }

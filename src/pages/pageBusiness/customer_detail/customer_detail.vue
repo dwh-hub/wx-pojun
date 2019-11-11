@@ -79,7 +79,7 @@
         <header-data :headerData="checkInData"></header-data>
         <scroll-view
           scroll-y
-          :style="{height: scrollViewHeight + 'px'}"
+          :style="{height: scrollViewHeight-80 + 'px'}"
           @scrolltolower="getCheckInList()"
         >
           <!-- <list-day-item :info="item" v-for="(item,index) in checkInList" :key="index"></list-day-item> -->

@@ -181,7 +181,7 @@ export default {
     }
     wx.getSetting({
       success(res) {
-        if (!res.authSetting['scope.userLocation'] && JSON.stringify(res.authSetting).length > 2) {
+        if (res.authSetting['scope.userLocation'] === false) {
           wx.showModal({
             title: "授权",
             content: "部分功能需要地理位置，是否授权？",

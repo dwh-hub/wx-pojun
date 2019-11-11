@@ -232,7 +232,7 @@ export default {
         success(res) {
           if (res.data.code === 200) {
             let resData = res.data.data.result;
-            if (!resData.length) {
+            if (!resData.length && status === 1) {
               if (page > 1 ) {
                 that.isNomore = true
               }

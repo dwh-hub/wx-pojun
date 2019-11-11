@@ -61,7 +61,7 @@
         <!-- <p>课程还没有填写简介</p> -->
       </div>
     </div>
-    <div class="class-people">
+    <div class="class-people" v-if="classDetail.isNeedAppoint">
       <div class="people-info">
         <div class="num">
           已预约（{{classDetail.appointCount}}
@@ -71,7 +71,8 @@
     </div>
     <div class="ruler">
       <div class="title">预约规则</div>
-      <p>1.开课前24小时可以预约。</p>
+      <p v-if="classDetail.isNeedAppoint">预约时间：{{appointTime}}</p>
+      <p v-else>无需预约</p>
     </div>
     <div class="process">
       <div class="title">上课流程</div>
@@ -180,26 +181,34 @@ export default {
     }
   },
   computed: {
-    statrTime() {
-      if (this.classDetail.timeStart) {
-        return formatDate(new Date(this.classDetail.timeStart), "hh:mm");
-      }
-      return "";
-    },
-    endTime() {
-      if (this.classDetail.timeEnd) {
-        return formatDate(new Date(this.classDetail.timeEnd), "hh:mm");
-      }
-      return "";
-    },
+    // statrTime() {
+    //   if (this.classDetail.timeStart) {
+    //     return formatDate(new Date(this.classDetail.timeStart), "hh:mm");
+    //   }
+    //   return "";
+    // },
+    // endTime() {
+    //   if (this.classDetail.timeEnd) {
+    //     return formatDate(new Date(this.classDetail.timeEnd), "hh:mm");
+    //   }
+    //   return "";
+    // },
     classTime() {
       if (this.classDetail.timeStart) {
         let week = ["日", "一", "二", "三", "四", "五", "六"];
         let w = "周" + week[new Date(this.classDetail.timeStart).getDay()];
         let md = formatDate(new Date(this.classDetail.timeStart), "M月dd");
-        return md + " " + w + " " + this.statrTime + "-" + this.endTime;
+        let statrTime = formatDate(new Date(this.classDetail.timeStart), "hh:mm");
+        let endTime = formatDate(new Date(this.classDetail.timeEnd), "hh:mm");
+        return md + " " + w + " " + statrTime + "-" + endTime;
       }
       return "";
+    },
+    appointTime() {
+      if (!this.classDetail.timeStart || !this.classDetail.advanceAppoint) return ''
+      let timeStart = this.classDetail.timeStart
+      let time = `${formatDate(new Date(timeStart - this.classDetail.advanceAppoint * 60), 'yyyy/MM/dd hh:mm')} ~ ${formatDate(new Date(timeStart - this.classDetail.stopAppoint * 60), 'yyyy/MM/dd hh:mm')}`
+      return time
     },
     isPhoneX() {
       return store.state.isIphoneX;
@@ -274,11 +283,12 @@ export default {
         methods: "POST",
         success(res) {
           if (res.data.code === 200) {
-            if (new Date().getTime() > res.data.data.timeEnd) {
+            let data = res.data.data
+            if (new Date().getTime() > data.timeEnd) {
               that.canAppoint = false;
             }
-            res.data.data.masterImg = res.data.data.masterImg.split(",");
-            that.classDetail = res.data.data;
+            data.masterImg = data.masterImg.split(",");
+            that.classDetail = data;
             that.getAddress();
           }
           that.loadCount++

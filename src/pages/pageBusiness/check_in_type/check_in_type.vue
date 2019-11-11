@@ -125,6 +125,9 @@ export default {
       return store.state.isIphoneX;
     }
   },
+  onUnload() {
+    this.recordList = []
+  },
   mounted() {
     setNavTab();
     this.checkInNum = "";
@@ -161,7 +164,7 @@ export default {
           timeEnd: formatDate(new Date(), 'yyyy-MM-dd') + ' 23:59:59'
         },
         success(res) {
-          if(res.data.code != 200 && res.data.data.result.lenght) {
+          if(res.data.code != 200 && res.data.data.result.length) {
             return
           }
           that.recordSum = res.data.data.recCount
@@ -181,12 +184,14 @@ export default {
       checkPopupData.venueName = this.venueList[this.venueIndex].venueName;
     },
     onVenueChange(e) {
+      this.recordList = []
       this.venueIndex = e.mp.detail.value;
       this.changeCommonVenue();
       this.logPage = 1
       this.getRecord();
     },
     selectStore(item) {
+      this.recordList = []
       this.selectedStore = item;
       this.changeCommonStore();
       this._getVenueList();

@@ -102,6 +102,8 @@ export default {
   mixins: [colorMixin],
   computed: {
     confirmDate() {
+      let date = this.dayDate.replace(/-/g, "/");
+      let endTime = formatDate(new Date(new Date(`${date} ${this.curEndTime}`).getTime()-60), 'hh:mm')
       if (this.curEndTime) {
         return (
           "（" +
@@ -109,7 +111,7 @@ export default {
           " " +
           this.curTime +
           "~" +
-          this.curEndTime +
+          endTime +
           "）"
         );
       }
@@ -153,15 +155,15 @@ export default {
       ];
       let _openStart = this.openStoreTime || "00:00";
       let _openEnd = this.closetoreTime || "23:59";
-      let _nowDay = this.curDate || formatDate(new Date(), "yyyy-MM-dd");
+      let _nowDay = this.curDate || formatDate(new Date(), "yyyy/MM/dd");
       // 关店时间 合到被占用时间
       let closeTimeArr = [
         {
           timeStart: new Date(_nowDay + " " + "00:00").getTime(),
-          timeEnd: new Date(_nowDay + " " + _openStart).getTime()
+          timeEnd: new Date(_nowDay + " " + _openStart).getTime()-60
         },
         {
-          timeStart: new Date(_nowDay + " " + _openEnd).getTime(),
+          timeStart: new Date(_nowDay + " " + _openEnd).getTime()+60,
           timeEnd: new Date(_nowDay + " " + "24:00").getTime()
         }
       ];
@@ -175,7 +177,7 @@ export default {
           hour: hourTime[i],
           disable: false,
           start: baseDay + parseInt(i) * HOUR,
-          end: baseDay + (parseInt(i) + 1) * HOUR,
+          end: (baseDay + (parseInt(i) + 1) * HOUR)-60,
           arr: []
         });
       }
@@ -190,7 +192,7 @@ export default {
             disable: false,
             start: target[i].start + j * TIME_SPLIT,
             // end: target[i].start + (j + 1) * TIME_SPLIT
-            end: target[i].start + HOUR
+            end: (target[i].start + HOUR)-60
           });
         }
       }
@@ -228,7 +230,7 @@ export default {
         let element = this.todayPeriodTime[i];
         if (
           // 开始时间在预约时间内
-          (element.timeStart - 60 * 60 * 1000 <= start &&
+          (element.timeStart - 60 * 59 * 1000 <= start &&
             start <= element.timeEnd) ||
           (element.timeStart <= end && end <= element.timeEnd)
         ) {

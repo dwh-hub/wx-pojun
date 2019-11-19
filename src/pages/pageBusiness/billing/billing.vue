@@ -557,7 +557,7 @@ export default {
     // day 有效日期
     computedEndTime(day) {
       const DAY = 24 * 60 * 60 * 1000
-      let startTime = new Date(this.payCardStartDate).getTime()
+      let startTime = new Date(this.payCardStartDate.replace(/-/g, "/")).getTime()
       let endTime = startTime + (Number(day) -1) * DAY
       let endDay = formatDate(new Date(endTime), 'yyyy-MM-dd')
       return endDay
@@ -1278,8 +1278,8 @@ export default {
       this.payCardEndDate = this.computedEndTime(Number(this.selectedCard.periodOfValidity))
     },
     onPayCardStartDate(e) {
-      let startTime = new Date(e.mp.detail.value).getTime()
-      if(new Date().getTime() > startTime) {
+      let startTime = new Date(e.mp.detail.value.replace(/-/g, "/")).getTime()
+      if(new Date().getTime() - 60*60*24*1000 > startTime) {
         return wx.showToast({
           title: '开始日期过小',
           icon: "none",
@@ -1290,8 +1290,8 @@ export default {
       this.payCardEndDate = this.computedEndTime(this.selectedCard.periodOfValidity)
     },
     onPayCardEndDate(e) {
-      let endTime = new Date(e.mp.detail.value).getTime()
-      let startTime = new Date(this.payCardStartDate).getTime()
+      let endTime = new Date(e.mp.detail.value.replace(/-/g, "/")).getTime()
+      let startTime = new Date(this.payCardStartDate.replace(/-/g, "/")).getTime()
       if(endTime < startTime) {
         return wx.showToast({
           title: '有效天数需大于0',

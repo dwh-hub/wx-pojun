@@ -119,8 +119,8 @@ export default {
         this.classEndTime = EndTime.length == 4 ? "0" + EndTime : EndTime;
       } else {
         if (
-          new Date("1970-01-01" + " " + e.mp.detail).getTime() <
-          new Date("1970-01-01" + " " + this.classStartTime).getTime()
+          new Date("1970/01/01" + " " + e.mp.detail).getTime() <
+          new Date("1970/01/01" + " " + this.classStartTime).getTime()
         ) {
           return wx.showModal({
             title: "提示",

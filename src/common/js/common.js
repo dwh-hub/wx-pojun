@@ -4,13 +4,13 @@ const window = {}
 window.isPublic = false // 是否是公用的小程序
 window.DEBUGGING = false
 // 榴莲: https://club.lirenos.com test: https://test.lirenos.com cn: https://www.pojun-tech.cn com: https://www.pojun-tech.com
-window.domain = "https://test.lirenos.com" // 服务器域名
+window.domain = "https://club.lirenos.com" // 服务器域名
 window.api = window.DEBUGGING ? "http://192.168.1.19" : window.domain
 window.defaultColor = "#0c9cf0"
 window.color = "" // "#0c9cf0"
 // 获取 ext.json 配置信息
 const extConfig = wx.getExtConfigSync() ? wx.getExtConfigSync() : {}
-const spareCompany = "55"
+const spareCompany = "6"
 
 if (window.isPublic && wx.getStorageSync('companyId')) {
 
@@ -94,7 +94,7 @@ export function wxLogin() {
             url: window.api + '/mini/getsessionByAuth', // ByAuth
             data: {
               code: res.code,
-              companyId: wx.getStorageSync("companyId")
+              companyId: window.isPublic ? '5' : wx.getStorageSync("companyId")
             },
             success(data) {
               wx.setStorageSync("sessionKey", data.data.data.sessionKey);

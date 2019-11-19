@@ -456,7 +456,9 @@ function register() {
     success(res) {
       if (res.data.code === 200) {
         wx.removeStorageSync("storeId")
-        bindMethod()
+        getUserInfo().then((member_res) => {
+          enterMember(member_res)
+        })
         if (wx.getStorageSync("serviceUserId")) {
           wxPush()
         }

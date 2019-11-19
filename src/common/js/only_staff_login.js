@@ -138,9 +138,9 @@ async function publicLogin() {
             if (member.data.data.length == 1) enterMember(member.data.data[0])
             if (member.data.data.length > 1) loginData.companyList = member.data.data
           }
+          resolve(loginData)
         }
       });
-      resolve(loginData)
     })
   }
 

@@ -747,7 +747,7 @@ export default {
           duration: 1000
         });
       }
-      if (this.ProjectCellText == "请选择" || this.ProjectCellText == "") {
+      if (!this.projectId) {
         return wx.showToast({
           title: "请选择消费项目",
           icon: "none",
@@ -757,6 +757,7 @@ export default {
       wx.showLoading({
         title: "预约中..."
       });
+      let _timeEndStemp  = new Date(that.curDate.replace(/-/g, "/") + " " + that.curEndTime + ":00").getTime()
       HttpRequest({
         url: window.api + "/mobile/coach/appoint/set/customer",
         data: {
@@ -766,7 +767,7 @@ export default {
           coachId: that.coachId,
           calendar: that.curDate + " " + "00:00:00",
           timeStart: that.curDate + " " + that.curTime + ":00",
-          timeEnd: that.curDate + " " + that.curEndTime + ":00",
+          timeEnd: formatDate(new Date(_timeEndStemp - 1), 'yyyy-MM-dd hh:mm:ss'),
           cardId: that.selectCardId,
           name: that.userInfo.name,
           customerId: that.userInfo.id,

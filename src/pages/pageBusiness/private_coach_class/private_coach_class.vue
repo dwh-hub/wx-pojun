@@ -342,7 +342,7 @@ export default {
                 first_1: e.name,
                 second_1: e.cardClassName,
                 // third_1: e.timeStart ? formatDate(new Date(e.timeStart), 'yyyy/MM/dd hh:mm') : "--",
-                third_1: e.timeStart.replace(/-/g, '/').slice(0, 16),
+                third_1: e.timeStart.replace(/-/g, '/').slice(0, 16) + ' ~ ' + e.timeEnd.slice(11, 16),
                 rightText: e.statusChar || ""
               };
             });

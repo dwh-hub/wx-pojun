@@ -1070,6 +1070,7 @@ export default {
       wx.showLoading({
         title: "预约中..."
       });
+      let _timeEndStemp  = new Date(this.curDate.replace(/-/g, "/") + " " + this.curEndTime + ":00").getTime()
       let params = {
         status: 1,
         customerId: this.id,
@@ -1080,7 +1081,7 @@ export default {
         projectId: this.projectId,
         calendar: this.curDate + " " + "00:00:00",
         timeStart: this.curDate + " " + this.curTime + ":00",
-        timeEnd: this.curDate + " " + this.curEndTime + ":00",
+        timeEnd: formatDate(new Date(_timeEndStemp - 1), 'yyyy-MM-dd hh:mm:ss'),
         name: this.studentInfo.name,
         phone: this.studentInfo.phone,
         valueCardFee: this.modifyPrice
@@ -1315,6 +1316,12 @@ export default {
                 delta: 1
               });
             }, 1000)
+          } else {
+            wx.showModal({
+              title: "提示",
+              content: res.data.message,
+              showCancel: false
+            })
           }
         }
       });

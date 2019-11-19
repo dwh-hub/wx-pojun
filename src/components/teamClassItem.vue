@@ -96,12 +96,18 @@ export default {
     },
     startTime() {
       if (this.info.timeStart) {
+        if (typeof this.info.timeStart == 'string') {
+          return formatDate(new Date(this.info.timeStart.replace(/-/g, "/")), "hh:mm");
+        }
         return formatDate(new Date(this.info.timeStart), "hh:mm");
       }
       return "";
     },
     endTime() {
       if (this.info.timeEnd) {
+        if (typeof this.info.timeEnd == 'string') {
+          return formatDate(new Date(this.info.timeStart.replace(/-/g, "/")), "hh:mm");
+        }
         return formatDate(new Date(this.info.timeEnd), "hh:mm");
       }
       return "";

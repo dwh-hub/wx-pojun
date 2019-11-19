@@ -98,9 +98,8 @@ export default {
     this.customerId = wx.getStorageSync("userInfo").id;
     this.companyId = wx.getStorageSync("companyId");
   },
-  
   onUnload() {
-    this.curCoachList = [{}, {}, {}, {}, {}];
+    this.curCoachList = [];
   },
   onPullDownRefresh() {
     setTimeout(() => {

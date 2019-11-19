@@ -88,22 +88,22 @@
       </div>
       <div class="item-cell">
         <div class="cell-left">最小上课人数</div>
-        <input type="text" class="cell-right" v-model="schedulingDetail.minPeople">
+        <input type="text" class="cell-right" v-model.lazy="schedulingDetail.minPeople">
         <van-icon name="arrow" color="#999999" size="1.2em"/>
       </div>
       <div class="item-cell">
         <div class="cell-left">最大上课人数</div>
-        <input type="text" class="cell-right" v-model="schedulingDetail.maxPeople">
+        <input type="text" class="cell-right" v-model.lazy="schedulingDetail.maxPeople">
         <van-icon name="arrow" color="#999999" size="1.2em"/>
       </div>
       <div class="item-cell">
         <div class="cell-left">预约截止时间</div>
-        <input type="text" class="cell-right" v-model="schedulingDetail.stopAppoint"> 分钟
+        <input type="text" class="cell-right" v-model.lazy="schedulingDetail.stopAppoint"> 分钟
         <van-icon name="arrow" color="#999999" size="1.2em"/>
       </div>
       <div class="item-cell">
         <div class="cell-left">预约开始时间</div>
-        <input type="text" class="cell-right" v-model="schedulingDetail.advanceAppoint"> 分钟
+        <input type="text" class="cell-right" v-model.lazy="schedulingDetail.advanceAppoint"> 分钟
         <van-icon name="arrow" color="#999999" size="1.2em"/>
       </div>
     </van-cell-group>
@@ -318,7 +318,7 @@ export default {
         this.classStartDate =  formatDate(new Date(e.mp.detail), "yyyy-MM-dd");
       }
       if(this.dateType == 'endDate') {
-        if(new Date(e.mp.detail).getTime() < new Date(this.classStartDate+' 00:00:00').getTime()) {
+        if(new Date(e.mp.detail).getTime() < new Date(this.classStartDate.replace(/-/g, "/")+' 00:00:00').getTime()) {
           return wx.showModal({
             title: "提示",
             content: "结束时间必须大于开始时间",
@@ -343,8 +343,8 @@ export default {
         this.classEndTime = EndTime.length == 4 ? "0" + EndTime : EndTime;
       } else {
         if (
-          new Date(this.classDate + " " + e.mp.detail).getTime() <
-          new Date(this.classDate + " " + this.classStartTime).getTime()
+          new Date(this.classDate.replace(/-/g, "/") + " " + e.mp.detail).getTime() <
+          new Date(this.classDate.replace(/-/g, "/") + " " + this.classStartTime).getTime()
         ) {
           return wx.showModal({
             title: "提示",
@@ -488,6 +488,9 @@ export default {
     },
     onChangeAppoint(event) {
       this.isAppoint = event.mp.detail;
+      if (this.isAppoint == "2") {
+        this.isAppointAttend = "2"
+      }
       this.getIsNeedAppoint();
     },
     onChangeAppointAttend(event) {
@@ -507,6 +510,36 @@ export default {
       this.showDatePopup = true;
     },
     save() {
+      if (this.isAppoint == 1) {
+        if (!this.schedulingDetail.minPeople && this.schedulingDetail.minPeople !== "" && this.schedulingDetail.minPeople != 0) {
+          return wx.showModal({
+            title: "提示",
+            content: "请填写最小上课人数",
+            showCancel: false
+          });
+        }
+        if (!this.schedulingDetail.maxPeople && this.schedulingDetail.maxPeople !== "" && this.schedulingDetail.maxPeople != 0) {
+          return wx.showModal({
+            title: "提示",
+            content: "请填写最大上课人数",
+            showCancel: false
+          });
+        }
+        if (!this.schedulingDetail.stopAppoint && this.schedulingDetail.stopAppoint !== "" && this.schedulingDetail.stopAppoint != 0) {
+          return wx.showModal({
+            title: "提示",
+            content: "请填写预约截止时间",
+            showCancel: false
+          });
+        }
+        if (!this.schedulingDetail.advanceAppoint && this.schedulingDetail.advanceAppoint !== "" && this.schedulingDetail.advanceAppoint != 0) {
+          return wx.showModal({
+            title: "提示",
+            content: "请填写预约开始时间",
+            showCancel: false
+          });
+        }
+      }
       if(this.type == "modify") {
         this.updateSchedule()
       } else {
@@ -673,10 +706,12 @@ export default {
       })
     },
     eachTime(classStart,classEnd){
+      console.log("classStartDate:"+this.classStartDate)
+      console.log("classEndDate:"+this.classEndDate)
       var arr = []
       var teamClassWeekendArr = this.batchWeek;
-      var timeStareStr = (new Date(this.classStartDate)).getTime();
-      var timeEndStr = (new Date(this.classEndDate)).getTime();
+      var timeStareStr = (new Date(this.classStartDate.replace(/-/g, "/"))).getTime();
+      var timeEndStr = (new Date(this.classEndDate.replace(/-/g, "/"))).getTime();
       for(var i = timeStareStr ; i <= timeEndStr ; i+=86400000){
         for(var j = 0 ; j < teamClassWeekendArr.length ; j++){
           if((new Date(i)).getDay() == teamClassWeekendArr[j]){

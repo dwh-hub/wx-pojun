@@ -161,7 +161,7 @@ export default {
     this.showCompanyList = false
     this.isLogin = wx.getStorageSync("isLogin")
     this.getTimes();
-    if(wx.getStorageSync("isLogin") == false) {
+    if(!wx.getStorageSync("isLogin")) {
       wxLogin();
     }
     if (this.themeColor != window.color) {
@@ -197,6 +197,7 @@ export default {
     _getPhoneNumber(e) {
       if (window.isPublic) {
         return getPhoneNumber_staff(e).then(res => {
+          console.log(res)
           this.role = res.role
           this.companyList = res.companyList
           this.showCompanyList = true;

@@ -28,6 +28,9 @@
         <van-cell title="预约截止时间" :value="classDetail.stopAppoint || '不限'" />
         <van-cell title="预约开始时间" :value="(classDetail.advanceAppoint || '--')+'分钟'" />
       </block>
+      <block v-if="classDetail.isPlanSeat == 1">
+        <van-cell title="座位模板" :value="classDetail.teamSeatChar" />
+      </block>
     </van-cell-group>
     <div class="cell-title">上课列表</div>
     <div class="student-list">
@@ -160,6 +163,7 @@ export default {
               _res.isNeedAppointText = "需要预约，不预约也可以上课";
             }
             that.classDetail = _res;
+            that.getSeatList()
           }
         }
       });
@@ -275,7 +279,27 @@ export default {
           }
         }
       });
-    }
+    },
+    // 获取座位模板列表
+    getSeatList() {
+      let that = this
+      HttpRequest({
+        url: '/teamClass/seat/pages_nolimit',
+        data: {
+          storeId: that.classDetail.storeId,
+          venueId: that.classDetail.venueId,
+          status: 0,
+          pageSize: 100
+        },
+        success(res) {
+          res.data.data.result.forEach(e => {
+            if (e.teamSeatId == that.classDetail.teamSeatId) {
+              that.$set(that.classDetail,'teamSeatChar',e.seatName)
+            }
+          })
+        }
+      })
+    },
   }
 };
 </script>

@@ -52,7 +52,7 @@ export function getPhoneNumber(e, url, isTab) {
         if(window.DEBUGGING) {
           return wx.setStorage({
             key: "phone",
-            data: "18888888882", // "13285923990",
+            data: "18888888881", // "13285923990",
             success: function () {
               login(url, isTab);
             }

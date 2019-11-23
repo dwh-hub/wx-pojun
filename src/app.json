@@ -68,7 +68,11 @@
       "check_in_customer/main",
       "face_collect/main",
       "allograph_class/main",
-      "my_qrcode/main"
+      "my_qrcode/main",
+      "daily_paper/main",
+      "daily_member/main",
+      "running_account/main",
+      "daily_table_detail/main"
     ]
   }],
   "permission": {

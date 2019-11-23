@@ -13,6 +13,7 @@
       <div class="class-date">上课时间：{{attendTime}}</div>
       <div class="class-name">课程名称：{{detail.anotherName || detail.projectName || ''}}</div>
       <div class="class-coach">上课教练：{{coachStr}}</div>
+      <div class="class-coach" v-if="detail.seatNo">座位号：{{detail.seatNo}}</div>
     </div>
     <div class="store" v-if="storeInfo.storeName">
       <div class="title">门店信息</div>

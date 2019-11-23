@@ -69,7 +69,7 @@ function checkAccount() {
       url: window.api + '/mini/checkAccount',
       data: {
         phone: wx.getStorageSync("phone"),
-        companyId: wx.getStorageSync("companyId")
+        // companyId: wx.getStorageSync("companyId")
       },
       success(res) {
         // 查询成功：0都不存在，1都存在，2只有customer，3只有user
@@ -116,7 +116,7 @@ async function publicLogin() {
     return loginData
   }
 
-  // TODO: 会员、商户 ok
+  // 会员、商户 ok
   if (account == 1) {
     return new Promise((resolve) => {
       wx.showModal({
@@ -243,7 +243,7 @@ function staffLogin(hasAppid) {
       url: window.api + '/user/login/mini',
       data: {
         phone: wx.getStorageSync("phone"),
-        companyId: wx.getStorageSync("companyId"),
+        companyId: hasAppid ?  '5' : wx.getStorageSync("companyId"),
         authAppId: hasAppid ? 'wxb3aa4f2e2276ecb6' : ''
       },
       success(res) {

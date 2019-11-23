@@ -108,6 +108,19 @@
       </div>
     </van-cell-group>
 
+    <div class="item-cell" v-if="isAppoint == 1">
+      <div class="cell-left">是否预约团课座位:</div>
+      <div class="cell-right">
+        <van-radio-group :value="isPlanSeat" @change="onChangeSeat" custom-class="radio-group">
+          <van-radio :checked-color="themeColor" custom-class="radio" name="1">是</van-radio>
+          <van-radio :checked-color="themeColor" custom-class="radio" name="0">否</van-radio>
+        </van-radio-group>
+      </div>
+    </div>
+    <van-cell-group v-if="isAppoint == 1 && isPlanSeat == 1">
+      <van-cell title="座位模板" is-link @click="showSeatPopop = true" :value="selectedSeatChar"/>
+    </van-cell-group>
+
     <div class="save-btn" :style="{backgroundColor: themeColor}" @click="save">
       保存
       <div class="block" v-if="isPhoneX"></div>
@@ -167,7 +180,7 @@
         <div class="action-sure" :style="{'background-color': themeColor}" @click="showCoachPopup = false">确认</div>
       </div>
     </van-popup>
-
+    <!-- 场馆列表 -->
     <van-popup
       :show="showVenuePopup"
       @close="showVenuePopup = false"
@@ -180,6 +193,22 @@
       <div class="action-list" style="padding-bottom: 0px;">
         <div class="action-item" @click="selectVenue(item)" v-for="(item, index) in venueList" :key="index">
           <div class="text">{{item.venueName}}</div>
+        </div>
+      </div>
+    </van-popup>
+    <!-- 座位列表 -->
+    <van-popup
+      :show="showSeatPopop"
+      @close="showSeatPopop = false"
+      :duration="200"
+      overlay-style="background-color:rgba(0,0,0,0.6);"
+      position="bottom"
+      custom-style="width:100%"
+      :z-index="101"
+    >
+      <div class="action-list" style="padding-bottom: 0px;">
+        <div class="action-item" @click="selectSeat(item)" v-for="(item, index) in seatList" :key="index">
+          <div class="text">{{item.seatName}}</div>
         </div>
       </div>
     </van-popup>
@@ -238,6 +267,11 @@ export default {
       isLimitAttendTimes: "1",
       isAppoint: "1", // 是否预约
       isAppointAttend: "1", // 是否预约才能上课
+      showSeatPopop: false, // 显示座位列表
+      seatList: [],
+      isPlanSeat: "0", // 是否选择座位
+      selectedSeatChar: "", // 选择的座位模板
+      teamSeatId: "" // 选择的座位模板Id
     };
   },
   onLoad(options) {
@@ -356,6 +390,7 @@ export default {
       }
       this.showTimePopup = false;
     },
+    // 获取排期详情
     getSchedulingDetail() {
       let that = this;
       HttpRequest({
@@ -375,9 +410,39 @@ export default {
             that.isAppoint = data.isNeedAppoint == 0 ? "2" : "1";
             that.isAppointAttend = data.isNeedAppoint == 1 ? "1" : "2";
             that.schedulingDetail = res.data.data;
+            that.getSeatList()
           }
         }
       });
+    },
+    // 获取座位模板列表
+    getSeatList() {
+      let that = this
+      HttpRequest({
+        url: '/teamClass/seat/pages_nolimit',
+        data: {
+          storeId: that.storeId,
+          venueId: that.schedulingDetail.venueId,
+          status: 0,
+          pageSize: 100
+        },
+        success(res) {
+          that.seatList = res.data.data.result
+          if (that.teamSeatId) {
+            that.seatList.forEach(e => {
+              if (e.teamSeatId == that.teamSeatId) {
+                that.selectedSeatChar = e.seatName
+              }
+            })
+          }
+        }
+      })
+    },
+    // 选择座位模板
+    selectSeat(item) {
+      this.selectedSeatChar = item.seatName
+      this.teamSeatId = item.teamSeatId
+      this.showSeatPopop = false
     },
     getTeamSchedule() {
       let that = this;
@@ -401,10 +466,13 @@ export default {
             that.classEndTime = formatDate(new Date(data.timeEnd), "hh:mm")
             that.selectedCoachStr = data.coachNameArray.join(',')
             that.selectedCoachIdStr = data.coachIdIntArray.join(',')
+            that.isPlanSeat = String(data.isPlanSeat)
+            that.teamSeatId = data.teamSeatId
             
             that.schedulingDetail = data;
 
             that.getCoachList()
+            that.getSeatList()
           }
         }
       });
@@ -490,8 +558,12 @@ export default {
       this.isAppoint = event.mp.detail;
       if (this.isAppoint == "2") {
         this.isAppointAttend = "2"
+        this.isPlanSeat = "0"
       }
       this.getIsNeedAppoint();
+    },
+    onChangeSeat(event) {
+      this.isPlanSeat = event.mp.detail;
     },
     onChangeAppointAttend(event) {
       this.isAppointAttend = event.mp.detail;
@@ -511,6 +583,13 @@ export default {
     },
     save() {
       if (this.isAppoint == 1) {
+        if (!this.teamSeatId && this.isPlanSeat == 1) {
+          return wx.showModal({
+            title: "提示",
+            content: "请选择座位模板",
+            showCancel: false
+          });
+        }
         if (!this.schedulingDetail.minPeople && this.schedulingDetail.minPeople !== "" && this.schedulingDetail.minPeople != 0) {
           return wx.showModal({
             title: "提示",
@@ -595,7 +674,9 @@ export default {
           stopAppoint: that.schedulingDetail.stopAppoint,
           advanceAppoint: that.schedulingDetail.advanceAppoint,
           teamScheduleTimeJsonStr: _timeStr,
-          attendClassPersonLimit: that.isLimitAttendTimes
+          attendClassPersonLimit: that.isLimitAttendTimes,
+          isPlanSeat: that.isPlanSeat,
+          teamSeatId: that.teamSeatId
         },
         success(res) {
           wx.showModal({
@@ -629,7 +710,9 @@ export default {
           maxPeople: that.schedulingDetail.maxPeople,
           stopAppoint: that.schedulingDetail.stopAppoint,
           advanceAppoint: that.schedulingDetail.advanceAppoint,
-          attendClassPersonLimit: that.isLimitAttendTimes
+          attendClassPersonLimit: that.isLimitAttendTimes,
+          isPlanSeat: that.isPlanSeat,
+          teamSeatId: that.teamSeatId
         },
         success(res) {
           wx.showModal({

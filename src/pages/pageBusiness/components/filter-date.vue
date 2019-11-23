@@ -52,9 +52,9 @@ export default {
   },
   methods: {
     selectDate(item, index) {
-      console.log("clickkkkkkk")
       this.dateIndex = index
       let dateObj = filterDateMethod(item.key)
+      dateObj.type = item.key
       this.$emit('changeDate', dateObj)
     }
   }

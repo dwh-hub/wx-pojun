@@ -37,14 +37,6 @@ let service = [{
         class: "iconfont icon-workbench_icon_3"
       },
       {
-        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_5.svg",
-        text: "营销",
-        navUrl: "",
-        isOpen: false,
-        hasAuth: true,
-        class: "iconfont icon-operation_report_icon_2"
-      },
-      {
         iconUrl: "/static/images/staff/workbench_icon/workbench_icon_6.jpg",
         text: "客户约访",
         authorityId: 184,
@@ -285,6 +277,14 @@ let service = [{
         isOpen: false,
         hasAuth: true,
         class: "iconfont icon-operation_report_icon_4"
+      },
+      {
+        iconUrl: "/static/images/staff/workbench_icon/workbench_icon_5.svg",
+        text: "运营日报",
+        navUrl: "../daily_paper/main",
+        isOpen: true,
+        hasAuth: true,
+        class: "iconfont icon-operation_report_icon_2"
       }
     ]
   },

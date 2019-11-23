@@ -268,7 +268,11 @@ export default {
           "&storeId=" +
           that.classDetail.storeId +
           "&venueId=" +
-          that.classDetail.venueId
+          that.classDetail.venueId + 
+          "&isPlanSeat=" +
+          that.classDetail.isPlanSeat + 
+          "&teamSeatId=" +
+          that.classDetail.teamSeatId
       });
     },
     // 获取团课详情

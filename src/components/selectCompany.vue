@@ -44,11 +44,9 @@ export default {
   },
   methods: {
     selectCompany(item, index) {
-      console.log(this.role);
       this.tabIndex = index;
     },
     confirm() {
-      console.log(this.companyList[this.tabIndex]);
       wx.setStorageSync("companyId", this.companyList[this.tabIndex].companyId);
       if (this.role == "staff") {
         staffLogin().then(res => {

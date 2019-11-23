@@ -176,18 +176,21 @@ function enterMember(data) {
   wx.hideLoading();
 
   store.commit("saveUserInfo", data);
-  wx.setStorage({
-    key: "userInfo",
-    data: data
-  });
-  wx.setStorage({
-    key: "companyId",
-    data: data.companyId
-  });
-  wx.setStorage({
-    key: "companyName",
-    data: data.companyName
-  });
+  wx.setStorageSync("userInfo", data);
+  wx.setStorageSync("companyId", data.companyId);
+  wx.setStorageSync("companyName", data.companyName);
+  // wx.setStorage({
+  //   key: "userInfo",
+  //   data: data
+  // });
+  // wx.setStorage({
+  //   key: "companyId",
+  //   data: data.companyId
+  // });
+  // wx.setStorage({
+  //   key: "companyName",
+  //   data: data.companyName
+  // });
   bindMember()
 }
 
@@ -243,8 +246,8 @@ function staffLogin(hasAppid) {
       url: window.api + '/user/login/mini',
       data: {
         phone: wx.getStorageSync("phone"),
-        companyId: hasAppid ?  '5' : wx.getStorageSync("companyId"),
-        authAppId: hasAppid ? 'wxb3aa4f2e2276ecb6' : ''
+        companyId: hasAppid ?  '55' : wx.getStorageSync("companyId"),
+        authAppId: hasAppid ? 'wxf88e780a44d47beb' : ''
       },
       success(res) {
         // if (res.data.code == 200) {

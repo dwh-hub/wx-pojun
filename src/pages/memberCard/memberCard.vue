@@ -34,13 +34,14 @@
               :key="col_index"
               @click="selecetSeat(num)"
             >
-              <div class="seat-none" v-if="num.num">{{num.num}}</div>
-              <div class="seat-item" :class="{'selected': seatIndex == num}" v-else>{{num}}</div>
+              <div class="seat-item" v-if="num.num">{{num.num}}</div>
+              <div class="seat-item" :class="{'selected': seatIndex == num}" v-if="!num.num && num">{{num}}</div>
               <div class="seat-none" v-if="!num"></div>
             </div>
           </div>
         </div>
         <div class="btn-wrapper">
+          <span class="cancel" @click="showSeatPopup=false;showPopup=true;">取消</span>
           <span class="confirm" @click="confrimSeat">确认</span>
         </div>
       </div>
@@ -141,7 +142,6 @@ export default {
     toCardDetail(item) {
       let that = this;
       this.selectCardInfo = item;
-      console.log("this.teamScheduleId:" + this.teamScheduleId);
       if (this.teamScheduleId) {
         wx.showLoading({
           title: "获取可消费项目..."
@@ -271,10 +271,10 @@ export default {
               success(info) {
                 let _list = info.data.data;
                 let positionArr = [];
-                let occupy = []
+                let occupy = [];
                 _list.forEach(e => {
-                  occupy.push(e.seatNo)
-                })
+                  occupy.push(e.seatNo);
+                });
                 data.positions.split(";").forEach(e => {
                   positionArr.push(e.split(","));
                 });
@@ -283,10 +283,10 @@ export default {
                     if (occupy.includes(two)) {
                       positionArr[one_index][two_index] = {
                         num: two
-                      }
+                      };
                     }
-                  })
-                })
+                  });
+                });
                 that.positions = positionArr;
                 that.showPopup = false;
                 that.showSeatPopup = true;
@@ -306,6 +306,12 @@ export default {
       this.seatIndex = num;
     },
     confrimSeat() {
+      if (this.seatIndex == -1) {
+        return wx.showToast({
+          title: "请选择座位",
+          icon: "none"
+        })
+      }
       this.appointClass();
     },
     appointClass() {
@@ -329,7 +335,7 @@ export default {
         success(data) {
           wx.hideLoading();
           that.showPopup = false;
-          that.showSeatPopup = true;
+          that.showSeatPopup = false;
           if (data.data.code === 200) {
             let msgData = data.data.data;
             msgData.storeId = that.storeId;
